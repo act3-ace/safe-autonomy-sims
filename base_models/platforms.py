@@ -180,7 +180,6 @@ class AgentController(BaseController):
         if action is not None:
             for i, action_val in enumerate(action):
                 if action_val is not None:
-
                     if not isinstance(action_val, np.ndarray):
                         action_val = np.array(action_val, ndmin=1)
 
@@ -263,7 +262,7 @@ class BaseActuatorSet:
 
 class BasePlatform(BaseEnvObj):
 
-    def __init__(self, name, dynamics, actuator_set, state, controller, rta=None):
+    def __init__(self, name, dynamics, actuator_set, state, controller):
 
         if controller is None:
             controller = PassThroughController()
@@ -280,17 +279,6 @@ class BasePlatform(BaseEnvObj):
         self.controller = controller
         self.state = state
         self.next_state = self.state
-
-        # setup rta module with reference to self
-        self.rta = rta
-        if type(self.rta) == dict:
-            if 'config' in self.rta:
-                rta_kwargs = self.rta['config']
-            else:
-                rta_kwargs = {}
-            self.rta = self.rta['class'](**rta_kwargs)
-        if self.rta is not None:
-            self.rta.setup(self)
 
         self.reset()
 
@@ -312,9 +300,6 @@ class BasePlatform(BaseEnvObj):
 
         actuation = self.controller.gen_actuation(self.state, action)
         control = self.actuator_set.gen_control(actuation)
-
-        if self.rta is not None:
-            control = self.rta.filter_control(sim_state, step_size, control)
 
         # save current actuation and control
         self.current_actuation = copy.deepcopy(actuation)
@@ -347,9 +332,6 @@ class BasePlatform(BaseEnvObj):
                 'control': self.current_control,
             }
         }
-
-        if self.rta is not None:
-            info['rta'] = self.rta.generate_info()
 
         return info
 
