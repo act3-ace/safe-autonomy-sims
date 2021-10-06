@@ -301,6 +301,7 @@ class BasePlatform(BaseEnvObj):
         # actuation = self.controller.gen_actuation(self.state, action)
         # control = self.actuator_set.gen_control(actuation)
         control = np.array(action)
+        self.current_control = control
 
         # save current actuation and control
         # self.current_actuation = copy.deepcopy(actuation)
