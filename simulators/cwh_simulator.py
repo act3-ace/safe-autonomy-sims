@@ -69,9 +69,8 @@ class CWHSimulator(BaseSimulator):
             agent_id = platform.name
             action = platform.get_applied_action()
             entity = self.sim_entities[agent_id]
-            entity.step_compute(action, self.config.step_size)
+            entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
             entity.step_apply()
-        self._state.sim_platforms = self.get_platforms()
         return self._state
 
 
@@ -82,7 +81,20 @@ if __name__ == "__main__":
             "blue0": {
                 "sim_config": {
                 },
-                "platform_config": []
+                "platform_config": [
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "X Thrust", "axis": 0}
+                    ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "Y Thrust", "axis": 1}
+                    ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "Z Thrust", "axis": 2}
+                    )
+                ]
             }
         }
     }
@@ -90,15 +102,19 @@ if __name__ == "__main__":
     reset_config = {
         "agent_initialization": {
             "blue0": {
-                "position": [1, 2, 3],
-                "velocity": [1, 2, 3]
+                "position": [0, 0, 0],
+                "velocity": [0, 0, 0]
             }
         }
     }
 
     tmp = CWHSimulator(**tmp_config)
     state = tmp.reset(reset_config)
-    print(state.sim_platforms[0].velocity)
+    print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
     for i in range(5):
+        state.sim_platforms[0]._controllers[0].apply_control(1)
+        state.sim_platforms[0]._controllers[1].apply_control(2)
+        state.sim_platforms[0]._controllers[2].apply_control(3)
         state = tmp.step()
-        print(state.sim_platforms[0].velocity)
+        print("Position: %s\t Velocity: %s" % (
+            str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
