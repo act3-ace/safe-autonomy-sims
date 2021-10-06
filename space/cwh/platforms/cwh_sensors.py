@@ -1,13 +1,21 @@
 from act3_rl_core.simulators.base_parts import BaseSensor
+from act3_rl_core.simulators.base_platform import BasePlatform
 from act3_rl_core.libraries.property import MultiBoxProp
 import math
 
+
 class PositionSensor(BaseSensor):
 
-    def __init__(self,parent_platform,config):
-         super.__init__()
-         self._platform = parent_platform
-         self._config = config
+    def __init__(self, parent_platform, config):
+        super().__init__()
+        self._platform = parent_platform
+        self._config = config
+
+    def name(self) -> str:
+        return self.__class__.__name__
+
+    def parent_platform(self) -> 'BasePlatform':
+        return self._platform
 
     def measurement_properties(self):
         position_properties = MultiBoxProp(
@@ -21,12 +29,19 @@ class PositionSensor(BaseSensor):
     def _calculate_measurement(self,state):
         return self._platform.position
 
+
 class VelocitySensor(BaseSensor):
 
-    def __init__(self,parent_platform,config):
-         super.__init__()
-         self._platform = parent_platform
-         self._config = config
+    def __init__(self, parent_platform, config):
+        super().__init__()
+        self._platform = parent_platform
+        self._config = config
+
+    def name(self) -> str:
+        return self.__class__.__name__
+
+    def parent_platform(self) -> 'BasePlatform':
+        return self._platform
 
     def measurement_properties(self):
         velocity_properties = MultiBoxProp(

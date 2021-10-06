@@ -19,7 +19,9 @@ class CWHPlatform(BasePlatform):
         self._controllers = tuple(
             part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController)
         )
-        # sensor_class_map = [part for part in platform_config if issubclass(part[0], BaseSensor)]
+        self._sensors = tuple(
+            part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor)
+        )
 
     @property
     def name(self) -> str:
@@ -32,6 +34,10 @@ class CWHPlatform(BasePlatform):
     @property
     def velocity(self):
         return self._platform.velocity
+
+    @property
+    def sensors(self):
+        return self._sensors
 
     def get_applied_action(self):
         return self.next_action
