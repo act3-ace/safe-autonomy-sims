@@ -92,18 +92,18 @@ if __name__ == "__main__":
                 "sim_config": {
                 },
                 "platform_config": [
-                    # (
-                    #     "space.cwh.platforms.cwh_controllers.ThrustController",
-                    #     {"name": "X Thrust", "axis": 0}
-                    # ),
-                    # (
-                    #     "space.cwh.platforms.cwh_controllers.ThrustController",
-                    #     {"name": "Y Thrust", "axis": 1}
-                    # ),
-                    # (
-                    #     "space.cwh.platforms.cwh_controllers.ThrustController",
-                    #     {"name": "Z Thrust", "axis": 2}
-                    # ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "X Thrust", "axis": 0}
+                    ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "Y Thrust", "axis": 1}
+                    ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "Z Thrust", "axis": 2}
+                    ),
                     (
                         "space.cwh.platforms.cwh_sensors.PositionSensor",
                         {}
