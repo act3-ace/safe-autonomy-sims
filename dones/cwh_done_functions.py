@@ -3,11 +3,16 @@ from act3_rl_core.dones import DoneFuncBase
 # need to import get_platform_name, WIP
 import numpy as np
 
+
+class MaxDistanceDoneValidator:
+    max_distance: float
+
+
 class MaxDistanceDoneFunction(DoneFuncBase):
-    def __init__(self,**kwargs):
+    def __init__(self, **kwargs):
         super.__init__(**kwargs)
 
-    def __call__(self,observation,action,next_observation,next_state):
+    def __call__(self, observation, action, next_observation, next_state):
 
         done = DoneDict()
 
@@ -17,15 +22,18 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         position = next_state.sim_platforms[0].position
 
-
-
         # compute to origin
         origin = np.array([0,0,0])
-        dist = np.linalg.norm(origin-np.array(pos))
+        dist = np.linalg.norm(origin-np.array(position))
 
         done[self.agent] = dist > self.config.max_distance
 
         return done
+
+
+class SuccessfulDockingDoneValidator:
+    docking_region_radius: float
+
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
     def __init__(self,**kwargs):
@@ -42,7 +50,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         origin = np.array([0,0,0])
         docking_region_radius = self.config.docking_region_radius
 
-        radial_distance = np.linalg.norm(np.array(pos) - origin)
+        radial_distance = np.linalg.norm(np.array(position) - origin)
         done[self.agent] = radial_distance <= docking_region_radius
 
         return done
