@@ -3,8 +3,7 @@
 AvailablePlatforms
 """
 from __future__ import annotations
-
-from act3.core.plugins.plugin_library import PluginLibrary
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 
 from simulators.cwh_simulator import CWHSimulator
 from act3_rl_core.simulators.base_available_platforms import BaseAvailablePlatformTypes

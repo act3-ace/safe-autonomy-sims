@@ -8,7 +8,7 @@ from act3_rl_core.libraries.state_dict import StateDict
 from space.cwh.platforms.cwh_platform import CWHPlatform
 from space.cwh.cwhspacecraft_sim.platforms.cwh import CWHSpacecraft3d
 
-from act3.core.plugins.plugin_library import PluginLibrary
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 
 
 class CWHSimulatorValidator(BaseSimulatorValidator):

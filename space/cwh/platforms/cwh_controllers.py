@@ -3,7 +3,7 @@ import numpy as np
 from act3_rl_core.simulators.base_parts import BaseController
 from act3_rl_core.libraries.property import MultiBoxProp, Prop
 from act3_rl_core.simulators.base_platform import BasePlatform
-from act3.core.plugins.plugin_library import PluginLibrary
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 from simulators.cwh_available_platforms import CWHAvailablePlatformTypes
 from simulators.cwh_simulator import CWHSimulator
 
