@@ -53,3 +53,18 @@ class VelocitySensor(CWHSensor):
     # state - tuple
     def _calculate_measurement(self, state):
         return self._platform.velocity
+
+
+class TimeSensor(CWHSensor):
+
+    def measurement_properties(self):
+        velocity_properties = MultiBoxProp(
+            name="time",
+            low=[-math.inf],
+            high=[math.inf],
+            unit=["sec"],
+            description="time since beginning of simulation")
+        return velocity_properties
+
+    def _calculate_measurement(self, state):
+        return self._platform.sim_time
