@@ -8,6 +8,8 @@ from act3_rl_core.libraries.state_dict import StateDict
 from space.cwh.platforms.cwh_platform import CWHPlatform
 from space.cwh.cwhspacecraft_sim.platforms.cwh import CWHSpacecraft3d
 
+from act3.core.plugins.plugin_library import PluginLibrary
+
 
 class CWHSimulatorValidator(BaseSimulatorValidator):
     step_size: int
@@ -24,7 +26,7 @@ class CWHPlatformConfigValidator(BaseModel):
 
 
 class CWHSimulatorResetValidator(BaseSimulatorResetValidator):
-    agent_initialization: typing.Dict[str, CWHPlatformConfigValidator]
+    agent_initialization: typing.Optional[typing.Dict[str, CWHPlatformConfigValidator]] = {"blue0": CWHPlatformConfigValidator(position=[0,1,2], velocity=[0,0,0])}
 
 
 class CWHSimulator(BaseSimulator):
@@ -76,12 +78,15 @@ class CWHSimulator(BaseSimulator):
     def step(self):
         for platform in self._state.sim_platforms:
             agent_id = platform.name
-            action = platform.get_applied_action()
+            import numpy as np
+            action = np.array(platform.get_applied_action(), dtype=np.float32)
             entity = self.sim_entities[agent_id]
             entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
             entity.step_apply()
         self.update_sensor_measurements()
         return self._state
+
+PluginLibrary.AddClassToGroup(CWHSimulator, "CWHSimulator", {})
 
 
 if __name__ == "__main__":

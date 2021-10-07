@@ -1,0 +1,76 @@
+# ---------------------------------------------------------------------------
+# //
+#
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning (RL) Core contributed by the:
+#  -  () Team
+#  - Safe Autonomy (SA) Team
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ---------------------------------------------------------------------------
+
+"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"config": {
+    "parts": [
+        {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0}},
+        {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1}},
+        {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2}},
+        {"part": "Sensor_Position"},
+        {"part": "Sensor_Velocity"}
+    ],
+    "glues": [
+        {
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config": {
+                "controller": "Controller_Thrust",
+            },
+        },
+        {
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config":{
+                "controller": "Controller_Thrust",
+                "index": 1
+            }
+        },
+        {
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config":{
+              "controller": "Controller_Thrust",
+              "index": 2
+            }
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Position"},
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Velocity"},
+        },
+    ],
+    "dones": [
+        {
+            "functor": "dones.cwh_done_functions.MaxDistanceDoneFunction",
+            "config":{
+                "max_distance": 40000,
+            },
+        },
+        {
+            "functor": "dones.cwh_done_functions.SuccessfulDockingDoneFunction",
+            "config":{
+              "docking_region_radius": 0.5,
+            },
+        },
+    ],
+    "rewards": [
+        {
+            "name": "CWHDistanceChangeReward",
+            "functor": "rewards.cwh_rewards.CWHDistanceChangeReward",
+            "config": {
+            }
+        },
+    ],
+}
