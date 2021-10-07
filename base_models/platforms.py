@@ -298,12 +298,13 @@ class BasePlatform(BaseEnvObj):
 
     def step_compute(self, sim_state, step_size, action=None):
 
-        actuation = self.controller.gen_actuation(self.state, action)
-        control = self.actuator_set.gen_control(actuation)
+        # actuation = self.controller.gen_actuation(self.state, action)
+        # control = self.actuator_set.gen_control(actuation)
+        control = np.array(action)
 
         # save current actuation and control
-        self.current_actuation = copy.deepcopy(actuation)
-        self.current_control = copy.deepcopy(control)
+        # self.current_actuation = copy.deepcopy(actuation)
+        # self.current_control = copy.deepcopy(control)
 
         # compute new state if dynamics were applied
         self.next_state = self.dynamics.step(step_size, copy.deepcopy(self.state), control)
