@@ -46,3 +46,7 @@ class CWHPlatform(BasePlatform):
 
     def get_applied_action(self):
         return self.next_action
+    
+    @property
+    def operable(self):
+        return True
