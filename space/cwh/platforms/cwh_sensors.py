@@ -4,18 +4,27 @@ from act3_rl_core.libraries.property import MultiBoxProp
 import math
 
 
-class PositionSensor(BaseSensor):
-
+class CWHSensor(BaseSensor):
     def __init__(self, parent_platform, config):
         super().__init__()
         self._platform = parent_platform
         self._config = config
 
+    @property
     def name(self) -> str:
         return self.__class__.__name__
 
     def parent_platform(self) -> 'BasePlatform':
         return self._platform
+
+    def measurement_properties(self):
+        raise NotImplementedError
+
+    def _calculate_measurement(self, state):
+        raise NotImplementedError
+
+
+class PositionSensor(CWHSensor):
 
     def measurement_properties(self):
         position_properties = MultiBoxProp(
@@ -30,18 +39,7 @@ class PositionSensor(BaseSensor):
         return self._platform.position
 
 
-class VelocitySensor(BaseSensor):
-
-    def __init__(self, parent_platform, config):
-        super().__init__()
-        self._platform = parent_platform
-        self._config = config
-
-    def name(self) -> str:
-        return self.__class__.__name__
-
-    def parent_platform(self) -> 'BasePlatform':
-        return self._platform
+class VelocitySensor(CWHSensor):
 
     def measurement_properties(self):
         velocity_properties = MultiBoxProp(
@@ -53,5 +51,5 @@ class VelocitySensor(BaseSensor):
         return velocity_properties
 
     # state - tuple
-    def _calculate_measurement(self,state):
+    def _calculate_measurement(self, state):
         return self._platform.velocity

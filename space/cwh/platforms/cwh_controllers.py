@@ -5,7 +5,7 @@ from act3_rl_core.libraries.property import MultiBoxProp, Prop
 from act3_rl_core.simulators.base_platform import BasePlatform
 
 
-class ThrustController(BaseController):
+class CWHController(BaseController):
     def __init__(
             self,
             parent_platform,  # type: ignore # noqa: F821
@@ -20,6 +20,18 @@ class ThrustController(BaseController):
 
     def parent_platform(self) -> 'BasePlatform':
         return self._parent_platform
+
+    def control_properties(self) -> Prop:
+        raise NotImplementedError
+
+    def apply_control(self, control: np.ndarray) -> None:
+        raise NotImplementedError
+
+    def get_applied_control(self) -> np.ndarray:
+        raise NotImplementedError
+
+
+class ThrustController(CWHController):
 
     def control_properties(self) -> Prop:
         return MultiBoxProp(

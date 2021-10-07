@@ -92,18 +92,18 @@ if __name__ == "__main__":
                 "sim_config": {
                 },
                 "platform_config": [
-                    # (
-                    #     "space.cwh.platforms.cwh_controllers.ThrustController",
-                    #     {"name": "X Thrust", "axis": 0}
-                    # ),
-                    # (
-                    #     "space.cwh.platforms.cwh_controllers.ThrustController",
-                    #     {"name": "Y Thrust", "axis": 1}
-                    # ),
-                    # (
-                    #     "space.cwh.platforms.cwh_controllers.ThrustController",
-                    #     {"name": "Z Thrust", "axis": 2}
-                    # ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "X Thrust", "axis": 0}
+                    ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "Y Thrust", "axis": 1}
+                    ),
+                    (
+                        "space.cwh.platforms.cwh_controllers.ThrustController",
+                        {"name": "Z Thrust", "axis": 2}
+                    ),
                     (
                         "space.cwh.platforms.cwh_sensors.PositionSensor",
                         {}
@@ -130,10 +130,10 @@ if __name__ == "__main__":
     state = tmp.reset(reset_config)
     # print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
     for i in range(5):
-        # state.sim_platforms[0]._controllers[0].apply_control(1)
-        # state.sim_platforms[0]._controllers[1].apply_control(2)
-        # state.sim_platforms[0]._controllers[2].apply_control(3)
-        print(state.sim_platforms[0]._sensors[1].get_measurement())
+        state.sim_platforms[0]._controllers[0].apply_control(1)
+        state.sim_platforms[0]._controllers[1].apply_control(2)
+        state.sim_platforms[0]._controllers[2].apply_control(3)
+        # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
-        # print("Position: %s\t Velocity: %s" % (
-        #     str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
+        print("Position: %s\t Velocity: %s" % (
+            str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
