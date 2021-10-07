@@ -4,16 +4,20 @@ from act3_rl_core.dones import DoneFuncBase
 import numpy as np
 
 class MaxDistanceDoneFunction(DoneFuncBase):
-    def __init__(self):
-        super.__init__()
+    def __init__(self,**kwargs):
+        super.__init__(**kwargs)
 
     def __call__(self,observation,action,next_observation,next_state):
 
         done = DoneDict()
 
         # compute distance to origin
-        platform = get_platform_name(next_state,self.agent)
-        pos = platform.position
+        #platform = get_platform_name(next_state,self.agent)
+        #pos = platform.position
+
+        position = next_state.sim_platforms[0].position
+
+
 
         # compute to origin
         origin = np.array([0,0,0])
@@ -24,15 +28,17 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         return done
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
-    def __init__(self):
-        super.__init__()
+    def __init__(self,**kwargs):
+        super.__init__(**kwargs)
 
     def __call__(self,observation,action,next_observation,next_state):
         # eventually will include velocity constraint
         done = DoneDict()
-        platform = get_platform_name(next_state,self.agent)
+        #platform = get_platform_name(next_state,self.agent)
 
-        pos = platform.position
+        #pos = platform.position
+        position = next_state.sim_platforms[0].position
+
         origin = np.array([0,0,0])
         docking_region_radius = self.config.docking_region_radius
 
