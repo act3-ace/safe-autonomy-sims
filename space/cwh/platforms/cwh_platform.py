@@ -22,6 +22,7 @@ class CWHPlatform(BasePlatform):
         self._sensors = tuple(
             part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor)
         )
+        self._sim_time = 0.0
 
     @property
     def name(self) -> str:
@@ -38,6 +39,10 @@ class CWHPlatform(BasePlatform):
     @property
     def sensors(self):
         return self._sensors
+
+    @property
+    def sim_time(self):
+        return self._sim_time
 
     def get_applied_action(self):
         return self.next_action
