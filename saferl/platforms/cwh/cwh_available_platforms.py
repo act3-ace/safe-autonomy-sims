@@ -5,7 +5,7 @@ AvailablePlatforms
 from __future__ import annotations
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 
-from simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.cwh.cwh_simulator import CWHSimulator
 from act3_rl_core.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
 
@@ -31,4 +31,4 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
         raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')
 
 
-PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": CWHSimulator})
+PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"backend": CWHSimulator})

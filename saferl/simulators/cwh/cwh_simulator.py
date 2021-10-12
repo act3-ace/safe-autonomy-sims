@@ -5,8 +5,8 @@ from pydantic import BaseModel, validator
 from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorValidator, BaseSimulatorResetValidator
 from act3_rl_core.libraries.state_dict import StateDict
 
-from space.cwh.platforms.cwh_platform import CWHPlatform
-from space.cwh.cwhspacecraft_sim.platforms.cwh import CWHSpacecraft3d
+from saferl.platforms.cwh.cwh_platform import CWHPlatform
+from saferl.simulators.cwh.backend.platforms.cwh import CWHSpacecraft3d
 
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 
@@ -18,6 +18,7 @@ class CWHSimulatorValidator(BaseSimulatorValidator):
 class CWHPlatformConfigValidator(BaseModel):
     position: typing.List[float]
     velocity: typing.List[float]
+
     @validator("position", "velocity")
     def check_position_len(cls, v, field):
         if len(v) != 3:
