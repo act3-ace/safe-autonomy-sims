@@ -10,7 +10,7 @@ from saferl.simulators.cwh.cwh_simulator import CWHSimulator
 class CWHController(BaseController):
     @property
     def name(self):
-        return self.config["name"] + self.__class__.__name__
+        return self.config.name + self.__class__.__name__
 
     def apply_control(self, control: np.ndarray) -> None:
         raise NotImplementedError
@@ -25,21 +25,20 @@ class ThrustControllerValidator(BaseControllerValidator):
 
 class ThrustController(CWHController):
 
-    control_props = MultiBoxProp(
+    def __init__(
+            self,
+            parent_platform,  # type: ignore # noqa: F821
+            config,
+    ):
+        control_props = MultiBoxProp(
             name="",
             low=[-1],
             high=[1],
             unit=["newtons"],
             description="Thrust"
         )
-
-    def __init__(
-            self,
-            parent_platform,  # type: ignore # noqa: F821
-            config,
-    ):
         super().__init__(
-            control_properties=self.control_props,
+            control_properties=control_props,
             parent_platform=parent_platform,
             config=config
         )
@@ -58,6 +57,6 @@ class ThrustController(CWHController):
 
 PluginLibrary.AddClassToGroup(
     ThrustController, "Controller_Thrust", {
-        "backend": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )

@@ -35,7 +35,7 @@ class PositionSensor(CWHSensor):
 
 PluginLibrary.AddClassToGroup(
     PositionSensor, "Sensor_Position", {
-        "backend": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
 
@@ -59,6 +59,6 @@ class VelocitySensor(CWHSensor):
 
 PluginLibrary.AddClassToGroup(
     VelocitySensor, "Sensor_Velocity", {
-        "backend": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
