@@ -1,25 +1,14 @@
 from act3_rl_core.simulators.base_parts import BaseSensor
-from act3_rl_core.simulators.base_platform import BasePlatform
 from act3_rl_core.libraries.property import MultiBoxProp
-import math
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from simulators.cwh_available_platforms import CWHAvailablePlatformTypes
-from simulators.cwh_simulator import CWHSimulator
-import numpy as np
+from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
+from saferl.simulators.cwh.cwh_simulator import CWHSimulator
 
 
 class CWHSensor(BaseSensor):
-    def __init__(self, parent_platform, config):
-        super().__init__()
-        self._platform = parent_platform
-        self._config = config
-
     @property
     def name(self) -> str:
         return self.__class__.__name__
-
-    def parent_platform(self) -> 'BasePlatform':
-        return self._platform
 
     def measurement_properties(self):
         raise NotImplementedError
@@ -40,12 +29,13 @@ class PositionSensor(CWHSensor):
             description="position of the spacecraft")
         return position_properties
 
-    def _calculate_measurement(self,state):
-        return self._platform.position
+    def _calculate_measurement(self, state):
+        return self.parent_platform.position
+
 
 PluginLibrary.AddClassToGroup(
     PositionSensor, "Sensor_Position", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+        "backend": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
 
@@ -64,11 +54,11 @@ class VelocitySensor(CWHSensor):
 
     # state - tuple
     def _calculate_measurement(self, state):
-        return self._platform.velocity
+        return self.parent_platform.velocity
 
 
 PluginLibrary.AddClassToGroup(
     VelocitySensor, "Sensor_Velocity", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+        "backend": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
