@@ -15,6 +15,7 @@
 {
   "simulator": "CWHSimulator",
   "platforms": "CWHSimulator_Platforms",
+  "plugin_paths": ["simulators", "space.cwh.platforms"],
   "horizon": 2000,
   "sim_config": {
       "step_size": 1
