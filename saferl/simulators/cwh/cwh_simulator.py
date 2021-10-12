@@ -103,14 +103,14 @@ if __name__ == "__main__":
                         "saferl.platforms.cwh.cwh_controllers.ThrustController",
                         {"name": "X Thrust", "axis": 0}
                     ),
-                    # (
-                    #     "saferl.platforms.cwh.cwh_controllers.ThrustController",
-                    #     {"name": "Y Thrust", "axis": 1}
-                    # ),
-                    # (
-                    #     "saferl.platforms.cwh.cwh_controllers.ThrustController",
-                    #     {"name": "Z Thrust", "axis": 2}
-                    # ),
+                    (
+                        "saferl.platforms.cwh.cwh_controllers.ThrustController",
+                        {"name": "Y Thrust", "axis": 1}
+                    ),
+                    (
+                        "saferl.platforms.cwh.cwh_controllers.ThrustController",
+                        {"name": "Z Thrust", "axis": 2}
+                    ),
                     (
                         "saferl.platforms.cwh.cwh_sensors.PositionSensor",
                         {}
