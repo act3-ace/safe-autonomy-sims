@@ -27,11 +27,11 @@ config:
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
     TrialName: Learjet-Rejoin-HSA-frame-stacking
-    output_path: /opt/data//act3
+    output_path: /tmp//act3
 
   # Change the default path for saving out the data
   tune_config_updates: &tune_config_updates
-    local_dir: /opt/data//ray_results/
+    local_dir: /tmp//ray_results/
 
   ####################################################################
   # Setup the actual keys used by the code
