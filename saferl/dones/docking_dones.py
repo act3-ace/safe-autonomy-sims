@@ -72,7 +72,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
 if __name__ == "__main__":
     from collections import OrderedDict
-    from simulators.cwh_simulator import CWHSimulator
+    from saferl.simulators.cwh.cwh_simulator import CWHSimulator
 
     tmp_config = {
         "step_size": 1,

@@ -2,7 +2,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from base_models.platforms import BasePlatform, BasePlatformStateVectorized, ContinuousActuator, \
+from saferl.simulators.base_models import BasePlatform, BasePlatformStateVectorized, ContinuousActuator, \
     BaseActuatorSet, BaseLinearODESolverDynamics
 
 

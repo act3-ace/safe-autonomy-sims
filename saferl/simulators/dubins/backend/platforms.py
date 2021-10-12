@@ -4,7 +4,7 @@ import numpy as np
 import math
 from scipy.spatial.transform import Rotation
 
-from base_models.platforms import BasePlatform, BasePlatformStateVectorized, ContinuousActuator, \
+from saferl.simulators.base_models.platforms import BasePlatform, BasePlatformStateVectorized, ContinuousActuator, \
     BaseActuatorSet, BaseODESolverDynamics
 
 

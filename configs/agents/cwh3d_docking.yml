@@ -53,13 +53,13 @@
     ],
     "dones": [
         {
-            "functor": "dones.cwh_done_functions.MaxDistanceDoneFunction",
+            "functor": "dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
             },
         },
         {
-            "functor": "dones.cwh_done_functions.SuccessfulDockingDoneFunction",
+            "functor": "dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
             },
