@@ -31,4 +31,4 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
         raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')
 
 
-PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"backend": CWHSimulator})
+PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": CWHSimulator})

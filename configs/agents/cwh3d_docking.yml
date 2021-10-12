@@ -53,13 +53,13 @@
     ],
     "dones": [
         {
-            "functor": "dones.docking_dones.MaxDistanceDoneFunction",
+            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
             },
         },
         {
-            "functor": "dones.docking_dones.SuccessfulDockingDoneFunction",
+            "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
             },
@@ -68,7 +68,7 @@
     "rewards": [
         {
             "name": "CWHDistanceChangeReward",
-            "functor": "rewards.cwh_rewards.CWHDistanceChangeReward",
+            "functor": "saferl.rewards.docking_rewards.CWHDistanceChangeReward",
             "config": {
             }
         },
