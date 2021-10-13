@@ -1,15 +1,15 @@
 import abc
+import math
 
 import numpy as np
-import math
 from scipy.spatial.transform import Rotation
 
-from saferl.simulators.base_models.platforms import BasePlatform, BasePlatformStateVectorized, ContinuousActuator, \
-    BaseActuatorSet, BaseODESolverDynamics
+from saferl.simulators.base_models.platforms import (
+    BaseActuatorSet, BaseODESolverDynamics, BasePlatform,
+    BasePlatformStateVectorized, ContinuousActuator)
 
 
 class BaseDubinsPlatform(BasePlatform):
-
     def generate_info(self):
         info = {
             'state': self.state.vector,
@@ -48,7 +48,6 @@ class BaseDubinsPlatform(BasePlatform):
 
 
 class BaseDubinsState(BasePlatformStateVectorized):
-
     @property
     @abc.abstractmethod
     def v(self):
@@ -60,7 +59,8 @@ class BaseDubinsState(BasePlatformStateVectorized):
             self.v * math.cos(self.heading) * math.cos(self.gamma),
             self.v * math.sin(self.heading) * math.cos(self.gamma),
             -1 * self.v * math.sin(self.gamma),
-        ], dtype=np.float64)
+        ],
+                            dtype=np.float64)
         return velocity
 
     @property
@@ -88,7 +88,6 @@ class BaseDubinsState(BasePlatformStateVectorized):
 
 
 class Dubins2dPlatform(BaseDubinsPlatform):
-
     def __init__(self, name, controller=None, rta=None, v_min=10, v_max=100):
 
         dynamics = Dubins2dDynamics(v_min=v_min, v_max=v_max)
@@ -96,11 +95,15 @@ class Dubins2dPlatform(BaseDubinsPlatform):
 
         state = Dubins2dState()
 
-        super().__init__(name, dynamics, actuator_set, state, controller, rta=rta)
+        super().__init__(name,
+                         dynamics,
+                         actuator_set,
+                         state,
+                         controller,
+                         rta=rta)
 
 
 class Dubins2dState(BaseDubinsState):
-
     def build_vector(self, x=0, y=0, heading=0, v=50, **kwargs):
 
         return np.array([x, y, heading, v], dtype=np.float64)
@@ -143,7 +146,7 @@ class Dubins2dState(BaseDubinsState):
 
     @property
     def position(self):
-        position = np.zeros((3,))
+        position = np.zeros((3, ))
         position[0:2] = self._vector[0:2]
         return position
 
@@ -161,27 +164,18 @@ class Dubins2dState(BaseDubinsState):
 
 
 class Dubins2dActuatorSet(BaseActuatorSet):
-
     def __init__(self):
 
         actuators = [
-            ContinuousActuator(
-                'rudder',
-                [np.deg2rad(-6), np.deg2rad(6)],
-                0
-            ),
-            ContinuousActuator(
-                'throttle',
-                [-10, 10],
-                0
-            )
+            ContinuousActuator('rudder',
+                               [np.deg2rad(-6), np.deg2rad(6)], 0),
+            ContinuousActuator('throttle', [-10, 10], 0)
         ]
 
         super().__init__(actuators)
 
 
 class Dubins2dDynamics(BaseODESolverDynamics):
-
     def __init__(self, v_min=10, v_max=100, *args, **kwargs):
         self.v_min = v_min
         self.v_max = v_max
@@ -223,7 +217,6 @@ class Dubins2dDynamics(BaseODESolverDynamics):
 
 
 class Dubins3dPlatform(BaseDubinsPlatform):
-
     def __init__(self, name, controller=None, v_min=10, v_max=100):
 
         dynamics = Dubins3dDynamics(v_min=v_min, v_max=v_max)
@@ -245,8 +238,15 @@ class Dubins3dPlatform(BaseDubinsPlatform):
 
 
 class Dubins3dState(BaseDubinsState):
-
-    def build_vector(self, x=0, y=0, z=0, heading=0, gamma=0, roll=0, v=100, **kwargs):
+    def build_vector(self,
+                     x=0,
+                     y=0,
+                     z=0,
+                     heading=0,
+                     gamma=0,
+                     roll=0,
+                     v=100,
+                     **kwargs):
         return np.array([x, y, z, heading, gamma, roll, v], dtype=np.float64)
 
     @property
@@ -307,7 +307,7 @@ class Dubins3dState(BaseDubinsState):
 
     @property
     def position(self):
-        position = np.zeros((3,))
+        position = np.zeros((3, ))
         position[0:3] = self._vector[0:3]
         return position
 
@@ -317,33 +317,28 @@ class Dubins3dState(BaseDubinsState):
 
 
 class Dubins3dActuatorSet(BaseActuatorSet):
-
     def __init__(self):
 
         actuators = [
-            ContinuousActuator(
-                'ailerons',
-                [np.deg2rad(-6), np.deg2rad(6)],
-                0
-            ),
-            ContinuousActuator(
-                'elevator',
-                [np.deg2rad(-6), np.deg2rad(6)],
-                0
-            ),
-            ContinuousActuator(
-                'throttle',
-                [-10, 10],
-                0
-            )
+            ContinuousActuator('ailerons',
+                               [np.deg2rad(-6), np.deg2rad(6)], 0),
+            ContinuousActuator('elevator',
+                               [np.deg2rad(-6), np.deg2rad(6)], 0),
+            ContinuousActuator('throttle', [-10, 10], 0)
         ]
 
         super().__init__(actuators)
 
 
 class Dubins3dDynamics(BaseODESolverDynamics):
-
-    def __init__(self, v_min=10, v_max=100, roll_min=-math.pi/2, roll_max=math.pi/2, g=32.17, *args, **kwargs):
+    def __init__(self,
+                 v_min=10,
+                 v_max=100,
+                 roll_min=-math.pi / 2,
+                 roll_max=math.pi / 2,
+                 g=32.17,
+                 *args,
+                 **kwargs):
         self.v_min = v_min
         self.v_max = v_max
         self.roll_min = roll_min
@@ -388,9 +383,11 @@ class Dubins3dDynamics(BaseODESolverDynamics):
 
         gamma_dot = elevator
         roll_dot = ailerons
-        heading_dot = (self.g / v) * math.tan(roll)                      # g = 32.17 ft/s^2
+        heading_dot = (self.g / v) * math.tan(roll)  # g = 32.17 ft/s^2
         v_dot = throttle
 
-        dx_vec = np.array([x_dot, y_dot, z_dot, heading_dot, gamma_dot, roll_dot, v_dot], dtype=np.float64)
+        dx_vec = np.array(
+            [x_dot, y_dot, z_dot, heading_dot, gamma_dot, roll_dot, v_dot],
+            dtype=np.float64)
 
         return dx_vec
