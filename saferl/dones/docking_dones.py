@@ -1,7 +1,7 @@
-from act3_rl_core.libraries.environment_dict import DoneDict
-from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 # need to import get_platform_name, WIP
 import numpy as np
+from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
+from act3_rl_core.libraries.environment_dict import DoneDict
 
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
@@ -9,6 +9,7 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
 
 
 class MaxDistanceDoneFunction(DoneFuncBase):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -21,14 +22,14 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # compute distance to origin
-        #platform = get_platform_name(next_state,self.agent)
-        #pos = platform.position
+        # platform = get_platform_name(next_state,self.agent)
+        # pos = platform.position
 
         position = next_state.sim_platforms[0].position
 
         # compute to origin
-        origin = np.array([0,0,0])
-        dist = np.linalg.norm(origin-np.array(position))
+        origin = np.array([0, 0, 0])
+        dist = np.linalg.norm(origin - np.array(position))
 
         done[self.agent] = dist > self.config.max_distance
 
@@ -43,22 +44,23 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
-    def __init__(self,**kwargs):
+
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @classmethod
     def get_validator(cls):
         return SuccessfulDockingDoneValidator
 
-    def __call__(self,observation,action,next_observation,next_state):
+    def __call__(self, observation, action, next_observation, next_state):
         # eventually will include velocity constraint
         done = DoneDict()
-        #platform = get_platform_name(next_state,self.agent)
+        # platform = get_platform_name(next_state,self.agent)
 
-        #pos = platform.position
+        # pos = platform.position
         position = next_state.sim_platforms[0].position
 
-        origin = np.array([0,0,0])
+        origin = np.array([0, 0, 0])
         docking_region_radius = self.config.docking_region_radius
 
         radial_distance = np.linalg.norm(np.array(position) - origin)
@@ -72,48 +74,28 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
 if __name__ == "__main__":
     from collections import OrderedDict
+
     from saferl.simulators.cwh.cwh_simulator import CWHSimulator
 
     tmp_config = {
         "step_size": 1,
         "agent_configs": {
             "blue0": {
-                "sim_config": {
-                },
+                "sim_config": {},
                 "platform_config": [
-                    (
-                        "space.cwh.platforms.cwh_controllers.ThrustController",
-                        {"name": "X Thrust", "axis": 0}
-                    ),
-                    (
-                        "space.cwh.platforms.cwh_controllers.ThrustController",
-                        {"name": "Y Thrust", "axis": 1}
-                    ),
-                    (
-                        "space.cwh.platforms.cwh_controllers.ThrustController",
-                        {"name": "Z Thrust", "axis": 2}
-                    ),
-                    (
-                        "space.cwh.platforms.cwh_sensors.PositionSensor",
-                        {}
-                    ),
-                    (
-                        "space.cwh.platforms.cwh_sensors.VelocitySensor",
-                        {}
-                    )
+                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                        "name": "X Thrust", "axis": 0
+                    }), ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                        "name": "Y Thrust", "axis": 1
+                    }), ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                        "name": "Z Thrust", "axis": 2
+                    }), ("space.cwh.platforms.cwh_sensors.PositionSensor", {}), ("space.cwh.platforms.cwh_sensors.VelocitySensor", {})
                 ]
             }
         }
     }
 
-    reset_config = {
-        "agent_initialization": {
-            "blue0": {
-                "position": [0, 0, 0],
-                "velocity": [0, 0, 0]
-            }
-        }
-    }
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}
 
     tmp = CWHSimulator(**tmp_config)
     state = tmp.reset(reset_config)
@@ -123,17 +105,7 @@ if __name__ == "__main__":
 
     for i in range(5):
         state = tmp.step()
-        dist_done = dist_done_fn(
-            observation=OrderedDict(),
-            action=OrderedDict(),
-            next_observation=OrderedDict(),
-            next_state=state
-        )
-        docking_done = docking_done_fn(
-            observation=OrderedDict(),
-            action=OrderedDict(),
-            next_observation=OrderedDict(),
-            next_state=state
-        )
+        dist_done = dist_done_fn(observation=OrderedDict(), action=OrderedDict(), next_observation=OrderedDict(), next_state=state)
+        docking_done = docking_done_fn(observation=OrderedDict(), action=OrderedDict(), next_observation=OrderedDict(), next_state=state)
         # print(dist_done)
         print(docking_done)

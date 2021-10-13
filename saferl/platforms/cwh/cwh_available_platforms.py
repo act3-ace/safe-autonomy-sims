@@ -3,10 +3,11 @@
 AvailablePlatforms
 """
 from __future__ import annotations
+
 from act3_rl_core.libraries.plugin_library import PluginLibrary
+from act3_rl_core.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
 from saferl.simulators.cwh.cwh_simulator import CWHSimulator
-from act3_rl_core.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
 
 class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
