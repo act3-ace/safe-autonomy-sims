@@ -2,10 +2,9 @@ import typing
 
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.simulators.base_simulator import (BaseSimulator,
-                                                    BaseSimulatorResetValidator,
-                                                    BaseSimulatorValidator)
+from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from pydantic import BaseModel, validator
+
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.cwh.backend.platforms.cwh import CWHSpacecraft3d
 
@@ -21,21 +20,18 @@ class CWHPlatformConfigValidator(BaseModel):
     @validator("position", "velocity")
     def check_position_len(cls, v, field):
         if len(v) != 3:
-            raise ValueError(
-                f"{field.name} provided to CWHPlatformValidator is not length 3"
-            )
+            raise ValueError(f"{field.name} provided to CWHPlatformValidator is not length 3")
         return v
 
 
 class CWHSimulatorResetValidator(BaseSimulatorResetValidator):
-    agent_initialization: typing.Optional[typing.Dict[
-        str, CWHPlatformConfigValidator]] = {
-            "blue0": CWHPlatformConfigValidator(position=[0, 1, 2],
-                                                velocity=[0, 0, 0])
-        }
+    agent_initialization: typing.Optional[typing.Dict[str, CWHPlatformConfigValidator]] = {
+        "blue0": CWHPlatformConfigValidator(position=[0, 1, 2], velocity=[0, 0, 0])
+    }
 
 
 class CWHSimulator(BaseSimulator):
+
     @classmethod
     def get_simulator_validator(cls):
         return CWHSimulatorValidator
@@ -46,10 +42,7 @@ class CWHSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.sim_entities = {
-            agent_id: CWHSpacecraft3d(name=agent_id)
-            for agent_id in self.config.agent_configs.keys()
-        }
+        self.sim_entities = {agent_id: CWHSpacecraft3d(name=agent_id) for agent_id in self.config.agent_configs.keys()}
         self._state = StateDict()
 
     def reset(self, config):
@@ -65,16 +58,16 @@ class CWHSimulator(BaseSimulator):
                     "x_dot": i.velocity[0],
                     "y_dot": i.velocity[1],
                     "z_dot": i.velocity[2]
-                })
+                }
+            )
         self._state.sim_platforms = self.get_platforms()
         self.update_sensor_measurements()
         return self._state
 
     def get_platforms(self):
         sim_platforms = tuple(
-            CWHPlatform(entity,
-                        self.config.agent_configs[agent_id].platform_config)
-            for agent_id, entity in self.sim_entities.items())
+            CWHPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
+        )
         return sim_platforms
 
     def update_sensor_measurements(self):
@@ -83,8 +76,7 @@ class CWHSimulator(BaseSimulator):
         """
         for plat in self._state.sim_platforms:
             for sensor in plat.sensors:
-                sensor.calculate_and_cache_measurement(
-                    state=self._state.sim_platforms)
+                sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
 
     def mark_episode_done(self):
         pass
@@ -98,9 +90,7 @@ class CWHSimulator(BaseSimulator):
             import numpy as np
             action = np.array(platform.get_applied_action(), dtype=np.float32)
             entity = self.sim_entities[agent_id]
-            entity.step_compute(sim_state=None,
-                                action=action,
-                                step_size=self.config.step_size)
+            entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
             entity.step_apply()
         self.update_sensor_measurements()
         return self._state
@@ -114,32 +104,20 @@ if __name__ == "__main__":
         "agent_configs": {
             "blue0": {
                 "sim_config": {},
-                "platform_config":
-                [("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                    "name": "X Thrust",
-                    "axis": 0
-                }),
-                 ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                     "name": "Y Thrust",
-                     "axis": 1
-                 }),
-                 ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                     "name": "Z Thrust",
-                     "axis": 2
-                 }), ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}),
-                 ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {})]
+                "platform_config": [
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "X Thrust", "axis": 0
+                    }), ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "Y Thrust", "axis": 1
+                    }), ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "Z Thrust", "axis": 2
+                    }), ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}), ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {})
+                ]
             }
         }
     }
 
-    reset_config = {
-        "agent_initialization": {
-            "blue0": {
-                "position": [0, 1, 2],
-                "velocity": [0, 0, 0]
-            }
-        }
-    }
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}
 
     tmp = CWHSimulator(**tmp_config)
     state = tmp.reset(reset_config)
@@ -150,6 +128,4 @@ if __name__ == "__main__":
         # state.sim_platforms[0]._controllers[2].apply_control(3)
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
-        print("Position: %s\t Velocity: %s" %
-              (str(state.sim_platforms[0].position),
-               str(state.sim_platforms[0].velocity)))
+        print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
