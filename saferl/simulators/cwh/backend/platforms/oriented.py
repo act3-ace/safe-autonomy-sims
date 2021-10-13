@@ -1,13 +1,14 @@
 import math
+
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl.simulators.base_models.platforms import BasePlatform, BasePlatformStateVectorized, ContinuousActuator, \
-    BaseActuatorSet, BaseLinearODESolverDynamics
+from saferl.simulators.base_models.platforms import (
+    BaseActuatorSet, BaseLinearODESolverDynamics, BasePlatform,
+    BasePlatformStateVectorized, ContinuousActuator)
 
 
 class CWHSpacecraftOriented2d(BasePlatform):
-
     def __init__(self, name, controller=None, **kwargs):
         self.mass = 12  # kg
         self.moment = 0.056  # kg*m^2
@@ -58,13 +59,22 @@ class CWHSpacecraftOriented2d(BasePlatform):
 
 
 class CWHOriented2dState(BasePlatformStateVectorized):
-
-    def build_vector(self, x=0, y=0, theta=0, x_dot=0, y_dot=0, theta_dot=0, react_wheel_ang_vel=0, **kwargs):
-        return np.array([x, y, theta, x_dot, y_dot, theta_dot, react_wheel_ang_vel], dtype=np.float64)
+    def build_vector(self,
+                     x=0,
+                     y=0,
+                     theta=0,
+                     x_dot=0,
+                     y_dot=0,
+                     theta_dot=0,
+                     react_wheel_ang_vel=0,
+                     **kwargs):
+        return np.array(
+            [x, y, theta, x_dot, y_dot, theta_dot, react_wheel_ang_vel],
+            dtype=np.float64)
 
     @property
     def vector_shape(self):
-        return (7,)
+        return (7, )
 
     @property
     def x(self):
@@ -100,7 +110,7 @@ class CWHOriented2dState(BasePlatformStateVectorized):
 
     @property
     def position(self):
-        position = np.zeros((3,))
+        position = np.zeros((3, ))
         position[0:2] = self._vector[0:2]
         return position
 
@@ -115,19 +125,10 @@ class CWHOriented2dState(BasePlatformStateVectorized):
 
 
 class CWHOriented2dActuatorSet(BaseActuatorSet):
-
     def __init__(self):
         actuators = [
-            ContinuousActuator(
-                'thrust',
-                [-100, 100],
-                0
-            ),
-            ContinuousActuator(
-                'reaction_wheel',
-                [-181.3, 181.3],
-                0
-            ),
+            ContinuousActuator('thrust', [-100, 100], 0),
+            ContinuousActuator('reaction_wheel', [-181.3, 181.3], 0),
         ]
 
         super().__init__(actuators)
@@ -140,7 +141,8 @@ class CWHOriented2dDynamics(BaseLinearODESolverDynamics):
         super().__init__(integration_method=integration_method)
 
     def dx(self, t, state_vec, control):
-        state_cur = CWHOriented2dState(vector=state_vec, vector_deep_copy=False)
+        state_cur = CWHOriented2dState(vector=state_vec,
+                                       vector_deep_copy=False)
 
         # check reaction wheel velocity limit
         if state_cur.react_wheel_ang_vel >= 576:
@@ -148,10 +150,15 @@ class CWHOriented2dDynamics(BaseLinearODESolverDynamics):
         elif state_cur.react_wheel_ang_vel <= -576:
             control[1] = max(0, control[1])
 
-        pos_vel_state_vec = np.array([state_cur.x, state_cur.y, state_cur.x_dot, state_cur.y_dot], dtype=np.float64)
+        pos_vel_state_vec = np.array(
+            [state_cur.x, state_cur.y, state_cur.x_dot, state_cur.y_dot],
+            dtype=np.float64)
 
-        thrust_vector = control[0] * np.array([math.cos(state_cur.theta), math.sin(state_cur.theta)])
-        pos_vel_derivative = np.matmul(self.A, pos_vel_state_vec) + np.matmul(self.B, thrust_vector)
+        thrust_vector = control[0] * np.array(
+            [math.cos(state_cur.theta),
+             math.sin(state_cur.theta)])
+        pos_vel_derivative = np.matmul(self.A, pos_vel_state_vec) + np.matmul(
+            self.B, thrust_vector)
 
         react_wheel_ang_acc = control[1]
         theta_dot_dot = -1 * self.platform.react_wheel_moment * react_wheel_ang_acc / self.platform.moment
@@ -175,15 +182,17 @@ class CWHOriented2dDynamics(BaseLinearODESolverDynamics):
         A = np.array([
             [0, 0, 1, 0],
             [0, 0, 0, 1],
-            [3 * n ** 2, 0, 0, 2 * n],
+            [3 * n**2, 0, 0, 2 * n],
             [0, 0, -2 * n, 0],
-        ], dtype=np.float64)
+        ],
+                     dtype=np.float64)
 
         B = np.array([
             [0, 0],
             [0, 0],
             [1 / m, 0],
             [0, 1 / m],
-        ], dtype=np.float64)
+        ],
+                     dtype=np.float64)
 
         return A, B
