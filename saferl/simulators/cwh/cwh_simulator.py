@@ -1,14 +1,12 @@
 import typing
 
-from pydantic import BaseModel, validator
-
-from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorValidator, BaseSimulatorResetValidator
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.libraries.state_dict import StateDict
+from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+from pydantic import BaseModel, validator
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.cwh.backend.platforms.cwh import CWHSpacecraft3d
-
-from act3_rl_core.libraries.plugin_library import PluginLibrary
 
 
 class CWHSimulatorValidator(BaseSimulatorValidator):
@@ -27,7 +25,9 @@ class CWHPlatformConfigValidator(BaseModel):
 
 
 class CWHSimulatorResetValidator(BaseSimulatorResetValidator):
-    agent_initialization: typing.Optional[typing.Dict[str, CWHPlatformConfigValidator]] = {"blue0": CWHPlatformConfigValidator(position=[0,1,2], velocity=[0,0,0])}
+    agent_initialization: typing.Optional[typing.Dict[str, CWHPlatformConfigValidator]] = {
+        "blue0": CWHPlatformConfigValidator(position=[0, 1, 2], velocity=[0, 0, 0])
+    }
 
 
 class CWHSimulator(BaseSimulator):
@@ -51,15 +51,23 @@ class CWHSimulator(BaseSimulator):
         for agent_id, entity in self.sim_entities.items():
             i = config.agent_initialization[agent_id]
             self.sim_entities[agent_id].reset(
-                **{"x": i.position[0], "y": i.position[1], "z": i.position[2],
-                    "x_dot": i.velocity[0], "y_dot": i.velocity[1], "z_dot": i.velocity[2]}
+                **{
+                    "x": i.position[0],
+                    "y": i.position[1],
+                    "z": i.position[2],
+                    "x_dot": i.velocity[0],
+                    "y_dot": i.velocity[1],
+                    "z_dot": i.velocity[2]
+                }
             )
         self._state.sim_platforms = self.get_platforms()
         self.update_sensor_measurements()
         return self._state
 
     def get_platforms(self):
-        sim_platforms = tuple(CWHPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items())
+        sim_platforms = tuple(
+            CWHPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
+        )
         return sim_platforms
 
     def update_sensor_measurements(self):
@@ -90,48 +98,26 @@ class CWHSimulator(BaseSimulator):
 
 PluginLibrary.AddClassToGroup(CWHSimulator, "CWHSimulator", {})
 
-
 if __name__ == "__main__":
     tmp_config = {
         "step_size": 1,
         "agent_configs": {
             "blue0": {
-                "sim_config": {
-                },
+                "sim_config": {},
                 "platform_config": [
-                    (
-                        "saferl.platforms.cwh.cwh_controllers.ThrustController",
-                        {"name": "X Thrust", "axis": 0}
-                    ),
-                    (
-                        "saferl.platforms.cwh.cwh_controllers.ThrustController",
-                        {"name": "Y Thrust", "axis": 1}
-                    ),
-                    (
-                        "saferl.platforms.cwh.cwh_controllers.ThrustController",
-                        {"name": "Z Thrust", "axis": 2}
-                    ),
-                    (
-                        "saferl.platforms.cwh.cwh_sensors.PositionSensor",
-                        {}
-                    ),
-                    (
-                        "saferl.platforms.cwh.cwh_sensors.VelocitySensor",
-                        {}
-                    )
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "X Thrust", "axis": 0
+                    }), ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "Y Thrust", "axis": 1
+                    }), ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "Z Thrust", "axis": 2
+                    }), ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}), ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {})
                 ]
             }
         }
     }
 
-    reset_config = {
-        "agent_initialization": {
-            "blue0": {
-                "position": [0, 1, 2],
-                "velocity": [0, 0, 0]
-            }
-        }
-    }
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}
 
     tmp = CWHSimulator(**tmp_config)
     state = tmp.reset(reset_config)
@@ -142,5 +128,4 @@ if __name__ == "__main__":
         # state.sim_platforms[0]._controllers[2].apply_control(3)
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
-        print("Position: %s\t Velocity: %s" % (
-            str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
+        print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
