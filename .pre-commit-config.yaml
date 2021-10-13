@@ -125,10 +125,10 @@ repos:
         entry: python -m flake8
         types: [ python ]
         verbose: false
-#      - id: pylint
-#        name: pylint
-#        files: saferl/
-#        stages: [ commit ]
-#        language: system
-#        entry: python -m pylint
-#        types: [ python ]
+      - id: pylint
+        name: pylint
+        files: saferl/
+        stages: [ commit ]
+        language: system
+        entry: python -m pylint
+        types: [ python ]
