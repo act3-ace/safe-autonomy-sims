@@ -22,8 +22,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # compute distance to origin
-        #platform = get_platform_name(next_state,self.agent)
-        #pos = platform.position
+        # platform = get_platform_name(next_state,self.agent)
+        # pos = platform.position
 
         position = next_state.sim_platforms[0].position
 
@@ -55,9 +55,9 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
     def __call__(self, observation, action, next_observation, next_state):
         # eventually will include velocity constraint
         done = DoneDict()
-        #platform = get_platform_name(next_state,self.agent)
+        # platform = get_platform_name(next_state,self.agent)
 
-        #pos = platform.position
+        # pos = platform.position
         position = next_state.sim_platforms[0].position
 
         origin = np.array([0, 0, 0])
