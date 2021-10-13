@@ -1,8 +1,6 @@
 # need to import get_platform_name, WIP
 import numpy as np
-from act3_rl_core.dones.done_func_base import (DoneFuncBase,
-                                               DoneFuncBaseValidator,
-                                               DoneStatusCodes)
+from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
 
 
@@ -11,6 +9,7 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
 
 
 class MaxDistanceDoneFunction(DoneFuncBase):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -35,8 +34,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done[self.agent] = dist > self.config.max_distance
 
         if done[self.agent]:
-            next_state.episode_state[self.agent][
-                self.name] = DoneStatusCodes.LOSE
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
         return done
 
@@ -46,6 +44,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -68,8 +67,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         done[self.agent] = radial_distance <= docking_region_radius
 
         if done[self.agent]:
-            next_state.episode_state[self.agent][
-                self.name] = DoneStatusCodes.WIN
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
 
         return done
 
@@ -84,50 +82,30 @@ if __name__ == "__main__":
         "agent_configs": {
             "blue0": {
                 "sim_config": {},
-                "platform_config":
-                [("space.cwh.platforms.cwh_controllers.ThrustController", {
-                    "name": "X Thrust",
-                    "axis": 0
-                }),
-                 ("space.cwh.platforms.cwh_controllers.ThrustController", {
-                     "name": "Y Thrust",
-                     "axis": 1
-                 }),
-                 ("space.cwh.platforms.cwh_controllers.ThrustController", {
-                     "name": "Z Thrust",
-                     "axis": 2
-                 }), ("space.cwh.platforms.cwh_sensors.PositionSensor", {}),
-                 ("space.cwh.platforms.cwh_sensors.VelocitySensor", {})]
+                "platform_config": [
+                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                        "name": "X Thrust", "axis": 0
+                    }), ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                        "name": "Y Thrust", "axis": 1
+                    }), ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                        "name": "Z Thrust", "axis": 2
+                    }), ("space.cwh.platforms.cwh_sensors.PositionSensor", {}), ("space.cwh.platforms.cwh_sensors.VelocitySensor", {})
+                ]
             }
         }
     }
 
-    reset_config = {
-        "agent_initialization": {
-            "blue0": {
-                "position": [0, 0, 0],
-                "velocity": [0, 0, 0]
-            }
-        }
-    }
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}
 
     tmp = CWHSimulator(**tmp_config)
     state = tmp.reset(reset_config)
 
-    dist_done_fn = MaxDistanceDoneFunction(agent_name="blue0",
-                                           max_distance=40000)
-    docking_done_fn = SuccessfulDockingDoneFunction(agent_name="blue0",
-                                                    docking_region_radius=0.5)
+    dist_done_fn = MaxDistanceDoneFunction(agent_name="blue0", max_distance=40000)
+    docking_done_fn = SuccessfulDockingDoneFunction(agent_name="blue0", docking_region_radius=0.5)
 
     for i in range(5):
         state = tmp.step()
-        dist_done = dist_done_fn(observation=OrderedDict(),
-                                 action=OrderedDict(),
-                                 next_observation=OrderedDict(),
-                                 next_state=state)
-        docking_done = docking_done_fn(observation=OrderedDict(),
-                                       action=OrderedDict(),
-                                       next_observation=OrderedDict(),
-                                       next_state=state)
+        dist_done = dist_done_fn(observation=OrderedDict(), action=OrderedDict(), next_observation=OrderedDict(), next_state=state)
+        docking_done = docking_done_fn(observation=OrderedDict(), action=OrderedDict(), next_observation=OrderedDict(), next_state=state)
         # print(dist_done)
         print(docking_done)

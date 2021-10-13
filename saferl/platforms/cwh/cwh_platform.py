@@ -11,17 +11,14 @@ class CWHPlatform(BasePlatform):
     allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function
     """
+
     def __init__(self, platform, platform_config, seed=None):  # pylint: disable=W0613
         self._platform = platform
         self._controllers: typing.Tuple[BaseController, ...] = ()
         self._sensors: typing.Tuple[BaseSensor, ...] = ()
         self.next_action = np.array([0, 0, 0], dtype=np.float32)
-        self._controllers = tuple(part[0](self, part[1])
-                                  for part in platform_config
-                                  if issubclass(part[0], BaseController))
-        self._sensors = tuple(part[0](self, part[1])
-                              for part in platform_config
-                              if issubclass(part[0], BaseSensor))
+        self._controllers = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController))
+        self._sensors = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor))
 
     @property
     def name(self) -> str:

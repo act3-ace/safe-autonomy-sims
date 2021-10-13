@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 
 class CWHDistanceChangeReward(RewardFuncBase):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._dist_buffer = RingBuffer(capacity=2, dtype=float)
