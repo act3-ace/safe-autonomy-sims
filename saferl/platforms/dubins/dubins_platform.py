@@ -2,7 +2,6 @@ import typing
 
 import numpy as np
 import pymap3d as pm
-
 from act3_rl_core.simulators.base_parts import BaseController, BaseSensor
 from act3_rl_core.simulators.six_dof.base_six_dof_platform import Base6DOFPlatform
 
@@ -19,12 +18,8 @@ class DubinsPlatform(Base6DOFPlatform):
         self._controllers: typing.Tuple[BaseController, ...] = ()
         self._sensors: typing.Tuple[BaseSensor, ...] = ()
         self.next_action = [0, 0, 0]
-        self._controllers = tuple(
-            part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController)
-        )
-        self._sensors = tuple(
-            part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor)
-        )
+        self._controllers = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController))
+        self._sensors = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor))
 
     @property
     def name(self) -> str:
@@ -67,3 +62,7 @@ class DubinsPlatform(Base6DOFPlatform):
 
     def get_applied_action(self):
         return self.next_action
+
+    @property
+    def operable(self):
+        return True

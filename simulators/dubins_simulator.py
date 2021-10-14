@@ -5,7 +5,7 @@ from pydantic import BaseModel, validator
 from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorValidator, BaseSimulatorResetValidator
 from act3_rl_core.libraries.state_dict import StateDict
 
-from air.dubins.platforms.dubins_platform import DubinsPlatform
+from saferl.platforms.dubins.dubins_platform import DubinsPlatform
 from air.dubins.dubins_sim.platforms import Dubins3dPlatform
 
 

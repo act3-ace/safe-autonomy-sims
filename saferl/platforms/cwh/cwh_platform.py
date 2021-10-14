@@ -30,7 +30,6 @@ class CWHPlatform(BasePlatform):
 
     @property
     def position(self):
-
         return self._platform.position
 
     @property
@@ -48,6 +47,10 @@ class CWHPlatform(BasePlatform):
     @property
     def sim_time(self):
         return self._sim_time
+
+    @sim_time.setter
+    def sim_time(self, time):
+        self._sim_time = time
 
     def get_applied_action(self):
         return self.next_action
