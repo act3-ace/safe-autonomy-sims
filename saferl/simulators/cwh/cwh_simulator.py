@@ -94,6 +94,7 @@ class CWHSimulator(BaseSimulator):
             entity = self.sim_entities[agent_id]
             entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
             entity.step_apply()
+            platform.sim_time = self.clock
         self.update_sensor_measurements()
         self.clock += self.config.step_size
         return self._state
