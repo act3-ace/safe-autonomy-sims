@@ -5,7 +5,7 @@
 The Safe-Autonomy-Sims library provides the components and tools to build modular,  compatible Reinforcement Learning environments with Run Time Assurance (RTA). This repo is designed to work hand-in-glove with the ACT3-RL-Core library.
 
 ## Installation
-Inside of the repo's root directory, simply install using the `setup.py` with:
+<!--- Inside of the repo's root directory, simply install using the `setup.py` with:
 ```shell
 pip install .
 ```
@@ -14,6 +14,7 @@ For a local development version, please install using the `-e, --editable` optio
 ```shell
 pip install -e .
 ```
+--->
 
 ## Usage
 
@@ -26,7 +27,7 @@ TO BE DETERMINED
 
 ### Evaluation
 
-TO BE DETERMINED 
+TO BE DETERMINED
 
 ## Environments
 
@@ -48,7 +49,7 @@ Throttle, heading, flight angle, roll control.
 
 
 ### Docking
-Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearlized dynamics model. Comes in the following flavors:
+Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors:
 
 -  **Docking 2D**  
 Static 1N thrusters in $`\pm x`$ and  $`\pm y`$.    
