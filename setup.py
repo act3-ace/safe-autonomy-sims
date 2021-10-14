@@ -6,7 +6,7 @@ setuptools.setup(
     author="",
     author_email="",
     description="Contains implementation of the  compatible SafeRL environments",
-    packages=["saferl"],
+    packages=setuptools.find_packages(include=["saferl"]),
     classifiers=[
         "Programming Language :: Python :: 3",
         # "License :: OSI Approved :: MIT License",
