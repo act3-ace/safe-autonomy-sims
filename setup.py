@@ -14,13 +14,6 @@ setuptools.setup(
     ],
     python_requires='>=3.6, <3.9',
     install_requires=[
-        "tensorflow==2.4",
-        "tqdm==4.59.0",
-        "jsonlines==2.0.0",
-        "matplotlib==3.3.4",
-        "pytest==6.2.4",
-        "flatten_json==0.1.13",
-        "aioredis==1.3.1",
-        "pyglet==1.5.19",
+        'act3-rl-core',
     ]
 )
