@@ -19,9 +19,6 @@ class CWHPlatform(BasePlatform):
         self.next_action = np.array([0, 0, 0], dtype=np.float32)
         self._controllers = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController))
         self._sensors = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor))
-        self.next_action = [0, 0, 0]
-        self._controllers = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController))
-        self._sensors = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor))
         self._sim_time = 0.0
 
     @property
