@@ -10,7 +10,7 @@ from saferl.simulators.cwh.backend.platforms.cwh import CWHSpacecraft3d
 
 
 class CWHSimulatorValidator(BaseSimulatorValidator):
-    step_size: int
+    step_size: float
 
 
 class CWHPlatformConfigValidator(BaseModel):
@@ -44,9 +44,11 @@ class CWHSimulator(BaseSimulator):
         super().__init__(**kwargs)
         self.sim_entities = {agent_id: CWHSpacecraft3d(name=agent_id) for agent_id in self.config.agent_configs.keys()}
         self._state = StateDict()
+        self.clock = 0.0
 
     def reset(self, config):
         self._state.clear()
+        self.clock = 0.0
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
             i = config.agent_initialization[agent_id]
@@ -92,7 +94,9 @@ class CWHSimulator(BaseSimulator):
             entity = self.sim_entities[agent_id]
             entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
             entity.step_apply()
+            platform.sim_time = self.clock
         self.update_sensor_measurements()
+        self.clock += self.config.step_size
         return self._state
 
 

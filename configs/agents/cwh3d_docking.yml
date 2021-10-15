@@ -70,6 +70,7 @@
             "name": "CWHDistanceChangeReward",
             "functor": "saferl.rewards.docking_rewards.CWHDistanceChangeReward",
             "config": {
+                "scale": 1.0e-2
             }
         },
     ],
