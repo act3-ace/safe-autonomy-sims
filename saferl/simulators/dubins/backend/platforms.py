@@ -46,6 +46,17 @@ class BaseDubinsPlatform(BasePlatform):
     def gamma(self):
         return self.state.gamma
 
+    @property
+    def acceleration(self):
+        # TODO: add acceleration to dynamics
+        acc = self.current_control
+        if self.v <= self.dynamics.v_min and acc < 0:
+            acc = 0
+        elif self.v >= self.dynamics.v_max and acc > 0:
+            acc = 0
+        acc = acc * (self.velocity / self.v)  # acc * unit velocity
+        return acc
+
 
 class BaseDubinsState(BasePlatformStateVectorized):
     @property
@@ -59,8 +70,7 @@ class BaseDubinsState(BasePlatformStateVectorized):
             self.v * math.cos(self.heading) * math.cos(self.gamma),
             self.v * math.sin(self.heading) * math.cos(self.gamma),
             -1 * self.v * math.sin(self.gamma),
-        ],
-                            dtype=np.float64)
+        ], dtype=np.float64)
         return velocity
 
     @property
@@ -88,19 +98,14 @@ class BaseDubinsState(BasePlatformStateVectorized):
 
 
 class Dubins2dPlatform(BaseDubinsPlatform):
-    def __init__(self, name, controller=None, rta=None, v_min=10, v_max=100):
+    def __init__(self, name, controller=None, v_min=10, v_max=100):
 
         dynamics = Dubins2dDynamics(v_min=v_min, v_max=v_max)
         actuator_set = Dubins2dActuatorSet()
 
         state = Dubins2dState()
 
-        super().__init__(name,
-                         dynamics,
-                         actuator_set,
-                         state,
-                         controller,
-                         rta=rta)
+        super().__init__(name, dynamics, actuator_set, state, controller)
 
 
 class Dubins2dState(BaseDubinsState):

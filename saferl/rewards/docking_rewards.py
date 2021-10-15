@@ -3,8 +3,12 @@ from collections import OrderedDict
 import numpy as np
 from act3_rl_core.libraries.environment_dict import RewardDict
 from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.rewards.reward_func_base import RewardFuncBase
+from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 from numpy_ringbuffer import RingBuffer
+
+
+class CWHDistanceChangeRewardValidator(RewardFuncBaseValidator):
+    scale: float
 
 
 class CWHDistanceChangeReward(RewardFuncBase):
@@ -12,7 +16,10 @@ class CWHDistanceChangeReward(RewardFuncBase):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._dist_buffer = RingBuffer(capacity=2, dtype=float)
-        self.scale = -1.0e-05
+
+    @classmethod
+    def get_validator(cls):
+        return CWHDistanceChangeRewardValidator
 
     def __call__(
         self,
@@ -35,7 +42,7 @@ class CWHDistanceChangeReward(RewardFuncBase):
 
         # TODO intialize distance buffer from initial state
         if len(self._dist_buffer) == 2:
-            val = self.scale * (self._dist_buffer[1] - self._dist_buffer[0])
+            val = self.config.scale * (self._dist_buffer[1] - self._dist_buffer[0])
 
         reward[self.config.agent_name] = val
 
