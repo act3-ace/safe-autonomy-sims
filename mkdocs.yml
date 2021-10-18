@@ -1,0 +1,49 @@
+site_name: Safe-Autonomy-Sims
+site_author: Safe-Autonomy Team
+repo_url: https://github.com/act3-ace/safe-autonomy-sims
+docs_dir: "docs"
+
+plugins:
+  - search
+  - macros
+  - git-revision-date-localized:
+      locale: en
+      type: timeago
+      fallback_to_build_date: true
+  - pdf-export:
+      verbose: true
+      media_type: print
+      enabled_if_env: ENABLE_PDF_EXPORT
+  - inari:
+      module: saferl
+      out-name: saferl
+
+  # - mktheapidocs:
+  #     modules:
+  #       act3:
+  #         section: .
+  #         source_repo: "https://git.aoc-pathfinder.cloud//ML/act3-rllib-agents"
+
+markdown_extensions:
+  - codehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+
+extra_javascript:
+  - https://unpkg.com/mermaid@8.4.2/dist/mermaid.min.js
+
+nav:
+  - "Table of Contents": index.md
+theme: material
+# theme: readthedocs
+
+## Macros info: https://github.com/fralau/mkdocs_macros_plugin#how-to-use-the-macros-plugin
+#extra:
+#  ace_version: 0.0.1-pre
+#  domain_name: act3-ace.ML
+#  external_domain_name: act3-ace.com
+#  cluster_name: coyote
+#  cluster_address: coyote.act3-ace.ML
