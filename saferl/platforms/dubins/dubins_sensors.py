@@ -21,7 +21,7 @@ class PositionSensor(DubinsSensor):
 
     def measurement_properties(self):
         position_properties = MultiBoxProp(
-            name="position", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["meters"] * 3, description="position of the spacecraft"
+            name="position", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["meters"] * 3, description="position of the aircraft"
         )
         return position_properties
 
@@ -33,7 +33,7 @@ class VelocitySensor(DubinsSensor):
 
     def measurement_properties(self):
         velocity_properties = MultiBoxProp(
-            name="velocity", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["m/s"] * 3, description="velocity of the spacecraft"
+            name="velocity", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["m/s"] * 3, description="velocity of the aircraft"
         )
         return velocity_properties
 
