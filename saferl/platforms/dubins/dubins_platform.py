@@ -2,7 +2,7 @@ import numpy as np
 from act3_rl_core.simulators.base_platform import BasePlatform
 
 
-class Dubins2dPlatform(BasePlatform):
+class DubinsPlatform(BasePlatform):
     """
     The __________________ as it's platform and
     allows for saving an action to the platform for when the platform needs
@@ -11,7 +11,7 @@ class Dubins2dPlatform(BasePlatform):
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
         super().__init__(platform_name=platform_name, platform=platform, parts_list=platform_config)
-        self._last_applied_action = np.array([0, 0], dtype=np.float32)  # turn rate, acceleration
+        self._last_applied_action = None
         self._sim_time = 0.0
 
     def get_applied_action(self):
@@ -44,6 +44,10 @@ class Dubins2dPlatform(BasePlatform):
         return self._platform.velocity
 
     @property
+    def heading(self):
+        return self._platform.heading
+
+    @property
     def sim_time(self):
         return self._sim_time
 
@@ -54,6 +58,38 @@ class Dubins2dPlatform(BasePlatform):
     @property
     def operable(self):
         return True
+
+
+class Dubins2dPlatform(DubinsPlatform):
+    """
+    The __________________ as it's platform and
+    allows for saving an action to the platform for when the platform needs
+    to give an action to the environment during the environment step function
+    """
+
+    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, platform_config=platform_config)
+        self._last_applied_action = np.array([0, 0], dtype=np.float32)  # turn rate, acceleration
+
+
+class Dubins3dPlatform(DubinsPlatform):
+    """
+    The __________________ as it's platform and
+    allows for saving an action to the platform for when the platform needs
+    to give an action to the environment during the environment step function
+    """
+
+    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, platform_config=platform_config)
+        self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)  # elevator, ailerons, throttle
+
+    @property
+    def flight_path_angle(self):
+        return self._platform.gamma
+
+    @property
+    def roll(self):
+        return self._platform.roll
 
 
 # class Dubins6DOFPlatform(Base6DOFPlatform):
