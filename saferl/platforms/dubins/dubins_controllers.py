@@ -3,7 +3,7 @@ from act3_rl_core.libraries.property import MultiBoxProp, Prop
 from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 
-from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
+from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
 
 
