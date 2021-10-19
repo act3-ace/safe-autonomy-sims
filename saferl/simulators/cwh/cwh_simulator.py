@@ -68,7 +68,9 @@ class CWHSimulator(BaseSimulator):
 
     def get_platforms(self):
         sim_platforms = tuple(
-            CWHPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
+            CWHPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config)
+            for agent_id,
+            entity in self.sim_entities.items()
         )
         return sim_platforms
 
