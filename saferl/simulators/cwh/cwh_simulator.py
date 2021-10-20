@@ -1,16 +1,12 @@
 import typing
 
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+from act3_rl_core.simulators.base_simulator import BaseSimulatorResetValidator
 from pydantic import BaseModel, validator
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.cwh.backend.platforms.cwh import CWHSpacecraft3d
-
-
-class CWHSimulatorValidator(BaseSimulatorValidator):
-    step_size: float
+from saferl.simulators.saferl_simulator import SafeRLSimulator
 
 
 class CWHPlatformConfigValidator(BaseModel):
@@ -30,25 +26,24 @@ class CWHSimulatorResetValidator(BaseSimulatorResetValidator):
     }
 
 
-class CWHSimulator(BaseSimulator):
-
-    @classmethod
-    def get_simulator_validator(cls):
-        return CWHSimulatorValidator
+class CWHSimulator(SafeRLSimulator):
 
     @classmethod
     def get_reset_validator(cls):
         return CWHSimulatorResetValidator
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.sim_entities = {agent_id: CWHSpacecraft3d(name=agent_id) for agent_id in self.config.agent_configs.keys()}
-        self._state = StateDict()
-        self.clock = 0.0
+    def get_sim_entities(self):
+        return {agent_id: CWHSpacecraft3d(name=agent_id) for agent_id in self.config.agent_configs.keys()}
 
-    def reset(self, config):
-        self._state.clear()
-        self.clock = 0.0
+    def get_platforms(self):
+        sim_platforms = tuple(
+            CWHPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config)
+            for agent_id,
+            entity in self.sim_entities.items()
+        )
+        return sim_platforms
+
+    def reset_sim_entities(self, config):
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
             i = config.agent_initialization[agent_id]
@@ -62,42 +57,6 @@ class CWHSimulator(BaseSimulator):
                     "z_dot": i.velocity[2]
                 }
             )
-        self._state.sim_platforms = self.get_platforms()
-        self.update_sensor_measurements()
-        return self._state
-
-    def get_platforms(self):
-        sim_platforms = tuple(
-            CWHPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
-        )
-        return sim_platforms
-
-    def update_sensor_measurements(self):
-        """
-        Update and caches all the measurements of all the sensors on each platform
-        """
-        for plat in self._state.sim_platforms:
-            for sensor in plat.sensors:
-                sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
-
-    def mark_episode_done(self):
-        pass
-
-    def save_episode_information(self, **kwargs):
-        pass
-
-    def step(self):
-        for platform in self._state.sim_platforms:
-            agent_id = platform.name
-            import numpy as np
-            action = np.array(platform.get_applied_action(), dtype=np.float32)
-            entity = self.sim_entities[agent_id]
-            entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
-            entity.step_apply()
-            platform.sim_time = self.clock
-        self.update_sensor_measurements()
-        self.clock += self.config.step_size
-        return self._state
 
 
 PluginLibrary.AddClassToGroup(CWHSimulator, "CWHSimulator", {})
