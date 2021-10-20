@@ -24,7 +24,7 @@ class TimeoutDoneFunction(DoneFuncBase):
         sim_time = next(iter(next_state.sim_platforms)).sim_time
         # sim_time = DoneFuncBase._get_platform_time(next(iter(next_state.sim_platforms)))
 
-        done[self.agent] = sim_time > self.config.max_sim_time
+        done[self.agent] = sim_time >= self.config.max_sim_time
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
