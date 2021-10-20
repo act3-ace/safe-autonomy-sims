@@ -41,6 +41,17 @@ class RateControllerValidator(BaseControllerValidator):
         return v
 
 
+class CombinedControllerValidator(BaseControllerValidator):
+    bounds: typing.List[float]
+
+    @validator("bounds")
+    def check_outer_len(cls, v):
+        check_len = 2
+        if len(v) != check_len:
+            raise ValueError(f"Outer bounds provided to validator is not length {check_len}")
+        return v
+
+
 class RateController(DubinsController):
     def __init__(
         self,
@@ -114,8 +125,16 @@ PluginLibrary.AddClassToGroup(
 # ------ 2D Only --------
 
 
-class CombinedTurnRateAccelerationControllerValidator(RateControllerValidator):
+class CombinedTurnRateAccelerationControllerValidator(CombinedControllerValidator):
     bounds: typing.Optional[typing.List[typing.List]] = [[-10, -96.5], [10, 96.5]]
+
+    @validator("bounds")
+    def check_inner_len(cls, v):
+        check_len = 2
+        for i in v:
+            if len(i) != check_len:
+                raise ValueError(f"Inner bounds provided to validator is not length {check_len}")
+        return v
 
 
 class CombinedTurnRateAccelerationController(DubinsController):
@@ -156,8 +175,16 @@ PluginLibrary.AddClassToGroup(
 # --------- 3D Only ------------
 
 
-class CombinedPitchRollAccelerationControllerValidator(RateControllerValidator):
+class CombinedPitchRollAccelerationControllerValidator(CombinedControllerValidator):
     bounds: typing.Optional[typing.List[typing.List]] = [[-5, -10, -96.5], [5, 10, 96.5]]
+
+    @validator("bounds")
+    def check_inner_len(cls, v):
+        check_len = 3
+        for i in v:
+            if len(i) != check_len:
+                raise ValueError(f"Inner bounds provided to validator is not length {check_len}")
+        return v
 
 
 class CombinedPitchRollAccelerationController(DubinsController):
