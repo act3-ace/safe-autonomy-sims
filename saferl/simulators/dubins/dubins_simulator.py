@@ -15,10 +15,10 @@ class Dubins2dPlatformConfigValidator(BaseModel):
     heading: float
 
     @validator("position")
-    def check_position_len(cls, v, field):
+    def check_position_len(cls, v):
         check_len = 2
         if len(v) != check_len:
-            raise ValueError(f"{field.name} provided to DubinsPlatformConfigValidator is not length {check_len}")
+            raise ValueError(f"Value provided to DubinsPlatformConfigValidator is not length {check_len}")
         return v
 
 
