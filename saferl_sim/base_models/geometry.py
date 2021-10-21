@@ -5,7 +5,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl.simulators.base_models.platforms import BaseEnvObj
+from saferl_sim.base_models.platforms import BaseEnvObj
 
 POINT_CONTAINS_DISTANCE = 1e-10
 
