@@ -3,7 +3,7 @@ import copy
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl.simulators.base_models.platforms import (
+from saferl_sim.base_models.platforms import (
     BaseActuatorSet,
     BaseLinearODESolverDynamics,
     BasePlatform,
@@ -13,6 +13,7 @@ from saferl.simulators.base_models.platforms import (
 
 
 class BaseCWHSpacecraft(BasePlatform):
+
     def generate_info(self):
         info = {
             "state": self.state.vector,
@@ -35,6 +36,7 @@ class BaseCWHSpacecraft(BasePlatform):
 
 
 class CWHSpacecraft2d(BaseCWHSpacecraft):
+
     def __init__(self, name, controller=None):
 
         dynamics = CWH2dDynamics()
@@ -45,6 +47,7 @@ class CWHSpacecraft2d(BaseCWHSpacecraft):
 
 
 class CWHSpacecraft3d(BaseCWHSpacecraft):
+
     def __init__(self, name, controller=None):
         dynamics = CWH3dDynamics()
         actuator_set = CWH3dActuatorSet()
@@ -66,6 +69,7 @@ class CWHSpacecraft3d(BaseCWHSpacecraft):
 
 
 class CWH2dState(BasePlatformStateVectorized):
+
     def build_vector(self, x=0, y=0, x_dot=0, y_dot=0, **kwargs):
         return np.array([x, y, x_dot, y_dot], dtype=np.float64)
 
@@ -91,7 +95,7 @@ class CWH2dState(BasePlatformStateVectorized):
 
     @property
     def position(self):
-        position = np.zeros((3,))
+        position = np.zeros((3, ))
         position[0:2] = self._vector[0:2]
         return position
 
@@ -107,6 +111,7 @@ class CWH2dState(BasePlatformStateVectorized):
 
 
 class CWH3dState(BasePlatformStateVectorized):
+
     def build_vector(self, x=0, y=0, z=0, x_dot=0, y_dot=0, z_dot=0, **kwargs):
         return np.array([x, y, z, x_dot, y_dot, z_dot], dtype=np.float64)
 
@@ -149,6 +154,7 @@ class CWH3dState(BasePlatformStateVectorized):
 
 
 class CWH2dActuatorSet(BaseActuatorSet):
+
     def __init__(self):
         actuators = [
             ContinuousActuator("thrust_x", [-100, 100], 0),
@@ -159,6 +165,7 @@ class CWH2dActuatorSet(BaseActuatorSet):
 
 
 class CWH3dActuatorSet(BaseActuatorSet):
+
     def __init__(self):
         actuators = [
             ContinuousActuator("thrust_x", [-100, 100], 0),
@@ -170,6 +177,7 @@ class CWH3dActuatorSet(BaseActuatorSet):
 
 
 class CWH2dDynamics(BaseLinearODESolverDynamics):
+
     def __init__(self, m=12, n=0.001027, integration_method="Euler"):
         self.m = m  # kg
         self.n = n  # rads/s
@@ -184,7 +192,7 @@ class CWH2dDynamics(BaseLinearODESolverDynamics):
             [
                 [0, 0, 1, 0],
                 [0, 0, 0, 1],
-                [3 * n ** 2, 0, 0, 2 * n],
+                [3 * n**2, 0, 0, 2 * n],
                 [0, 0, -2 * n, 0],
             ],
             dtype=np.float64,
@@ -204,6 +212,7 @@ class CWH2dDynamics(BaseLinearODESolverDynamics):
 
 
 class CWH3dDynamics(BaseLinearODESolverDynamics):
+
     def __init__(self, m=12, n=0.001027, integration_method="Euler"):
         self.m = m  # kg
         self.n = n  # rads/s
@@ -219,9 +228,9 @@ class CWH3dDynamics(BaseLinearODESolverDynamics):
                 [0, 0, 0, 1, 0, 0],
                 [0, 0, 0, 0, 1, 0],
                 [0, 0, 0, 0, 0, 1],
-                [3 * n ** 2, 0, 0, 0, 2 * n, 0],
+                [3 * n**2, 0, 0, 0, 2 * n, 0],
                 [0, 0, 0, -2 * n, 0, 0],
-                [0, 0, -(n ** 2), 0, 0, 0],
+                [0, 0, -(n**2), 0, 0, 0],
             ],
             dtype=np.float64,
         )
