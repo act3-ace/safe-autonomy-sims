@@ -96,7 +96,7 @@ class CombinedTurnRateAccelerationController(DubinsController):
     @property
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(
-            name=f"TurnAcceleration",
+            name="TurnAcceleration",
             low=[np.deg2rad(-6), -10],
             high=[np.deg2rad(6), 10],
             unit=["rad/s, m/s/s"],
@@ -134,7 +134,7 @@ class CombinedPitchRollAccelerationController(DubinsController):
     @property
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(
-            name=f"PitchRollAcc",
+            name="PitchRollAcc",
             low=[np.deg2rad(-6), np.deg2rad(-6), -10],
             high=[np.deg2rad(6), np.deg2rad(6), 10],
             unit=["rad/s, rad/s, m/s/s"],
