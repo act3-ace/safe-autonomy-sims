@@ -7,7 +7,7 @@ from act3_rl_core.simulators.base_parts import BaseSensor
 
 import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
-from saferl.simulators.cwh.cwh_simulator import CWHSimulator
+from saferl.simulators.cwh_simulator import CWHSimulator
 
 
 class CWHSensor(BaseSensor):

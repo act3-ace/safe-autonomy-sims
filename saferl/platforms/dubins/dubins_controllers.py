@@ -7,7 +7,7 @@ from act3_rl_core.simulators.base_parts import BaseController, BaseControllerVal
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
-from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
+from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
 
 class DubinsController(BaseController):
