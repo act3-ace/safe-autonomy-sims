@@ -63,7 +63,7 @@ class BaseActuator(abc.ABC):
 class ContinuousActuator(BaseActuator):
     def __init__(self, name, bounds, default):
         self._name = name
-        self._space = 'continuous'
+        self._space = "continuous"
         self._bounds = bounds
 
         if isinstance(default, np.ndarray):
@@ -109,10 +109,9 @@ class PassThroughController(BaseController):
 class AgentController(BaseController):
     def __init__(self, actuator_set, config):
         self.actuator_set = actuator_set
-        self.actuator_config_list = config['actuators']
+        self.actuator_config_list = config["actuators"]
 
-        self.action_preprocessors, self.action_space = self.setup_action_space(
-        )
+        self.action_preprocessors, self.action_space = self.setup_action_space()
 
     def setup_action_space(self):
         action_preprocessors = []
@@ -120,68 +119,53 @@ class AgentController(BaseController):
 
         # loop over actuators in controller config and setup preprocessors
         for i, actuator_config in enumerate(self.actuator_config_list):
-            actuator_name = actuator_config['name']
+            actuator_name = actuator_config["name"]
 
             # get associated actuator from platform's actuator_set
             if actuator_name in self.actuator_set.name_idx_map:
-                actuator = self.actuator_set.actuators[
-                    self.actuator_set.name_idx_map[actuator_name]]
+                actuator = self.actuator_set.actuators[self.actuator_set.name_idx_map[actuator_name]]
             else:
-                raise ValueError(
-                    "Actuator name {} not found in platform's actuator set".
-                    format(actuator_name))
+                raise ValueError("Actuator name {} not found in platform's actuator set".format(actuator_name))
 
-            if actuator.space == 'continuous':
+            if actuator.space == "continuous":
                 # determine upper and lower bounds of actuator range.
                 # Should be the intersection of the actuator object bounds and the actuator config bounds
-                if 'bounds' in actuator_config:
-                    actuator.bounds = actuator_config['bounds']
+                if "bounds" in actuator_config:
+                    actuator.bounds = actuator_config["bounds"]
 
                 bounds_min = actuator.bounds[0]
                 bounds_max = actuator.bounds[1]
 
-                if ('space'
-                        not in actuator_config) or (actuator_config['space']
-                                                    == 'continuous'):
-                    if ('rescale' not in actuator_config) or (
-                            actuator_config['rescale']):
-                        preprocessor = ActionPreprocessorContinuousRescale(
-                            actuator_name, [bounds_min, bounds_max])
-                        actuator_action_space = gym.spaces.Box(low=-1,
-                                                               high=1,
-                                                               shape=(1, ))
+                if ("space" not in actuator_config) or (actuator_config["space"] == "continuous"):
+                    if ("rescale" not in actuator_config) or (actuator_config["rescale"]):
+                        preprocessor = ActionPreprocessorContinuousRescale(actuator_name, [bounds_min, bounds_max])
+                        actuator_action_space = gym.spaces.Box(low=-1, high=1, shape=(1,))
                     else:
-                        preprocessor = ActionPreprocessorPassThrough(
-                            actuator_name)
-                        actuator_action_space = gym.spaces.Box(low=bounds_min,
-                                                               high=bounds_max,
-                                                               shape=(1, ))
-                elif actuator_config['space'] == 'discrete':
+                        preprocessor = ActionPreprocessorPassThrough(actuator_name)
+                        actuator_action_space = gym.spaces.Box(low=bounds_min, high=bounds_max, shape=(1,))
+                elif actuator_config["space"] == "discrete":
                     # if actuator in continuous but config is discrete, discretize actuator bounds
-                    vals = np.linspace(bounds_min, bounds_max,
-                                       actuator_config['points'])
-                    preprocessor = ActionPreprocessorDiscreteMap(
-                        actuator_name, vals)
-                    actuator_action_space = gym.spaces.Discrete(
-                        actuator_config['points'])
+                    vals = np.linspace(bounds_min, bounds_max, actuator_config["points"])
+                    preprocessor = ActionPreprocessorDiscreteMap(actuator_name, vals)
+                    actuator_action_space = gym.spaces.Discrete(actuator_config["points"])
                 else:
                     raise ValueError(
                         "Action Config for Actuator {} has invalid space of {}. "
-                        "Should be 'continuous' or 'discrete'".format(
-                            actuator.name, actuator_config['space']))
+                        "Should be 'continuous' or 'discrete'".format(actuator.name, actuator_config["space"])
+                    )
 
-            elif actuator.space == 'discrete':
+            elif actuator.space == "discrete":
                 # if the actuator is discrete, ignore actuator config.
                 # Use actuator defined points and pass through value to control
                 raise NotImplementedError
 
             else:
                 raise ValueError(
-                    "Actuator {} has invalid space of {}. Should be 'continuous' or 'discrete'"
-                    .format(actuator.name, actuator.space))
+                    "Actuator {} has invalid space of {}. Should be 'continuous' or 'discrete'".format(actuator.name, actuator.space)
+                )
 
             # append actuator action space and preprocessor
-            action_space_tup += (actuator_action_space, )
+            action_space_tup += (actuator_action_space,)
             action_preprocessors.append(preprocessor)
 
         action_space = gym.spaces.Tuple(action_space_tup)
@@ -197,8 +181,7 @@ class AgentController(BaseController):
                     if not isinstance(action_val, np.ndarray):
                         action_val = np.array(action_val, ndmin=1)
 
-                    actuator_name, action_processed = self.action_preprocessors[
-                        i](action_val)
+                    actuator_name, action_processed = self.action_preprocessors[i](action_val)
                     actuation[actuator_name] = action_processed
 
         return actuation
@@ -320,9 +303,7 @@ class BasePlatform(BaseEnvObj):
         # self.current_control = copy.deepcopy(control)
 
         # compute new state if dynamics were applied
-        self.next_state = self.dynamics.step(step_size,
-                                             copy.deepcopy(self.state),
-                                             control)
+        self.next_state = self.dynamics.step(step_size, copy.deepcopy(self.state), control)
 
         for obj in self.dependent_objs:
             obj.step_compute(sim_state, action=action)
@@ -340,13 +321,13 @@ class BasePlatform(BaseEnvObj):
 
     def generate_info(self):
         info = {
-            'x': self.x,
-            'y': self.y,
-            'z': self.z,
-            'controller': {
-                'actuation': self.current_actuation,
-                'control': self.current_control,
-            }
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+            "controller": {
+                "actuation": self.current_actuation,
+                "control": self.current_control,
+            },
         }
 
         return info
@@ -421,7 +402,7 @@ class BaseDynamics(abc.ABC):
 
 
 class BaseODESolverDynamics(BaseDynamics):
-    def __init__(self, integration_method='Euler'):
+    def __init__(self, integration_method="Euler"):
         self.integration_method = integration_method
         super().__init__()
 
@@ -432,24 +413,20 @@ class BaseODESolverDynamics(BaseDynamics):
     def step(self, step_size, state, control):
 
         if self.integration_method == "RK45":
-            sol = scipy.integrate.solve_ivp(self.dx, (0, step_size),
-                                            state.vector,
-                                            args=(control, ))
+            sol = scipy.integrate.solve_ivp(self.dx, (0, step_size), state.vector, args=(control,))
 
-            state.vector = sol.y[:,
-                                 -1]  # save last timestep of integration solution
-        elif self.integration_method == 'Euler':
+            state.vector = sol.y[:, -1]  # save last timestep of integration solution
+        elif self.integration_method == "Euler":
             state_dot = self.dx(0, state.vector, control)
             state.vector = state.vector + step_size * state_dot
         else:
-            raise ValueError("invalid integration method '{}'".format(
-                self.integration_method))
+            raise ValueError("invalid integration method '{}'".format(self.integration_method))
 
         return state
 
 
 class BaseLinearODESolverDynamics(BaseODESolverDynamics):
-    def __init__(self, integration_method='Euler'):
+    def __init__(self, integration_method="Euler"):
         self.A, self.B = self.gen_dynamics_matrices()
         super().__init__(integration_method=integration_method)
 

@@ -22,12 +22,13 @@ class Dubins2dPlatformConfigValidator(BaseModel):
     speed : float
     heading : float
     """
+
     position: typing.List[float]
     speed: float
     heading: float
 
     @validator("position")
-    def check_position_len(cls, v, field):
+    def check_position_len(cls, v):
         """
         Ensures that all fields are of a certain length - (2,).
         """
@@ -41,6 +42,7 @@ class Dubins2dSimulatorResetValidator(BaseSimulatorResetValidator):
     """
     Validator for the SimulatorReset operation for Dubins2D
     """
+
     agent_initialization: typing.Optional[typing.Dict[str, Dubins2dPlatformConfigValidator]] = {
         "blue0": Dubins2dPlatformConfigValidator(position=[0, 1], speed=100, heading=0)
     }
@@ -124,6 +126,7 @@ class Dubins3dPlatformConfigValidator(BaseModel):
     gamma: float
     roll : float
     """
+
     position: typing.List[float]
     speed: float
     heading: float
@@ -145,6 +148,7 @@ class Dubins3dSimulatorResetValidator(BaseSimulatorResetValidator):
     """
     Validator for the SimulatorReset operation for Dubins3D
     """
+
     agent_initialization: typing.Optional[typing.Dict[str, Dubins3dPlatformConfigValidator]] = {
         "blue0": Dubins3dPlatformConfigValidator(position=[0, 1, 2], speed=100, heading=0, gamma=0, roll=0)
     }
@@ -216,7 +220,7 @@ class Dubins3dSimulator(SafeRLSimulator):
                     "heading": init_params.heading,
                     "v": init_params.speed,
                     "gamma": init_params.gamma,
-                    "roll": init_params.roll
+                    "roll": init_params.roll,
                 }
             )
 
@@ -241,10 +245,10 @@ if __name__ == "__main__":
                     }),
                     ("saferl.platforms.dubins.dubins_sensors.PositionSensor", {}),
                     ("saferl.platforms.dubins.dubins_sensors.VelocitySensor", {}),
-                    ("saferl.platforms.dubins.dubins_sensors.HeadingSensor", {})
-                ]
+                    ("saferl.platforms.dubins.dubins_sensors.HeadingSensor", {}),
+                ],
             }
-        }
+        },
     }
 
     tmp_config_3d = {
@@ -269,9 +273,9 @@ if __name__ == "__main__":
                     ("saferl.platforms.dubins.dubins_sensors.VelocitySensor", {}),
                     ("saferl.platforms.dubins.dubins_sensors.HeadingSensor", {}),
                     # ("saferl.platforms.dubins.dubins_sensors.FlightPathSensor", {}),
-                ]
+                ],
             }
-        }
+        },
     }
 
     # reset_config = {"agent_initialization": {"blue0": {"position": [0, 1], "heading": 0, "speed": 50}}}
@@ -282,7 +286,8 @@ if __name__ == "__main__":
 
     state = tmp.reset(reset_config)
     print(
-        f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
+        f"Position: {state.sim_platforms[0].position}\t"
+        f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
     )
     for i in range(5):
         control = [1, 0, 0]

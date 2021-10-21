@@ -14,6 +14,7 @@ class CWHDistanceChangeRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalor value to adjust magnitude of the reward
     """
+
     scale: float
 
 

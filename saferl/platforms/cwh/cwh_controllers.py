@@ -49,6 +49,7 @@ class ThrustControllerValidator(BaseControllerValidator):
     """
     Controller config validator for the ThrustController
     """
+
     axis: int
 
 
@@ -67,10 +68,10 @@ class ThrustController(CWHController):
 
     def __init__(
         self,
-        parent_platform,  # type: ignore # noqa: F821
+        parent_platform,
         config,
         control_properties=cwh_props.ThrustProp,
-        exclusiveness=set()
+        exclusiveness=set()  # type: ignore # noqa: F821
     ):  # pylint: disable=W0102
         super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 

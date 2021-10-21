@@ -15,6 +15,7 @@ class SafeRLSimulatorValidator(BaseSimulatorValidator):
 
     step_size: A float representing how many simulated seconds pass each time the simulator updates
     """
+
     step_size: float
 
 
