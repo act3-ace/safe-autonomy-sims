@@ -46,15 +46,15 @@ class CWHSimulator(SafeRLSimulator):
     def reset_sim_entities(self, config):
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
-            i = config.agent_initialization[agent_id]
-            self.sim_entities[agent_id].reset(
+            init_params = config.agent_initialization[agent_id]
+            entity.reset(
                 **{
-                    "x": i.position[0],
-                    "y": i.position[1],
-                    "z": i.position[2],
-                    "x_dot": i.velocity[0],
-                    "y_dot": i.velocity[1],
-                    "z_dot": i.velocity[2]
+                    "x": init_params.position[0],
+                    "y": init_params.position[1],
+                    "z": init_params.position[2],
+                    "x_dot": init_params.velocity[0],
+                    "y_dot": init_params.velocity[1],
+                    "z_dot": init_params.velocity[2]
                 }
             )
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     state = tmp.reset(reset_config)
     # print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
     for i in range(5):
-        state.sim_platforms[0]._controllers[0].apply_control(1)
+        # state.sim_platforms[0]._controllers[0].apply_control(1)
         # state.sim_platforms[0]._controllers[1].apply_control(2)
         # state.sim_platforms[0]._controllers[2].apply_control(3)
         # print(state.sim_platforms[0]._sensors[1].get_measurement())

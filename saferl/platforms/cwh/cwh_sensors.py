@@ -12,6 +12,7 @@ class CWHSensor(BaseSensor):
     def name(self) -> str:
         return self.__class__.__name__
 
+    @property
     def measurement_properties(self):
         raise NotImplementedError
 

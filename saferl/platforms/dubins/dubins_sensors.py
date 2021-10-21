@@ -14,6 +14,7 @@ class DubinsSensor(BaseSensor):
     def name(self) -> str:
         return self.__class__.__name__
 
+    @property
     def measurement_properties(self):
         raise NotImplementedError
 
@@ -23,6 +24,7 @@ class DubinsSensor(BaseSensor):
 
 class PositionSensor(DubinsSensor):
 
+    @property
     def measurement_properties(self):
         position_properties = MultiBoxProp(
             name="position", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["meters"] * 3, description="position of the aircraft"
@@ -42,6 +44,7 @@ PluginLibrary.AddClassToGroup(
 
 class VelocitySensor(DubinsSensor):
 
+    @property
     def measurement_properties(self):
         velocity_properties = MultiBoxProp(
             name="velocity", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["m/s"] * 3, description="velocity of the aircraft"
@@ -61,6 +64,7 @@ PluginLibrary.AddClassToGroup(
 
 class HeadingSensor(DubinsSensor):
 
+    @property
     def measurement_properties(self):
         heading_properties = MultiBoxProp(
             name="heading", low=[-2 * math.pi], high=[2 * math.pi], unit=["rad"], description="heading of the aircraft"
@@ -80,6 +84,7 @@ PluginLibrary.AddClassToGroup(
 
 class FlightPathSensor(DubinsSensor):
 
+    @property
     def measurement_properties(self):
         fp_properties = MultiBoxProp(
             name="flight_path_angle", low=[-2 * math.pi], high=[2 * math.pi], unit=["rad"], description="flight path angle of the aircraft"
@@ -101,6 +106,7 @@ class FlightPathSensor(DubinsSensor):
 
 class TimeSensor(DubinsSensor):
 
+    @property
     def measurement_properties(self):
         velocity_properties = MultiBoxProp(
             name="time", low=[-math.inf], high=[math.inf], unit=["sec"], description="time since beginning of simulation"

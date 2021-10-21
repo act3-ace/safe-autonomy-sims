@@ -40,6 +40,7 @@ class RateController(DubinsController):
     def get_validator(cls):
         return RateControllerValidator
 
+    @property
     def control_properties(self) -> Prop:
         raise NotImplementedError
 
