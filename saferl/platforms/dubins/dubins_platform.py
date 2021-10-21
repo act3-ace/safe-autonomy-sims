@@ -1,12 +1,26 @@
+"""
+This module defines the platforms used with saferl Dubins2dSimulator and Subins3dSimulator classes. It represents an
+aircraft operating under the Dubins dynamics model.
+"""
+
 import numpy as np
 from act3_rl_core.simulators.base_platform import BasePlatform
 
 
 class DubinsPlatform(BasePlatform):
     """
-    The __________________ as it's platform and
-    allows for saving an action to the platform for when the platform needs
+    A platform representing an aircraft operating under Dubins dynamics.
+    Allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function
+
+    Parameters
+    ----------
+    platform_name : str
+        Name of the platform
+    platform : sim_entity
+        Backend simulation entity associated with the platform
+    platform_config : dict
+        Platform-specific configuration dictionary
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -37,18 +51,50 @@ class DubinsPlatform(BasePlatform):
 
     @property
     def position(self):
+        """
+        The position of the platform
+
+        Returns
+        -------
+        np.ndarray
+            The position vector of the platform
+        """
         return self._platform.position
 
     @property
     def velocity(self):
+        """
+        The velocity of the platform
+
+        Returns
+        -------
+        np.ndarray
+            The velocity vector of the platform
+        """
         return self._platform.velocity
 
     @property
     def heading(self):
+        """
+        The heading of the platform
+
+        Returns
+        -------
+        float
+            The heading angle of the platform in radians
+        """
         return self._platform.heading
 
     @property
     def sim_time(self):
+        """
+        The current simulation time in seconds.
+
+        Returns
+        -------
+        float
+            Current simulation time
+        """
         return self._sim_time
 
     @sim_time.setter
@@ -62,9 +108,18 @@ class DubinsPlatform(BasePlatform):
 
 class Dubins2dPlatform(DubinsPlatform):
     """
-    The __________________ as it's platform and
-    allows for saving an action to the platform for when the platform needs
+    A platform representing an aircraft operating under 2D Dubins dynamics.
+    Allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function
+
+    Parameters
+    ----------
+    platform_name : str
+        Name of the platform
+    platform : sim_entity
+        Backend simulation entity associated with the platform
+    platform_config : dict
+        Platform-specific configuration dictionary
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -74,9 +129,18 @@ class Dubins2dPlatform(DubinsPlatform):
 
 class Dubins3dPlatform(DubinsPlatform):
     """
-    The __________________ as it's platform and
-    allows for saving an action to the platform for when the platform needs
+    A platform representing an aircraft operating under 3D Dubins dynamics.
+    Allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function
+
+    Parameters
+    ----------
+    platform_name : str
+        Name of the platform
+    platform : sim_entity
+        Backend simulation entity associated with the platform
+    platform_config : dict
+        Platform-specific configuration dictionary
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -85,10 +149,26 @@ class Dubins3dPlatform(DubinsPlatform):
 
     @property
     def flight_path_angle(self):
+        """
+        The flight path angle of the platform
+
+        Returns
+        -------
+        float
+            The flight path angle of the platform in radians
+        """
         return self._platform.gamma
 
     @property
     def roll(self):
+        """
+        The roll of the platform
+
+        Returns
+        -------
+        float
+            The roll angle of the platform in radians
+        """
         return self._platform.roll
 
 
