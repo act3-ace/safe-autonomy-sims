@@ -4,9 +4,9 @@ This module contains controllers for the CWH platform.
 
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.libraries.property import MultiBoxProp, Prop
 from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
 
+import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from saferl.simulators.cwh.cwh_simulator import CWHSimulator
 
@@ -25,16 +25,6 @@ class CWHController(BaseController):
             name of the controller
         """
         return self.config.name + self.__class__.__name__
-
-    @property
-    def control_properties(self) -> Prop:
-        """
-        Raises
-        ------
-        NotImplementedError
-            If the method has not been implemented
-        """
-        raise NotImplementedError
 
     def apply_control(self, control: np.ndarray) -> None:
         """
@@ -79,9 +69,10 @@ class ThrustController(CWHController):
         self,
         parent_platform,  # type: ignore # noqa: F821
         config,
-    ):
-
-        super().__init__(parent_platform=parent_platform, config=config)
+        control_properties=cwh_props.ThrustProp,
+        exclusiveness=set()
+    ):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
     @classmethod
     def get_validator(cls):
@@ -98,17 +89,6 @@ class ThrustController(CWHController):
         """
 
         return ThrustControllerValidator
-
-    @property
-    def control_properties(self) -> Prop:
-        """
-        Returns
-        -------
-        control_props: MultiBoxProp
-            describes the range of values and units of the thrust possible from this controller
-        """
-        control_props = MultiBoxProp(name=f"{self.name} Thrust", low=[-1], high=[1], unit=["newtons"], description="Thrust")
-        return control_props
 
     def apply_control(self, control: np.ndarray) -> None:
         """
