@@ -13,6 +13,7 @@ class CWHController(BaseController):
     def name(self):
         return self.config.name + self.__class__.__name__
 
+    @property
     def control_properties(self) -> Prop:
         raise NotImplementedError
 
