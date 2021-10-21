@@ -71,11 +71,11 @@ class PositionSensor(CWHSensor):
 
     def _calculate_measurement(self, state):
         """
-        Calculate the position
+        Calculate the measurement - position
 
         Returns
         -------
-        list of ints
+        list of floats
             position of spacecraft
         """
         return self.parent_platform.position
@@ -95,6 +95,15 @@ class VelocitySensor(CWHSensor):
 
     @property
     def measurement_properties(self):
+        """
+        Retreive the measurement properies.
+        Specifically here return the bounds and units of the velocity of spacecraft.
+
+        Returns
+        -------
+        velocity_properties : MultiBoxProp
+            bounds and units of the velocity measurement
+        """
         velocity_properties = MultiBoxProp(
             name="velocity", low=[-10000] * 3, high=[10000] * 3, unit=["m/s"] * 3, description="velocity of the spacecraft"
         )
@@ -102,6 +111,14 @@ class VelocitySensor(CWHSensor):
 
     # state - tuple
     def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - velocity
+
+        Returns
+        -------
+        list of floats
+            velocity of spacecraft
+        """
         return self.parent_platform.velocity
 
 
