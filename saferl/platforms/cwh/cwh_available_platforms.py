@@ -15,8 +15,10 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
     """
     CWH = (1, )
 
+    # TODO: Figure out mypy typing error and re-annotate
+
     @classmethod
-    def ParseFromNameModel(cls, config: dict) -> CWHAvailablePlatformTypes:
+    def ParseFromNameModel(cls, config: dict):
         """Given a config with the keys "model" and "name" determine the PlatformType
 
         Parameters
