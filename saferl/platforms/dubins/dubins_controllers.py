@@ -3,9 +3,9 @@ This module contains controllers for the Dubins platform.
 """
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.libraries.property import MultiBoxProp, Prop
 from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
 
+import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
 from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
@@ -13,10 +13,6 @@ from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator, Dubins3
 class DubinsController(BaseController):
     """Generic dubins controller
     """
-
-    @property
-    def name(self):
-        return self.config.name + self.__class__.__name__
 
     def apply_control(self, control: np.ndarray) -> None:
         raise NotImplementedError
@@ -38,29 +34,11 @@ class RateControllerValidator(BaseControllerValidator):
 
 class RateController(DubinsController):
     """Generic rate controller. Writes control action to platform's control vector and reads applied action from platform.
-
-    Parameters
-    ----------
-    parent_platform : DubinsPlatform
-        the platform to which the controller belongs
-    config : dict
-        contains configuration proprties
     """
-
-    def __init__(
-        self,
-        parent_platform,  # type: ignore # noqa: F821
-        config,
-    ):
-        super().__init__(parent_platform=parent_platform, config=config)
 
     @classmethod
     def get_validator(cls):
         return RateControllerValidator
-
-    @property
-    def control_properties(self) -> Prop:
-        raise NotImplementedError
 
     def apply_control(self, control: np.ndarray) -> None:
         self._parent_platform.save_action_to_platform(action=control, axis=self.config.axis)
@@ -73,10 +51,8 @@ class AccelerationController(RateController):
     """Applies acceleration control to dubins platform
     """
 
-    @property
-    def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="Acceleration", low=[-10], high=[10], unit=["m/s/s"], description="Acceleration")
-        return control_props
+    def __init__(self, parent_platform, config, control_properties=dubins_props.AccelerationProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
 
 PluginLibrary.AddClassToGroup(
@@ -91,10 +67,8 @@ class YawRateController(RateController):
     """Applies Yaw control to dubins platform
     """
 
-    @property
-    def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="YawRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)], unit=["rad/s"], description="Yaw Rate")
-        return control_props
+    def __init__(self, parent_platform, config, control_properties=dubins_props.YawRateProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
 
 PluginLibrary.AddClassToGroup(
@@ -121,20 +95,11 @@ class CombinedTurnRateAccelerationController(DubinsController):
         self,
         parent_platform,  # type: ignore # noqa: F821
         config,
-    ):
+        control_properties=dubins_props.YawAndAccelerationProp,
+        exclusiveness=set()
+    ):  # pylint: disable=W0102
 
-        super().__init__(parent_platform=parent_platform, config=config)
-
-    @property
-    def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(
-            name="TurnAcceleration",
-            low=[np.deg2rad(-6), -10],
-            high=[np.deg2rad(6), 10],
-            unit=["rad/s, m/s/s"],
-            description="Combined Turn Rate and Acceleration"
-        )
-        return control_props
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
     def apply_control(self, control: np.ndarray) -> None:
         self.parent_platform.save_action_to_platform(action=control)
@@ -168,20 +133,10 @@ class CombinedPitchRollAccelerationController(DubinsController):
         self,
         parent_platform,  # type: ignore # noqa: F821
         config,
-    ):
-
-        super().__init__(parent_platform=parent_platform, config=config)
-
-    @property
-    def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(
-            name="PitchRollAcc",
-            low=[np.deg2rad(-6), np.deg2rad(-6), -10],
-            high=[np.deg2rad(6), np.deg2rad(6), 10],
-            unit=["rad/s, rad/s, m/s/s"],
-            description="Combined Pitch Rate, Roll Rate, and Acceleration"
-        )
-        return control_props
+        control_properties=dubins_props.PitchRollAndAccelerationProp,
+        exclusiveness=set()
+    ):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
     def apply_control(self, control: np.ndarray) -> None:
         self.parent_platform.save_action_to_platform(action=control)
@@ -202,10 +157,8 @@ class PitchRateController(RateController):
     """Applies pitch rate control to dubins platform
     """
 
-    @property
-    def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="PitchRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)], unit=["rad/s"], description="Pitch Rate")
-        return control_props
+    def __init__(self, parent_platform, config, control_properties=dubins_props.PitchRateProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
 
 PluginLibrary.AddClassToGroup(
@@ -219,10 +172,8 @@ class RollRateController(RateController):
     """Applies roll rate control to dubins platform
     """
 
-    @property
-    def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="RollRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)], unit=["rad/s"], description="Roll Rate")
-        return control_props
+    def __init__(self, parent_platform, config, control_properties=dubins_props.RollRateProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
 
 PluginLibrary.AddClassToGroup(
