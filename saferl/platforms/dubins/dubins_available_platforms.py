@@ -16,8 +16,10 @@ class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
     DUBINS2D = (1, )
     DUBINS3D = (2, )
 
+    # TODO: Figure out mypy typing error and re-annotate
+
     @classmethod
-    def ParseFromNameModel(cls, config: dict) -> DubinsAvailablePlatformTypes:
+    def ParseFromNameModel(cls, config: dict):
         """Given a config with the keys "model" and "name" determine the PlatformType
 
         Raises:
