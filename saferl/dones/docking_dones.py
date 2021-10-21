@@ -15,6 +15,7 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     This class validates that the config contains the max_distance data needed for
     computations in the MaxDistanceDoneFucntion.
     """
+
     max_distance: float
 
 
@@ -83,6 +84,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     This class validates that the config contains the docking_region_radius data needed for
     computations in the SuccessfulDockingDoneFunction.
     """
+
     docking_region_radius: float
 
 
@@ -157,14 +159,18 @@ if __name__ == "__main__":
                 "platform_config": [
                     ("space.cwh.platforms.cwh_controllers.ThrustController", {
                         "name": "X Thrust", "axis": 0
-                    }), ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                    }),
+                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
                         "name": "Y Thrust", "axis": 1
-                    }), ("space.cwh.platforms.cwh_controllers.ThrustController", {
+                    }),
+                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
                         "name": "Z Thrust", "axis": 2
-                    }), ("space.cwh.platforms.cwh_sensors.PositionSensor", {}), ("space.cwh.platforms.cwh_sensors.VelocitySensor", {})
-                ]
+                    }),
+                    ("space.cwh.platforms.cwh_sensors.PositionSensor", {}),
+                    ("space.cwh.platforms.cwh_sensors.VelocitySensor", {}),
+                ],
             }
-        }
+        },
     }
 
     reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}

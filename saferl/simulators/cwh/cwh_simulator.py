@@ -18,6 +18,7 @@ class CWHPlatformConfigValidator(BaseModel):
     position: initial position of cwh platform
     velocity: initial velocity of cwh platform
     """
+
     position: typing.List[float]
     velocity: typing.List[float]
 
@@ -47,6 +48,7 @@ class CWHSimulatorResetValidator(BaseSimulatorResetValidator):
 
     agent_initialization: Dict of individual platform reset configs
     """
+
     agent_initialization: typing.Optional[typing.Dict[str, CWHPlatformConfigValidator]] = {
         "blue0": CWHPlatformConfigValidator(position=[0, 1, 2], velocity=[0, 0, 0])
     }
@@ -83,7 +85,7 @@ class CWHSimulator(SafeRLSimulator):
                     "z": init_params.position[2],
                     "x_dot": init_params.velocity[0],
                     "y_dot": init_params.velocity[1],
-                    "z_dot": init_params.velocity[2]
+                    "z_dot": init_params.velocity[2],
                 }
             )
 
@@ -99,14 +101,18 @@ if __name__ == "__main__":
                 "platform_config": [
                     ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
                         "name": "X Thrust", "axis": 0
-                    }), ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                    }),
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
                         "name": "Y Thrust", "axis": 1
-                    }), ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                    }),
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
                         "name": "Z Thrust", "axis": 2
-                    }), ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}), ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {})
-                ]
+                    }),
+                    ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}),
+                    ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {}),
+                ],
             }
-        }
+        },
     }
 
     reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}

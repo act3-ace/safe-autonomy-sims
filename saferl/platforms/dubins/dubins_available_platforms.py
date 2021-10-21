@@ -11,8 +11,8 @@ from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
 
 
 class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
-    """Enumeration that outlines the platform types that have been implemented
-    """
+    """Enumeration that outlines the platform types that have been implemented"""
+
     DUBINS2D = (1, )
     DUBINS3D = (2, )
 

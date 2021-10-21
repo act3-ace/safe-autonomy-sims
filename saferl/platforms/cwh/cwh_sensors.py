@@ -32,10 +32,8 @@ class PositionSensor(CWHSensor):
     Implementation of a sensor designed to give the position at any time
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=cwh_props.PositionProp, exclusiveness=set()):  # pylint: disable=W0102
-        super().__init__(
-            measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness
-        )
+    def __init__(self, parent_platform, config, measurement_properties=cwh_props.PositionProp):
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
 
     def _calculate_measurement(self, state):
         """
@@ -61,10 +59,8 @@ class VelocitySensor(CWHSensor):
     Implementation of a sensor to give velocity at any time
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=cwh_props.VelocityProp, exclusiveness=set()):  # pylint: disable=W0102
-        super().__init__(
-            measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness
-        )
+    def __init__(self, parent_platform, config, measurement_properties=cwh_props.VelocityProp):
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
 
     # state - tuple
     def _calculate_measurement(self, state):

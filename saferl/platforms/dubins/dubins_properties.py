@@ -1,3 +1,7 @@
+"""
+This module defines the measurement and control properties for Dubins aircraft sensors and controllers.
+"""
+
 import math
 import typing
 
@@ -8,6 +12,21 @@ from typing_extensions import Annotated
 
 
 class AccelerationProp(BoxProp):
+    """
+    Acceleration control properties.
+
+    name : str
+        control property name
+    low : list[float]
+        minimum bounds of control input
+    high : list[float]
+        maximum bounds of control input
+    unit : str
+        unit of measurement for control input
+    description : str
+        description of control properties
+    """
+
     name: str = "acceleration"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-96.5]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [96.5]
@@ -16,6 +35,21 @@ class AccelerationProp(BoxProp):
 
 
 class YawRateProp(BoxProp):
+    """
+    Yaw rate control properties.
+
+    name : str
+        control property name
+    low : list[float]
+        minimum bounds of control input
+    high : list[float]
+        maximum bounds of control input
+    unit : str
+        unit of measurement for control input
+    description : str
+        description of control properties
+    """
+
     name: str = "yaw_rate"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.deg2rad(-10)]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.deg2rad(10)]
@@ -24,6 +58,21 @@ class YawRateProp(BoxProp):
 
 
 class PitchRateProp(BoxProp):
+    """
+    Pitch rate control properties.
+
+    name : str
+        control property name
+    low : list[float]
+        minimum bounds of control input
+    high : list[float]
+        maximum bounds of control input
+    unit : str
+        unit of measurement for control input
+    description : str
+        description of control properties
+    """
+
     name: str = "pitch_rate"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.deg2rad(-10)]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.deg2rad(10)]
@@ -32,6 +81,21 @@ class PitchRateProp(BoxProp):
 
 
 class RollRateProp(BoxProp):
+    """
+    Roll rate control properties.
+
+    name : str
+        control property name
+    low : list[float]
+        minimum bounds of control input
+    high : list[float]
+        maximum bounds of control input
+    unit : str
+        unit of measurement for control input
+    description : str
+        description of control properties
+    """
+
     name: str = "roll_rate"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.deg2rad(-10)]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.deg2rad(10)]
@@ -40,6 +104,21 @@ class RollRateProp(BoxProp):
 
 
 class YawAndAccelerationProp(BoxProp):
+    """
+    Combined Yaw Rate and Acceleration control properties.
+
+    name : str
+        control property name
+    low : list[float]
+        minimum bounds of control input
+    high : list[float]
+        maximum bounds of control input
+    unit : str
+        unit of measurement for control input
+    description : str
+        description of control properties
+    """
+
     name: str = "yaw_acceleration"
     low: Annotated[typing.List[StrictFloat], Field(min_items=2, max_items=2)] = [np.deg2rad(-10), -96.5]
     high: Annotated[typing.List[StrictFloat], Field(min_items=2, max_items=2)] = [np.deg2rad(10), 96.5]
@@ -48,6 +127,21 @@ class YawAndAccelerationProp(BoxProp):
 
 
 class PitchRollAndAccelerationProp(BoxProp):
+    """
+    Combined Pitch Rate, Roll Rate, and Acceleration control properties.
+
+    name : str
+        control property name
+    low : list[float]
+        minimum bounds of control input
+    high : list[float]
+        maximum bounds of control input
+    unit : str
+        unit of measurement for control input
+    description : str
+        description of control properties
+    """
+
     name: str = "pitch_roll_acceleration"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [np.deg2rad(-5), np.deg2rad(-10), -96.5]
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [np.deg2rad(5), np.deg2rad(10), 96.5]
@@ -56,6 +150,21 @@ class PitchRollAndAccelerationProp(BoxProp):
 
 
 class PositionProp(BoxProp):
+    """
+    Position sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
     name: str = "position"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.inf] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [math.inf] * 3
@@ -64,6 +173,21 @@ class PositionProp(BoxProp):
 
 
 class VelocityProp(BoxProp):
+    """
+    Velocity sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
     name: str = "velocity"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.inf] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [math.inf] * 3
@@ -72,6 +196,21 @@ class VelocityProp(BoxProp):
 
 
 class HeadingProp(BoxProp):
+    """
+    Heading sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
     name: str = "heading"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.pi * 2]
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.pi * 2]
@@ -80,6 +219,21 @@ class HeadingProp(BoxProp):
 
 
 class FlightPathProp(BoxProp):
+    """
+    Flight path sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
     name: str = "flight_path"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.pi * 2]
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.pi * 2]

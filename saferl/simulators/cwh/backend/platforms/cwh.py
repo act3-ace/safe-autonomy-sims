@@ -4,16 +4,20 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from saferl.simulators.base_models.platforms import (
-    BaseActuatorSet, BaseLinearODESolverDynamics, BasePlatform,
-    BasePlatformStateVectorized, ContinuousActuator)
+    BaseActuatorSet,
+    BaseLinearODESolverDynamics,
+    BasePlatform,
+    BasePlatformStateVectorized,
+    ContinuousActuator,
+)
 
 
 class BaseCWHSpacecraft(BasePlatform):
     def generate_info(self):
         info = {
-            'state': self.state.vector,
-            'x_dot': self.x_dot,
-            'y_dot': self.y_dot,
+            "state": self.state.vector,
+            "x_dot": self.x_dot,
+            "y_dot": self.y_dot,
         }
 
         info_parent = super().generate_info()
@@ -49,7 +53,7 @@ class CWHSpacecraft3d(BaseCWHSpacecraft):
         super().__init__(name, dynamics, actuator_set, state, controller)
 
     def generate_info(self):
-        info = {'z_dot': self.z_dot}
+        info = {"z_dot": self.z_dot}
 
         info_parent = super().generate_info()
         info_ret = {**info_parent, **info}
@@ -87,7 +91,7 @@ class CWH2dState(BasePlatformStateVectorized):
 
     @property
     def position(self):
-        position = np.zeros((3, ))
+        position = np.zeros((3,))
         position[0:2] = self._vector[0:2]
         return position
 
@@ -147,8 +151,8 @@ class CWH3dState(BasePlatformStateVectorized):
 class CWH2dActuatorSet(BaseActuatorSet):
     def __init__(self):
         actuators = [
-            ContinuousActuator('thrust_x', [-100, 100], 0),
-            ContinuousActuator('thrust_y', [-100, 100], 0),
+            ContinuousActuator("thrust_x", [-100, 100], 0),
+            ContinuousActuator("thrust_y", [-100, 100], 0),
         ]
 
         super().__init__(actuators)
@@ -157,16 +161,16 @@ class CWH2dActuatorSet(BaseActuatorSet):
 class CWH3dActuatorSet(BaseActuatorSet):
     def __init__(self):
         actuators = [
-            ContinuousActuator('thrust_x', [-100, 100], 0),
-            ContinuousActuator('thrust_y', [-100, 100], 0),
-            ContinuousActuator('thrust_z', [-100, 100], 0),
+            ContinuousActuator("thrust_x", [-100, 100], 0),
+            ContinuousActuator("thrust_y", [-100, 100], 0),
+            ContinuousActuator("thrust_z", [-100, 100], 0),
         ]
 
         super().__init__(actuators)
 
 
 class CWH2dDynamics(BaseLinearODESolverDynamics):
-    def __init__(self, m=12, n=0.001027, integration_method='Euler'):
+    def __init__(self, m=12, n=0.001027, integration_method="Euler"):
         self.m = m  # kg
         self.n = n  # rads/s
 
@@ -176,27 +180,31 @@ class CWH2dDynamics(BaseLinearODESolverDynamics):
         m = self.m
         n = self.n
 
-        A = np.array([
-            [0, 0, 1, 0],
-            [0, 0, 0, 1],
-            [3 * n**2, 0, 0, 2 * n],
-            [0, 0, -2 * n, 0],
-        ],
-                     dtype=np.float64)
+        A = np.array(
+            [
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+                [3 * n ** 2, 0, 0, 2 * n],
+                [0, 0, -2 * n, 0],
+            ],
+            dtype=np.float64,
+        )
 
-        B = np.array([
-            [0, 0],
-            [0, 0],
-            [1 / m, 0],
-            [0, 1 / m],
-        ],
-                     dtype=np.float64)
+        B = np.array(
+            [
+                [0, 0],
+                [0, 0],
+                [1 / m, 0],
+                [0, 1 / m],
+            ],
+            dtype=np.float64,
+        )
 
         return A, B
 
 
 class CWH3dDynamics(BaseLinearODESolverDynamics):
-    def __init__(self, m=12, n=0.001027, integration_method='Euler'):
+    def __init__(self, m=12, n=0.001027, integration_method="Euler"):
         self.m = m  # kg
         self.n = n  # rads/s
 
@@ -206,24 +214,28 @@ class CWH3dDynamics(BaseLinearODESolverDynamics):
         m = self.m
         n = self.n
 
-        A = np.array([
-            [0, 0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 1, 0],
-            [0, 0, 0, 0, 0, 1],
-            [3 * n**2, 0, 0, 0, 2 * n, 0],
-            [0, 0, 0, -2 * n, 0, 0],
-            [0, 0, -n**2, 0, 0, 0],
-        ],
-                     dtype=np.float64)
+        A = np.array(
+            [
+                [0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 1],
+                [3 * n ** 2, 0, 0, 0, 2 * n, 0],
+                [0, 0, 0, -2 * n, 0, 0],
+                [0, 0, -(n ** 2), 0, 0, 0],
+            ],
+            dtype=np.float64,
+        )
 
-        B = np.array([
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [1 / m, 0, 0],
-            [0, 1 / m, 0],
-            [0, 0, 1 / m],
-        ],
-                     dtype=np.float64)
+        B = np.array(
+            [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [1 / m, 0, 0],
+                [0, 1 / m, 0],
+                [0, 0, 1 / m],
+            ],
+            dtype=np.float64,
+        )
 
         return A, B
