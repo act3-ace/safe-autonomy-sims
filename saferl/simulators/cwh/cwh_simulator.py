@@ -1,3 +1,6 @@
+"""
+This module contains the CWH Simulator for interacting with the CWH Docking task simulator
+"""
 import typing
 
 from act3_rl_core.libraries.plugin_library import PluginLibrary
@@ -10,23 +13,49 @@ from saferl.simulators.saferl_simulator import SafeRLSimulator
 
 
 class CWHPlatformConfigValidator(BaseModel):
+    """Validator for CWH Platform config
+
+    position: initial position of cwh platform
+    velocity: initial velocity of cwh platform
+    """
     position: typing.List[float]
     velocity: typing.List[float]
 
     @validator("position", "velocity")
-    def check_position_len(cls, v, field):
+    def check_3d_vec_len(cls, v, field):
+        """checks 3d vector field for length 3
+
+        Parameters
+        ----------
+        v : typing.List[float]
+            vector quantity to check
+        field : string
+            name of validator field
+
+        Returns
+        -------
+        typing.List[float]
+            v
+        """
         if len(v) != 3:
             raise ValueError(f"{field.name} provided to CWHPlatformValidator is not length 3")
         return v
 
 
 class CWHSimulatorResetValidator(BaseSimulatorResetValidator):
+    """Validator for CWH Simulator Reset config
+
+    agent_initialization: Dict of individual platform reset configs
+    """
     agent_initialization: typing.Optional[typing.Dict[str, CWHPlatformConfigValidator]] = {
         "blue0": CWHPlatformConfigValidator(position=[0, 1, 2], velocity=[0, 0, 0])
     }
 
 
 class CWHSimulator(SafeRLSimulator):
+    """
+    Simulator for CWH Docking Task. Interfaces CWH platforms with underlying CWH entities in Docking simulation.
+    """
 
     @classmethod
     def get_reset_validator(cls):
