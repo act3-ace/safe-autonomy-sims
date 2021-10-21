@@ -29,7 +29,7 @@ class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
         if config["name"] == "Dubins2d":
             return DubinsAvailablePlatformTypes.DUBINS2D
-        elif config["name"] == "Dubins3d":
+        if config["name"] == "Dubins3d":
             return DubinsAvailablePlatformTypes.DUBINS3D
 
         raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')

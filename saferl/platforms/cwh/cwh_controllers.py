@@ -26,6 +26,7 @@ class CWHController(BaseController):
         """
         return self.config.name + self.__class__.__name__
 
+    @property
     def control_properties(self) -> Prop:
         """
         Raises

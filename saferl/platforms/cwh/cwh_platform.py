@@ -1,12 +1,26 @@
+"""
+This module defines the platform used with saferl CWHSimulator class. It represents a spacecraft
+operating under the Clohessy-Wiltshire dynamics model.
+"""
+
 import numpy as np
 from act3_rl_core.simulators.base_platform import BasePlatform
 
 
 class CWHPlatform(BasePlatform):
     """
-    The __________________ as it's platform and
-    allows for saving an action to the platform for when the platform needs
+    A platform representing a spacecraft operating under CWH dynamics.
+    Allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function
+
+    Parameters
+    ----------
+    platform_name : str
+        Name of the platform
+    platform : sim_entity
+        Backend simulation entity associated with the platform
+    platform_config : dict
+        Platform-specific configuration dictionary
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -33,15 +47,39 @@ class CWHPlatform(BasePlatform):
         self._last_applied_action[axis] = action
 
     @property
-    def position(self):
+    def position(self) -> np.ndarray:
+        """
+        The position of the platform
+
+        Returns
+        -------
+        np.ndarray
+            The position vector of the platform
+        """
         return self._platform.position
 
     @property
     def velocity(self):
+        """
+        The velocity of the platform
+
+        Returns
+        -------
+        np.ndarray
+            The velocity vector of the platform
+        """
         return self._platform.velocity
 
     @property
     def sim_time(self):
+        """
+        The current simulation time in seconds.
+
+        Returns
+        -------
+        float
+            Current simulation time
+        """
         return self._sim_time
 
     @sim_time.setter

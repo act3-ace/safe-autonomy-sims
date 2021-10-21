@@ -49,7 +49,7 @@ class Dubins2dSimulator(SafeRLSimulator):
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
             init_params = config.agent_initialization[agent_id]
-            self.sim_entities[agent_id].reset(
+            entity.reset(
                 **{
                     "x": init_params.position[0], "y": init_params.position[1], "heading": init_params.heading, "v": init_params.speed
                 }
@@ -98,7 +98,7 @@ class Dubins3dSimulator(SafeRLSimulator):
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
             init_params = config.agent_initialization[agent_id]
-            self.sim_entities[agent_id].reset(
+            entity.reset(
                 **{
                     "x": init_params.position[0],
                     "y": init_params.position[1],
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     )
     for i in range(5):
         control = [1, 0, 0]
-        state.sim_platforms[0]._controllers[0].apply_control(control)
+        # state.sim_platforms[0]._controllers[0].apply_control(control)
         # state.sim_platforms[0]._controllers[0].apply_control(control[0])
         # state.sim_platforms[0]._controllers[1].apply_control(control[1])
         # state.sim_platforms[0]._controllers[2].apply_control(control[2])
