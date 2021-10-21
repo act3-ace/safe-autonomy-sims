@@ -11,13 +11,15 @@ from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
 
 
 class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
-    """Enumeration that outlines the platform types that have been implemented
-    """
+    """Enumeration that outlines the platform types that have been implemented"""
+
     DUBINS2D = (1, )
     DUBINS3D = (2, )
 
+    # TODO: Figure out mypy typing error and re-annotate
+
     @classmethod
-    def ParseFromNameModel(cls, config: dict) -> DubinsAvailablePlatformTypes:
+    def ParseFromNameModel(cls, config: dict):
         """Given a config with the keys "model" and "name" determine the PlatformType
 
         Raises:
@@ -29,7 +31,7 @@ class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
         if config["name"] == "Dubins2d":
             return DubinsAvailablePlatformTypes.DUBINS2D
-        elif config["name"] == "Dubins3d":
+        if config["name"] == "Dubins3d":
             return DubinsAvailablePlatformTypes.DUBINS3D
 
         raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')

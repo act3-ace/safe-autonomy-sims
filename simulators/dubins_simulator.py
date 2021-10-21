@@ -16,6 +16,7 @@ class DubinsSimulatorValidator(BaseSimulatorValidator):
 class DubinsPlatformConfigValidator(BaseModel):
     position: typing.List[float]
     velocity: typing.List[float]
+
     @validator("position", "velocity")
     def check_position_len(cls, v, field):
         if len(v) != 3:
@@ -28,7 +29,6 @@ class DubinsSimulatorResetValidator(BaseSimulatorResetValidator):
 
 
 class DubinsSimulator(BaseSimulator):
-
     @classmethod
     def get_simulator_validator(cls):
         return DubinsSimulatorValidator
@@ -48,15 +48,23 @@ class DubinsSimulator(BaseSimulator):
         for agent_id, entity in self.sim_entities.items():
             i = config.agent_initialization[agent_id]
             self.sim_entities[agent_id].reset(
-                **{"x": i.position[0], "y": i.position[1], "z": i.position[2],
-                    "x_dot": i.velocity[0], "y_dot": i.velocity[1], "z_dot": i.velocity[2]}
+                **{
+                    "x": i.position[0],
+                    "y": i.position[1],
+                    "z": i.position[2],
+                    "x_dot": i.velocity[0],
+                    "y_dot": i.velocity[1],
+                    "z_dot": i.velocity[2],
+                }
             )
         self._state.sim_platforms = self.get_platforms()
         self.update_sensor_measurements()
         return self._state
 
     def get_platforms(self):
-        sim_platforms = tuple(DubinsPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items())
+        sim_platforms = tuple(
+            DubinsPlatform(entity, self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
+        )
         return sim_platforms
 
     def update_sensor_measurements(self):
@@ -89,8 +97,7 @@ if __name__ == "__main__":
         "step_size": 1,
         "agent_configs": {
             "blue0": {
-                "sim_config": {
-                },
+                "sim_config": {},
                 "platform_config": [
                     # (
                     #     "space.cwh.platforms.cwh_controllers.ThrustController",
@@ -112,19 +119,12 @@ if __name__ == "__main__":
                     #     "space.cwh.platforms.cwh_sensors.VelocitySensor",
                     #     {}
                     # )
-                ]
+                ],
             }
-        }
+        },
     }
 
-    reset_config = {
-        "agent_initialization": {
-            "blue0": {
-                "position": [0, 1, 2],
-                "velocity": [0, 0, 0]
-            }
-        }
-    }
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}
 
     tmp = DubinsSimulator(**tmp_config)
     state = tmp.reset(reset_config)
