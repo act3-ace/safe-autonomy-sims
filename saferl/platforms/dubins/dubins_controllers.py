@@ -1,10 +1,10 @@
 import numpy as np
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.libraries.property import MultiBoxProp, Prop
 from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
-from act3_rl_core.libraries.plugin_library import PluginLibrary
 
-from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
+from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
 
 class DubinsController(BaseController):
@@ -22,11 +22,13 @@ class DubinsController(BaseController):
 
 # TODO: Find a better way to save actions to platform instead of storing an axis in the saved vector
 
+
 class RateControllerValidator(BaseControllerValidator):
     axis: int
 
 
 class RateController(DubinsController):
+
     def __init__(
         self,
         parent_platform,  # type: ignore # noqa: F821
@@ -52,13 +54,13 @@ class AccelerationController(RateController):
 
     @property
     def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="Acceleration", low=[-10], high=[10],
-                                     unit=["m/s/s"], description="Acceleration")
+        control_props = MultiBoxProp(name="Acceleration", low=[-10], high=[10], unit=["m/s/s"], description="Acceleration")
         return control_props
 
 
 PluginLibrary.AddClassToGroup(
-    AccelerationController, "Controller_Acceleration", {
+    AccelerationController,
+    "Controller_Acceleration", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
@@ -68,8 +70,7 @@ class YawRateController(RateController):
 
     @property
     def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="YawRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)],
-                                     unit=["rad/s"], description="Yaw Rate")
+        control_props = MultiBoxProp(name="YawRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)], unit=["rad/s"], description="Yaw Rate")
         return control_props
 
 
@@ -78,7 +79,6 @@ PluginLibrary.AddClassToGroup(
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
-
 
 # ------ 2D Only --------
 
@@ -95,8 +95,13 @@ class CombinedTurnRateAccelerationController(DubinsController):
 
     @property
     def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name=f"TurnAcceleration", low=[np.deg2rad(-6), -10], high=[np.deg2rad(6), 10],
-                                     unit=["rad/s, m/s/s"], description="Combined Turn Rate and Acceleration")
+        control_props = MultiBoxProp(
+            name=f"TurnAcceleration",
+            low=[np.deg2rad(-6), -10],
+            high=[np.deg2rad(6), 10],
+            unit=["rad/s, m/s/s"],
+            description="Combined Turn Rate and Acceleration"
+        )
         return control_props
 
     def apply_control(self, control: np.ndarray) -> None:
@@ -107,11 +112,11 @@ class CombinedTurnRateAccelerationController(DubinsController):
 
 
 PluginLibrary.AddClassToGroup(
-    CombinedTurnRateAccelerationController, "Controller_TurnAcc", {
+    CombinedTurnRateAccelerationController,
+    "Controller_TurnAcc", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
-
 
 # --------- 3D Only ------------
 
@@ -128,10 +133,13 @@ class CombinedPitchRollAccelerationController(DubinsController):
 
     @property
     def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name=f"PitchRollAcc", low=[np.deg2rad(-6), np.deg2rad(-6), -10],
-                                     high=[np.deg2rad(6), np.deg2rad(6), 10],
-                                     unit=["rad/s, rad/s, m/s/s"],
-                                     description="Combined Pitch Rate, Roll Rate, and Acceleration")
+        control_props = MultiBoxProp(
+            name=f"PitchRollAcc",
+            low=[np.deg2rad(-6), np.deg2rad(-6), -10],
+            high=[np.deg2rad(6), np.deg2rad(6), 10],
+            unit=["rad/s, rad/s, m/s/s"],
+            description="Combined Pitch Rate, Roll Rate, and Acceleration"
+        )
         return control_props
 
     def apply_control(self, control: np.ndarray) -> None:
@@ -142,7 +150,8 @@ class CombinedPitchRollAccelerationController(DubinsController):
 
 
 PluginLibrary.AddClassToGroup(
-    CombinedPitchRollAccelerationController, "Controller_PitchRollAcc", {
+    CombinedPitchRollAccelerationController,
+    "Controller_PitchRollAcc", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
@@ -152,8 +161,7 @@ class PitchRateController(RateController):
 
     @property
     def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="PitchRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)],
-                                     unit=["rad/s"], description="Pitch Rate")
+        control_props = MultiBoxProp(name="PitchRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)], unit=["rad/s"], description="Pitch Rate")
         return control_props
 
 
@@ -168,8 +176,7 @@ class RollRateController(RateController):
 
     @property
     def control_properties(self) -> Prop:
-        control_props = MultiBoxProp(name="RollRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)],
-                                     unit=["rad/s"], description="Roll Rate")
+        control_props = MultiBoxProp(name="RollRate", low=[np.deg2rad(-6)], high=[np.deg2rad(6)], unit=["rad/s"], description="Roll Rate")
         return control_props
 
 
