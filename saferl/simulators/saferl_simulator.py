@@ -11,6 +11,8 @@ from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorV
 
 class SafeRLSimulatorValidator(BaseSimulatorValidator):
     """
+    A validator for the SafeRLSimulator config.
+
     step_size: A float representing how many simulated seconds pass each time the simulator updates
     """
     step_size: float
