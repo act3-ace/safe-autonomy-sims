@@ -1,6 +1,7 @@
 import numpy as np
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
+from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 # done conditions
 # crash, distance , timeout
@@ -25,19 +26,19 @@ class SuccessfulRejoinFunction(DoneFuncBase):
         # eventually will include velocity constraint
         done = DoneDict()
 
-        # placeholder til we find out how to find lead_aircraft
-        lead_aircraft_id = 8
-        wingman_id = 6
+        lead_aircraft_platform = get_platform_by_name(next_state,self.config.lead)
+        wingman_agent_platform = get_platform_by_name(next_state,self.agent)
 
-        # find lead aircraft
-        lead_aircraft = next_state.sim_state[lead_aircraft_id]
-        wingman = next_state.sim_state[wingman_id]
+        # compute the rejoin region , using all three pieces of info
 
-        rejoin_region_center = lead_aircraft.rejoin_region_center
-
-        # Rejoin region will change with where the aircraft is
-
+        # all 3 pieces
         rejoin_region_radius = self.config.rejoin_region_radius
+        lead_orientation = lead_aircraft_platform.lead_orientation
+        offset_vector = np.array(self.config.offset_values)
+
+        # rotate vector then add it to the lead center
+        rotated_vector = lead_orientation.apply(offset_vector)
+        rejoin_region_center = lead_aircraft_platform.position + rotated_vector
 
         radial_distance = np.linalg.norm(np.array(position) - rejoin_region_center)
         done[self.agent] = radial_distance <= rejoin_region_center
@@ -65,10 +66,15 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         done = DoneDict()
 
-        position = next_state.sim_platforms[0].position
+        wingman_agent_platform = get_platform_by_name(next_state,self.agent)
 
-        # compute to origin
-        origin = np.array([0, 0, 0])
+        # all 3 pieces
+        rejoin_region_radius = self.config.rejoin_region_radius
+        lead_orientation = lead_aircraft_platform.lead_orientation
+        offset_vector = np.array(self.config.offset_values)
+
+
+
         dist = np.linalg.norm(origin - np.array(position))
 
         done[self.agent] = dist > self.config.max_distance
