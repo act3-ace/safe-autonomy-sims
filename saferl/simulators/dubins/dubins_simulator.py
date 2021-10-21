@@ -4,8 +4,8 @@ from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_simulator import BaseSimulatorResetValidator
 from pydantic import BaseModel, validator
 
-from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
 import saferl.simulators.dubins.backend.platforms as bp
+from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator
 
 
@@ -39,7 +39,9 @@ class Dubins2dSimulator(SafeRLSimulator):
 
     def get_platforms(self):
         sim_platforms = tuple(
-            Dubins2dPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
+            Dubins2dPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config)
+            for agent_id,
+            entity in self.sim_entities.items()
         )
         return sim_platforms
 
@@ -49,10 +51,7 @@ class Dubins2dSimulator(SafeRLSimulator):
             init_params = config.agent_initialization[agent_id]
             self.sim_entities[agent_id].reset(
                 **{
-                    "x": init_params.position[0],
-                    "y": init_params.position[1],
-                    "heading": init_params.heading,
-                    "v": init_params.speed
+                    "x": init_params.position[0], "y": init_params.position[1], "heading": init_params.heading, "v": init_params.speed
                 }
             )
 
@@ -89,7 +88,9 @@ class Dubins3dSimulator(SafeRLSimulator):
 
     def get_platforms(self):
         sim_platforms = tuple(
-            Dubins3dPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config) for agent_id, entity in self.sim_entities.items()
+            Dubins3dPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config)
+            for agent_id,
+            entity in self.sim_entities.items()
         )
         return sim_platforms
 
@@ -111,7 +112,6 @@ class Dubins3dSimulator(SafeRLSimulator):
 
 
 PluginLibrary.AddClassToGroup(Dubins3dSimulator, "Dubins3dSimulator", {})
-
 
 if __name__ == "__main__":
     tmp_config_2d = {
@@ -164,17 +164,17 @@ if __name__ == "__main__":
         }
     }
 
-
     # reset_config = {"agent_initialization": {"blue0": {"position": [0, 1], "heading": 0, "speed": 50}}}
-    reset_config = {"agent_initialization": {
-        "blue0": {"position": [0, 1, 2], "heading": 0, "speed": 50, "gamma": 0, "roll": 0}}}
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "heading": 0, "speed": 50, "gamma": 0, "roll": 0}}}
 
     # tmp = Dubins2dSimulator(**tmp_config_2d)
     tmp = Dubins3dSimulator(**tmp_config_3d)
 
     state = tmp.reset(reset_config)
     print(
-        f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}")
+        f"Position: {state.sim_platforms[0].position}\t "
+        f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
+    )
     for i in range(5):
         control = [1, 0, 0]
         state.sim_platforms[0]._controllers[0].apply_control(control)
@@ -183,4 +183,7 @@ if __name__ == "__main__":
         # state.sim_platforms[0]._controllers[2].apply_control(control[2])
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
-        print(f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}")
+        print(
+            f"Position: {state.sim_platforms[0].position}\t "
+            f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
+        )
