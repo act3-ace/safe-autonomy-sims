@@ -1,7 +1,7 @@
 import typing
 
 import numpy as np
-from act3_rl_core.libraries.property import MultiBoxProp, Prop
+from act3_rl_core.libraries.property import DiscreteProp, Prop
 from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 
@@ -53,19 +53,10 @@ class CombinedControllerValidator(BaseControllerValidator):
 
 
 class RateController(DubinsController):
-    def __init__(
-        self,
-        parent_platform,  # type: ignore # noqa: F821
-        config,
-    ):
-        super().__init__(parent_platform=parent_platform, config=config)
 
     @classmethod
     def get_validator(cls):
         return RateControllerValidator
-
-    def control_properties(self) -> Prop:
-        raise NotImplementedError
 
     def apply_control(self, control: np.ndarray) -> None:
         self._parent_platform.save_action_to_platform(action=control, axis=self.config.axis)
@@ -99,7 +90,7 @@ PluginLibrary.AddClassToGroup(
 
 
 class YawRateControllerValidator(RateControllerValidator):
-    bounds: typing.Optional[typing.List[float]] = [-10, 10]
+    bounds: typing.Optional[typing.List[float]] = [np.deg2rad(-10), np.deg2rad(10)]
 
 
 class YawRateController(RateController):
@@ -111,7 +102,7 @@ class YawRateController(RateController):
     @property
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(name="YawRate", low=[self.config.bounds[0]], high=[self.config.bounds[1]],
-                                     unit=["deg/s"], description="Yaw Rate")
+                                     unit=["rad/s"], description="Yaw Rate")
         return control_props
 
 
@@ -126,7 +117,7 @@ PluginLibrary.AddClassToGroup(
 
 
 class CombinedTurnRateAccelerationControllerValidator(CombinedControllerValidator):
-    bounds: typing.Optional[typing.List[typing.List]] = [[-10, -96.5], [10, 96.5]]
+    bounds: typing.Optional[typing.List[typing.List]] = [[np.deg2rad(-10), -96.5], [np.deg2rad(10), 96.5]]
 
     @validator("bounds")
     def check_inner_len(cls, v):
@@ -155,7 +146,7 @@ class CombinedTurnRateAccelerationController(DubinsController):
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(name=f"TurnAcceleration", low=[bound for bound in self.config.bounds[0]],
                                      high=[bound for bound in self.config.bounds[1]],
-                                     unit=["deg/s, ft/s/s"], description="Combined Turn Rate and Acceleration")
+                                     unit=["rad/s, ft/s/s"], description="Combined Turn Rate and Acceleration")
         return control_props
 
     def apply_control(self, control: np.ndarray) -> None:
@@ -176,7 +167,8 @@ PluginLibrary.AddClassToGroup(
 
 
 class CombinedPitchRollAccelerationControllerValidator(CombinedControllerValidator):
-    bounds: typing.Optional[typing.List[typing.List]] = [[-5, -10, -96.5], [5, 10, 96.5]]
+    bounds: typing.Optional[typing.List[typing.List]] = [[np.deg2rad(-5), np.deg2rad(-10), -96.5],
+                                                         [np.deg2rad(5), np.deg2rad(10), 96.5]]
 
     @validator("bounds")
     def check_inner_len(cls, v):
@@ -205,7 +197,7 @@ class CombinedPitchRollAccelerationController(DubinsController):
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(name=f"PitchRollAcc", low=[bound for bound in self.config.bounds[0]],
                                      high=[bound for bound in self.config.bounds[1]],
-                                     unit=["deg/s, deg/s, ft/s/s"],
+                                     unit=["rad/s, rad/s, ft/s/s"],
                                      description="Combined Pitch Rate, Roll Rate, and Acceleration")
         return control_props
 
@@ -224,7 +216,7 @@ PluginLibrary.AddClassToGroup(
 
 
 class PitchRateControllerValidator(RateControllerValidator):
-    bounds: typing.Optional[typing.List[float]] = [-5, 5]
+    bounds: typing.Optional[typing.List[float]] = [np.deg2rad(-5), np.deg2rad(5)]
 
 
 class PitchRateController(RateController):
@@ -236,7 +228,7 @@ class PitchRateController(RateController):
     @property
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(name="PitchRate", low=[self.config.bounds[0]], high=[self.config.bounds[1]],
-                                     unit=["deg/s"], description="Pitch Rate")
+                                     unit=["rad/s"], description="Pitch Rate")
         return control_props
 
 
@@ -248,7 +240,7 @@ PluginLibrary.AddClassToGroup(
 
 
 class RollRateControllerValidator(RateControllerValidator):
-    bounds: typing.Optional[typing.List[float]] = [-10, 10]
+    bounds: typing.Optional[typing.List[float]] = [np.deg2rad(-10), np.deg2rad(10)]
 
 
 class RollRateController(RateController):
@@ -260,7 +252,7 @@ class RollRateController(RateController):
     @property
     def control_properties(self) -> Prop:
         control_props = MultiBoxProp(name="RollRate", low=[self.config.bounds[0]], high=[self.config.bounds[1]],
-                                     unit=["deg/s"], description="Roll Rate")
+                                     unit=["rad/s"], description="Roll Rate")
         return control_props
 
 
