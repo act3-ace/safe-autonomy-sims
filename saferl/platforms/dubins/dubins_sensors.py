@@ -1,22 +1,12 @@
-import math
-
-from act3_rl_core.libraries.property import MultiBoxProp
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_parts import BaseSensor
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-
-from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
+import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
+from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
 
 
 class DubinsSensor(BaseSensor):
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
-
-    def measurement_properties(self):
-        raise NotImplementedError
 
     def _calculate_measurement(self, state):
         raise NotImplementedError
@@ -24,11 +14,10 @@ class DubinsSensor(BaseSensor):
 
 class PositionSensor(DubinsSensor):
 
-    def measurement_properties(self):
-        position_properties = MultiBoxProp(
-            name="position", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["meters"] * 3, description="position of the aircraft"
+    def __init__(self, parent_platform, config, measurement_properties=dubins_props.PositionProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(
+            measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness
         )
-        return position_properties
 
     def _calculate_measurement(self, state):
         return self.parent_platform.position
@@ -43,11 +32,10 @@ PluginLibrary.AddClassToGroup(
 
 class VelocitySensor(DubinsSensor):
 
-    def measurement_properties(self):
-        velocity_properties = MultiBoxProp(
-            name="velocity", low=[-math.inf] * 3, high=[math.inf] * 3, unit=["m/s"] * 3, description="velocity of the aircraft"
+    def __init__(self, parent_platform, config, measurement_properties=dubins_props.VelocityProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(
+            measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness
         )
-        return velocity_properties
 
     def _calculate_measurement(self, state):
         return self.parent_platform.velocity
@@ -62,11 +50,10 @@ PluginLibrary.AddClassToGroup(
 
 class HeadingSensor(DubinsSensor):
 
-    def measurement_properties(self):
-        heading_properties = MultiBoxProp(
-            name="heading", low=[-2*math.pi], high=[2*math.pi], unit=["rad"], description="heading of the aircraft"
+    def __init__(self, parent_platform, config, measurement_properties=dubins_props.HeadingProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(
+            measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness
         )
-        return heading_properties
 
     def _calculate_measurement(self, state):
         return self.parent_platform.heading
@@ -81,12 +68,10 @@ PluginLibrary.AddClassToGroup(
 
 class FlightPathSensor(DubinsSensor):
 
-    def measurement_properties(self):
-        fp_properties = MultiBoxProp(
-            name="flight_path_angle", low=[-2*math.pi], high=[2*math.pi], unit=["rad"],
-            description="flight path angle of the aircraft"
+    def __init__(self, parent_platform, config, measurement_properties=dubins_props.FlightPathProp, exclusiveness=set()):  # pylint: disable=W0102
+        super().__init__(
+            measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness
         )
-        return fp_properties
 
     def _calculate_measurement(self, state):
         return self.parent_platform.gamma
@@ -98,16 +83,16 @@ class FlightPathSensor(DubinsSensor):
 #     }
 # )
 
-
 # TODO: Add to plugin group
 
-class TimeSensor(DubinsSensor):
-
-    def measurement_properties(self):
-        velocity_properties = MultiBoxProp(
-            name="time", low=[-math.inf], high=[math.inf], unit=["sec"], description="time since beginning of simulation"
-        )
-        return velocity_properties
-
-    def _calculate_measurement(self, state):
-        return self.parent_platform.sim_time
+# class TimeSensor(DubinsSensor):
+#
+#     def measurement_properties(self):
+#         velocity_properties = MultiBoxProp(
+#             name="time", low=[-math.inf], high=[math.inf], unit=["sec"],
+#             description="time since beginning of simulation"
+#         )
+#         return velocity_properties
+#
+#     def _calculate_measurement(self, state):
+#         return self.parent_platform.sim_time
