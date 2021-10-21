@@ -172,7 +172,8 @@ if __name__ == "__main__":
 
     state = tmp.reset(reset_config)
     print(
-        f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
+        f"Position: {state.sim_platforms[0].position}\t "
+        f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
     )
     for i in range(5):
         control = [1, 0, 0]
@@ -183,5 +184,6 @@ if __name__ == "__main__":
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
         print(
-            f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
+            f"Position: {state.sim_platforms[0].position}\t "
+            f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
         )
