@@ -1,5 +1,5 @@
 # https://github.com/apache/airflow/blob/master/.pre-commit-config.yaml
-exclude: backend|base_models|.*\.md
+exclude: saferl_sim|.*\.md
 default_language_version:
   python: python3.8
 repos:

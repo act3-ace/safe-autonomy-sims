@@ -7,7 +7,7 @@ from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_simulator import BaseSimulatorResetValidator
 from pydantic import BaseModel, validator
 
-import saferl.simulators.dubins.backend.platforms as bp
+import saferl_sim.dubins.platforms as bp
 from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator
 
