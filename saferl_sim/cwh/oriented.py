@@ -3,7 +3,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl.simulators.base_models.platforms import (
+from saferl_sim.base_models import (
     BaseActuatorSet,
     BaseLinearODESolverDynamics,
     BasePlatform,
@@ -13,6 +13,7 @@ from saferl.simulators.base_models.platforms import (
 
 
 class CWHSpacecraftOriented2d(BasePlatform):
+
     def __init__(self, name, controller=None, **kwargs):
         self.mass = 12  # kg
         self.moment = 0.056  # kg*m^2
@@ -63,12 +64,13 @@ class CWHSpacecraftOriented2d(BasePlatform):
 
 
 class CWHOriented2dState(BasePlatformStateVectorized):
+
     def build_vector(self, x=0, y=0, theta=0, x_dot=0, y_dot=0, theta_dot=0, react_wheel_ang_vel=0, **kwargs):
         return np.array([x, y, theta, x_dot, y_dot, theta_dot, react_wheel_ang_vel], dtype=np.float64)
 
     @property
     def vector_shape(self):
-        return (7,)
+        return (7, )
 
     @property
     def x(self):
@@ -104,7 +106,7 @@ class CWHOriented2dState(BasePlatformStateVectorized):
 
     @property
     def position(self):
-        position = np.zeros((3,))
+        position = np.zeros((3, ))
         position[0:2] = self._vector[0:2]
         return position
 
@@ -119,6 +121,7 @@ class CWHOriented2dState(BasePlatformStateVectorized):
 
 
 class CWHOriented2dActuatorSet(BaseActuatorSet):
+
     def __init__(self):
         actuators = [
             ContinuousActuator("thrust", [-100, 100], 0),
@@ -129,6 +132,7 @@ class CWHOriented2dActuatorSet(BaseActuatorSet):
 
 
 class CWHOriented2dDynamics(BaseLinearODESolverDynamics):
+
     def __init__(self, platform, integration_method="Euler"):
         self.platform = platform
 
@@ -171,7 +175,7 @@ class CWHOriented2dDynamics(BaseLinearODESolverDynamics):
             [
                 [0, 0, 1, 0],
                 [0, 0, 0, 1],
-                [3 * n ** 2, 0, 0, 2 * n],
+                [3 * n**2, 0, 0, 2 * n],
                 [0, 0, -2 * n, 0],
             ],
             dtype=np.float64,

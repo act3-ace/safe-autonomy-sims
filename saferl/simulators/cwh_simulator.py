@@ -8,8 +8,8 @@ from act3_rl_core.simulators.base_simulator import BaseSimulatorResetValidator
 from pydantic import BaseModel, validator
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl.simulators.cwh.backend.platforms.cwh import CWHSpacecraft3d
 from saferl.simulators.saferl_simulator import SafeRLSimulator
+from saferl_sim.cwh.cwh import CWHSpacecraft3d
 
 
 class CWHPlatformConfigValidator(BaseModel):
