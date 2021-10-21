@@ -71,8 +71,7 @@ class Point(BaseGeometry):
 
     @position.setter
     def position(self, value):
-        assert isinstance(value, np.ndarray) and value.shape == (
-            3, ), "Position must be set in a numpy ndarray with shape=(3,)"
+        assert isinstance(value, np.ndarray) and value.shape == (3,), "Position must be set in a numpy ndarray with shape=(3,)"
         self._center = copy.deepcopy(value)
 
     @property
@@ -92,9 +91,9 @@ class Point(BaseGeometry):
 
     def generate_info(self):
         info = {
-            'x': self.x,
-            'y': self.y,
-            'z': self.z,
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
         }
 
         return info
@@ -106,14 +105,13 @@ class Circle(Point):
         self.radius = radius
 
     def contains(self, other):
-        radial_distance = np.linalg.norm(self.position[0:2] -
-                                         other.position[0:2])
+        radial_distance = np.linalg.norm(self.position[0:2] - other.position[0:2])
         is_contained = radial_distance <= self.radius
         return is_contained
 
     def generate_info(self):
         info = super().generate_info()
-        info['radius'] = self.radius
+        info["radius"] = self.radius
 
         return info
 
@@ -131,35 +129,35 @@ class Cylinder(Circle):
         super().__init__(name, x=x, y=y, z=z, radius=radius)
 
     def contains(self, other):
-        radial_distance = np.linalg.norm(self.position[0:2] -
-                                         other.position[0:2])
+        radial_distance = np.linalg.norm(self.position[0:2] - other.position[0:2])
         axial_distance = abs(self.position[2] - other.position[2])
 
-        is_contained = (radial_distance <= self.radius) and (axial_distance <=
-                                                             (self.height / 2))
+        is_contained = (radial_distance <= self.radius) and (axial_distance <= (self.height / 2))
         return is_contained
 
     def generate_info(self):
         info = super().generate_info()
-        info['height'] = self.height
+        info["height"] = self.height
 
         return info
 
 
 class RelativeGeometry(BaseEnvObj):
-    def __init__(self,
-                 ref,
-                 shape,
-                 track_orientation=False,
-                 x_offset=None,
-                 y_offset=None,
-                 z_offset=None,
-                 r_offset=None,
-                 theta_offset=None,
-                 aspect_angle=None,
-                 euler_decomp_axis=None,
-                 init=None,
-                 **kwargs):
+    def __init__(
+        self,
+        ref,
+        shape,
+        track_orientation=False,
+        x_offset=None,
+        y_offset=None,
+        z_offset=None,
+        r_offset=None,
+        theta_offset=None,
+        aspect_angle=None,
+        euler_decomp_axis=None,
+        init=None,
+        **kwargs
+    ):
         """
 
         Constructs RelativeGeometry Object
@@ -201,22 +199,20 @@ class RelativeGeometry(BaseEnvObj):
         """
 
         # check that both x_offset and y_offset are used at the same time if used
-        assert (x_offset is None) == (y_offset is None), \
-            "if either x_offset or y_offset is used, both x_offset and y_offset must be used"
+        assert (x_offset is None) == (y_offset is None), "if either x_offset or y_offset is used, both x_offset and y_offset must be used"
 
         # check that only r_offset, theta_offset or x/y/z offset are specified
         assert ((r_offset is not None) or (theta_offset is not None) or (aspect_angle is not None)) != (
-            (x_offset is not None) or (y_offset is not None)), \
-            "user either polar or x/y relative position definiton, not both"
+            (x_offset is not None) or (y_offset is not None)
+        ), "user either polar or x/y relative position definiton, not both"
 
         # check that only theta_offset or aspect_angle is used
-        assert ((theta_offset is None) or (aspect_angle is None)
-                ), "specify either theta_offset or aspect_angle, not both"
+        assert (theta_offset is None) or (aspect_angle is None), "specify either theta_offset or aspect_angle, not both"
 
         # convert aspect angle to theta
         if aspect_angle is not None:
             aspect_angle_rad = np.deg2rad(aspect_angle)
-            theta_offset = (math.pi + aspect_angle_rad)
+            theta_offset = math.pi + aspect_angle_rad
 
         # convert polar to x,y offset
         if (x_offset is None) and (y_offset is None):
@@ -235,8 +231,7 @@ class RelativeGeometry(BaseEnvObj):
         self.track_orientation = track_orientation
         self.euler_decomp_axis = euler_decomp_axis
 
-        self._cartesian_offset = np.array([x_offset, y_offset, z_offset],
-                                          dtype=np.float64)
+        self._cartesian_offset = np.array([x_offset, y_offset, z_offset], dtype=np.float64)
 
         self.shape = shape
 
@@ -251,11 +246,10 @@ class RelativeGeometry(BaseEnvObj):
     def update(self):
         ref_orientation = self.ref.orientation
 
-        if self.euler_decomp_axis == 'z':
+        if self.euler_decomp_axis == "z":
             raise NotImplementedError
         elif self.euler_decomp_axis is not None:
-            raise ValueError("Invalid euler_decomp_axis {}".format(
-                self.euler_decomp_axis))
+            raise ValueError("Invalid euler_decomp_axis {}".format(self.euler_decomp_axis))
 
         offset = ref_orientation.apply(self._cartesian_offset)
 
@@ -309,17 +303,19 @@ class RelativeGeometry(BaseEnvObj):
 
 
 class RelativePoint(RelativeGeometry):
-    def __init__(self,
-                 ref,
-                 track_orientation=False,
-                 x_offset=None,
-                 y_offset=None,
-                 z_offset=None,
-                 r_offset=None,
-                 theta_offset=None,
-                 aspect_angle=None,
-                 init=None,
-                 **kwargs):
+    def __init__(
+        self,
+        ref,
+        track_orientation=False,
+        x_offset=None,
+        y_offset=None,
+        z_offset=None,
+        r_offset=None,
+        theta_offset=None,
+        aspect_angle=None,
+        init=None,
+        **kwargs
+    ):
         shape = Point(**kwargs)
 
         super().__init__(
@@ -337,29 +333,33 @@ class RelativePoint(RelativeGeometry):
 
 
 class RelativeCircle(RelativeGeometry):
-    def __init__(self,
-                 ref,
-                 track_orientation=False,
-                 x_offset=None,
-                 y_offset=None,
-                 z_offset=None,
-                 r_offset=None,
-                 theta_offset=None,
-                 aspect_angle=None,
-                 init=None,
-                 **kwargs):
+    def __init__(
+        self,
+        ref,
+        track_orientation=False,
+        x_offset=None,
+        y_offset=None,
+        z_offset=None,
+        r_offset=None,
+        theta_offset=None,
+        aspect_angle=None,
+        init=None,
+        **kwargs
+    ):
         shape = Circle(**kwargs)
 
-        super().__init__(ref,
-                         shape,
-                         track_orientation=track_orientation,
-                         x_offset=x_offset,
-                         y_offset=y_offset,
-                         z_offset=z_offset,
-                         r_offset=r_offset,
-                         theta_offset=theta_offset,
-                         aspect_angle=aspect_angle,
-                         init=init)
+        super().__init__(
+            ref,
+            shape,
+            track_orientation=track_orientation,
+            x_offset=x_offset,
+            y_offset=y_offset,
+            z_offset=z_offset,
+            r_offset=r_offset,
+            theta_offset=theta_offset,
+            aspect_angle=aspect_angle,
+            init=init,
+        )
 
     @property
     def radius(self):
@@ -367,29 +367,33 @@ class RelativeCircle(RelativeGeometry):
 
 
 class RelativeSphere(RelativeGeometry):
-    def __init__(self,
-                 ref,
-                 track_orientation=False,
-                 x_offset=None,
-                 y_offset=None,
-                 z_offset=None,
-                 r_offset=None,
-                 theta_offset=None,
-                 aspect_angle=None,
-                 init=None,
-                 **kwargs):
+    def __init__(
+        self,
+        ref,
+        track_orientation=False,
+        x_offset=None,
+        y_offset=None,
+        z_offset=None,
+        r_offset=None,
+        theta_offset=None,
+        aspect_angle=None,
+        init=None,
+        **kwargs
+    ):
         shape = Sphere(**kwargs)
 
-        super().__init__(ref,
-                         shape,
-                         track_orientation=track_orientation,
-                         x_offset=x_offset,
-                         y_offset=y_offset,
-                         z_offset=z_offset,
-                         r_offset=r_offset,
-                         theta_offset=theta_offset,
-                         aspect_angle=aspect_angle,
-                         init=init)
+        super().__init__(
+            ref,
+            shape,
+            track_orientation=track_orientation,
+            x_offset=x_offset,
+            y_offset=y_offset,
+            z_offset=z_offset,
+            r_offset=r_offset,
+            theta_offset=theta_offset,
+            aspect_angle=aspect_angle,
+            init=init,
+        )
 
     @property
     def radius(self):
@@ -397,29 +401,33 @@ class RelativeSphere(RelativeGeometry):
 
 
 class RelativeCylinder(RelativeGeometry):
-    def __init__(self,
-                 ref,
-                 track_orientation=False,
-                 x_offset=None,
-                 y_offset=None,
-                 z_offset=None,
-                 r_offset=None,
-                 theta_offset=None,
-                 aspect_angle=None,
-                 init=None,
-                 **kwargs):
+    def __init__(
+        self,
+        ref,
+        track_orientation=False,
+        x_offset=None,
+        y_offset=None,
+        z_offset=None,
+        r_offset=None,
+        theta_offset=None,
+        aspect_angle=None,
+        init=None,
+        **kwargs
+    ):
         shape = Cylinder(**kwargs)
 
-        super().__init__(ref,
-                         shape,
-                         track_orientation=track_orientation,
-                         x_offset=x_offset,
-                         y_offset=y_offset,
-                         z_offset=z_offset,
-                         r_offset=r_offset,
-                         theta_offset=theta_offset,
-                         aspect_angle=aspect_angle,
-                         init=init)
+        super().__init__(
+            ref,
+            shape,
+            track_orientation=track_orientation,
+            x_offset=x_offset,
+            y_offset=y_offset,
+            z_offset=z_offset,
+            r_offset=r_offset,
+            theta_offset=theta_offset,
+            aspect_angle=aspect_angle,
+            init=init,
+        )
 
     @property
     def radius(self):
@@ -434,10 +442,10 @@ def distance(a, b):
     return np.linalg.norm(a.position - b.position)
 
 
-def angle_wrap(angle, mode='pi'):
-    assert mode == 'pi' or mode == '2pi', "invalid mode, must be on of ('pi', '2pi')"
+def angle_wrap(angle, mode="pi"):
+    assert mode == "pi" or mode == "2pi", "invalid mode, must be on of ('pi', '2pi')"
 
-    if mode == 'pi':
+    if mode == "pi":
         offset = math.pi
     else:
         offset = 0
