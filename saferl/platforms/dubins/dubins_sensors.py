@@ -1,12 +1,11 @@
 import math
 
+from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.libraries.property import MultiBoxProp
 from act3_rl_core.simulators.base_parts import BaseSensor
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-
-from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
+from saferl.simulators.dubins.dubins_simulator import Dubins2dSimulator
 
 
 class DubinsSensor(BaseSensor):
@@ -64,7 +63,7 @@ class HeadingSensor(DubinsSensor):
 
     def measurement_properties(self):
         heading_properties = MultiBoxProp(
-            name="heading", low=[-2*math.pi], high=[2*math.pi], unit=["rad"], description="heading of the aircraft"
+            name="heading", low=[-2 * math.pi], high=[2 * math.pi], unit=["rad"], description="heading of the aircraft"
         )
         return heading_properties
 
@@ -83,8 +82,7 @@ class FlightPathSensor(DubinsSensor):
 
     def measurement_properties(self):
         fp_properties = MultiBoxProp(
-            name="flight_path_angle", low=[-2*math.pi], high=[2*math.pi], unit=["rad"],
-            description="flight path angle of the aircraft"
+            name="flight_path_angle", low=[-2 * math.pi], high=[2 * math.pi], unit=["rad"], description="flight path angle of the aircraft"
         )
         return fp_properties
 
@@ -98,8 +96,8 @@ class FlightPathSensor(DubinsSensor):
 #     }
 # )
 
-
 # TODO: Add to plugin group
+
 
 class TimeSensor(DubinsSensor):
 
