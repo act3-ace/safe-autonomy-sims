@@ -74,9 +74,9 @@ if __name__ == '__main__':
             "Operating System :: OS Independent",
         ],
 
-        install_requires=[
-            'act3-rl-core'
-        ],
+        #install_requires=[
+        #    'act3-rl-core'
+        #],
         extras_require={
             "testing":  tests_require,
             "docs":  docs_require,
