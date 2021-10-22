@@ -68,16 +68,36 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         wingman_agent_platform = get_platform_by_name(next_state,self.agent)
 
-        # all 3 pieces
-        rejoin_region_radius = self.config.rejoin_region_radius
-        lead_orientation = lead_aircraft_platform.lead_orientation
-        offset_vector = np.array(self.config.offset_values)
-
-
-
-        dist = np.linalg.norm(origin - np.array(position))
+        dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
         done[self.agent] = dist > self.config.max_distance
+
+        if done[self.agent]:
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+
+        return done
+
+
+class CrashDoneValidator(DoneFuncBaseValidator):
+    safety_margin: float
+
+class CrashDoneFunction(DoneFuncBase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def get_validator(cls):
+        return CrashDoneValidator
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+        done = DoneDict()
+
+        wingman_agent_platform = get_platform_by_name(next_state,self.agent)
+
+        dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
+
+        done[self.agent] = dist <= self.config.safety_margin
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
