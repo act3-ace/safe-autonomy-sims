@@ -8,9 +8,11 @@ from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 # also need SuccessfulRejoin,
 
+
 class SuccessfulRejoinDoneValidator(DoneFuncBaseValidator):
     rejoin_region_radius: float
-    offset_values: typing.List(float,float,float)
+    offset_values: typing.List(float, float, float)
+
 
 class SuccessfulRejoinFunction(DoneFuncBase):
 
@@ -21,13 +23,12 @@ class SuccessfulRejoinFunction(DoneFuncBase):
     def get_validator(cls):
         return SuccessfulRejoinDoneValidator
 
-
     def __call__(self, observation, action, next_observation, next_state):
         # eventually will include velocity constraint
         done = DoneDict()
 
-        lead_aircraft_platform = get_platform_by_name(next_state,self.config.lead)
-        wingman_agent_platform = get_platform_by_name(next_state,self.agent)
+        lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
+        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
 
         # compute the rejoin region , using all three pieces of info
 
@@ -43,7 +44,6 @@ class SuccessfulRejoinFunction(DoneFuncBase):
         radial_distance = np.linalg.norm(np.array(position) - rejoin_region_center)
         done[self.agent] = radial_distance <= rejoin_region_center
 
-
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
 
@@ -52,6 +52,7 @@ class SuccessfulRejoinFunction(DoneFuncBase):
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     max_distance: float
+
 
 class MaxDistanceDoneFunction(DoneFuncBase):
 
@@ -66,7 +67,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         done = DoneDict()
 
-        wingman_agent_platform = get_platform_by_name(next_state,self.agent)
+        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
@@ -81,7 +82,9 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 class CrashDoneValidator(DoneFuncBaseValidator):
     safety_margin: float
 
+
 class CrashDoneFunction(DoneFuncBase):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -93,7 +96,7 @@ class CrashDoneFunction(DoneFuncBase):
 
         done = DoneDict()
 
-        wingman_agent_platform = get_platform_by_name(next_state,self.agent)
+        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
