@@ -126,4 +126,4 @@ if __name__ == "__main__":
         # state.sim_platforms[0]._controllers[2].apply_control(3)
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
-        print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
+        # print(f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}")
