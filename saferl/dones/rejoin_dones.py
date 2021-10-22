@@ -1,17 +1,22 @@
+"""
+Contains implementations of the necessary done functions for the rejoin environment.
+Namely three done funcitons : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
+"""
+
+
+
 import numpy as np
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
-# done conditions
-# crash, distance , timeout
 
-# also need SuccessfulRejoin,
 
 
 class SuccessfulRejoinDoneValidator(DoneFuncBaseValidator):
     rejoin_region_radius: float
     offset_values: typing.List(float, float, float)
+    lead: str
 
 
 class SuccessfulRejoinFunction(DoneFuncBase):
@@ -52,6 +57,7 @@ class SuccessfulRejoinFunction(DoneFuncBase):
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     max_distance: float
+    lead: str
 
 
 class MaxDistanceDoneFunction(DoneFuncBase):
@@ -81,6 +87,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
 class CrashDoneValidator(DoneFuncBaseValidator):
     safety_margin: float
+    lead: str
 
 
 class CrashDoneFunction(DoneFuncBase):
@@ -97,6 +104,8 @@ class CrashDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+
+        lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
