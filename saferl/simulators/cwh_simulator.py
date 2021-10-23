@@ -78,16 +78,7 @@ class CWHSimulator(SafeRLSimulator):
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
             init_params = config.agent_initialization[agent_id]
-            entity.reset(
-                **{
-                    "x": init_params.position[0],
-                    "y": init_params.position[1],
-                    "z": init_params.position[2],
-                    "x_dot": init_params.velocity[0],
-                    "y_dot": init_params.velocity[1],
-                    "z_dot": init_params.velocity[2],
-                }
-            )
+            entity.reset(**init_params.dict())
 
 
 PluginLibrary.AddClassToGroup(CWHSimulator, "CWHSimulator", {})
