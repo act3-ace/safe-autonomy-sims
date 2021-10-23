@@ -11,8 +11,8 @@ from saferl_sim.base_models.platforms import (
 
 class CWHSpacecraft3d(BasePlatform):
 
-    def __init__(self, name):
-        dynamics = CWH3dDynamics()
+    def __init__(self, name, m=12, n=0.001027, integration_method="RK45"):
+        dynamics = CWH3dDynamics(m=m, n=n, integration_method=integration_method)
         self._state = np.array([])
         self.reset()
 
@@ -73,11 +73,11 @@ class CWHSpacecraft3d(BasePlatform):
 
 class CWH3dDynamics(BaseLinearODESolverDynamics):
 
-    def __init__(self, m=12, n=0.001027, integration_method="Euler"):
+    def __init__(self, m=12, n=0.001027, **kwargs):
         self.m = m  # kg
         self.n = n  # rads/s
 
-        super().__init__(integration_method=integration_method)
+        super().__init__(**kwargs)
 
     def gen_dynamics_matrices(self):
         m = self.m
