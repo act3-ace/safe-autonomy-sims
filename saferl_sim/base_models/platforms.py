@@ -100,9 +100,9 @@ class BaseDynamics(abc.ABC):
 
 
 class BaseODESolverDynamics(BaseDynamics):
-    def __init__(self, integration_method="Euler", state_limits=None):
+    def __init__(self, integration_method="Euler", **kwargs):
         self.integration_method = integration_method
-        super().__init__()
+        super().__init__(**kwargs)
 
     @abc.abstractmethod
     def dx(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
@@ -124,9 +124,9 @@ class BaseODESolverDynamics(BaseDynamics):
 
 
 class BaseLinearODESolverDynamics(BaseODESolverDynamics):
-    def __init__(self, integration_method="Euler"):
+    def __init__(self, **kwargs):
         self.A, self.B = self.gen_dynamics_matrices()
-        super().__init__(integration_method=integration_method)
+        super().__init__(**kwargs)
 
     @abc.abstractmethod
     def gen_dynamics_matrices(self):
