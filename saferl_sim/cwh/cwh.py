@@ -14,9 +14,15 @@ class CWHSpacecraft3d(BasePlatform):
     def __init__(self, name, m=12, n=0.001027, integration_method="RK45"):
         dynamics = CWH3dDynamics(m=m, n=n, integration_method=integration_method)
         self._state = np.array([])
-        self.reset()
 
-        super().__init__(name, dynamics)
+        control_map = {
+            'thrust_x': 0,
+            'thrust_y': 1,
+            'thrust_z': 2,
+        }
+
+        super().__init__(name, dynamics, control_default=np.zeros((3,)), control_min=-1, control_max=1, control_map=control_map)
+        self.reset()
 
     def reset(self, state=None, position=None, velocity=None):
         super().reset(state=state, position=position, velocity=velocity)
@@ -108,3 +114,15 @@ class CWH3dDynamics(BaseLinearODESolverDynamics):
         )
 
         return A, B
+
+
+if __name__ == "__main__":
+    entity = CWHSpacecraft3d(name="abc")
+    print(entity.state)
+    # action = [0.5, 0.75, 1]
+    # action = np.array([0.5, 0.75, 1], dtype=float)
+    action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_z': 1}
+    # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
+    for i in range(5):
+        entity.step(1, action)
+        print(entity.state)

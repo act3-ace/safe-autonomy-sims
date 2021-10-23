@@ -3,6 +3,7 @@ import copy
 
 import gym
 import numpy as np
+from numpy.lib.arraysetops import isin
 import scipy.integrate
 import scipy.spatial
 from typing import Union
@@ -45,12 +46,17 @@ class BaseEnvObj(abc.ABC):
 
 
 class BasePlatform(BaseEnvObj):
-    def __init__(self, name, dynamics):
+    def __init__(self, name, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None):
 
         super().__init__(name)
         self.dependent_objs = []
 
         self.dynamics = dynamics
+
+        self.control_default = control_default
+        self.control_min = control_min
+        self.control_max = control_max
+        self.control_map = control_map
 
         self.reset()
 
@@ -61,16 +67,37 @@ class BasePlatform(BaseEnvObj):
         else:
             self._state = self.build_state(**kwargs)
 
-    def step(self, sim_state, step_size, action=None):
+    def step(self, step_size, action=None):
 
-        control = np.array(action)
-        self.current_control = control
+        if action is None:
+            control = self.control_default.copy()
+        else:
+            if isinstance(action, dict):
+                assert self.control_map is not None, "Cannot use dict-type action without a control_map (see platform __init__())"
+                control = self.control_default.copy()
+                for action_name, action_value in action.items():
+                    if action_name not in self.control_map:
+                        raise KeyError(
+                            f"action '{action_name}' not found in platform's control_map, "
+                            f"please use one of: {[k for k in self.control_map.keys()]}"
+                        )
+                    else:
+                        control[self.control_map[action_name]] = action_value
+            elif isinstance(action, list):
+                control = np.array(action, dtype=np.float64)
+            elif isinstance(action, np.ndarray):
+                control = action.copy()
+            else:
+                raise ValueError("action must be type dict, list, or np.ndarray")
+
+        # enforce control bounds
+        control = np.clip(control, self.control_min, self.control_max)
 
         # compute new state if dynamics were applied
         self.state = self.dynamics.step(step_size, self.state, control)
 
         for obj in self.dependent_objs:
-            obj.step(sim_state, action=action)
+            obj.step(step_size, action=action)
 
     def register_dependent_obj(self, obj):
         self.dependent_objs.append(obj)
