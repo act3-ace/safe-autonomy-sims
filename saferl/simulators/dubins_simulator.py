@@ -114,9 +114,6 @@ class Dubins2dSimulator(SafeRLSimulator):
             )
 
 
-PluginLibrary.AddClassToGroup(Dubins2dSimulator, "Dubins2dSimulator", {})
-
-
 class Dubins3dPlatformConfigValidator(BaseModel):
     """
     Config validator for the Dubins 3D platform.
