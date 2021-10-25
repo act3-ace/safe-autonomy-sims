@@ -1,3 +1,7 @@
+"""
+This module contains the base Simulator class used by the saferl team's CWH and Dubins simulators.
+"""
+
 import abc
 
 import numpy as np
@@ -6,10 +10,22 @@ from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorV
 
 
 class SafeRLSimulatorValidator(BaseSimulatorValidator):
+    """
+    A validator for the SafeRLSimulator config.
+
+    step_size: A float representing how many simulated seconds pass each time the simulator updates
+    """
+
     step_size: float
 
 
 class SafeRLSimulator(BaseSimulator):
+    """
+    The base simulator class used by the CWH and Dubins simulators. SafeRLSimulator is responsible for
+    initializing the platform objects for a simulation
+    and knowing how to set up episodes based on input parameters from a parameter provider.
+    It is also responsible for reporting the simulation state at each timestep.
+    """
 
     @classmethod
     def get_simulator_validator(cls):
@@ -30,20 +46,39 @@ class SafeRLSimulator(BaseSimulator):
         return self._state
 
     @abc.abstractmethod
-    def get_sim_entities(self):
+    def get_sim_entities(self) -> dict:
+        """
+        Gets the correct backend simulation entity for each agent.
+
+        Returns
+        -------
+        dict[str: sim_entity]
+            Dictionary mapping agent id to simulation backend entity.
+        """
         ...
 
     @abc.abstractmethod
-    def get_platforms(self):
+    def get_platforms(self) -> tuple:
+        """
+        Gets the platform object associated with each simulation entity.
+
+        Returns
+        -------
+        tuple
+            Collection of platforms associated with each simulation entity.
+        """
         ...
 
     @abc.abstractmethod
     def reset_sim_entities(self, config):
+        """
+        Reset simulation entities to an initial state.
+        """
         ...
 
     def update_sensor_measurements(self):
         """
-        Update and caches all the measurements of all the sensors on each platform
+        Update and cache all the measurements of all the sensors on each platform
         """
         for plat in self._state.sim_platforms:
             for sensor in plat.sensors:
@@ -52,7 +87,7 @@ class SafeRLSimulator(BaseSimulator):
     def mark_episode_done(self, done_string: str):
         pass
 
-    def save_episode_information(self, **kwargs):
+    def save_episode_information(self, dones, rewards, observations):
         pass
 
     def step(self):
