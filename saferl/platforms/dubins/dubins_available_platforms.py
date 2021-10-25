@@ -29,9 +29,9 @@ class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
         if "name" not in config:
             raise RuntimeError("Attempting to parse a PlatformType from name/model config, but both are not given!")
 
-        if config["name"] == "Dubins2d":
+        if config["name"] == "DUBINS2D":
             return DubinsAvailablePlatformTypes.DUBINS2D
-        if config["name"] == "Dubins3d":
+        if config["name"] == "DUBINS3D":
             return DubinsAvailablePlatformTypes.DUBINS3D
 
         raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')
