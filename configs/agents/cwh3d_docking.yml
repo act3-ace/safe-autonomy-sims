@@ -15,9 +15,9 @@
 "agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
-        {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0}},
-        {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1}},
-        {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2}},
+        {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
+        {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
+        {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2, properties: {name: "z_thrust"}}},
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"}
     ],
