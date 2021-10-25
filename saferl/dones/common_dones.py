@@ -2,7 +2,6 @@
 This module contains functions that define common terminal conditions across environments.
 """
 
-import numpy as np
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
 
@@ -18,9 +17,6 @@ class TimeoutDoneFunction(DoneFuncBase):
     """
     A done function that determines if the max episode time has been reached.
     """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     @classmethod
     def get_validator(cls):
