@@ -1,34 +1,49 @@
+"""
+Contains implementations of sensors that can be used in injuction with the CWH platform
+"""
+
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.libraries.property import MultiBoxProp
 from act3_rl_core.simulators.base_parts import BaseSensor
 
+import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
-from saferl.simulators.cwh.cwh_simulator import CWHSimulator
+from saferl.simulators.cwh_simulator import CWHSimulator
 
 
 class CWHSensor(BaseSensor):
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
-
-    def measurement_properties(self):
-        raise NotImplementedError
+    """
+    Interface for a basic sensor of the CWH platform
+    """
 
     def _calculate_measurement(self, state):
+        """
+        get measurements from the sensor
+
+        Raises
+        ------
+        NotImplementedError
+            If the method has not been implemented
+        """
         raise NotImplementedError
 
 
 class PositionSensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the position at any time
+    """
 
-    @property
-    def measurement_properties(self):
-        position_properties = MultiBoxProp(
-            name="position", low=[-80000] * 3, high=[80000] * 3, unit=["meters"] * 3, description="position of the spacecraft"
-        )
-        return position_properties
+    def __init__(self, parent_platform, config, measurement_properties=cwh_props.PositionProp):
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
 
     def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position
+
+        Returns
+        -------
+        list of floats
+            position of spacecraft
+        """
         return self.parent_platform.position
 
 
@@ -40,16 +55,23 @@ PluginLibrary.AddClassToGroup(
 
 
 class VelocitySensor(CWHSensor):
+    """
+    Implementation of a sensor to give velocity at any time
+    """
 
-    @property
-    def measurement_properties(self):
-        velocity_properties = MultiBoxProp(
-            name="velocity", low=[-10000] * 3, high=[10000] * 3, unit=["m/s"] * 3, description="velocity of the spacecraft"
-        )
-        return velocity_properties
+    def __init__(self, parent_platform, config, measurement_properties=cwh_props.VelocityProp):
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
 
     # state - tuple
     def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - velocity
+
+        Returns
+        -------
+        list of floats
+            velocity of spacecraft
+        """
         return self.parent_platform.velocity
 
 
