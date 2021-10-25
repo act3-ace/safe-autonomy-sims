@@ -2,11 +2,12 @@
 Contains implementations of the necessary done functions for the rejoin environment.
 Namely three done funcitons : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
 """
+import typing
+
 import numpy as np
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
-
 
 
 class SuccessfulRejoinDoneValidator(DoneFuncBaseValidator):
@@ -22,7 +23,7 @@ class SuccessfulRejoinDoneValidator(DoneFuncBaseValidator):
             name of the lead platform, for later lookup
     """
     rejoin_region_radius: float
-    offset_values: [float, float, float]
+    offset_values: typing.List[float]
     lead: str
 
 
@@ -30,9 +31,6 @@ class SuccessfulRejoinDoneFunction(DoneFuncBase):
     """
     Done function that details whether a successful rejoin has been made or not.
     """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     @classmethod
     def get_validator(cls):
@@ -91,8 +89,8 @@ class SuccessfulRejoinDoneFunction(DoneFuncBase):
         rotated_vector = lead_orientation.apply(offset_vector)
         rejoin_region_center = lead_aircraft_platform.position + rotated_vector
 
-        radial_distance = np.linalg.norm(np.array(position) - rejoin_region_center)
-        done[self.agent] = radial_distance <= rejoin_region_center
+        radial_distance = np.linalg.norm(np.array(wingman_agent_platform.position) - rejoin_region_center)
+        done[self.agent] = radial_distance <= rejoin_region_radius
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
@@ -118,8 +116,6 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     """
     Done function that determines if the wingman  has exceeded the max distance threshold and has exited the bounds of the simulation.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     @classmethod
     def get_validator(cls):
@@ -163,6 +159,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+        lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
@@ -193,9 +190,6 @@ class CrashDoneFunction(DoneFuncBase):
     Done function that determines whether a crash occured or not.
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     @classmethod
     def get_validator(cls):
         """
@@ -214,7 +208,6 @@ class CrashDoneFunction(DoneFuncBase):
         return CrashDoneValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-
         """
         Logic that returns the done condition given the current environment conditions
 
