@@ -1,7 +1,6 @@
 """
 This module contains implementations of sensors that reside on the Dubins platform
 """
-import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_parts import BaseSensor
 
@@ -115,7 +114,7 @@ class HeadingSensor(DubinsSensor):
             heading of aircraft
         """
 
-        return np.array([np.deg2rad(self.parent_platform.heading)], dtype=np.float32)
+        return self.parent_platform.heading
 
 
 PluginLibrary.AddClassToGroup(
