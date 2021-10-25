@@ -1,3 +1,6 @@
+"""
+This module implements the Reward Functions and Reward Validators specific to the docking task.
+"""
 from collections import OrderedDict
 
 import numpy as np
@@ -8,10 +11,17 @@ from numpy_ringbuffer import RingBuffer
 
 
 class CWHDistanceChangeRewardValidator(RewardFuncBaseValidator):
+    """
+    scale: Scalor value to adjust magnitude of the reward
+    """
+
     scale: float
 
 
 class CWHDistanceChangeReward(RewardFuncBase):
+    """
+    This RewardFuncBase extension is responsible for calculating the reward associated with a change in agent position.
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -19,6 +29,9 @@ class CWHDistanceChangeReward(RewardFuncBase):
 
     @classmethod
     def get_validator(cls):
+        """
+        Method to return class's Validator.
+        """
         return CWHDistanceChangeRewardValidator
 
     def __call__(
@@ -31,6 +44,32 @@ class CWHDistanceChangeReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
+        """
+        This method calculates the current position of the agent and compares it to the previous position. The
+        difference is used to return a proportional reward.
+
+        Parameters
+        ----------
+        observation : OrderedDict
+            The observations available to the agent from the previous state.
+        action :
+            The last action performed by the agent.
+        next_observation : OrderedDict
+            The observations available to the agent from the current state.
+        state : StateDict
+            The previous state of the simulation.
+        next_state : StateDict
+            The current state of the simulation.
+        observation_space : StateDict
+            The agent's observation space.
+        observation_units : StateDict
+            The units corresponding to values in the observation_space?
+
+        Returns
+        -------
+        reward : float
+            The agent's reward for their change in distance.
+        """
 
         reward = RewardDict()
         val = 0
