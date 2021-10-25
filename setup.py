@@ -66,6 +66,7 @@ if __name__ == '__main__':
 
         packages=[
                 'saferl',
+                'saferl_sim'
         ],
 
         classifiers=[
