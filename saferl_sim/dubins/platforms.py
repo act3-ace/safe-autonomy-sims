@@ -1,5 +1,6 @@
 import abc
 import math
+from operator import pos
 
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -11,18 +12,6 @@ from saferl_sim.base_models.platforms import (
 
 
 class BaseDubinsPlatform(BasePlatform):
-
-    def generate_info(self):
-        info = {
-            "state": self.state.vector,
-            "heading": self.heading,
-            "v": self.v,
-        }
-
-        info_parent = super().generate_info()
-        info_ret = {**info_parent, **info}
-
-        return info_ret
 
     @property
     @abc.abstractmethod
@@ -100,7 +89,7 @@ class Dubins2dPlatform(BaseDubinsPlatform):
         super().__init__(name, dynamics, control_default=control_default, 
             control_min=control_min, control_max=control_max, control_map=control_map)
 
-    def reset(self, state=None, position=None, heading=0, v=200, **kwargs):
+    def reset(self, state=None, position=None, heading=0, v=200):
         super().reset(state=state, position=position, heading=heading, v=v)
 
     def build_state(self, position=None, heading=0, v=200):
@@ -163,9 +152,6 @@ class Dubins2dPlatform(BaseDubinsPlatform):
 
 class Dubins2dDynamics(BaseODESolverDynamics):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def dx(self, t, state_vec, control):
         _, _, heading, v = state_vec
         rudder, throttle = control
@@ -187,90 +173,95 @@ class Dubins2dDynamics(BaseODESolverDynamics):
 
 class Dubins3dPlatform(BaseDubinsPlatform):
 
-    def __init__(self, name, controller=None, v_min=10, v_max=100):
+    def __init__(self, name, integration_method='RK45'):
 
-        dynamics = Dubins3dDynamics(v_min=v_min, v_max=v_max)
-        state = Dubins3dState()
+        state_min = np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.pi/9, -np.pi/3, 200], dtype=float)
+        state_max = np.array([np.inf, np.inf, np.inf, np.inf, np.pi/9, np.pi/3, 400], dtype=float)
 
-        super().__init__(name, dynamics, state, controller)
-
-    def generate_info(self):
-        info = {
-            "gamma": self.gamma,
-            "roll": self.roll,
+        control_default = np.zeros((3,))
+        control_min = np.array([-np.deg2rad(10), -np.deg2rad(5), -96.5])
+        control_max = np.array([np.deg2rad(10), np.deg2rad(5), 96.5])
+        control_map = {
+            'gamma_rate': 0,
+            'roll_rate': 1,
+            'acceleration': 2,
         }
+        
+        dynamics = Dubins3dDynamics(state_min=state_min, state_max=state_max, integration_method=integration_method)
 
-        info_parent = super().generate_info()
-        info_ret = {**info_parent, **info}
+        super().__init__(name, dynamics, control_default=control_default, 
+            control_min=control_min, control_max=control_max, control_map=control_map)
 
-        return info_ret
+    def reset(self, state=None, position=None, heading=0, gamma=0, roll=0, v=200):
+        if position is None:
+            position = [0, 0, 0]
 
+        super().reset(state=state, position=position, heading=heading, gamma=gamma, roll=roll, v=v)
 
-class Dubins3dState:
+    def build_state(self, position, heading, gamma, roll, v):
+        assert isinstance(position, list) and len(position) == 3, "position must be a list of length 3"
 
-    def build_vector(self, x=0, y=0, z=0, heading=0, gamma=0, roll=0, v=100, **kwargs):
-        return np.array([x, y, z, heading, gamma, roll, v], dtype=np.float64)
+        return np.array(position + [heading, gamma, roll, v], dtype=np.float64)
 
     @property
     def x(self):
-        return self._vector[0]
+        return self._state[0]
 
     @x.setter
     def x(self, value):
-        self._vector[0] = value
+        self._state[0] = value
 
     @property
     def y(self):
-        return self._vector[1]
+        return self._state[1]
 
     @y.setter
     def y(self, value):
-        self._vector[1] = value
+        self._state[1] = value
 
     @property
     def z(self):
-        return self._vector[2]
+        return self._state[2]
 
     @z.setter
     def z(self, value):
-        self._vector[2] = value
+        self._state[2] = value
 
     @property
     def heading(self):
-        return self._vector[3]
+        return self._state[3]
 
     @heading.setter
     def heading(self, value):
-        self._vector[3] = value
+        self._state[3] = value
 
     @property
     def gamma(self):
-        return self._vector[4]
+        return self._state[4]
 
     @gamma.setter
     def gamma(self, value):
-        self._vector[4] = value
+        self._state[4] = value
 
     @property
     def roll(self):
-        return self._vector[5]
+        return self._state[5]
 
     @roll.setter
     def roll(self, value):
-        self._vector[5] = value
+        self._state[5] = value
 
     @property
     def v(self):
-        return self._vector[6]
+        return self._state[6]
 
     @v.setter
     def v(self, value):
-        self._vector[6] = value
+        self._state[6] = value
 
     @property
     def position(self):
-        position = np.zeros((3, ))
-        position[0:3] = self._vector[0:3]
+        position = self._state[0:3].copy()
         return position
 
     @property
@@ -280,44 +271,14 @@ class Dubins3dState:
 
 class Dubins3dDynamics(BaseODESolverDynamics):
 
-    def __init__(self, v_min=10, v_max=100, roll_min=-math.pi / 2, roll_max=math.pi / 2, g=32.17, *args, **kwargs):
-        self.v_min = v_min
-        self.v_max = v_max
-        self.roll_min = roll_min
-        self.roll_max = roll_max
+    def __init__(self, g=32.17, **kwargs):
         self.g = g
-
-        super().__init__(*args, **kwargs)
-
-    def step(self, step_size, state, control):
-        state = super().step(step_size, state, control)
-
-        # enforce velocity limits
-        if state.v < self.v_min or state.v > self.v_max:
-            state.v = max(min(state.v, self.v_max), self.v_min)
-
-        # enforce roll limits
-        if state.roll < self.roll_min or state.roll > self.roll_max:
-            state.roll = max(min(state.roll, self.roll_max), self.roll_min)
-
-        return state
+        super().__init__(**kwargs)
 
     def dx(self, t, state_vec, control):
         x, y, z, heading, gamma, roll, v = state_vec
 
         elevator, ailerons, throttle = control
-
-        # enforce velocity limits
-        if v <= self.v_min and throttle < 0:
-            throttle = 0
-        elif v >= self.v_max and throttle > 0:
-            throttle = 0
-
-        # enforce roll limits
-        if roll <= self.roll_min and ailerons < 0:
-            ailerons = 0
-        elif roll >= self.roll_max and ailerons > 0:
-            ailerons = 0
 
         x_dot = v * math.cos(heading) * math.cos(gamma)
         y_dot = v * math.sin(heading) * math.cos(gamma)
@@ -333,13 +294,23 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         return dx_vec
 
 if __name__ == "__main__":
-    entity = Dubins2dPlatform(name="abc")
+    # entity = Dubins2dPlatform(name="abc")
+    # print(entity.state)
+    # # action = [0.5, 0.75, 1]
+    # # action = np.array([0.5, 0.75, 1], dtype=float)
+    # action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    # # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    # # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
+    # for i in range(5):
+    #     entity.step(1, action)
+    #     print(f'position={entity.position}, heading={entity.heading}')
+
+    entity = Dubins3dPlatform(name="abc")
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=float)
-    action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
-    # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    action = {'gamma_rate': 0.1, 'roll_rate': 0.05, 'acceleration': 0} 
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
         entity.step(1, action)
-        print(entity.state)
+        print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}')
