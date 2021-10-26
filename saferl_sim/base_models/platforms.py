@@ -129,6 +129,7 @@ class BaseDynamics(abc.ABC):
 class BaseODESolverDynamics(BaseDynamics):
     def __init__(self, integration_method="Euler", **kwargs):
         self.integration_method = integration_method
+        self.state_dot = None
         super().__init__(**kwargs)
 
     @abc.abstractmethod
@@ -141,9 +142,11 @@ class BaseODESolverDynamics(BaseDynamics):
             sol = scipy.integrate.solve_ivp(self.dx, (0, step_size), state, args=(control,))
 
             next_state = sol.y[:, -1]  # save last timestep of integration solution
+            self.state_dot = self.dx(1, next_state, control)
         elif self.integration_method == "Euler":
             state_dot = self.dx(0, state, control)
             next_state = state + step_size * state_dot
+            self.state_dot = state_dot
         else:
             raise ValueError("invalid integration method '{}'".format(self.integration_method))
 

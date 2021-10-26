@@ -5,11 +5,8 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from saferl_sim.base_models.platforms import (
-    BaseActuatorSet,
     BaseODESolverDynamics,
     BasePlatform,
-    BasePlatformStateVectorized,
-    ContinuousActuator,
 )
 
 
@@ -28,32 +25,36 @@ class BaseDubinsPlatform(BasePlatform):
         return info_ret
 
     @property
+    @abc.abstractmethod
     def v(self):
-        return self.state.v
+        raise NotImplemented
 
     @property
     def yaw(self):
-        return self.state.yaw
+        return self.heading
 
     @property
     def pitch(self):
-        return self.state.pitch
+        return self.gamma
 
     @property
+    @abc.abstractmethod
     def roll(self):
         return self.state.roll
 
     @property
+    @abc.abstractmethod
     def heading(self):
         return self.state.heading
 
     @property
+    @abc.abstractmethod
     def gamma(self):
         return self.state.gamma
 
     @property
     def acceleration(self):
-        # TODO: add acceleration to dynamics
+        # TODO Fix
         acc = self.current_control
         if self.v <= self.dynamics.v_min and acc < 0:
             acc = 0
@@ -61,14 +62,6 @@ class BaseDubinsPlatform(BasePlatform):
             acc = 0
         acc = acc * (self.velocity / self.v)  # acc * unit velocity
         return acc
-
-
-class BaseDubinsState(BasePlatformStateVectorized):
-
-    @property
-    @abc.abstractmethod
-    def v(self):
-        raise NotImplementedError
 
     @property
     def velocity(self):
@@ -83,62 +76,55 @@ class BaseDubinsState(BasePlatformStateVectorized):
         return velocity
 
     @property
-    def yaw(self):
-        return self.heading
-
-    @property
-    def pitch(self):
-        return self.gamma
-
-    @property
-    @abc.abstractmethod
-    def roll(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def heading(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def gamma(self):
-        raise NotImplementedError
+    def orientation(self):
+        return Rotation.from_euler("ZYX", [self.yaw, self.pitch, self.roll])
 
 
 class Dubins2dPlatform(BaseDubinsPlatform):
 
-    def __init__(self, name, controller=None, v_min=10, v_max=100):
+    def __init__(self, name, integration_method="RK45"):
 
-        dynamics = Dubins2dDynamics(v_min=v_min, v_max=v_max)
-        actuator_set = Dubins2dActuatorSet()
+        state_min = np.array([-np.inf, -np.inf, -np.inf, 200], dtype=float)
+        state_max = np.array([np.inf, np.inf, np.inf, 400], dtype=float)
 
-        state = Dubins2dState()
+        control_default = np.zeros((2,))
+        control_min = np.array([-np.deg2rad(10), -96.5])
+        control_max = np.array([np.deg2rad(10), 96.5])
+        control_map = {
+            'heading_rate': 0,
+            'acceleration': 1,
+        }
+        
+        dynamics = Dubins2dDynamics(state_min=state_min, state_max=state_max, integration_method=integration_method)
 
-        super().__init__(name, dynamics, actuator_set, state, controller)
+        super().__init__(name, dynamics, control_default=control_default, 
+            control_min=control_min, control_max=control_max, control_map=control_map)
 
+    def reset(self, state=None, position=None, heading=0, v=200, **kwargs):
+        super().reset(state=state, position=position, heading=heading, v=v)
 
-class Dubins2dState(BaseDubinsState):
+    def build_state(self, position=None, heading=0, v=200):
 
-    def build_vector(self, x=0, y=0, heading=0, v=50, **kwargs):
+        if position is None:
+            position = [0, 0, 0]
 
-        return np.array([x, y, heading, v], dtype=np.float64)
+        return np.array([position[0], position[1], heading, v], dtype=np.float64)
 
     @property
     def x(self):
-        return self._vector[0]
+        return self._state[0]
 
     @x.setter
     def x(self, value):
-        self._vector[0] = value
+        self._state[0] = value
 
     @property
     def y(self):
-        return self._vector[1]
+        return self._state[1]
 
     @y.setter
     def y(self, value):
-        self._vector[1] = value
+        self._state[1] = value
 
     @property
     def z(self):
@@ -146,29 +132,25 @@ class Dubins2dState(BaseDubinsState):
 
     @property
     def heading(self):
-        return self._vector[2]
+        return self._state[2]
 
     @heading.setter
     def heading(self, value):
-        self._vector[2] = value
+        self._state[2] = value
 
     @property
     def v(self):
-        return self._vector[3]
+        return self._state[3]
 
     @v.setter
     def v(self, value):
-        self._vector[3] = value
+        self._state[3] = value
 
     @property
     def position(self):
         position = np.zeros((3, ))
-        position[0:2] = self._vector[0:2]
+        position[0:2] = self._state[0:2]
         return position
-
-    @property
-    def orientation(self):
-        return Rotation.from_euler("z", self.yaw)
 
     @property
     def gamma(self):
@@ -179,44 +161,17 @@ class Dubins2dState(BaseDubinsState):
         return 0
 
 
-class Dubins2dActuatorSet(BaseActuatorSet):
-
-    def __init__(self):
-
-        actuators = [ContinuousActuator("rudder", [np.deg2rad(-6), np.deg2rad(6)], 0), ContinuousActuator("throttle", [-10, 10], 0)]
-
-        super().__init__(actuators)
-
-
 class Dubins2dDynamics(BaseODESolverDynamics):
 
-    def __init__(self, v_min=10, v_max=100, *args, **kwargs):
-        self.v_min = v_min
-        self.v_max = v_max
-
-        super().__init__(*args, **kwargs)
-
-    def step(self, step_size, state, control):
-        state = super().step(step_size, state, control)
-
-        # enforce velocity limits
-        if state.v < self.v_min or state.v > self.v_max:
-            state.v = max(min(state.v, self.v_max), self.v_min)
-
-        return state
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def dx(self, t, state_vec, control):
         _, _, heading, v = state_vec
         rudder, throttle = control
 
-        # enforce velocity limits
-        if v <= self.v_min and throttle < 0:
-            throttle = 0
-        elif v >= self.v_max and throttle > 0:
-            throttle = 0
-
-        x_dot = v * math.cos(heading)  # x_dot
-        y_dot = v * math.sin(heading)  # y_dot
+        x_dot = v * math.cos(heading)
+        y_dot = v * math.sin(heading)
         heading_dot = rudder
         v_dot = throttle
 
@@ -235,10 +190,9 @@ class Dubins3dPlatform(BaseDubinsPlatform):
     def __init__(self, name, controller=None, v_min=10, v_max=100):
 
         dynamics = Dubins3dDynamics(v_min=v_min, v_max=v_max)
-        actuator_set = Dubins3dActuatorSet()
         state = Dubins3dState()
 
-        super().__init__(name, dynamics, actuator_set, state, controller)
+        super().__init__(name, dynamics, state, controller)
 
     def generate_info(self):
         info = {
@@ -252,7 +206,7 @@ class Dubins3dPlatform(BaseDubinsPlatform):
         return info_ret
 
 
-class Dubins3dState(BaseDubinsState):
+class Dubins3dState:
 
     def build_vector(self, x=0, y=0, z=0, heading=0, gamma=0, roll=0, v=100, **kwargs):
         return np.array([x, y, z, heading, gamma, roll, v], dtype=np.float64)
@@ -324,19 +278,6 @@ class Dubins3dState(BaseDubinsState):
         return Rotation.from_euler("ZYX", [self.yaw, self.pitch, self.roll])
 
 
-class Dubins3dActuatorSet(BaseActuatorSet):
-
-    def __init__(self):
-
-        actuators = [
-            ContinuousActuator("ailerons", [np.deg2rad(-6), np.deg2rad(6)], 0),
-            ContinuousActuator("elevator", [np.deg2rad(-6), np.deg2rad(6)], 0),
-            ContinuousActuator("throttle", [-10, 10], 0),
-        ]
-
-        super().__init__(actuators)
-
-
 class Dubins3dDynamics(BaseODESolverDynamics):
 
     def __init__(self, v_min=10, v_max=100, roll_min=-math.pi / 2, roll_max=math.pi / 2, g=32.17, *args, **kwargs):
@@ -390,3 +331,15 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         dx_vec = np.array([x_dot, y_dot, z_dot, heading_dot, gamma_dot, roll_dot, v_dot], dtype=np.float64)
 
         return dx_vec
+
+if __name__ == "__main__":
+    entity = Dubins2dPlatform(name="abc")
+    print(entity.state)
+    # action = [0.5, 0.75, 1]
+    # action = np.array([0.5, 0.75, 1], dtype=float)
+    action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
+    for i in range(5):
+        entity.step(1, action)
+        print(entity.state)
