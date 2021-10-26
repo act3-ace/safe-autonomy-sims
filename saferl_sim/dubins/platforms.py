@@ -152,7 +152,7 @@ class Dubins2dPlatform(BaseDubinsPlatform):
 
 class Dubins2dDynamics(BaseODESolverDynamics):
 
-    def dx(self, t, state_vec, control):
+    def _compute_state_dot(self, t, state_vec, control):
         _, _, heading, v = state_vec
         rudder, throttle = control
 
@@ -161,9 +161,9 @@ class Dubins2dDynamics(BaseODESolverDynamics):
         heading_dot = rudder
         v_dot = throttle
 
-        dx_vec = np.array([x_dot, y_dot, heading_dot, v_dot], dtype=np.float64)
+        state_dot = np.array([x_dot, y_dot, heading_dot, v_dot], dtype=np.float64)
 
-        return dx_vec
+        return state_dot
 
 
 """
@@ -275,7 +275,7 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         self.g = g
         super().__init__(**kwargs)
 
-    def dx(self, t, state_vec, control):
+    def _compute_state_dot(self, t, state_vec, control):
         x, y, z, heading, gamma, roll, v = state_vec
 
         elevator, ailerons, throttle = control
@@ -289,9 +289,9 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         heading_dot = (self.g / v) * math.tan(roll)  # g = 32.17 ft/s^2
         v_dot = throttle
 
-        dx_vec = np.array([x_dot, y_dot, z_dot, heading_dot, gamma_dot, roll_dot, v_dot], dtype=np.float64)
+        state_dot = np.array([x_dot, y_dot, z_dot, heading_dot, gamma_dot, roll_dot, v_dot], dtype=np.float64)
 
-        return dx_vec
+        return state_dot
 
 if __name__ == "__main__":
     # entity = Dubins2dPlatform(name="abc")
@@ -309,8 +309,9 @@ if __name__ == "__main__":
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=float)
-    action = {'gamma_rate': 0.1, 'roll_rate': 0.05, 'acceleration': 0} 
+    # action = {'gamma_rate': 0.1, 'roll_rate': -0.05, 'acceleration': 10}
+    action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # test derivative state limit, after 1 step, position = [200, 0, 0]
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
         entity.step(1, action)
-        print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}')
+        print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}')
