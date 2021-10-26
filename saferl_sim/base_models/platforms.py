@@ -132,19 +132,33 @@ class BaseODESolverDynamics(BaseDynamics):
         self.state_dot = None
         super().__init__(**kwargs)
 
+    def compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
+        state_dot = self._compute_state_dot(t, state, control)
+        state_dot = self.clip_state_dot_by_state_limits(state, state_dot)
+        return state_dot
+
     @abc.abstractmethod
-    def dx(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
+    def _compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
         raise NotImplementedError
+
+    def clip_state_dot_by_state_limits(self, state, state_dot):
+        lower_bounded_states = state <= self.state_min
+        upper_bounded_state = state >= self.state_max
+
+        state_dot[lower_bounded_states] = np.clip(state_dot[lower_bounded_states], 0, np.inf)
+        state_dot[upper_bounded_state] = np.clip(state_dot[upper_bounded_state], -np.inf, 0)
+
+        return state_dot
 
     def _step(self, step_size, state, control):
 
         if self.integration_method == "RK45":
-            sol = scipy.integrate.solve_ivp(self.dx, (0, step_size), state, args=(control,))
+            sol = scipy.integrate.solve_ivp(self.compute_state_dot, (0, step_size), state, args=(control,))
 
             next_state = sol.y[:, -1]  # save last timestep of integration solution
-            self.state_dot = self.dx(1, next_state, control)
+            self.state_dot = self.compute_state_dot(step_size, next_state, control)
         elif self.integration_method == "Euler":
-            state_dot = self.dx(0, state, control)
+            state_dot = self.compute_state_dot(0, state, control)
             next_state = state + step_size * state_dot
             self.state_dot = state_dot
         else:
@@ -165,7 +179,7 @@ class BaseLinearODESolverDynamics(BaseODESolverDynamics):
     def update_dynamics_matrices(self, state):
         pass
 
-    def dx(self, t: float, state: np.ndarray, control: np.ndarray):
+    def _compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray):
         self.update_dynamics_matrices(state)
-        dx = np.matmul(self.A, state) + np.matmul(self.B, control)
-        return dx
+        state_dot = np.matmul(self.A, state) + np.matmul(self.B, control)
+        return state_dot
