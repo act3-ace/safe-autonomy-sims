@@ -16,7 +16,7 @@ class BaseDubinsPlatform(BasePlatform):
     @property
     @abc.abstractmethod
     def v(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     @property
     def yaw(self):
@@ -44,7 +44,7 @@ class BaseDubinsPlatform(BasePlatform):
     @property
     @abc.abstractmethod
     def acceleration(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     @property
     def velocity(self):
