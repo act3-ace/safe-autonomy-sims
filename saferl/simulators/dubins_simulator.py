@@ -7,7 +7,7 @@ from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_simulator import BaseSimulatorResetValidator
 from pydantic import BaseModel, validator
 
-import saferl_sim.dubins.platforms as bp
+import saferl_sim.dubins.entities as bp
 from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator
 
@@ -76,7 +76,7 @@ class Dubins2dSimulator(SafeRLSimulator):
             dictionary of all the entities by name mapped to their object references.
         """
 
-        return {agent_id: bp.Dubins2dPlatform(name=agent_id) for agent_id in self.config.agent_configs.keys()}
+        return {agent_id: bp.Dubins2dAircraft(name=agent_id) for agent_id in self.config.agent_configs.keys()}
 
     def get_platforms(self):
         """
@@ -181,7 +181,7 @@ class Dubins3dSimulator(SafeRLSimulator):
         dict
             dictionary of all the entities by name mapped to their object references.
         """
-        return {agent_id: bp.Dubins3dPlatform(name=agent_id) for agent_id in self.config.agent_configs.keys()}
+        return {agent_id: bp.Dubins3dAircraft(name=agent_id) for agent_id in self.config.agent_configs.keys()}
 
     def get_platforms(self):
         """

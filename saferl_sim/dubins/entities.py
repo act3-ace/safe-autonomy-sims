@@ -5,13 +5,13 @@ from operator import pos
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl_sim.base_models.platforms import (
+from saferl_sim.base_models.entities import (
     BaseODESolverDynamics,
-    BasePlatform,
+    BaseEntity,
 )
 
 
-class BaseDubinsPlatform(BasePlatform):
+class BaseDubinsAircraft(BaseEntity):
 
     @property
     @abc.abstractmethod
@@ -63,7 +63,7 @@ class BaseDubinsPlatform(BasePlatform):
         return Rotation.from_euler("ZYX", [self.yaw, self.pitch, self.roll])
 
 
-class Dubins2dPlatform(BaseDubinsPlatform):
+class Dubins2dAircraft(BaseDubinsAircraft):
 
     def __init__(self, name, integration_method="RK45"):
 
@@ -173,7 +173,7 @@ class Dubins2dDynamics(BaseODESolverDynamics):
 """
 
 
-class Dubins3dPlatform(BaseDubinsPlatform):
+class Dubins3dAircraft(BaseDubinsAircraft):
 
     def __init__(self, name, integration_method='RK45'):
 
@@ -304,7 +304,7 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         return state_dot
 
 if __name__ == "__main__":
-    entity = Dubins2dPlatform(name="abc")
+    entity = Dubins2dAircraft(name="abc")
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=np.float32)
@@ -316,7 +316,7 @@ if __name__ == "__main__":
         entity.step(1, action)
         print(f'position={entity.position}, heading={entity.heading}, v={entity.v}, acceleration={entity.acceleration}')
 
-    # entity = Dubins3dPlatform(name="abc")
+    # entity = Dubins3dAircraft(name="abc")
     # print(entity.state)
     # # action = [0.5, 0.75, 1]
     # # action = np.array([0.5, 0.75, 1], dtype=np.float32)
