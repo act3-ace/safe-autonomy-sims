@@ -9,48 +9,9 @@ import scipy.spatial
 from typing import Union, Tuple
 
 
-class BaseEnvObj(abc.ABC):
-    @abc.abstractmethod
-    def __init__(self, name):
-        self.name = name
-
-    @property
-    @abc.abstractmethod
-    def x(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def y(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def z(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def position(self):
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def orientation(self) -> scipy.spatial.transform.Rotation:
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def velocity(self):
-        raise NotImplementedError
-
-
-class BasePlatform(BaseEnvObj):
+class BasePlatform(abc.ABC):
     def __init__(self, name, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None):
-
-        super().__init__(name)
-        self.dependent_objs = []
-
+        self.name = name
         self.dynamics = dynamics
 
         self.control_default = control_default
@@ -98,12 +59,6 @@ class BasePlatform(BaseEnvObj):
         # compute new state if dynamics were applied
         self.state, self.state_dot = self.dynamics.step(step_size, self.state, control)
 
-        for obj in self.dependent_objs:
-            obj.step(step_size, action=action)
-
-    def register_dependent_obj(self, obj):
-        self.dependent_objs.append(obj)
-
     @property
     def state(self) -> np.ndarray:
         return self._state.copy()
@@ -111,6 +66,36 @@ class BasePlatform(BaseEnvObj):
     @state.setter
     def state(self, value: np.ndarray):
         self._state = value.copy()
+
+    @property
+    @abc.abstractmethod
+    def x(self):
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def y(self):
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def z(self):
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def position(self):
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def orientation(self) -> scipy.spatial.transform.Rotation:
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def velocity(self):
+        raise NotImplementedError
 
 
 class BaseDynamics(abc.ABC):
