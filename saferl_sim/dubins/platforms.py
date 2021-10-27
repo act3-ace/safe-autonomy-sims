@@ -69,6 +69,7 @@ class Dubins2dPlatform(BaseDubinsPlatform):
 
         state_min = np.array([-np.inf, -np.inf, -np.inf, 200], dtype=np.float32)
         state_max = np.array([np.inf, np.inf, np.inf, 400], dtype=np.float32)
+        angle_wrap_centers = np.array([None, None, 0, None], dtype=np.float32)
 
         control_default = np.zeros((2,))
         control_min = np.array([-np.deg2rad(10), -96.5])
@@ -78,7 +79,8 @@ class Dubins2dPlatform(BaseDubinsPlatform):
             'acceleration': 1,
         }
         
-        dynamics = Dubins2dDynamics(state_min=state_min, state_max=state_max, integration_method=integration_method)
+        dynamics = Dubins2dDynamics(state_min=state_min, state_max=state_max, angle_wrap_centers=angle_wrap_centers,
+            integration_method=integration_method)
 
         super().__init__(name, dynamics, control_default=control_default, 
             control_min=control_min, control_max=control_max, control_map=control_map)
@@ -177,6 +179,7 @@ class Dubins3dPlatform(BaseDubinsPlatform):
 
         state_min = np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.pi/9, -np.pi/3, 200], dtype=np.float32)
         state_max = np.array([np.inf, np.inf, np.inf, np.inf, np.pi/9, np.pi/3, 400], dtype=np.float32)
+        angle_wrap_centers = np.array([None, None, None, 0, 0, 0, None], dtype=np.float32)
 
         control_default = np.zeros((3,))
         control_min = np.array([-np.deg2rad(10), -np.deg2rad(5), -96.5])
@@ -187,7 +190,8 @@ class Dubins3dPlatform(BaseDubinsPlatform):
             'acceleration': 2,
         }
         
-        dynamics = Dubins3dDynamics(state_min=state_min, state_max=state_max, integration_method=integration_method)
+        dynamics = Dubins3dDynamics(state_min=state_min, state_max=state_max, angle_wrap_centers=angle_wrap_centers,
+            integration_method=integration_method)
 
         super().__init__(name, dynamics, control_default=control_default, 
             control_min=control_min, control_max=control_max, control_map=control_map)
@@ -300,26 +304,26 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         return state_dot
 
 if __name__ == "__main__":
-    # entity = Dubins2dPlatform(name="abc")
-    # print(entity.state)
-    # # action = [0.5, 0.75, 1]
-    # # action = np.array([0.5, 0.75, 1], dtype=np.float32)
-    # # action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
-    # action = {'heading_rate': 0.1, 'acceleration': 10} 
-    # # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
-    # # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
-    # for i in range(5):
-    #     entity.step(1, action)
-    #     print(f'position={entity.position}, heading={entity.heading}, v={entity.v}, acceleration={entity.acceleration}')
-
-    entity = Dubins3dPlatform(name="abc")
+    entity = Dubins2dPlatform(name="abc")
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=np.float32)
-    action = {'gamma_rate': 0.1, 'roll_rate': -0.05, 'acceleration': 10}
-    # action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # test derivative state limit, after 1 step, position = [200, 0, 0]
+    # action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    action = {'heading_rate': 0.1, 'acceleration': 10} 
+    # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
         entity.step(1, action)
-        print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}, '
-            f'acceleration={entity.acceleration}')
+        print(f'position={entity.position}, heading={entity.heading}, v={entity.v}, acceleration={entity.acceleration}')
+
+    # entity = Dubins3dPlatform(name="abc")
+    # print(entity.state)
+    # # action = [0.5, 0.75, 1]
+    # # action = np.array([0.5, 0.75, 1], dtype=np.float32)
+    # action = {'gamma_rate': 0.1, 'roll_rate': -0.05, 'acceleration': 10}
+    # # action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # test derivative state limit, after 1 step, position = [200, 0, 0]
+    # # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
+    # for i in range(5):
+    #     entity.step(1, action)
+    #     print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}, '
+    #         f'acceleration={entity.acceleration}')

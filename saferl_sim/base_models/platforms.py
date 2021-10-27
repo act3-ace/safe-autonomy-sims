@@ -114,14 +114,31 @@ class BasePlatform(BaseEnvObj):
 
 
 class BaseDynamics(abc.ABC):
-    def __init__(self, state_min: Union[float, np.ndarray] = -np.inf, state_max: Union[float, np.ndarray] = np.inf):
+    def __init__(
+        self, 
+        state_min: Union[float, np.ndarray] = -np.inf, 
+        state_max: Union[float, np.ndarray] = np.inf, 
+        angle_wrap_centers: np.ndarray = None,
+    ):
         self.state_min = state_min
         self.state_max = state_max
+        self.angle_wrap_centers = angle_wrap_centers
 
     def step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         next_state, state_dot = self._step(step_size, state, control)
         next_state = np.clip(next_state, self.state_min, self.state_max)
+        next_state = self.wrap_angles(next_state)
         return next_state, state_dot
+
+    def wrap_angles(self, state):
+        wrapped_state = state.copy()
+        if self.angle_wrap_centers is not None:
+            wrap_idxs = np.logical_not(np.isnan(self.angle_wrap_centers))
+
+            wrapped_state[wrap_idxs] = \
+                ((wrapped_state[wrap_idxs] + np.pi) % (2*np.pi)) - np.pi + self.angle_wrap_centers[wrap_idxs]
+
+        return wrapped_state
 
     @abc.abstractmethod
     def _step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
