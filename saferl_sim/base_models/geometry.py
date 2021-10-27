@@ -34,7 +34,7 @@ class BaseGeometry(BaseEnvObj):
 
     @property
     def velocity(self):
-        return np.array([0, 0, 0], dtype=np.float64)
+        return np.array([0, 0, 0], dtype=np.float32)
 
     @abc.abstractmethod
     def contains(self, other):
@@ -48,7 +48,7 @@ class BaseGeometry(BaseEnvObj):
 class Point(BaseGeometry):
     def __init__(self, name, x=0, y=0, z=0):
         super().__init__(name)
-        self._center = np.array([x, y, z], dtype=np.float64)
+        self._center = np.array([x, y, z], dtype=np.float32)
 
     def reset(self, **kwargs):
         pass
@@ -231,7 +231,7 @@ class RelativeGeometry(BaseEnvObj):
         self.track_orientation = track_orientation
         self.euler_decomp_axis = euler_decomp_axis
 
-        self._cartesian_offset = np.array([x_offset, y_offset, z_offset], dtype=np.float64)
+        self._cartesian_offset = np.array([x_offset, y_offset, z_offset], dtype=np.float32)
 
         self.shape = shape
 

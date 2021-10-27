@@ -98,7 +98,7 @@ class CWH3dDynamics(BaseLinearODESolverDynamics):
                 [0, 0, 0, -2 * n, 0, 0],
                 [0, 0, -(n**2), 0, 0, 0],
             ],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         B = np.array(
@@ -110,7 +110,7 @@ class CWH3dDynamics(BaseLinearODESolverDynamics):
                 [0, 1 / m, 0],
                 [0, 0, 1 / m],
             ],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         return A, B
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     entity = CWHSpacecraft3d(name="abc")
     print(entity.state)
     # action = [0.5, 0.75, 1]
-    # action = np.array([0.5, 0.75, 1], dtype=float)
+    # action = np.array([0.5, 0.75, 1], dtype=np.float32)
     action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_z': 1}
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
