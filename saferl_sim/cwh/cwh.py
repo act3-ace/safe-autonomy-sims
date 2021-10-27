@@ -9,10 +9,10 @@ from saferl_sim.base_models.entities import (
 )
 
 
-class CWHSpacecraft3d(BaseEntity):
+class CWHSpacecraft(BaseEntity):
 
     def __init__(self, name, m=12, n=0.001027, integration_method="RK45"):
-        dynamics = CWH3dDynamics(m=m, n=n, integration_method=integration_method)
+        dynamics = CWHDynamics(m=m, n=n, integration_method=integration_method)
         self._state = np.array([])
 
         control_map = {
@@ -77,7 +77,7 @@ class CWHSpacecraft3d(BaseEntity):
 
 
 
-class CWH3dDynamics(BaseLinearODESolverDynamics):
+class CWHDynamics(BaseLinearODESolverDynamics):
 
     def __init__(self, m=12, n=0.001027, **kwargs):
         self.m = m  # kg
@@ -117,7 +117,7 @@ class CWH3dDynamics(BaseLinearODESolverDynamics):
 
 
 if __name__ == "__main__":
-    entity = CWHSpacecraft3d(name="abc")
+    entity = CWHSpacecraft(name="abc")
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=np.float32)
