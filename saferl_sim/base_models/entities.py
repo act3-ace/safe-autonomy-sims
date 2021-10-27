@@ -9,7 +9,7 @@ import scipy.spatial
 from typing import Union, Tuple
 
 
-class BasePlatform(abc.ABC):
+class BaseEntity(abc.ABC):
     def __init__(self, name, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None):
         self.name = name
         self.dynamics = dynamics
@@ -36,12 +36,12 @@ class BasePlatform(abc.ABC):
             control = self.control_default.copy()
         else:
             if isinstance(action, dict):
-                assert self.control_map is not None, "Cannot use dict-type action without a control_map (see platform __init__())"
+                assert self.control_map is not None, "Cannot use dict-type action without a control_map (see BaseEntity __init__())"
                 control = self.control_default.copy()
                 for action_name, action_value in action.items():
                     if action_name not in self.control_map:
                         raise KeyError(
-                            f"action '{action_name}' not found in platform's control_map, "
+                            f"action '{action_name}' not found in entity's control_map, "
                             f"please use one of: {[k for k in self.control_map.keys()]}"
                         )
                     else:

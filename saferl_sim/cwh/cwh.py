@@ -3,13 +3,13 @@ import copy
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl_sim.base_models.platforms import (
+from saferl_sim.base_models.entities import (
     BaseLinearODESolverDynamics,
-    BasePlatform,
+    BaseEntity,
 )
 
 
-class CWHSpacecraft3d(BasePlatform):
+class CWHSpacecraft3d(BaseEntity):
 
     def __init__(self, name, m=12, n=0.001027, integration_method="RK45"):
         dynamics = CWH3dDynamics(m=m, n=n, integration_method=integration_method)
