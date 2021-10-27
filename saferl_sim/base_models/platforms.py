@@ -6,7 +6,7 @@ import numpy as np
 from numpy.lib.arraysetops import isin
 import scipy.integrate
 import scipy.spatial
-from typing import Union
+from typing import Union, Tuple
 
 
 class BaseEnvObj(abc.ABC):
@@ -67,6 +67,8 @@ class BasePlatform(BaseEnvObj):
         else:
             self._state = self.build_state(**kwargs)
 
+        self.state_dot = np.zeros_like(self._state)
+
     def step(self, step_size, action=None):
 
         if action is None:
@@ -94,7 +96,7 @@ class BasePlatform(BaseEnvObj):
         control = np.clip(control, self.control_min, self.control_max)
 
         # compute new state if dynamics were applied
-        self.state = self.dynamics.step(step_size, self.state, control)
+        self.state, self.state_dot = self.dynamics.step(step_size, self.state, control)
 
         for obj in self.dependent_objs:
             obj.step(step_size, action=action)
@@ -116,20 +118,19 @@ class BaseDynamics(abc.ABC):
         self.state_min = state_min
         self.state_max = state_max
 
-    def step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
-        next_state = self._step(step_size, state, control)
+    def step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        next_state, state_dot = self._step(step_size, state, control)
         next_state = np.clip(next_state, self.state_min, self.state_max)
-        return next_state
+        return next_state, state_dot
 
     @abc.abstractmethod
-    def _step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
+    def _step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         raise NotImplementedError
 
 
 class BaseODESolverDynamics(BaseDynamics):
     def __init__(self, integration_method="Euler", **kwargs):
         self.integration_method = integration_method
-        self.state_dot = None
         super().__init__(**kwargs)
 
     def compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
@@ -156,15 +157,15 @@ class BaseODESolverDynamics(BaseDynamics):
             sol = scipy.integrate.solve_ivp(self.compute_state_dot, (0, step_size), state, args=(control,))
 
             next_state = sol.y[:, -1]  # save last timestep of integration solution
-            self.state_dot = self.compute_state_dot(step_size, next_state, control)
+            state_dot = self.compute_state_dot(step_size, next_state, control)
         elif self.integration_method == "Euler":
             state_dot = self.compute_state_dot(0, state, control)
             next_state = state + step_size * state_dot
-            self.state_dot = state_dot
+            state_dot = state_dot
         else:
             raise ValueError("invalid integration method '{}'".format(self.integration_method))
 
-        return next_state
+        return next_state, state_dot
 
 
 class BaseLinearODESolverDynamics(BaseODESolverDynamics):
