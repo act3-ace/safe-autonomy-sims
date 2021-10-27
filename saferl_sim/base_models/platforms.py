@@ -86,7 +86,7 @@ class BasePlatform(BaseEnvObj):
                     else:
                         control[self.control_map[action_name]] = action_value
             elif isinstance(action, list):
-                control = np.array(action, dtype=np.float64)
+                control = np.array(action, dtype=np.float32)
             elif isinstance(action, np.ndarray):
                 control = action.copy()
             else:
