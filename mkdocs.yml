@@ -31,21 +31,21 @@ nav:
   - "API":
     - saferl/index.md
     - Dones:
-      - dones/index.md
-      - dones/docking_dones-py.md
+      - saferl/dones/index.md
+      - saferl/dones/docking_dones-py.md
     - Glues:
-      - glues/index.md
-      - glues/combined_controller_glue-py.md
-      - glues/rta_glue-py.md
+      - saferl/glues/index.md
+      - saferl/glues/combined_controller_glue-py.md
+      - saferl/glues/rta_glue-py.md
     - Platforms:
-      - platforms/index.md
+      - saferl/platforms/index.md
       - CWH:
-        - cwh/index.md
+        - saferl/platforms/cwh/index.md
       - Dubins:
-        - dubins/index.md
+        - saferl/platforms/dubins/index.md
     - Rewards:
-      - rewards/index.md
-      - rewards/docking_rewards-py.md
+      - saferl/rewards/index.md
+      - saferl/rewards/docking_rewards-py.md
     - Simulators:
-      - simulators/index.md
+      - saferl/simulators/index.md
 theme: material
