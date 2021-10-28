@@ -140,7 +140,7 @@ class BaseDynamics(abc.ABC):
 
 class BaseODESolverDynamics(BaseDynamics):
 
-    def __init__(self, integration_method="Euler", **kwargs):
+    def __init__(self, integration_method="RK45", **kwargs):
         self.integration_method = integration_method
         super().__init__(**kwargs)
 
