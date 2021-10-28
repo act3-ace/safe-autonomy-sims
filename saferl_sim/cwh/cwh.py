@@ -3,10 +3,7 @@ import copy
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl_sim.base_models.entities import (
-    BaseLinearODESolverDynamics,
-    BaseEntity,
-)
+from saferl_sim.base_models.entities import BaseEntity, BaseLinearODESolverDynamics
 
 
 class CWHSpacecraft(BaseEntity):
@@ -21,20 +18,22 @@ class CWHSpacecraft(BaseEntity):
             'thrust_z': 2,
         }
 
-        super().__init__(name, dynamics, control_default=np.zeros((3,)), control_min=-1, control_max=1, control_map=control_map)
+        super().__init__(name, dynamics, control_default=np.zeros((3, )), control_min=-1, control_max=1, control_map=control_map)
         self.reset()
 
     def reset(self, state=None, position=None, velocity=None):
-        super().reset(state=state, position=position, velocity=velocity)
-
-    def build_state(self, position=None, velocity=None):
-        # TODO defensive programming        
         if position is None:
             position = [0, 0, 0]
         if velocity is None:
             velocity = [0, 0, 0]
 
-        state = np.concatenate([position, velocity])
+        super().reset(state=state, position=position, velocity=velocity)
+
+    def build_state(self, position, velocity):
+        assert isinstance(position, list) and len(position) == 3, "position should be a list of len 3"
+        assert isinstance(velocity, list) and len(velocity) == 3, "velocity should be a list of len 3"
+
+        state = np.concatenate((position, velocity), dtype=np.float32)
 
         return state
 
@@ -74,7 +73,6 @@ class CWHSpacecraft(BaseEntity):
     @property
     def velocity(self):
         return self._state[3:6].copy()
-
 
 
 class CWHDynamics(BaseLinearODESolverDynamics):
@@ -121,7 +119,7 @@ if __name__ == "__main__":
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=np.float32)
-    action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_z': 1}
+    action = {'thrust_x': 0.5, 'thrust_y': 0.75, 'thrust_z': 1}
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
         entity.step(1, action)

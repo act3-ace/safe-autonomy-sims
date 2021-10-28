@@ -5,10 +5,7 @@ from operator import pos
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from saferl_sim.base_models.entities import (
-    BaseODESolverDynamics,
-    BaseEntity,
-)
+from saferl_sim.base_models.entities import BaseEntity, BaseODESolverDynamics
 
 
 class BaseDubinsAircraft(BaseEntity):
@@ -71,27 +68,30 @@ class Dubins2dAircraft(BaseDubinsAircraft):
         state_max = np.array([np.inf, np.inf, np.inf, 400], dtype=np.float32)
         angle_wrap_centers = np.array([None, None, 0, None], dtype=np.float32)
 
-        control_default = np.zeros((2,))
+        control_default = np.zeros((2, ))
         control_min = np.array([-np.deg2rad(10), -96.5])
         control_max = np.array([np.deg2rad(10), 96.5])
         control_map = {
             'heading_rate': 0,
             'acceleration': 1,
         }
-        
-        dynamics = Dubins2dDynamics(state_min=state_min, state_max=state_max, angle_wrap_centers=angle_wrap_centers,
-            integration_method=integration_method)
 
-        super().__init__(name, dynamics, control_default=control_default, 
-            control_min=control_min, control_max=control_max, control_map=control_map)
+        dynamics = Dubins2dDynamics(
+            state_min=state_min, state_max=state_max, angle_wrap_centers=angle_wrap_centers, integration_method=integration_method
+        )
+
+        super().__init__(
+            name, dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map
+        )
 
     def reset(self, state=None, position=None, heading=0, v=200):
-        super().reset(state=state, position=position, heading=heading, v=v)
-
-    def build_state(self, position=None, heading=0, v=200):
-
         if position is None:
             position = [0, 0, 0]
+
+        super().reset(state=state, position=position, heading=heading, v=v)
+
+    def build_state(self, position, heading, v):
+        assert isinstance(position, list) and len(position) == 3, "position should be a list of len 3"
 
         return np.array([position[0], position[1], heading, v], dtype=np.float32)
 
@@ -177,11 +177,11 @@ class Dubins3dAircraft(BaseDubinsAircraft):
 
     def __init__(self, name, integration_method='RK45'):
 
-        state_min = np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.pi/9, -np.pi/3, 200], dtype=np.float32)
-        state_max = np.array([np.inf, np.inf, np.inf, np.inf, np.pi/9, np.pi/3, 400], dtype=np.float32)
+        state_min = np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.pi / 9, -np.pi / 3, 200], dtype=np.float32)
+        state_max = np.array([np.inf, np.inf, np.inf, np.inf, np.pi / 9, np.pi / 3, 400], dtype=np.float32)
         angle_wrap_centers = np.array([None, None, None, 0, 0, 0, None], dtype=np.float32)
 
-        control_default = np.zeros((3,))
+        control_default = np.zeros((3, ))
         control_min = np.array([-np.deg2rad(10), -np.deg2rad(5), -96.5])
         control_max = np.array([np.deg2rad(10), np.deg2rad(5), 96.5])
         control_map = {
@@ -189,12 +189,14 @@ class Dubins3dAircraft(BaseDubinsAircraft):
             'roll_rate': 1,
             'acceleration': 2,
         }
-        
-        dynamics = Dubins3dDynamics(state_min=state_min, state_max=state_max, angle_wrap_centers=angle_wrap_centers,
-            integration_method=integration_method)
 
-        super().__init__(name, dynamics, control_default=control_default, 
-            control_min=control_min, control_max=control_max, control_map=control_map)
+        dynamics = Dubins3dDynamics(
+            state_min=state_min, state_max=state_max, angle_wrap_centers=angle_wrap_centers, integration_method=integration_method
+        )
+
+        super().__init__(
+            name, dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map
+        )
 
     def reset(self, state=None, position=None, heading=0, gamma=0, roll=0, v=200):
         if position is None:
@@ -303,13 +305,14 @@ class Dubins3dDynamics(BaseODESolverDynamics):
 
         return state_dot
 
+
 if __name__ == "__main__":
     entity = Dubins2dAircraft(name="abc")
     print(entity.state)
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=np.float32)
     # action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
-    action = {'heading_rate': 0.1, 'acceleration': 10} 
+    action = {'heading_rate': 0.1, 'acceleration': 10}
     # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
