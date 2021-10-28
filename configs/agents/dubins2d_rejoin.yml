@@ -52,12 +52,22 @@
             "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 10000,
+                "lead": "red0",
+            },
+        },
+        {
+            "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
+            "config":{
+                "safety_margin": 10,
+                "lead": "red0",
             },
         },
         {
             "functor": "saferl.dones.rejoin_dones.SuccessfulRejoinDoneFunction",
             "config":{
-              "rejoin_region_radius": 100,
+                "rejoin_region_radius": 100,
+                "offset_values": [500, 500],
+                "lead": "red0",
             },
         },
     ],
