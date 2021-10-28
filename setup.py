@@ -72,14 +72,14 @@ if __name__ == '__main__':
             'saferl': ['*.yml', '*.yaml']
         },
 
-        packages=find_packages()
+        packages=find_packages(),
 
         classifiers=[
             "Programming Language :: Python :: 3",
             "Operating System :: OS Independent",
         ],
 
-        install_requires=reqs
+        install_requires=reqs,
 
         extras_require={
             "testing":  tests_require,
