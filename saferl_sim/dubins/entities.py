@@ -1,14 +1,45 @@
 import abc
 import math
 from operator import pos
+import typing
 
 import numpy as np
 from scipy.spatial.transform import Rotation
+from pydantic import validator
 
-from saferl_sim.base_models.entities import BaseEntity, BaseODESolverDynamics
+from saferl_sim.base_models.entities import BaseEntity, BaseODESolverDynamics, BaseEntityValidator
+
+
+class BaseDubinsAircraftValidator(BaseEntityValidator):
+    position: typing.List[float] = [0, 0, 0]
+    heading: float = 0
+    v: float = 200
+    @validator("position")
+    def check_3d_vec_len(cls, v, field):
+        """checks 3d vector field for length 3
+
+        Parameters
+        ----------
+        v : typing.List[float]
+            vector quantity to check
+        field : string
+            name of validator field
+
+        Returns
+        -------
+        typing.List[float]
+            v
+        """
+        if len(v) != 3:
+            raise ValueError(f"{field.name} provided to CWHPlatformValidator is not length 3")
+        return v
 
 
 class BaseDubinsAircraft(BaseEntity):
+
+    @classmethod
+    def get_config_validator(cls):
+        return BaseDubinsAircraftValidator
 
     @property
     @abc.abstractmethod
@@ -62,7 +93,7 @@ class BaseDubinsAircraft(BaseEntity):
 
 class Dubins2dAircraft(BaseDubinsAircraft):
 
-    def __init__(self, name, integration_method="RK45"):
+    def __init__(self, integration_method="RK45", **kwargs):
 
         state_min = np.array([-np.inf, -np.inf, -np.inf, 200], dtype=np.float32)
         state_max = np.array([np.inf, np.inf, np.inf, 400], dtype=np.float32)
@@ -81,19 +112,11 @@ class Dubins2dAircraft(BaseDubinsAircraft):
         )
 
         super().__init__(
-            name, dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map
+            dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map, **kwargs
         )
 
-    def reset(self, state=None, position=None, heading=0, v=200):
-        if position is None:
-            position = [0, 0, 0]
-
-        super().reset(state=state, position=position, heading=heading, v=v)
-
-    def build_state(self, position, heading, v):
-        assert isinstance(position, list) and len(position) == 3, "position should be a list of len 3"
-
-        return np.array([position[0], position[1], heading, v], dtype=np.float32)
+    def _build_state(self):
+        return np.array(self.config.position[0:2] + [self.config.heading, self.config.v], dtype=np.float32)
 
     @property
     def x(self):
@@ -172,10 +195,13 @@ class Dubins2dDynamics(BaseODESolverDynamics):
 3D Dubins Implementation
 """
 
+class Dubins3dAircraftValidator(BaseDubinsAircraftValidator):
+    gamma: float = 0
+    roll: float = 0
 
 class Dubins3dAircraft(BaseDubinsAircraft):
 
-    def __init__(self, name, integration_method='RK45'):
+    def __init__(self, integration_method='RK45', **kwargs):
 
         state_min = np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.pi / 9, -np.pi / 3, 200], dtype=np.float32)
         state_max = np.array([np.inf, np.inf, np.inf, np.inf, np.pi / 9, np.pi / 3, 400], dtype=np.float32)
@@ -195,19 +221,15 @@ class Dubins3dAircraft(BaseDubinsAircraft):
         )
 
         super().__init__(
-            name, dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map
+            dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map, **kwargs
         )
 
-    def reset(self, state=None, position=None, heading=0, gamma=0, roll=0, v=200):
-        if position is None:
-            position = [0, 0, 0]
+    @classmethod
+    def get_config_validator(cls):
+        return Dubins3dAircraftValidator
 
-        super().reset(state=state, position=position, heading=heading, gamma=gamma, roll=roll, v=v)
-
-    def build_state(self, position, heading, gamma, roll, v):
-        assert isinstance(position, list) and len(position) == 3, "position must be a list of length 3"
-
-        return np.array(position + [heading, gamma, roll, v], dtype=np.float32)
+    def _build_state(self):
+        return np.array(self.config.position + [self.config.heading, self.config.gamma, self.config.roll, self.config.v], dtype=np.float32)
 
     @property
     def x(self):
@@ -307,26 +329,26 @@ class Dubins3dDynamics(BaseODESolverDynamics):
 
 
 if __name__ == "__main__":
-    entity = Dubins2dAircraft(name="abc")
-    print(entity.state)
-    # action = [0.5, 0.75, 1]
-    # action = np.array([0.5, 0.75, 1], dtype=np.float32)
-    # action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
-    action = {'heading_rate': 0.1, 'acceleration': 10}
-    # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
-    # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
-    for i in range(5):
-        entity.step(1, action)
-        print(f'position={entity.position}, heading={entity.heading}, v={entity.v}, acceleration={entity.acceleration}')
-
-    # entity = Dubins3dAircraft(name="abc")
+    # entity = Dubins2dAircraft(name="abc")
     # print(entity.state)
     # # action = [0.5, 0.75, 1]
     # # action = np.array([0.5, 0.75, 1], dtype=np.float32)
-    # action = {'gamma_rate': 0.1, 'roll_rate': -0.05, 'acceleration': 10}
-    # # action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # test derivative state limit, after 1 step, position = [200, 0, 0]
+    # # action = {'heading_rate': 0.1, 'acceleration': 0} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
+    # # action = {'heading_rate': 0.1, 'acceleration': 10}
+    # action = {'heading_rate': 0.1, 'acceleration': -20} # after one step, x = 199.667, y = 9.992, v=200, heading=0.1
     # # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     # for i in range(5):
     #     entity.step(1, action)
-    #     print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}, '
-    #         f'acceleration={entity.acceleration}')
+    #     print(f'position={entity.position}, heading={entity.heading}, v={entity.v}, acceleration={entity.acceleration}')
+
+    entity = Dubins3dAircraft(name="abc")
+    print(entity.state)
+    # action = [0.5, 0.75, 1]
+    # action = np.array([0.5, 0.75, 1], dtype=np.float32)
+    action = {'gamma_rate': 0.1, 'roll_rate': -0.05, 'acceleration': 10}
+    # action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # test derivative state limit, after 1 step, position = [200, 0, 0]
+    # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
+    for i in range(5):
+        entity.step(1, action)
+        print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}, '
+            f'acceleration={entity.acceleration}')
