@@ -67,7 +67,7 @@ class CWHDistanceChangeReward(RewardFuncBase):
 
         Returns
         -------
-        reward : float
+        reward : RewardDict
             The agent's reward for their change in distance.
         """
 
@@ -88,129 +88,250 @@ class CWHDistanceChangeReward(RewardFuncBase):
         return reward
 
 
-########################################################################################################################
-class TimeRewardValidator(RewardFuncBaseValidator):
+class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward
+    timeout: The max time for an episode                                              TODO: [optional]
+    deputy: The name of the deputy (agent) platform
+    docking_region_radius: The radius of the docking region in meters
     """
     scale: float
+    timeout: float
+    deputy: str
+    docking_region_radius: float
 
 
-class TimeRewardFunction(RewardFuncBase):
-    def __init__(self, name=None, reward=None):
-        super().__init__(name=name, reward=reward)
+class DockingSuccessRewardFunction(RewardFuncBase):
+    """
+    This Reward Function is responsible for calculating the reward associated with a successful docking.
+    """
 
     @classmethod
     def get_validator(cls):
         """
         Method to return class's Validator.
         """
-        return TimeRewardValidator
+        return DockingSuccessRewardValidator
 
     def __call__(
-            self,
-            observation: OrderedDict,
-            action,
-            next_observation: OrderedDict,
-            state: StateDict,
-            next_state: StateDict,
-            observation_space: StateDict,
-            observation_units: StateDict,
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
     ) -> RewardDict:
+        """
+        This method determines if the agent has succeeded and returns an appropriate reward.
+
+        Parameters
+        ----------
+        observation : OrderedDict
+            The observations available to the agent from the previous state.
+        action :
+            The last action performed by the agent.
+        next_observation : OrderedDict
+            The observations available to the agent from the current state.
+        state : StateDict
+            The previous state of the simulation.
+        next_state : StateDict
+            The current state of the simulation.
+        observation_space : StateDict
+            The agent's observation space.
+        observation_units : StateDict
+            The units corresponding to values in the observation_space?
+
+        Returns
+        -------
+        reward : RewardDict
+            The agent's reward for their change in distance.
+        """
+
+        reward = RewardDict()
+        value = 0
+
+        position = next_state.sim_platforms[0].position
+        sim_time = next_state.sim_platforms[0].sim_time
+
+        origin = np.array([0, 0, 0])
+        docking_region_radius = self.config.docking_region_radius
+
+        radial_distance = np.linalg.norm(np.array(position) - origin)
+        in_docking = radial_distance <= docking_region_radius
+
+        if in_docking:
+            value = self.config.scale
+            if self.config.timeout:
+                # Add time reward component, if timeout specified
+                value += 1 - (sim_time / self.config.timeout)
+
+        reward[self.config.agent_name] = value
+        return reward
 
 
+class DockingFailureRewardValidator(RewardFuncBaseValidator):
+    """
+    timeout_reward: Reward (penalty) associated with a failure by exceeding max episode time
+    distance_reward: Reward (penalty) associated with a failure by exceeding max distance
+    crash_reward: Reward (penalty) associated with a failure by crashing
+    timeout: Max episode time
+    max_goal_distance: Max distance from the goal
+    docking_region_radius: Radius of the docking region in meters
+    max_vel_constraint: The max velocity allowed for a successful dock in the docking region in meters per second
+    """
+    timeout_reward: float
+    distance_reward: float
+    crash_reward: float
+    timeout: float
+    max_goal_distance: float
+    docking_region_radius: float
+    max_vel_constraint: float
 
 
-    def reset(self, sim_state):
-        super().reset(sim_state)
-        self.previous_step_size = 0
+class DockingFailureRewardFunction(RewardFuncBase):
+    """
+    This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
+    """
 
-    def _increment(self, sim_state, step_size):
-        # update state
-        self.previous_step_size = step_size
+    @classmethod
+    def get_validator(cls):
+        """
+        Method to return class's Validator.
+        """
+        return DockingFailureRewardValidator
 
-    def _process(self, sim_state):
-        step_reward = self.previous_step_size * self.reward
-        return step_reward
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        """
+        This method determines if the agent had failed the task and allocates an appropriate reward.
 
+        Parameters
+        ----------
+        observation : OrderedDict
+            The observations available to the agent from the previous state.
+        action :
+            The last action performed by the agent.
+        next_observation : OrderedDict
+            The observations available to the agent from the current state.
+        state : StateDict
+            The previous state of the simulation.
+        next_state : StateDict
+            The current state of the simulation.
+        observation_space : StateDict
+            The agent's observation space.
+        observation_units : StateDict
+            The units corresponding to values in the observation_space?
 
+        Returns
+        -------
+        reward : RewardDict
+            The agent's reward for their change in distance.
+        """
 
+        reward = RewardDict()
+        value = 0
 
+        sim_time = next_state.sim_platforms[0].sim_time
+        position = next_state.sim_platforms[0].position
+        distance = np.linalg.norm(position)
+        velocity_vector = next_state.sim_platforms[0].velocity
+        velocity = np.linalg.norm(velocity_vector)
 
+        origin = np.array([0, 0, 0])
+        radial_distance = np.linalg.norm(np.array(position) - origin)
+        in_docking = radial_distance <= self.config.docking_region_radius
 
-class DistanceChangeRewardProcessor(RewardProcessor):
-    def __init__(self, name=None, deputy=None, docking_region=None, reward=None):
-        super().__init__(name=name, reward=reward)
-        self.deputy = deputy
-        self.docking_region = docking_region
+        if sim_time > self.config.timeout:
+            # episode reached max time
+            value = self.config.timeout_reward
+        elif distance >= self.config.max_goal_distance:
+            # agent exceeded max distance from goal
+            value = self.config.distance_reward
+        elif in_docking and velocity >= self.config.max_vel_constraint:
+            # agent exceeded velocity constraint within docking region
+            value = self.config.crash_reward
 
-    def reset(self, sim_state):
-        super().reset(sim_state)
-        self.cur_distance = distance(sim_state.env_objs[self.deputy], sim_state.env_objs[self.docking_region])
-        self.prev_distance = distance(sim_state.env_objs[self.deputy], sim_state.env_objs[self.docking_region])
-
-    def _increment(self, sim_state, step_size):
-        self.prev_distance = self.cur_distance
-        self.cur_distance = distance(sim_state.env_objs[self.deputy], sim_state.env_objs[self.docking_region])
-
-    def _process(self, sim_state):
-        dist_change = self.cur_distance - self.prev_distance
-        step_reward = dist_change * self.reward
-        return step_reward
-
-
-class DistanceChangeZRewardProcessor(RewardProcessor):
-    def __init__(self, name=None, deputy=None, docking_region=None, reward=None):
-        super().__init__(name=name, reward=reward)
-        self.deputy = deputy
-        self.docking_region = docking_region
-
-    def reset(self, sim_state):
-        super().reset(sim_state)
-        self.prev_z_distance = 0
-        self.cur_z_distance = abs(sim_state.env_objs[self.deputy].z - sim_state.env_objs[self.docking_region].z)
-
-    def _increment(self, sim_state, step_size):
-        self.prev_z_distance = self.cur_z_distance
-        self.cur_z_distance = abs(sim_state.env_objs[self.deputy].z - sim_state.env_objs[self.docking_region].z)
-
-    def _process(self, sim_state):
-        dist_z_change = self.cur_z_distance - self.prev_z_distance
-        step_reward = dist_z_change * self.reward
-        return step_reward
-
-
-class SuccessRewardProcessor(RewardProcessor):
-    def __init__(self, name=None, success_status=None, reward=None, timeout=None):
-        super().__init__(name=name, reward=reward)
-        self.success_status = success_status
-        self.timeout = timeout
-
-    def _increment(self, sim_state, step_size):
-        # reward derived straight from status dict, therefore no state machine necessary
-        pass
-
-    def _process(self, sim_state):
-        step_reward = 0
-        if sim_state.status[self.success_status]:
-            step_reward = self.reward
-            if self.timeout is not None:
-                step_reward += 1 - (sim_state.time_elapsed / self.timeout)
-        return step_reward
+        reward[self.config.agent_name] = value
+        return reward
 
 
-class FailureRewardProcessor(RewardProcessor):
-    def __init__(self, name=None, failure_status=None, reward=None):
-        super().__init__(name=name, reward=reward)
-        self.failure_status = failure_status
+if __name__ == "__main__":
+    # from collections import OrderedDict
 
-    def _increment(self, sim_state, step_size):
-        # reward derived straight from status dict, therefore no state machine necessary
-        pass
+    from saferl.simulators.cwh_simulator import CWHSimulator
 
-    def _process(self, sim_state):
-        step_reward = 0
-        if sim_state.status[self.failure_status]:
-            step_reward = self.reward[sim_state.status[self.failure_status]]
-        return step_reward
+    tmp_config = {
+        "step_size": 1,
+        "agent_configs": {
+            "blue0": {
+                "sim_config": {},
+                "platform_config": [
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "X Thrust", "axis": 0
+                    }),
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "Y Thrust", "axis": 1
+                    }),
+                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
+                        "name": "Z Thrust", "axis": 2
+                    }),
+                    ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}),
+                    ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {}),
+                ],
+            }
+        },
+    }
 
+    reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}
+
+    tmp = CWHSimulator(**tmp_config)
+    first_state = tmp.reset(reset_config)
+
+    success_reward_fn = DockingSuccessRewardFunction(agent_name="blue0", scale=1, timeout=50, deputy="deputy", docking_region_radius=25)
+
+    failure_reward_fn = DockingFailureRewardFunction(
+        agent_name="blue0",
+        timeout_reward=1,
+        distance_reward=2,
+        crash_reward=3,
+        timeout=50,
+        docking_distance=5,
+        max_goal_distance=40000,
+        docking_region_radius=25,
+        max_vel_constraint=10
+    )
+
+    for i in range(5):
+        curr_state = tmp.step()
+
+        success_reward = success_reward_fn(
+            observation=OrderedDict(),
+            action=OrderedDict(),
+            next_observation=OrderedDict(),
+            next_state=curr_state,
+            state=curr_state,
+            observation_space=StateDict(),
+            observation_units=StateDict()
+        )
+        failure_reward = failure_reward_fn(
+            observation=OrderedDict(),
+            action=OrderedDict(),
+            next_observation=OrderedDict(),
+            next_state=curr_state,
+            state=curr_state,
+            observation_space=StateDict(),
+            observation_units=StateDict()
+        )
+
+        print(success_reward)
+        print(failure_reward)
