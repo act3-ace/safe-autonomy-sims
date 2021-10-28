@@ -1,15 +1,16 @@
 import abc
 import copy
+from typing import Tuple, Union
 
 import gym
 import numpy as np
-from numpy.lib.arraysetops import isin
 import scipy.integrate
 import scipy.spatial
-from typing import Union, Tuple
+from numpy.lib.arraysetops import isin
 
 
 class BaseEntity(abc.ABC):
+
     def __init__(self, name, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None):
         self.name = name
         self.dynamics = dynamics
@@ -99,10 +100,11 @@ class BaseEntity(abc.ABC):
 
 
 class BaseDynamics(abc.ABC):
+
     def __init__(
-        self, 
-        state_min: Union[float, np.ndarray] = -np.inf, 
-        state_max: Union[float, np.ndarray] = np.inf, 
+        self,
+        state_min: Union[float, np.ndarray] = -np.inf,
+        state_max: Union[float, np.ndarray] = np.inf,
         angle_wrap_centers: np.ndarray = None,
     ):
         self.state_min = state_min
@@ -131,6 +133,7 @@ class BaseDynamics(abc.ABC):
 
 
 class BaseODESolverDynamics(BaseDynamics):
+
     def __init__(self, integration_method="Euler", **kwargs):
         self.integration_method = integration_method
         super().__init__(**kwargs)
@@ -156,7 +159,7 @@ class BaseODESolverDynamics(BaseDynamics):
     def _step(self, step_size, state, control):
 
         if self.integration_method == "RK45":
-            sol = scipy.integrate.solve_ivp(self.compute_state_dot, (0, step_size), state, args=(control,))
+            sol = scipy.integrate.solve_ivp(self.compute_state_dot, (0, step_size), state, args=(control, ))
 
             next_state = sol.y[:, -1]  # save last timestep of integration solution
             state_dot = self.compute_state_dot(step_size, next_state, control)
@@ -171,6 +174,7 @@ class BaseODESolverDynamics(BaseDynamics):
 
 
 class BaseLinearODESolverDynamics(BaseODESolverDynamics):
+
     def __init__(self, **kwargs):
         self.A, self.B = self.gen_dynamics_matrices()
         super().__init__(**kwargs)
