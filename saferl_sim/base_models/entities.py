@@ -7,12 +7,18 @@ import numpy as np
 import scipy.integrate
 import scipy.spatial
 from numpy.lib.arraysetops import isin
+from pydantic import BaseModel
+
+
+class BaseEntityValidator(BaseModel):
+    name: str
 
 
 class BaseEntity(abc.ABC):
 
-    def __init__(self, name, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None):
-        self.name = name
+    def __init__(self, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None, **kwargs):
+        self.config = self.get_config_validator()(**kwargs)
+        self.name = self.config.name
         self.dynamics = dynamics
 
         self.control_default = control_default
@@ -20,16 +26,16 @@ class BaseEntity(abc.ABC):
         self.control_max = control_max
         self.control_map = control_map
 
-        self.reset()
-
-    def reset(self, state=None, **kwargs):
-        assert state is None or isinstance(state, np.ndarray)
-        if state:
-            self._state = state.copy()
-        else:
-            self._state = self.build_state(**kwargs)
-
+        self._state = self._build_state()
         self.state_dot = np.zeros_like(self._state)
+
+    @classmethod
+    def get_config_validator(cls):
+        return BaseEntityValidator
+
+    @abc.abstractmethod
+    def _build_state(self) -> np.ndarray:
+        raise  NotImplementedError
 
     def step(self, step_size, action=None):
 

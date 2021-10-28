@@ -2,13 +2,40 @@ import copy
 
 import numpy as np
 from scipy.spatial.transform import Rotation
+from pydantic import validator
+import typing
 
-from saferl_sim.base_models.entities import BaseEntity, BaseLinearODESolverDynamics
+from saferl_sim.base_models.entities import BaseEntity, BaseLinearODESolverDynamics, BaseEntityValidator
+
+
+class CWHSpacecraftValidator(BaseEntityValidator):
+    position: typing.List[float] = [0, 0, 0]
+    velocity: typing.List[float] = [0, 0, 0]
+
+    @validator("position", "velocity")
+    def check_3d_vec_len(cls, v, field):
+        """checks 3d vector field for length 3
+
+        Parameters
+        ----------
+        v : typing.List[float]
+            vector quantity to check
+        field : string
+            name of validator field
+
+        Returns
+        -------
+        typing.List[float]
+            v
+        """
+        if len(v) != 3:
+            raise ValueError(f"{field.name} provided to CWHPlatformValidator is not length 3")
+        return v
 
 
 class CWHSpacecraft(BaseEntity):
 
-    def __init__(self, name, m=12, n=0.001027, integration_method="RK45"):
+    def __init__(self, m=12, n=0.001027, integration_method="RK45", **kwargs):
         dynamics = CWHDynamics(m=m, n=n, integration_method=integration_method)
         self._state = np.array([])
 
@@ -18,22 +45,15 @@ class CWHSpacecraft(BaseEntity):
             'thrust_z': 2,
         }
 
-        super().__init__(name, dynamics, control_default=np.zeros((3, )), control_min=-1, control_max=1, control_map=control_map)
-        self.reset()
+        super().__init__(dynamics, control_default=np.zeros((3, )), control_min=-1, control_max=1, control_map=control_map, **kwargs)
 
-    def reset(self, state=None, position=None, velocity=None):
-        if position is None:
-            position = [0, 0, 0]
-        if velocity is None:
-            velocity = [0, 0, 0]
+    @classmethod
+    def get_config_validator(cls):
+        return CWHSpacecraftValidator
 
-        super().reset(state=state, position=position, velocity=velocity)
+    def _build_state(self):
 
-    def build_state(self, position, velocity):
-        assert isinstance(position, list) and len(position) == 3, "position should be a list of len 3"
-        assert isinstance(velocity, list) and len(velocity) == 3, "velocity should be a list of len 3"
-
-        state = np.concatenate((position, velocity), dtype=np.float32)
+        state = np.concatenate((self.config.position, self.config.velocity), dtype=np.float32)
 
         return state
 
