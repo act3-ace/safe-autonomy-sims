@@ -6,6 +6,14 @@ from pathlib import Path
 from setuptools import setup
 
 
+def parse_requirements(filename: str):
+    """ load requirements from a pip requirements file """
+    lineiter = (line.strip() for line in open(filename))
+    return [line for line in lineiter if line and not line.startswith("#")]
+
+reqs = parse_requirements("requirements.txt")
+
+
 if __name__ == '__main__':
     tests_require = [
         'flake8',
@@ -64,19 +72,15 @@ if __name__ == '__main__':
             'saferl': ['*.yml', '*.yaml']
         },
 
-        packages=[
-                'saferl',
-                'saferl_sim'
-        ],
+        packages=find_packages()
 
         classifiers=[
             "Programming Language :: Python :: 3",
             "Operating System :: OS Independent",
         ],
 
-        #install_requires=[
-        #    'act3-rl-core'
-        #],
+        install_requires=reqs
+
         extras_require={
             "testing":  tests_require,
             "docs":  docs_require,
