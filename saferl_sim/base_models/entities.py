@@ -143,7 +143,7 @@ class BaseEntity(abc.ABC):
     @property
     @abc.abstractmethod
     def position(self) -> np.ndarray:
-        """get position vector of len 3"""
+        """get 3d position vector"""
         raise NotImplementedError
 
     @property
@@ -162,7 +162,7 @@ class BaseEntity(abc.ABC):
     @property
     @abc.abstractmethod
     def velocity(self):
-        """get velocity vector of length 3"""
+        """get 3d velocity vector"""
         raise NotImplementedError
 
 
