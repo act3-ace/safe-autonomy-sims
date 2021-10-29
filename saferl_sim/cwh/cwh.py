@@ -1,11 +1,10 @@
-import copy
-
-import numpy as np
-from scipy.spatial.transform import Rotation
-from pydantic import validator
 import typing
 
-from saferl_sim.base_models.entities import BaseEntity, BaseLinearODESolverDynamics, BaseEntityValidator
+import numpy as np
+from pydantic import validator
+from scipy.spatial.transform import Rotation
+
+from saferl_sim.base_models.entities import BaseEntity, BaseEntityValidator, BaseLinearODESolverDynamics
 
 
 class CWHSpacecraftValidator(BaseEntityValidator):
@@ -48,12 +47,12 @@ class CWHSpacecraft(BaseEntity):
         super().__init__(dynamics, control_default=np.zeros((3, )), control_min=-1, control_max=1, control_map=control_map, **kwargs)
 
     @classmethod
-    def get_config_validator(cls):
+    def _get_config_validator(cls):
         return CWHSpacecraftValidator
 
     def _build_state(self):
 
-        state = np.concatenate((self.config.position, self.config.velocity), dtype=np.float32)
+        state = np.array(self.config.position + self.config.velocity, dtype=np.float32)
 
         return state
 
@@ -103,7 +102,7 @@ class CWHDynamics(BaseLinearODESolverDynamics):
 
         super().__init__(**kwargs)
 
-    def gen_dynamics_matrices(self):
+    def _gen_dynamics_matrices(self):
         m = self.m
         n = self.n
 
