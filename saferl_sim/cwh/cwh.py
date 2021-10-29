@@ -1,3 +1,6 @@
+"""
+This module implements 3D a point mass spacecraft with Clohessy-Wilshire phyiscs dynamics in non-intertial orbital Hill's reference frame
+"""
 import typing
 
 import numpy as np
@@ -8,6 +11,20 @@ from saferl_sim.base_models.entities import BaseEntity, BaseEntityValidator, Bas
 
 
 class CWHSpacecraftValidator(BaseEntityValidator):
+    """Validator for CWHSpacecraft kwargs
+
+    Parameters
+    ----------
+    position : list[float]
+        length 3 list of x, y, z position values.
+    velocity : list[float]
+        length 3 list of x, y, z velocity values.
+
+    Raises
+    ------
+    ValueError
+        Improper list lengths for parameters 'position', 'velocity'
+    """
     position: typing.List[float] = [0, 0, 0]
     velocity: typing.List[float] = [0, 0, 0]
 
@@ -33,6 +50,19 @@ class CWHSpacecraftValidator(BaseEntityValidator):
 
 
 class CWHSpacecraft(BaseEntity):
+    """3D point mass spacecraft with +/- xyz thrusters and Clohessy-Wiltshire dynamics in Hill's reference frame
+
+    Parameters
+    ----------
+    m: float
+        Mass of spacecraft in kilograms, by default 12
+    n: float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027
+    integration_method: str
+        Numerical integration method passed to dynamics model. See BaseODESolverDynamics
+    kwargs:
+        Additional keyword arguments passed to CWHSpacecraftValidator
+    """
 
     def __init__(self, m=12, n=0.001027, integration_method="RK45", **kwargs):
         dynamics = CWHDynamics(m=m, n=n, integration_method=integration_method)
@@ -51,50 +81,76 @@ class CWHSpacecraft(BaseEntity):
         return CWHSpacecraftValidator
 
     def _build_state(self):
-
         state = np.array(self.config.position + self.config.velocity, dtype=np.float32)
 
         return state
 
     @property
     def x(self):
+        """get x"""
         return self._state[0]
 
     @property
     def y(self):
+        """get y"""
         return self._state[1]
 
     @property
     def z(self):
+        """get z"""
         return self._state[2]
 
     @property
     def x_dot(self):
+        """get x_dot, the velocity component in the x direction"""
         return self._state[3]
 
     @property
     def y_dot(self):
+        """get y_dot, the velocity component in the y direction"""
         return self._state[4]
 
     @property
     def z_dot(self):
+        """get z_dot, the velocity component in the z direction"""
         return self._state[5]
 
     @property
     def position(self):
+        """get 3d position vector"""
         return self._state[0:3].copy()
 
     @property
     def orientation(self):
+        """gets orientation of CWHSpacecraft. Always identity as point mass model doesn't rotate.
+
+        Returns
+        -------
+        scipy.spatial.transform.Rotation
+            Rotation tranformation of the entity's local reference frame basis vectors in the global reference frame.
+            i.e. applying this rotation to [1, 0, 0] yields the entity's local x-axis in the global frame.
+        """
         # always return a no rotation quaternion as points do not have an orientation
         return Rotation.from_quat([0, 0, 0, 1])
 
     @property
     def velocity(self):
+        """get 3d velocity vector"""
         return self._state[3:6].copy()
 
 
 class CWHDynamics(BaseLinearODESolverDynamics):
+    """State transition implementation of 3D Clohessy-Wiltshire dynamics model.
+
+    Parameters
+    ----------
+    m: float
+        Mass of spacecraft in kilograms, by default 12
+    n: float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027
+    kwargs:
+        Additional keyword arguments passed to parent class BaseLinearODESolverDynamics constructor
+    """
 
     def __init__(self, m=12, n=0.001027, **kwargs):
         self.m = m  # kg
