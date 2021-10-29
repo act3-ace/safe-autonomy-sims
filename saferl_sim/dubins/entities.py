@@ -1,3 +1,7 @@
+"""
+This module implements 2D and 3D Aircraft entities with Dubins phyiscs dynamics models
+"""
+
 import abc
 import math
 import typing
@@ -10,6 +14,23 @@ from saferl_sim.base_models.entities import BaseEntity, BaseEntityValidator, Bas
 
 
 class BaseDubinsAircraftValidator(BaseEntityValidator):
+    """Base validator for Dubin Aircraft implementations
+
+    Parameters
+    ----------
+    position : list[float]
+        Initial 3d position vector in x, y, z
+    heading : float
+        Initial angle of velocity vector relative to x-axis. Right hand rule sign convention.
+    v : float
+        Initial velocity magnitude, aka speed, of dubins entity.
+
+    Raises
+    ------
+    ValueError
+        Improper list length for parameter 'position'
+    """
+
     position: typing.List[float] = [0, 0, 0]
     heading: float = 0
     v: float = 200
@@ -36,6 +57,8 @@ class BaseDubinsAircraftValidator(BaseEntityValidator):
 
 
 class BaseDubinsAircraft(BaseEntity):
+    """Base interface for Dubins Entities
+    """
 
     @classmethod
     def _get_config_validator(cls):
@@ -44,38 +67,52 @@ class BaseDubinsAircraft(BaseEntity):
     @property
     @abc.abstractmethod
     def v(self):
+        """get v, the velocity magnitude. aka speed."""
         raise NotImplementedError
 
     @property
     def yaw(self):
+        """get yaw. Equivalent to heading for Dubins model"""
         return self.heading
 
     @property
     def pitch(self):
+        """get pitch. Equivalent to gamma for Dubins model"""
         return self.gamma
 
     @property
     @abc.abstractmethod
     def roll(self):
-        return self.state.roll
+        """get roll"""
+        raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def heading(self):
-        return self.state.heading
+        """
+        Get heading, the angle of velocity relative to the x-axis projected to the xy-plane.
+        Right hand rule sign convention.
+        """
+        raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def gamma(self):
-        return self.state.gamma
+        """
+        Get gamma, aka flight path angle, the angle of the velocity vector relative to the xy-plane.
+        Right hand rule sign convention.
+        """
+        raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def acceleration(self):
+        """get 3d acceleration vector"""
         raise NotImplementedError
 
     @property
     def velocity(self):
+        """get 3d velocity vector"""
         velocity = np.array(
             [
                 self.v * math.cos(self.heading) * math.cos(self.gamma),
@@ -88,6 +125,15 @@ class BaseDubinsAircraft(BaseEntity):
 
     @property
     def orientation(self):
+        """get orientation of entity
+
+        Returns
+        -------
+        scipy.spatial.transform.Rotation
+            Rotation tranformation of the entity's local reference frame basis vectors in the global reference frame.
+            i.e. applying this rotation to [1, 0, 0] yields the entity's local x-axis (i.e. direction of nose) in the global frame.
+            For Dubins, derived from yaw, pitch, roll attributes.
+        """
         return Rotation.from_euler("ZYX", [self.yaw, self.pitch, self.roll])
 
 
@@ -97,6 +143,30 @@ class BaseDubinsAircraft(BaseEntity):
 
 
 class Dubins2dAircraft(BaseDubinsAircraft):
+    """
+    2D Dubins Aircraft Simulation Entity.
+
+    States
+        x
+        y
+        heading
+            range = [-pi, pi] rad
+        v
+            range = [200, 400] ft/s
+
+    Controls
+        heading_rate
+            range = [-pi/18, pi/18] rad/s (i.e. +/- 10 deg/s)
+        acceleration
+            range = [-96.5, 96.5] ft/s^2
+
+    Parameters
+    ----------
+    integration_method: str
+        Numerical integration method passed to dynamics model. See BaseODESolverDynamics
+    kwargs
+        Additional keyword args passed to BaseDubinsAircraftValidator
+    """
 
     def __init__(self, integration_method="RK45", **kwargs):
 
@@ -167,10 +237,19 @@ class Dubins2dAircraft(BaseDubinsAircraft):
 
     @property
     def gamma(self):
+        """
+        Get gamma, aka flight path angle, the angle of the velocity vector relative to the xy-plane.
+        Right hand rule sign convention.
+        Always 0 for Dubins 2D.
+        """
         return 0
 
     @property
     def roll(self):
+        """
+        Get roll.
+        Always 0 for Dubins 2D.
+        """
         return 0
 
     @property
@@ -181,6 +260,8 @@ class Dubins2dAircraft(BaseDubinsAircraft):
 
 
 class Dubins2dDynamics(BaseODESolverDynamics):
+    """State transition implementation of non-linear 2D Dubins dynamics model.
+    """
 
     def _compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
         _, _, heading, v = state
@@ -202,11 +283,51 @@ class Dubins2dDynamics(BaseODESolverDynamics):
 
 
 class Dubins3dAircraftValidator(BaseDubinsAircraftValidator):
+    """Validator for Dubins3dAircraft
+
+    Parameters
+    ----------
+    gamma : float
+        Initial gamma value of Dubins3dAircraft in radians
+    roll : float
+        Initial roll value of Dubins3dAircraft in radians
+    """
     gamma: float = 0
     roll: float = 0
 
 
 class Dubins3dAircraft(BaseDubinsAircraft):
+    """
+    3D Dubins Aircraft Simulation Entity.
+
+    States
+        x
+        y
+        z
+        heading
+            range = [-pi, pi] rad
+        gamma
+            range = [-pi/9, pi/9] rad
+        roll
+            range = [-pi/3, pi/3] rad
+        v
+            range = [200, 400] ft/s
+
+    Controls
+        gamma_rate
+            range = [-pi/18, pi/18] rad/s (i.e. +/- 10 deg/s)
+        roll_rate
+            range = [-pi/36, pi/36] rad/s (i.e. +/- 5 deg/s)
+        acceleration
+            range = [-96.5, 96.5] ft/s^2
+
+    Parameters
+    ----------
+    integration_method: str
+        Numerical integration method passed to dynamics model. See BaseODESolverDynamics
+    kwargs
+        Additional keyword args passed to BaseDubinsAircraftValidator
+    """
 
     def __init__(self, integration_method='RK45', **kwargs):
 
@@ -311,6 +432,15 @@ class Dubins3dAircraft(BaseDubinsAircraft):
 
 
 class Dubins3dDynamics(BaseODESolverDynamics):
+    """State transition implementation of non-linear 2D Dubins dynamics model.
+
+    Parameters
+    ----------
+    g : float
+        gravitational acceleration constant if ft/s^2
+    kwargs
+        Additional keyword args passed to parent BaseODESolverDynamics constructor
+    """
 
     def __init__(self, g=32.17, **kwargs):
         self.g = g

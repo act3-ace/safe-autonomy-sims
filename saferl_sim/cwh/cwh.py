@@ -52,6 +52,22 @@ class CWHSpacecraftValidator(BaseEntityValidator):
 class CWHSpacecraft(BaseEntity):
     """3D point mass spacecraft with +/- xyz thrusters and Clohessy-Wiltshire dynamics in Hill's reference frame
 
+    States
+        x
+        y
+        z
+        x_dot
+        y_dot
+        z_dot
+
+    Controls
+        thrust_x
+            range = [-1, 1] Newtons
+        thrust_y
+            range = [-1, 1] Newtons
+        thrust_z
+            range = [-1, 1] Newtons
+
     Parameters
     ----------
     m: float
@@ -122,7 +138,7 @@ class CWHSpacecraft(BaseEntity):
 
     @property
     def orientation(self):
-        """gets orientation of CWHSpacecraft. Always identity as point mass model doesn't rotate.
+        """get orientation of CWHSpacecraft. Always identity as point mass model doesn't rotate.
 
         Returns
         -------
