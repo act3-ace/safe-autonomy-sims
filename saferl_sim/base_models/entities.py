@@ -149,7 +149,7 @@ class BaseEntity(abc.ABC):
     @property
     @abc.abstractmethod
     def orientation(self) -> scipy.spatial.transform.Rotation:
-        """gets orientation of entity
+        """get orientation of entity
 
         Returns
         -------
