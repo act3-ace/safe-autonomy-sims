@@ -1,19 +1,19 @@
 import abc
 import math
-from operator import pos
 import typing
 
 import numpy as np
-from scipy.spatial.transform import Rotation
 from pydantic import validator
+from scipy.spatial.transform import Rotation
 
-from saferl_sim.base_models.entities import BaseEntity, BaseODESolverDynamics, BaseEntityValidator
+from saferl_sim.base_models.entities import BaseEntity, BaseEntityValidator, BaseODESolverDynamics
 
 
 class BaseDubinsAircraftValidator(BaseEntityValidator):
     position: typing.List[float] = [0, 0, 0]
     heading: float = 0
     v: float = 200
+
     @validator("position")
     def check_3d_vec_len(cls, v, field):
         """checks 3d vector field for length 3
@@ -38,7 +38,7 @@ class BaseDubinsAircraftValidator(BaseEntityValidator):
 class BaseDubinsAircraft(BaseEntity):
 
     @classmethod
-    def get_config_validator(cls):
+    def _get_config_validator(cls):
         return BaseDubinsAircraftValidator
 
     @property
@@ -89,6 +89,11 @@ class BaseDubinsAircraft(BaseEntity):
     @property
     def orientation(self):
         return Rotation.from_euler("ZYX", [self.yaw, self.pitch, self.roll])
+
+
+############################
+# 2d Dubins Implementation #
+############################
 
 
 class Dubins2dAircraft(BaseDubinsAircraft):
@@ -177,8 +182,8 @@ class Dubins2dAircraft(BaseDubinsAircraft):
 
 class Dubins2dDynamics(BaseODESolverDynamics):
 
-    def _compute_state_dot(self, t, state_vec, control):
-        _, _, heading, v = state_vec
+    def _compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
+        _, _, heading, v = state
         rudder, throttle = control
 
         x_dot = v * math.cos(heading)
@@ -191,13 +196,15 @@ class Dubins2dDynamics(BaseODESolverDynamics):
         return state_dot
 
 
-"""
-3D Dubins Implementation
-"""
+############################
+# 3D Dubins Implementation #
+############################
+
 
 class Dubins3dAircraftValidator(BaseDubinsAircraftValidator):
     gamma: float = 0
     roll: float = 0
+
 
 class Dubins3dAircraft(BaseDubinsAircraft):
 
@@ -225,7 +232,7 @@ class Dubins3dAircraft(BaseDubinsAircraft):
         )
 
     @classmethod
-    def get_config_validator(cls):
+    def _get_config_validator(cls):
         return Dubins3dAircraftValidator
 
     def _build_state(self):
@@ -309,8 +316,8 @@ class Dubins3dDynamics(BaseODESolverDynamics):
         self.g = g
         super().__init__(**kwargs)
 
-    def _compute_state_dot(self, t, state_vec, control):
-        x, y, z, heading, gamma, roll, v = state_vec
+    def _compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
+        _, _, _, heading, gamma, roll, v = state
 
         elevator, ailerons, throttle = control
 
@@ -350,5 +357,7 @@ if __name__ == "__main__":
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
         entity.step(1, action)
-        print(f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}, '
-            f'acceleration={entity.acceleration}')
+        print(
+            f'position={entity.position}, heading={entity.heading}, gamma={entity.gamma}, roll={entity.roll}, v={entity.v}, '
+            f'acceleration={entity.acceleration}'
+        )
