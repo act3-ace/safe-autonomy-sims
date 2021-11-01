@@ -92,12 +92,10 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward
     timeout: The max time for an episode                                              TODO: [optional]
-    deputy: The name of the deputy (agent) platform
     docking_region_radius: The radius of the docking region in meters
     """
     scale: float
     timeout: float
-    deputy: str
     docking_region_radius: float
 
 
@@ -297,7 +295,7 @@ if __name__ == "__main__":
     tmp = CWHSimulator(**tmp_config)
     first_state = tmp.reset(reset_config)
 
-    success_reward_fn = DockingSuccessRewardFunction(agent_name="blue0", scale=1, timeout=50, deputy="deputy", docking_region_radius=25)
+    success_reward_fn = DockingSuccessRewardFunction(agent_name="blue0", scale=1, timeout=50, docking_region_radius=25)
 
     failure_reward_fn = DockingFailureRewardFunction(
         agent_name="blue0",
