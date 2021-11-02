@@ -172,57 +172,12 @@ class Dubins3dSimulator(SafeRLSimulator):
         """
         return Dubins3dSimulatorResetValidator
 
-    def get_sim_entities(self):
-        """
-        Retrieve the entities present in the simulation
-
-        Returns
-        -------
-        dict
-            dictionary of all the entities by name mapped to their object references.
-        """
-        return {agent_id: bp.Dubins3dAircraft(name=agent_id) for agent_id in self.config.agent_configs.keys()}
-
-    def get_platforms(self):
-        """
-        Retrieve the platform present in the simulation
-
-        Returns
-        -------
-        tuple
-            tuple of all platform alongside their name , reference and config
-        """
-        sim_platforms = tuple(
-            Dubins3dPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config)
-            for agent_id,
-            entity in self.sim_entities.items()
-        )
-        return sim_platforms
-
-    def reset_sim_entities(self, config):
-        """
-        Reset the internal states of all the simulation entities.
-
-        Params
-        ------
-        config : dict
-            contains configuration properties
-        """
-
-        config = self.get_reset_validator()(**config)
-        for agent_id, entity in self.sim_entities.items():
-            init_params = config.agent_initialization[agent_id]
-            entity.reset(
-                **{
-                    "x": init_params.position[0],
-                    "y": init_params.position[1],
-                    "z": init_params.position[2],
-                    "heading": init_params.heading,
-                    "v": init_params.speed,
-                    "gamma": init_params.gamma,
-                    "roll": init_params.roll,
-                }
-            )
+    def _construct_platform_map(self) -> dict:
+        return {
+            'default': (bp.Dubins2dAircraft, Dubins2dPlatform),
+            'dubins2d': (bp.Dubins2dAircraft, Dubins2dPlatform),
+            'dubins3d': (bp.Dubins3dAircraft, Dubins3dPlatform),
+        }
 
 
 PluginLibrary.AddClassToGroup(Dubins3dSimulator, "Dubins3dSimulator", {})
@@ -255,7 +210,9 @@ if __name__ == "__main__":
         "step_size": 1,
         "agent_configs": {
             "blue0": {
-                "sim_config": {},
+                "sim_config": {
+                    'platform': 'dubins3d'
+                },
                 "platform_config": [
                     ("saferl.platforms.dubins.dubins_controllers.CombinedPitchRollAccelerationController", {
                         "name": "PitchRollAccControl"
