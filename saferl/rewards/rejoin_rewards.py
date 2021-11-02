@@ -27,7 +27,7 @@ class DubinsRejoinSuccessRewardValidator(RewardFuncBaseValidator):
     rejoin_region_radius: float
     offset_values: typing.List[float]
     lead: str
-    reward : float
+    reward: float
 
 
 class DubinsRejoinSuccessReward(RewardFuncBase):
@@ -96,8 +96,9 @@ class DubinsRejoinSuccessReward(RewardFuncBase):
 
         return reward
 
+
 class RejoinDistanceChangeRewardValidator(RewardFuncBaseValidator):
-        """
+    """
         Validator for the RejoinDistanceChangeReward Reward Function
         Attributes
         ----------
@@ -110,35 +111,36 @@ class RejoinDistanceChangeRewardValidator(RewardFuncBaseValidator):
         reward : float
             reward for accomplishing the task
             """
-        rejoin_region_radius: float
-        offset_values: typing.List[float]
-        lead: str
-        reward : float
+    rejoin_region_radius: float
+    offset_values: typing.List[float]
+    lead: str
+    reward: float
+
 
 class RejoinDistanceChangeReward(RewardFuncBase):
 
-        def __init__(self,prev_dist,**kwargs):
-            super().__init__(**kwargs)
-            self.prev_dist = prev_dist
+    def __init__(self, prev_dist, **kwargs):
+        super().__init__(**kwargs)
+        self.prev_dist = prev_dist
 
-        @classmethod
-        def get_validator(cls):
-            """
+    @classmethod
+    def get_validator(cls):
+        """
             Method to return class's Validator.
             """
-            return DubinsRejoinSuccessRewardValidator
+        return DubinsRejoinSuccessRewardValidator
 
-        def __call__(
-            self,
-            observation: OrderedDict,
-            action,
-            next_observation: OrderedDict,
-            state: StateDict,
-            next_state: StateDict,
-            observation_space: StateDict,
-            observation_units: StateDict,
-        ) -> RewardDict:
-            """
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        """
             This method calculates the current position of the agent and compares it to the previous position. The
             difference is used to return a proportional reward.
 
@@ -165,22 +167,21 @@ class RejoinDistanceChangeReward(RewardFuncBase):
                 The agent's reward for their change in distance.
             """
 
-            reward = RewardDict()
-            val = 0
+        reward = RewardDict()
+        val = 0
 
-            # all 3 pieces
-            rejoin_region_radius = self.config.rejoin_region_radius
-            lead_orientation = lead_aircraft_platform.lead_orientation
-            offset_vector = np.array(self.config.offset_values)
+        # all 3 pieces
+        rejoin_region_radius = self.config.rejoin_region_radius
+        lead_orientation = lead_aircraft_platform.lead_orientation
+        offset_vector = np.array(self.config.offset_values)
 
-            # rotate vector then add it to the lead center
-            rotated_vector = lead_orientation.apply(offset_vector)
-            rejoin_region_center = lead_aircraft_platform.position + rotated_vector
+        # rotate vector then add it to the lead center
+        rotated_vector = lead_orientation.apply(offset_vector)
+        rejoin_region_center = lead_aircraft_platform.position + rotated_vector
 
-            radial_distance = np.linalg.norm(np.array(wingman_agent_platform.position) - rejoin_region_center)
-            diff_distance = self.prev_dist - radial_distance
+        radial_distance = np.linalg.norm(np.array(wingman_agent_platform.position) - rejoin_region_center)
+        diff_distance = self.prev_dist - radial_distance
 
+        reward[self.config.agent_name] = self.config.reward * diff_distance
 
-            reward[self.config.agent_name] = self.config.reward * diff_distance
-
-            return reward
+        return reward
