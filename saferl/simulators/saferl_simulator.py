@@ -33,32 +33,56 @@ class SafeRLSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.sim_entities = self.get_sim_entities()
+        self.platform_map = self._construct_platform_map()
+        self.sim_entities = self.construct_sim_entities()
         self._state = StateDict()
         self.clock = 0.0
 
     def reset(self, config):
         self._state.clear()
         self.clock = 0.0
-        self.reset_sim_entities(config)
-        self._state.sim_platforms = self.get_platforms()
+        self.sim_entities = self.construct_sim_entities(config)
+        self._state.sim_platforms = self.construct_platforms()
         self.update_sensor_measurements()
         return self._state
 
     @abc.abstractmethod
-    def get_sim_entities(self) -> dict:
+    def _construct_platform_map(self) -> dict:
+        ...
+
+    def construct_sim_entities(self, reset_config=None) -> dict:
         """
         Gets the correct backend simulation entity for each agent.
+
+        Parameters
+        ----------
+        reset_config: dict
+            Reset config containing the parameters to validate and use to setup this episode.
 
         Returns
         -------
         dict[str: sim_entity]
             Dictionary mapping agent id to simulation backend entity.
         """
-        ...
 
-    @abc.abstractmethod
-    def get_platforms(self) -> tuple:
+        sim_entities = {}
+        for agent_id, agent_config in self.config.agent_configs.items():
+            sim_config = agent_config.sim_config
+            sim_config_kwargs = sim_config.get("kwargs", {})
+
+            if reset_config is None:
+                agent_reset_config = {}
+            else:
+                agent_reset_config = reset_config['agent_initialization'].get(agent_id, {})
+
+            entity_kwargs = {**sim_config_kwargs, **agent_reset_config}
+
+            entity_class = self.platform_map[sim_config.get('platform', 'default')][0]
+            sim_entities[agent_id] = entity_class(name=agent_id, **entity_kwargs)
+
+        return sim_entities
+
+    def construct_platforms(self) -> tuple:
         """
         Gets the platform object associated with each simulation entity.
 
@@ -67,14 +91,14 @@ class SafeRLSimulator(BaseSimulator):
         tuple
             Collection of platforms associated with each simulation entity.
         """
-        ...
-
-    @abc.abstractmethod
-    def reset_sim_entities(self, config):
-        """
-        Reset simulation entities to an initial state.
-        """
-        ...
+        sim_platforms = []
+        for agent_id, entity in self.sim_entities.items():
+            agent_config = self.config.agent_configs[agent_id]
+            sim_config = agent_config.sim_config
+            platform_config = agent_config.platform_config
+            platform_class = self.platform_map[sim_config.get('platform', 'default')][1]
+            sim_platforms.append(platform_class(platform_name=agent_id, platform=entity, platform_config=platform_config))
+        return tuple(sim_platforms)
 
     def update_sensor_measurements(self):
         """
@@ -95,7 +119,7 @@ class SafeRLSimulator(BaseSimulator):
             agent_id = platform.name
             action = np.array(platform.get_applied_action(), dtype=np.float32)
             entity = self.sim_entities[agent_id]
-            entity.step(sim_state=None, action=action, step_size=self.config.step_size)
+            entity.step(action=action, step_size=self.config.step_size)
             platform.sim_time = self.clock
         self.update_sensor_measurements()
         self.clock += self.config.step_size
