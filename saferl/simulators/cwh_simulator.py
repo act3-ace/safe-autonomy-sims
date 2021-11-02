@@ -63,32 +63,27 @@ class CWHSimulator(SafeRLSimulator):
     def get_reset_validator(cls):
         return CWHSimulatorResetValidator
 
-    def get_sim_entities(self):
-        return {agent_id: CWHSpacecraft(name=agent_id) for agent_id in self.config.agent_configs.keys()}
-
-    def get_platforms(self):
-        sim_platforms = tuple(
-            CWHPlatform(platform_name=agent_id, platform=entity, platform_config=self.config.agent_configs[agent_id].platform_config)
-            for agent_id,
-            entity in self.sim_entities.items()
-        )
-        return sim_platforms
-
-    def reset_sim_entities(self, config):
-        config = self.get_reset_validator()(**config)
-        for agent_id, entity in self.sim_entities.items():
-            init_params = config.agent_initialization[agent_id]
-            entity.reset(**init_params.dict())
+    def _construct_platform_map(self) -> dict:
+        return {
+            'default': (CWHSpacecraft, CWHPlatform),
+            'cwh': (CWHSpacecraft, CWHPlatform),
+        }
 
 
 PluginLibrary.AddClassToGroup(CWHSimulator, "CWHSimulator", {})
 
-if __name__ == "__main__":
+
+def main():
+    """main"""
     tmp_config = {
         "step_size": 1,
         "agent_configs": {
             "blue0": {
-                "sim_config": {},
+                "sim_config": {
+                    "platform": "cwh", "kwargs": {
+                        "integration_method": "RK45"
+                    }
+                },
                 "platform_config": [
                     ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
                         "name": "X Thrust", "axis": 0
@@ -111,10 +106,14 @@ if __name__ == "__main__":
     tmp = CWHSimulator(**tmp_config)
     state = tmp.reset(reset_config)
     # print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
-    for i in range(5):
+    for _ in range(5):
         # state.sim_platforms[0]._controllers[0].apply_control(1)
         # state.sim_platforms[0]._controllers[1].apply_control(2)
         # state.sim_platforms[0]._controllers[2].apply_control(3)
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
         state = tmp.step()
         print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
+
+
+if __name__ == "__main__":
+    main()
