@@ -9,6 +9,8 @@ from act3_rl_core.libraries.environment_dict import DoneDict
 
 # need to import get_platform_name, WIP
 
+# check how the done combination is done !
+
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
@@ -86,6 +88,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
 
     docking_region_radius: float
+    velocity_limit: float
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
@@ -138,10 +141,126 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         docking_region_radius = self.config.docking_region_radius
 
         radial_distance = np.linalg.norm(np.array(position) - origin)
-        done[self.agent] = radial_distance <= docking_region_radius
+        #done[self.agent] = radial_distance <= docking_region_radius
+
+        # add constraint for velocity
+        in_docking_region = radial_distance <= docking_region_radius
+        within_limit = deputy.velocity <= self.config.velocity_limit
+
+        if in_docking_region and within_limit:
+            done[self.agent] = True
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+        elif in_docking_region and not within_limit:
+            done[self.agent] = True
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        return done
+
+
+class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
+    """
+    This class validates that the config contains essential peices of data for the done function
+    """
+    velocity_limit: float
+
+
+class DockingVelocityLimitDoneFunction(DoneFuncBase):
+    """
+    TBD
+    """
+
+    @classmethod
+    def get_validator(cls):
+        """
+        Params
+        ------
+        cls : constructor function
+
+        Returns
+        -------
+        TBD
+        """
+        return MaxViolationVelocityDoneFunctionValidator
+
+    def __call__(self, observation, action, next_observation, next_state):
+        """
+        Params
+        ------
+        TBD
+
+        Returns
+        -------
+            done : DoneDict
+                dictionary containing the condition condition for the current agent
+
+        """
+        # eventually will include velocity constraint
+        done = DoneDict()
+        # platform = get_platform_name(next_state,self.agent)
+        deputy = get_platform_by_name(next_state, self.agent)
+
+        # pos = platform.position
+        curr_vel = deputy.velocity
+        curr_vel_mag = np.linalg.norm(current_velocity)
+
+        if curr_vel_mag > self.config.velocity_limit:
+            done[self.agent] = True
 
         if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+
+        return done
+
+
+class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
+    """
+    This class validates that the config contains essential peices of data for the done function
+    """
+    constraint_velocity: float
+    target: str
+
+
+# needs a reference object
+class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
+
+    @classmethod
+    def get_validator(cls):
+        """
+        Params
+        ------
+        cls : constructor function
+
+        Returns
+        -------
+        TBD
+        """
+        return DockingVelocityLimitDoneValidator
+
+    def __call__(self, observation, action, next_observation, next_state):
+        """
+        Params
+        ------
+        TBD
+
+        Returns
+        -------
+            done : DoneDict
+                dictionary containing the condition condition for the current agent
+
+        """
+        # eventually will include velocity constraint
+        done = DoneDict()
+        # platform = get_platform_name(next_state,self.agent)
+        deputy = get_platform_by_name(next_state, self.agent)
+        target = get_platform_by_name(next_state, self.config.target)
+        # pos = platform.position
+
+        curr_vel_mag = np.linalg.norm(deputy.velocity - target.velocity)
+
+        if curr_vel_mag < self.config.constraint_velocity:
+            done[self.agent] = True
+
+        if done[self.agent]:
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
         return done
 
