@@ -95,8 +95,7 @@ class SafeRLSimulator(BaseSimulator):
             agent_id = platform.name
             action = np.array(platform.get_applied_action(), dtype=np.float32)
             entity = self.sim_entities[agent_id]
-            entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
-            entity.step_apply()
+            entity.step(sim_state=None, action=action, step_size=self.config.step_size)
             platform.sim_time = self.clock
         self.update_sensor_measurements()
         self.clock += self.config.step_size

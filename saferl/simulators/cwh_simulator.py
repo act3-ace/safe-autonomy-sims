@@ -9,7 +9,7 @@ from pydantic import BaseModel, validator
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator
-from saferl_sim.cwh.cwh import CWHSpacecraft3d
+from saferl_sim.cwh.cwh import CWHSpacecraft
 
 
 class CWHPlatformConfigValidator(BaseModel):
@@ -64,7 +64,7 @@ class CWHSimulator(SafeRLSimulator):
         return CWHSimulatorResetValidator
 
     def get_sim_entities(self):
-        return {agent_id: CWHSpacecraft3d(name=agent_id) for agent_id in self.config.agent_configs.keys()}
+        return {agent_id: CWHSpacecraft(name=agent_id) for agent_id in self.config.agent_configs.keys()}
 
     def get_platforms(self):
         sim_platforms = tuple(
@@ -78,16 +78,7 @@ class CWHSimulator(SafeRLSimulator):
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
             init_params = config.agent_initialization[agent_id]
-            entity.reset(
-                **{
-                    "x": init_params.position[0],
-                    "y": init_params.position[1],
-                    "z": init_params.position[2],
-                    "x_dot": init_params.velocity[0],
-                    "y_dot": init_params.velocity[1],
-                    "z_dot": init_params.velocity[2],
-                }
-            )
+            entity.reset(**init_params.dict())
 
 
 PluginLibrary.AddClassToGroup(CWHSimulator, "CWHSimulator", {})
