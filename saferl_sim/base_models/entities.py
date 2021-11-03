@@ -299,7 +299,7 @@ class BaseODESolverDynamics(BaseDynamics):
             state_dot = self.compute_state_dot(0, state, control)
             next_state = state + step_size * state_dot
         else:
-            raise ValueError("invalid integration method '{}'".format(self.integration_method))
+            raise ValueError(f"invalid integration method '{self.integration_method}'")
 
         return next_state, state_dot
 
