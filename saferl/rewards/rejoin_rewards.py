@@ -1,13 +1,14 @@
 """
 This module implements the Reward Functions and Reward Validators specific to the rejoin task.
 """
+import typing
 from collections import OrderedDict
 
 import numpy as np
 from act3_rl_core.libraries.environment_dict import RewardDict
 from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
-from numpy_ringbuffer import RingBuffer
+from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 
 class DubinsRejoinSuccessRewardValidator(RewardFuncBaseValidator):
@@ -31,6 +32,9 @@ class DubinsRejoinSuccessRewardValidator(RewardFuncBaseValidator):
 
 
 class DubinsRejoinSuccessReward(RewardFuncBase):
+    """
+    This function determines the reward for when the wingman successfully enters the rejoin region
+    """
 
     @classmethod
     def get_validator(cls):
@@ -77,7 +81,10 @@ class DubinsRejoinSuccessReward(RewardFuncBase):
         """
 
         reward = RewardDict()
-        val = 0
+
+        # get necessary platforms
+        lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
+        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
 
         # all 3 pieces
         rejoin_region_radius = self.config.rejoin_region_radius
@@ -118,6 +125,9 @@ class RejoinDistanceChangeRewardValidator(RewardFuncBaseValidator):
 
 
 class RejoinDistanceChangeReward(RewardFuncBase):
+    """
+    A reward function that provides a reward proportional to the change in distance from the rejoin distance.
+    """
 
     def __init__(self, prev_dist, **kwargs):
         super().__init__(**kwargs)
@@ -168,10 +178,12 @@ class RejoinDistanceChangeReward(RewardFuncBase):
             """
 
         reward = RewardDict()
-        val = 0
+
+        lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
+        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
 
         # all 3 pieces
-        rejoin_region_radius = self.config.rejoin_region_radius
+        # rejoin_region_radius = self.config.rejoin_region_radius
         lead_orientation = lead_aircraft_platform.lead_orientation
         offset_vector = np.array(self.config.offset_values)
 
