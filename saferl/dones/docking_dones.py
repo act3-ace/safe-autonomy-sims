@@ -6,6 +6,7 @@ This in turn defines whether the end is episode is reached or not.
 import numpy as np
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
+from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
@@ -84,6 +85,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
 
     docking_region_radius: float
+    velocity_limit: float
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
@@ -121,6 +123,131 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
         Returns
         -------
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
+
+        """
+        # eventually will include velocity constraint
+        done = DoneDict()
+        deputy = get_platform_by_name(next_state, self.agent)
+
+        origin = np.array([0, 0, 0])
+        docking_region_radius = self.config.docking_region_radius
+
+        radial_distance = np.linalg.norm(np.array(deputy.position) - origin)
+
+        # add constraint for velocity
+        in_docking_region = radial_distance <= docking_region_radius
+        within_limit = deputy.velocity <= self.config.velocity_limit
+
+        if in_docking_region and within_limit:
+            done[self.agent] = True
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+        elif in_docking_region and not within_limit:
+            done[self.agent] = True
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        return done
+
+
+class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
+    """
+    Validator for the DockingVelocityLimitDoneFunction
+
+    Attributes
+    ----------
+    velocity_limit : float
+        the velocity limit constraint that the deputy cannot exceed
+    """
+    velocity_limit: float
+
+
+class DockingVelocityLimitDoneFunction(DoneFuncBase):
+    """
+    This done fucntion determines whether the velocity limit has been exceeded or not.
+    """
+
+    @classmethod
+    def get_validator(cls):
+        """
+        Params
+        ------
+        cls : constructor function
+
+        Returns
+        -------
+        TBD
+        """
+        return DockingVelocityLimitDoneFunctionValidator
+
+    def __call__(self, observation, action, next_observation, next_state):
+        """
+        Params
+        ------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+
+        Returns
+        -------
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
+        """
+
+        done = DoneDict()
+
+        deputy = get_platform_by_name(next_state, self.agent)
+
+        curr_vel_mag = np.linalg.norm(deputy.velocity)
+
+        if curr_vel_mag > self.config.velocity_limit:
+            done[self.agent] = True
+
+        if done[self.agent]:
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+
+        return done
+
+
+class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
+    """
+    This class validates that the config contains essential peices of data for the done function
+    """
+    constraint_velocity: float
+    target: str
+
+
+# needs a reference object
+class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
+    """
+    A done function that checks if the docking velocity relative to a target object has exceeded a certain specified threshold velocity.
+    """
+
+    @classmethod
+    def get_validator(cls):
+        """
+        Params
+        ------
+        cls : constructor function
+
+        Returns
+        -------
+        TBD
+        """
+        return DockingRelativeVelocityConstraintDoneFunctionValidator
+
+    def __call__(self, observation, action, next_observation, next_state):
+        """
+        Params
+        ------
+        TBD
+
+        Returns
+        -------
             done : DoneDict
                 dictionary containing the condition condition for the current agent
 
@@ -128,18 +255,17 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         # eventually will include velocity constraint
         done = DoneDict()
         # platform = get_platform_name(next_state,self.agent)
-
+        deputy = get_platform_by_name(next_state, self.agent)
+        target = get_platform_by_name(next_state, self.config.target)
         # pos = platform.position
-        position = next_state.sim_platforms[0].position
 
-        origin = np.array([0, 0, 0])
-        docking_region_radius = self.config.docking_region_radius
+        curr_vel_mag = np.linalg.norm(deputy.velocity - target.velocity)
 
-        radial_distance = np.linalg.norm(np.array(position) - origin)
-        done[self.agent] = radial_distance <= docking_region_radius
+        if curr_vel_mag > self.config.constraint_velocity:
+            done[self.agent] = True
 
         if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
         return done
 
