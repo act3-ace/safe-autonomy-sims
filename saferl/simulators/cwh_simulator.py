@@ -104,15 +104,15 @@ def main():
     reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}
 
     tmp = CWHSimulator(**tmp_config)
-    _ = tmp.reset(reset_config)
+    state = tmp.reset(reset_config)
     # print("Position: %s\t Velocity: %s" % (str(state.sim_platforms[0].position), str(state.sim_platforms[0].velocity)))
     for _ in range(5):
         # state.sim_platforms[0]._controllers[0].apply_control(1)
         # state.sim_platforms[0]._controllers[1].apply_control(2)
         # state.sim_platforms[0]._controllers[2].apply_control(3)
         # print(state.sim_platforms[0]._sensors[1].get_measurement())
-        _ = tmp.step()
-        print("Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}")
+        state = tmp.step()
+        print(f"Position: {state.sim_platforms[0].position}\t Velocity: {state.sim_platforms[0].velocity}")
 
 
 if __name__ == "__main__":
