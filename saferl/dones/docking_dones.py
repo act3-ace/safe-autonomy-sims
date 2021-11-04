@@ -261,7 +261,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
         curr_vel_mag = np.linalg.norm(deputy.velocity - target.velocity)
 
-        if curr_vel_mag < self.config.constraint_velocity:
+        if curr_vel_mag > self.config.constraint_velocity:
             done[self.agent] = True
 
         if done[self.agent]:

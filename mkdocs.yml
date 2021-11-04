@@ -6,10 +6,6 @@ docs_dir: "docs"
 plugins:
   - search
   - macros
-  - git-revision-date-localized:
-      locale: en
-      type: timeago
-      fallback_to_build_date: true
   - pdf-export:
       verbose: true
       media_type: print
@@ -17,12 +13,6 @@ plugins:
   - inari:
       module: saferl
       out-name: saferl
-
-  # - mktheapidocs:
-  #     modules:
-  #       act3:
-  #         section: .
-  #         source_repo: "https://git.aoc-pathfinder.cloud//ML/act3-rllib-agents"
 
 markdown_extensions:
   - codehilite
@@ -36,14 +26,26 @@ extra_javascript:
   - https://unpkg.com/mermaid@8.4.2/dist/mermaid.min.js
 
 nav:
-  - "Table of Contents": index.md
+  - "Introduction": index.md
+  - "About": about.md
+  - "API":
+    - saferl/index.md
+    - Dones:
+      - saferl/dones/index.md
+      - saferl/dones/docking_dones-py.md
+    - Glues:
+      - saferl/glues/index.md
+      - saferl/glues/combined_controller_glue-py.md
+      - saferl/glues/rta_glue-py.md
+    - Platforms:
+      - saferl/platforms/index.md
+      - CWH:
+        - saferl/platforms/cwh/index.md
+      - Dubins:
+        - saferl/platforms/dubins/index.md
+    - Rewards:
+      - saferl/rewards/index.md
+      - saferl/rewards/docking_rewards-py.md
+    - Simulators:
+      - saferl/simulators/index.md
 theme: material
-# theme: readthedocs
-
-## Macros info: https://github.com/fralau/mkdocs_macros_plugin#how-to-use-the-macros-plugin
-#extra:
-#  ace_version: 0.0.1-pre
-#  domain_name: act3-ace.ML
-#  external_domain_name: act3-ace.com
-#  cluster_name: coyote
-#  cluster_address: coyote.act3-ace.ML
