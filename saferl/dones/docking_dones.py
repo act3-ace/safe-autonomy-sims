@@ -7,8 +7,6 @@ import numpy as np
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
 
-# need to import get_platform_name, WIP
-
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
