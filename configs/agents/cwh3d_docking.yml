@@ -56,12 +56,14 @@
             "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
+
             },
         },
         {
             "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
+              "velocity_limit": 10,
             },
         },
     ],
