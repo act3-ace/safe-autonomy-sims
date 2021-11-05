@@ -3,10 +3,11 @@ This module contains the base Simulator class used by the saferl team's CWH and 
 """
 
 import abc
+import typing
 
 import numpy as np
 from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorValidator
+from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
 
 class SafeRLSimulatorValidator(BaseSimulatorValidator):
@@ -17,6 +18,18 @@ class SafeRLSimulatorValidator(BaseSimulatorValidator):
     """
 
     step_size: float
+
+
+class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
+    """
+    Validator for SafeRLSimator reset configs
+
+    Parameters
+    ----------
+    agent_initialization: dict
+        Contains individual initialization dicts for each agent. Key is agent name, value is agent's initialization dict.
+    """
+    agent_initialization: typing.Optional[typing.Dict[str, typing.Dict]] = {}
 
 
 class SafeRLSimulator(BaseSimulator):
@@ -31,6 +44,10 @@ class SafeRLSimulator(BaseSimulator):
     def get_simulator_validator(cls):
         return SafeRLSimulatorValidator
 
+    @classmethod
+    def get_reset_validator(cls):
+        return SafeRLSimulatorResetValidator
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.platform_map = self._construct_platform_map()
@@ -39,9 +56,10 @@ class SafeRLSimulator(BaseSimulator):
         self.clock = 0.0
 
     def reset(self, config):
+        config = self.get_reset_validator()(**config)
         self._state.clear()
         self.clock = 0.0
-        self.sim_entities = self.construct_sim_entities(config)
+        self.sim_entities = self.construct_sim_entities(config.agent_initialization)
         self._state.sim_platforms = self.construct_platforms()
         self.update_sensor_measurements()
         return self._state
@@ -50,14 +68,14 @@ class SafeRLSimulator(BaseSimulator):
     def _construct_platform_map(self) -> dict:
         ...
 
-    def construct_sim_entities(self, reset_config=None) -> dict:
+    def construct_sim_entities(self, agent_initialization: dict = None) -> dict:
         """
         Gets the correct backend simulation entity for each agent.
 
         Parameters
         ----------
-        reset_config: dict
-            Reset config containing the parameters to validate and use to setup this episode.
+        agent_initialization: dict
+            Agent initialization entry from reset config containing initialization parameters for backend sim entities
 
         Returns
         -------
@@ -70,10 +88,10 @@ class SafeRLSimulator(BaseSimulator):
             sim_config = agent_config.sim_config
             sim_config_kwargs = sim_config.get("kwargs", {})
 
-            if reset_config is None:
+            if agent_initialization is None:
                 agent_reset_config = {}
             else:
-                agent_reset_config = reset_config['agent_initialization'].get(agent_id, {})
+                agent_reset_config = agent_initialization.get(agent_id, {})
 
             entity_kwargs = {**sim_config_kwargs, **agent_reset_config}
 
