@@ -52,7 +52,7 @@ class BaseDubinsAircraftValidator(BaseEntityValidator):
             v
         """
         if len(v) != 3:
-            raise ValueError(f"{field.name} provided to CWHPlatformValidator is not length 3")
+            raise ValueError(f"{field.name} provided to BaseDubinsAircraftValidator is not length 3")
         return v
 
 
