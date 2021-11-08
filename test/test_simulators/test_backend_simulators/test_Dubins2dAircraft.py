@@ -1,5 +1,5 @@
 """
-This module defines tests for the Dubins2dAircraft entity.
+This module defines test for the Dubins2dAircraft entity.
 
 Author: John McCarroll
 """

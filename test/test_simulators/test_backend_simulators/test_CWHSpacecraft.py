@@ -1,5 +1,5 @@
 """
-This module defines tests for the CWHSpacecraft entity.
+This module defines test for the CWHSpacecraft entity.
 
 Author: John McCarroll
 """
