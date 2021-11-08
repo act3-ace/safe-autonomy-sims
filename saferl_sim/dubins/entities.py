@@ -483,7 +483,7 @@ if __name__ == "__main__":
     # action = [0.5, 0.75, 1]
     # action = np.array([0.5, 0.75, 1], dtype=np.float32)
     action = {'gamma_rate': 0.1, 'roll_rate': -0.05, 'acceleration': 10}
-    # action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # tests derivative state limit, after 1 step, position = [200, 0, 0]
+    # action = {'gamma_rate': 0, 'roll_rate': 0, 'acceleration': -50} # test derivative state limit, after 1 step, position = [200, 0, 0]
     # action = {'thrust_x': 0.5, 'thrust_y':0.75, 'thrust_zzzz': 1}
     for i in range(5):
         entity.step(1, action)

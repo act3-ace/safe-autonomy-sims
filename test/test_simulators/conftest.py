@@ -1,5 +1,5 @@
 """
-This module holds fixtures common to all simulator tests.
+This module holds fixtures common to all simulator test.
 
 Author: John McCarroll
 """
