@@ -175,7 +175,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        TBD
+        DockingVelocityLimitDoneFunctionValidator : Done Function
+            done function for the DockingVelocityLimitDoneFunction
         """
         return DockingVelocityLimitDoneFunctionValidator
 
@@ -236,21 +237,28 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        TBD
+        DockingRelativeVelocityConstraintDoneFunctionValidator : DoneFunctionValidator
         """
+
         return DockingRelativeVelocityConstraintDoneFunctionValidator
 
     def __call__(self, observation, action, next_observation, next_state):
         """
         Params
         ------
-        TBD
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
 
         Returns
         -------
-            done : DoneDict
-                dictionary containing the condition condition for the current agent
-
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
         """
         # eventually will include velocity constraint
         done = DoneDict()
