@@ -61,10 +61,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # compute distance to origin
-        # platform = get_platform_name(next_state,self.agent)
-        # pos = platform.position
-
-        position = next_state.sim_platforms[0].position
+        platform = get_platform_by_name(next_state, self.agent)
+        position = platform.position
 
         # compute to origin
         origin = np.array([0, 0, 0])
@@ -138,7 +136,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
         # add constraint for velocity
         in_docking_region = radial_distance <= docking_region_radius
-        within_limit = np.linalg.norm(deputy.velocity) <= self.config.velocity_limit
+        within_limit = np.linalg.norm(np.array(deputy.velocity)) <= self.config.velocity_limit
 
         if in_docking_region and within_limit:
             done[self.agent] = True
@@ -177,7 +175,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        TBD
+        DockingVelocityLimitDoneFunctionValidator : Done Function
+            done function for the DockingVelocityLimitDoneFunction
         """
         return DockingVelocityLimitDoneFunctionValidator
 
@@ -237,21 +236,28 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        TBD
+        DockingRelativeVelocityConstraintDoneFunctionValidator : DoneFunctionValidator
         """
+
         return DockingRelativeVelocityConstraintDoneFunctionValidator
 
     def __call__(self, observation, action, next_observation, next_state):
         """
         Params
         ------
-        TBD
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
 
         Returns
         -------
-            done : DoneDict
-                dictionary containing the condition condition for the current agent
-
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
         """
         # eventually will include velocity constraint
         done = DoneDict()
@@ -260,7 +266,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         target = get_platform_by_name(next_state, self.config.target)
         # pos = platform.position
 
-        curr_vel_mag = np.linalg.norm(deputy.velocity - target.velocity)
+        curr_vel_mag = np.linalg.norm(np.array(deputy.velocity) - np.array(target.velocity))
 
         if curr_vel_mag > self.config.constraint_velocity:
             done[self.agent] = True
