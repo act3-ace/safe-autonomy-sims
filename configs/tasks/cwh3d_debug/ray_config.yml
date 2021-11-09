@@ -14,7 +14,7 @@
 
 address: null
 # Password for redis cluster
-_redis_password: null
+# _redis_password: null
 # If true will start dashboard on localhost (default)
 include_dashboard: False
 # If set will ignore reinit errors

@@ -62,6 +62,7 @@
             "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
+              "velocity_limit": 10,
             },
         },
     ],

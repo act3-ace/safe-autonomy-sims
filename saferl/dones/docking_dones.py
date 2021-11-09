@@ -138,7 +138,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
         # add constraint for velocity
         in_docking_region = radial_distance <= docking_region_radius
-        within_limit = deputy.velocity <= self.config.velocity_limit
+        within_limit = np.linalg.norm(deputy.velocity) <= self.config.velocity_limit
 
         if in_docking_region and within_limit:
             done[self.agent] = True
@@ -146,6 +146,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         elif in_docking_region and not within_limit:
             done[self.agent] = True
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        else:
+            done[self.agent] = False
         return done
 
 
@@ -204,8 +206,7 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
         curr_vel_mag = np.linalg.norm(deputy.velocity)
 
-        if curr_vel_mag > self.config.velocity_limit:
-            done[self.agent] = True
+        done[self.agent] = curr_vel_mag > self.config.velocity_limit
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
