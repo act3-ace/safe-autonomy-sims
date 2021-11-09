@@ -7,6 +7,7 @@ import numpy as np
 from act3_rl_core.libraries.environment_dict import RewardDict
 from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
+from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
 
@@ -74,8 +75,9 @@ class CWHDistanceChangeReward(RewardFuncBase):
         reward = RewardDict()
         val = 0
 
-        # question, less brittle way to refer to platforms?
-        position = next_state.sim_platforms[0].position
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+        position = deputy.position
+
         distance = np.linalg.norm(position)
         self._dist_buffer.append(distance)
 
@@ -97,6 +99,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     scale: float
     timeout: float
     docking_region_radius: float
+    max_vel_constraint: float
 
 
 class DockingSuccessRewardFunction(RewardFuncBase):
@@ -150,16 +153,20 @@ class DockingSuccessRewardFunction(RewardFuncBase):
         reward = RewardDict()
         value = 0
 
-        position = next_state.sim_platforms[0].position
-        sim_time = next_state.sim_platforms[0].sim_time
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+
+        position = deputy.position
+        sim_time = deputy.sim_time
+        velocity_vector = deputy.velocity
 
         origin = np.array([0, 0, 0])
         docking_region_radius = self.config.docking_region_radius
+        velocity = np.linalg.norm(velocity_vector)
 
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        if in_docking:
+        if in_docking and velocity < self.config.max_vel_constraint:
             value = self.config.scale
             if self.config.timeout:
                 # Add time reward component, if timeout specified
@@ -239,12 +246,16 @@ class DockingFailureRewardFunction(RewardFuncBase):
         reward = RewardDict()
         value = 0
 
-        sim_time = next_state.sim_platforms[0].sim_time
-        position = next_state.sim_platforms[0].position
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+
+        position = deputy.position
+        sim_time = deputy.sim_time
+        velocity_vector = deputy.velocity
+
         distance = np.linalg.norm(position)
-        velocity_vector = next_state.sim_platforms[0].velocity
         velocity = np.linalg.norm(velocity_vector)
 
+        # TODO: update to chief location when multiple platforms enabled
         origin = np.array([0, 0, 0])
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= self.config.docking_region_radius
@@ -295,7 +306,9 @@ if __name__ == "__main__":
     tmp = CWHSimulator(**tmp_config)
     first_state = tmp.reset(reset_config)
 
-    success_reward_fn = DockingSuccessRewardFunction(agent_name="blue0", scale=1, timeout=50, docking_region_radius=25)
+    success_reward_fn = DockingSuccessRewardFunction(
+        agent_name="blue0", scale=1, timeout=50, docking_region_radius=25, max_vel_constraint=50
+    )
 
     failure_reward_fn = DockingFailureRewardFunction(
         agent_name="blue0",
