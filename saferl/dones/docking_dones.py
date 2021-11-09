@@ -61,10 +61,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # compute distance to origin
-        # platform = get_platform_name(next_state,self.agent)
-        # pos = platform.position
-
-        position = next_state.sim_platforms[0].position
+        platform = get_platform_by_name(next_state, self.agent)
+        position = platform.position
 
         # compute to origin
         origin = np.array([0, 0, 0])
@@ -146,6 +144,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         elif in_docking_region and not within_limit:
             done[self.agent] = True
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+
         return done
 
 
