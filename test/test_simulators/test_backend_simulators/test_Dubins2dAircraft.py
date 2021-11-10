@@ -26,7 +26,7 @@ test_configs = [
     (
         1,                                                                                  # num_steps
         {'heading_rate': 0.1, 'acceleration': 10},                                          # action
-        {'position': [199.667, 9.992], 'heading': 0.1, 'v': 200, 'acceleration': 10}        # attr_targets                                                        # attr_targets
+        {'position': [199.667, 9.992], 'heading': 0.1, 'v': 200, 'acceleration': 10}        # attr_targets
     ),
 ]
 
