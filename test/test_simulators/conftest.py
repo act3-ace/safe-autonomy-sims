@@ -21,3 +21,8 @@ def action(request):
 @pytest.fixture
 def attr_targets(request):
     return request.param
+
+
+@pytest.fixture
+def error_bound(request):
+    return request.param
