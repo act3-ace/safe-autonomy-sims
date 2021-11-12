@@ -8,7 +8,7 @@ import pytest
 import numpy as np
 
 from saferl_sim.cwh.cwh import CWHSpacecraft
-from test.test_simulators.test_backend_simulators.conftest import evaluate
+from tests.test_simulators.test_backend_simulators.conftest import evaluate
 
 
 # override entity fixture
