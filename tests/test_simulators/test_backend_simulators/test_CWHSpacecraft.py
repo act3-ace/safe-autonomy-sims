@@ -1,5 +1,5 @@
 """
-This module defines test for the CWHSpacecraft entity.
+This module defines tests for the CWHSpacecraft entity.
 
 Author: John McCarroll
 """
@@ -14,7 +14,7 @@ from tests.test_simulators.test_backend_simulators.conftest import evaluate
 # override entity fixture
 @pytest.fixture
 def entity(initial_entity_state):
-    entity = CWHSpacecraft(name="test")
+    entity = CWHSpacecraft(name="tests")
 
     if initial_entity_state is not None:
         entity.state = initial_entity_state
@@ -22,13 +22,13 @@ def entity(initial_entity_state):
     return entity
 
 
-# Define test assay
+# Define tests assay
 test_configs = [
     (
         np.array([0, 0, 0, 0, 0, 0]),                           # initial_entity_state
         {'thrust_x': 0.5, 'thrust_y': 0.75, 'thrust_z': 1},     # action
         5,                                                      # num_steps
-        {'state': np.array([0, 0, 0])},                         # attr_targets
+        {'state': np.array([0, 0, 0, 0, 0, 0])},                # attr_targets
         0.1                                                     # error_bound
     ),
 ]
