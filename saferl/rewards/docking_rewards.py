@@ -102,7 +102,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     max_vel_constraint: float
 
 
-class DockingSuccessRewardFunction(RewardFuncBase):
+class DockingSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
     """
@@ -195,7 +195,7 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     max_vel_constraint: float
 
 
-class DockingFailureRewardFunction(RewardFuncBase):
+class DockingFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
     """
@@ -272,77 +272,3 @@ class DockingFailureRewardFunction(RewardFuncBase):
 
         reward[self.config.agent_name] = value
         return reward
-
-
-if __name__ == "__main__":
-    # from collections import OrderedDict
-
-    from saferl.simulators.cwh_simulator import CWHSimulator
-
-    tmp_config = {
-        "step_size": 1,
-        "agent_configs": {
-            "blue0": {
-                "sim_config": {},
-                "platform_config": [
-                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                        "name": "X Thrust", "axis": 0
-                    }),
-                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                        "name": "Y Thrust", "axis": 1
-                    }),
-                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                        "name": "Z Thrust", "axis": 2
-                    }),
-                    ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}),
-                    ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {}),
-                ],
-            }
-        },
-    }
-
-    reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}
-
-    tmp = CWHSimulator(**tmp_config)
-    first_state = tmp.reset(reset_config)
-
-    success_reward_fn = DockingSuccessRewardFunction(
-        agent_name="blue0", scale=1, timeout=50, docking_region_radius=25, max_vel_constraint=50
-    )
-
-    failure_reward_fn = DockingFailureRewardFunction(
-        agent_name="blue0",
-        timeout_reward=1,
-        distance_reward=2,
-        crash_reward=3,
-        timeout=50,
-        docking_distance=5,
-        max_goal_distance=40000,
-        docking_region_radius=25,
-        max_vel_constraint=10
-    )
-
-    for i in range(5):
-        curr_state = tmp.step()
-
-        success_reward = success_reward_fn(
-            observation=OrderedDict(),
-            action=OrderedDict(),
-            next_observation=OrderedDict(),
-            next_state=curr_state,
-            state=curr_state,
-            observation_space=StateDict(),
-            observation_units=StateDict()
-        )
-        failure_reward = failure_reward_fn(
-            observation=OrderedDict(),
-            action=OrderedDict(),
-            next_observation=OrderedDict(),
-            next_state=curr_state,
-            state=curr_state,
-            observation_space=StateDict(),
-            observation_units=StateDict()
-        )
-
-        print(success_reward)
-        print(failure_reward)
