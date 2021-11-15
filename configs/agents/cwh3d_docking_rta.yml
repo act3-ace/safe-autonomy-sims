@@ -24,40 +24,37 @@
     "glues": [
         {
           "functor": "saferl.glues.multi_wrapper.MultiWrapperGlue",
-          "config":
+          "wrapped_glues": [
             {
-              "wrapped_glues": [
-                {
-                  "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
-                  "config": {
-                    "controller": "Controller_Thrust",
-                  },
-                },
-                {
-                  "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
-                  "config": {
-                    "controller": "Controller_Thrust",
-                    "index": 1
-                  }
-                },
-                {
-                  "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
-                  "config": {
-                    "controller": "Controller_Thrust",
-                    "index": 2
-                  }
-                },
-              ]
-            }
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+              },
+            },
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+                "index": 1
+              }
+            },
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+                "index": 2
+              }
+            },
+          ]
         },
-        {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Position"},
-        },
-        {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Velocity"},
-        },
+#        {
+#            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+#            "config": {"sensor": "Sensor_Position"},
+#        },
+#        {
+#            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+#            "config": {"sensor": "Sensor_Velocity"},
+#        },
     ],
     "dones": [
         {
