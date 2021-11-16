@@ -12,7 +12,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # ---------------------------------------------------------------------------
 
-"agent": "saferl.agents.rta_agent.RTAAgent"
+"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
         {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
@@ -21,10 +21,13 @@
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"}
     ],
+    "episode_parameter_provider": {
+      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
     "glues": [
         {
-          "functor": "saferl.glues.multi_wrapper.MultiWrapperGlue",
-          "wrapped_glues": [
+          "functor": "saferl.glues.rta_glue.RTAGlue",
+          "wrapped": [
             {
               "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
               "config": {
@@ -47,14 +50,14 @@
             },
           ]
         },
-#        {
-#            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-#            "config": {"sensor": "Sensor_Position"},
-#        },
-#        {
-#            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-#            "config": {"sensor": "Sensor_Velocity"},
-#        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Position"},
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Velocity"},
+        },
     ],
     "dones": [
         {
