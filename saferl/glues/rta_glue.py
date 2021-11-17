@@ -58,14 +58,14 @@ class RTAGlue(BaseMultiWrapperGlue):
         action_space_dict[self.config.name] = gym.spaces.tuple.Tuple(tuple(action_spaces))
         return gym.spaces.Dict(action_space_dict)
 
-    def apply_action(self, action: typing.Union[np.ndarray, typing.Tuple, typing.Dict]) -> None:
+    def apply_action(self, action: typing.Union[np.ndarray, typing.Tuple, typing.Dict], observation: typing.Dict) -> None:
         assert isinstance(action, dict)  # TODO: Support all action types
         action = next(iter(action.values()))
         for i in range(len(self.glues())):  # TODO: Don't assume glue/action ordering
-            self.glues()[i].apply_action(action[i])
+            self.glues()[i].apply_action(action[i], observation)
         filtered_action = self.rta(self._get_stored_action())
         for controller_glue in self.controller_glues:
-            controller_glue.apply_action(filtered_action)
+            controller_glue.apply_action(filtered_action, observation)
 
     def observation_space(self) -> gym.spaces.Space:
         return None
