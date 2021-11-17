@@ -2,6 +2,7 @@
 Glue containing RTA module for filtering actions.
 """
 import typing
+from collections import OrderedDict
 
 import gym
 import numpy as np
@@ -23,7 +24,7 @@ def flip_rta(control):
         dict
             The filtered control dictionary
     """
-    filtered_control = {}
+    filtered_control = OrderedDict()
     for k, v in control.items():
         filtered_control[k] = -v
     return filtered_control
@@ -83,9 +84,10 @@ class RTAGlue(BaseMultiWrapperGlue):
         return controller_glues
 
     def _get_stored_action(self):
-        stored_action = {}
+        stored_action = OrderedDict()
         for controller_glue in self.controller_glues:
-            stored_action[controller_glue.key] = controller_glue.get_applied_control()
+            applied_action = controller_glue.get_applied_control()
+            stored_action.update(applied_action)
         return stored_action
 
     @property
