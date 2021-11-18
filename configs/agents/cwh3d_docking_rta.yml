@@ -22,28 +22,33 @@
         {"part": "Sensor_Velocity"}
     ],
     "episode_parameter_provider": {
-        "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "glues": [
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
-            "config": {
+          "functor": "saferl.glues.rta_glue.RTAGlue",
+          "wrapped": [
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
                 "controller": "Controller_Thrust",
+              },
             },
-        },
-        {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
-            "config":{
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
                 "controller": "Controller_Thrust",
                 "index": 1
-            }
-        },
-        {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Controller_Thrust",
-              "index": 2
-            }
+              }
+            },
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+                "index": 2
+              }
+            },
+          ]
         },
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
@@ -70,9 +75,6 @@
             },
         },
     ],
-    "episode_parameter_provider": {
-      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
-    },
     "rewards": [
         {
             "name": "CWHDistanceChangeReward",
