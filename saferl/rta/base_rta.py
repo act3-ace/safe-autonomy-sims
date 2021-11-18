@@ -86,6 +86,14 @@ class ConstraintBasedRTA(BaseRTA):
     def _pred_state_vector(self, action, state_vec, step_size):
         ...
 
+    @abc.abstractmethod
+    def _get_action_vector(self, action):
+        ...
+
+    @abc.abstractmethod
+    def _get_action_dict(self, action, keys):
+        ...
+
 
 class SimplexModule(ConstraintBasedRTA):
     """TODO"""
