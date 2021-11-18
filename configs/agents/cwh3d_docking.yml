@@ -67,6 +67,9 @@
             },
         },
     ],
+    "episode_parameter_provider": {
+      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
     "rewards": [
         {
             "name": "CWHDistanceChangeReward",
