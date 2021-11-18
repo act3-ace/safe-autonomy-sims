@@ -3,10 +3,11 @@ This module contains the base Simulator class used by the saferl team's CWH and 
 """
 
 import abc
+import typing
 
 import numpy as np
 from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorValidator
+from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
 
 class SafeRLSimulatorValidator(BaseSimulatorValidator):
@@ -17,6 +18,18 @@ class SafeRLSimulatorValidator(BaseSimulatorValidator):
     """
 
     step_size: float
+
+
+class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
+    """
+    Validator for SafeRLSimator reset configs
+
+    Parameters
+    ----------
+    agent_initialization: dict
+        Contains individual initialization dicts for each agent. Key is agent name, value is agent's initialization dict.
+    """
+    agent_initialization: typing.Optional[typing.Dict[str, typing.Dict]] = {}
 
 
 class SafeRLSimulator(BaseSimulator):
@@ -31,34 +44,63 @@ class SafeRLSimulator(BaseSimulator):
     def get_simulator_validator(cls):
         return SafeRLSimulatorValidator
 
+    @classmethod
+    def get_reset_validator(cls):
+        return SafeRLSimulatorResetValidator
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.sim_entities = self.get_sim_entities()
+        self.platform_map = self._construct_platform_map()
+        self.sim_entities = self.construct_sim_entities()
         self._state = StateDict()
         self.clock = 0.0
 
     def reset(self, config):
+        config = self.get_reset_validator()(**config)
         self._state.clear()
         self.clock = 0.0
-        self.reset_sim_entities(config)
-        self._state.sim_platforms = self.get_platforms()
+        self.sim_entities = self.construct_sim_entities(config.agent_initialization)
+        self._state.sim_platforms = self.construct_platforms()
         self.update_sensor_measurements()
         return self._state
 
     @abc.abstractmethod
-    def get_sim_entities(self) -> dict:
+    def _construct_platform_map(self) -> dict:
+        ...
+
+    def construct_sim_entities(self, agent_initialization: dict = None) -> dict:
         """
         Gets the correct backend simulation entity for each agent.
+
+        Parameters
+        ----------
+        agent_initialization: dict
+            Agent initialization entry from reset config containing initialization parameters for backend sim entities
 
         Returns
         -------
         dict[str: sim_entity]
             Dictionary mapping agent id to simulation backend entity.
         """
-        ...
 
-    @abc.abstractmethod
-    def get_platforms(self) -> tuple:
+        sim_entities = {}
+        for agent_id, agent_config in self.config.agent_configs.items():
+            sim_config = agent_config.sim_config
+            sim_config_kwargs = sim_config.get("kwargs", {})
+
+            if agent_initialization is None:
+                agent_reset_config = {}
+            else:
+                agent_reset_config = agent_initialization.get(agent_id, {})
+
+            entity_kwargs = {**sim_config_kwargs, **agent_reset_config}
+
+            entity_class = self.platform_map[sim_config.get('platform', 'default')][0]
+            sim_entities[agent_id] = entity_class(name=agent_id, **entity_kwargs)
+
+        return sim_entities
+
+    def construct_platforms(self) -> tuple:
         """
         Gets the platform object associated with each simulation entity.
 
@@ -67,14 +109,14 @@ class SafeRLSimulator(BaseSimulator):
         tuple
             Collection of platforms associated with each simulation entity.
         """
-        ...
-
-    @abc.abstractmethod
-    def reset_sim_entities(self, config):
-        """
-        Reset simulation entities to an initial state.
-        """
-        ...
+        sim_platforms = []
+        for agent_id, entity in self.sim_entities.items():
+            agent_config = self.config.agent_configs[agent_id]
+            sim_config = agent_config.sim_config
+            platform_config = agent_config.platform_config
+            platform_class = self.platform_map[sim_config.get('platform', 'default')][1]
+            sim_platforms.append(platform_class(platform_name=agent_id, platform=entity, platform_config=platform_config))
+        return tuple(sim_platforms)
 
     def update_sensor_measurements(self):
         """
@@ -95,8 +137,7 @@ class SafeRLSimulator(BaseSimulator):
             agent_id = platform.name
             action = np.array(platform.get_applied_action(), dtype=np.float32)
             entity = self.sim_entities[agent_id]
-            entity.step_compute(sim_state=None, action=action, step_size=self.config.step_size)
-            entity.step_apply()
+            entity.step(action=action, step_size=self.config.step_size)
             platform.sim_time = self.clock
         self.update_sensor_measurements()
         self.clock += self.config.step_size
