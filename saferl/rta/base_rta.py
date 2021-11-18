@@ -139,3 +139,35 @@ class ExplicitSimplexModule(SimplexModule):
     @abc.abstractmethod
     def _backup_control(self, action, observation):
         raise NotImplementedError()
+
+
+class ConstraintModule(abc.ABC):
+    """TODO"""
+
+    @abc.abstractmethod
+    def h_x(self, state_vec):
+        '''
+        Safety Constraint (Required for all RTA):
+        Function of state variables
+        If h(x) >= 0, current state is safe
+        Else, current state is unsafe
+        Returns a constant
+        '''
+        raise NotImplementedError()
+
+    def grad(self, state_vec):
+        '''
+        Gradient of Safety Constraint (Required for ASIF):
+        Matrix size n x n, where n is the number of state variables
+        Multiply matrix by state vector
+        Returns a vector size n
+        '''
+        raise NotImplementedError()
+
+    def alpha(self, x):
+        '''
+        Strengthening Function (Required for ASIF):
+        Function of h(x)
+        Returns a constant
+        '''
+        raise NotImplementedError()
