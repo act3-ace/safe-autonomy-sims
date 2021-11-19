@@ -15,7 +15,7 @@
 ####################################################################
 # Override values used by the setup
 ####################################################################
-experiment_class: act3_rl_core.experiments.rllib_experiment.RllibExperiment
+experiment_class: scripts.test_cwh_rta_final.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
     #num_workers: 0
@@ -44,4 +44,3 @@ config:
   ray_config: [!include ray_config.yml, *ray_config_updates]
   env_config: [!include ../../environments/cwh3d.yml, *env_config_updates]
   tune_config: [!include tune_config.yml, *tune_config_updates]
-
