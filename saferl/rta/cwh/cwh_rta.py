@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import numpy as np
 
 from saferl.rta.base_rta import ConstraintModule, ExplicitSimplexModule
@@ -92,6 +94,24 @@ class DockingRTA(ExplicitSimplexModule):
 
         next_state = self.A @ state_vec + self.B @ action_vec
         return next_state
+
+    def _get_action_vector(self, action):
+        action_vec = []  # TODO: Make more general
+        for k, v in action.items():
+            action_vec.extend(list(v))
+        return np.ndarray(action_vec)
+
+    def _get_action_dict(self, action, keys):
+        action_dict = OrderedDict()  # TODO: Find a better way to construct dict
+        for i in range(len(action)):
+            action_dict[keys[i]] = action[i]
+        return action_dict
+
+    def _get_state_vector(self, observation):
+        state_vector = []
+        for k, v in observation.items():
+            state_vector.extend(list(next(iter(v.values()))))
+        return np.ndarray(state_vector)
 
 
 class Constraint_rel_vel(ConstraintModule):
