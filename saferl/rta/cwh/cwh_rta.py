@@ -55,9 +55,11 @@ class DockingRTA(ExplicitSimplexModule):
 
         backup_action = (accel[0:2] - self.A[2:4] @ pred_state) * self.m
 
-        backup_action = self.clip(backup_action)
+        backup_action = np.clip(backup_action, -1, 1)
 
-        return backup_action
+        backup_action_dict = self._get_action_dict(backup_action, ["thrust_x", "thrust_y"])
+
+        return backup_action_dict
 
     def _gen_dynamics_matrices(self):
         m = self.m
@@ -90,14 +92,14 @@ class DockingRTA(ExplicitSimplexModule):
         return A, B
 
     def _pred_state_vector(self, action, state_vec, step_size):
-        action_vec = 1  # TODO
+        action_vec = self._get_action_vector(action)
 
         next_state = self.A @ state_vec + self.B @ action_vec
         return next_state
 
     def _get_action_vector(self, action):
         action_vec = []  # TODO: Make more general
-        for k, v in action.items():
+        for _, v in action.items():
             action_vec.extend(list(v))
         return np.ndarray(action_vec)
 
@@ -109,7 +111,7 @@ class DockingRTA(ExplicitSimplexModule):
 
     def _get_state_vector(self, observation):
         state_vector = []
-        for k, v in observation.items():
+        for _, v in observation.items():
             state_vector.extend(list(next(iter(v.values()))))
         return np.ndarray(state_vector)
 
