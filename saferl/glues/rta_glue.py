@@ -10,6 +10,8 @@ from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMult
 from act3_rl_core.glues.common.controller_glue import ControllerGlue
 from pydantic import PyObject
 
+from saferl.rta.cwh.cwh_rta import DockingRTA
+
 
 def flip_rta(control):
     """
@@ -36,7 +38,7 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
 
     rta: RTA module which filters actions based on a safety function
     """
-    rta: PyObject = flip_rta
+    rta: PyObject = DockingRTA
 
 
 class RTAGlue(BaseMultiWrapperGlue):
@@ -47,6 +49,7 @@ class RTAGlue(BaseMultiWrapperGlue):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.controller_glues = self._get_controller_glues(self)
+        self.config.rta = self.config.rta()
 
     @classmethod
     def get_validator(cls):
@@ -63,7 +66,7 @@ class RTAGlue(BaseMultiWrapperGlue):
         action = next(iter(action.values()))
         for i in range(len(self.glues())):  # TODO: Don't assume glue/action ordering
             self.glues()[i].apply_action(action[i], observation)
-        filtered_action = self.rta(self._get_stored_action())
+        filtered_action = self.rta.filter_action(self._get_stored_action(), observation)
         for controller_glue in self.controller_glues:
             controller_glue.apply_action(filtered_action, observation)
 

@@ -10,7 +10,6 @@ class DockingRTA(ExplicitSimplexModule):
     def __init__(
         self, x_vel_limit=10, y_vel_limit=10, T_backup=5, Nskip=1, N_checkall=5, v0=0.2, v1_coef=2, kappa=1, n=0.001027, m=12, **kwargs
     ):
-        super().__init__(**kwargs)
         self.T_backup = T_backup
         self.Nskip = Nskip
         self.N_checkall = N_checkall
@@ -29,6 +28,8 @@ class DockingRTA(ExplicitSimplexModule):
         self.m = m
 
         self.A, self.B = self._gen_dynamics_matrices()
+
+        super().__init__(**kwargs)
 
     def _setup_constraints(self):
         # TODO: Automate this?
@@ -57,7 +58,10 @@ class DockingRTA(ExplicitSimplexModule):
 
         backup_action = np.clip(backup_action, -1, 1)
 
-        backup_action_dict = self._get_action_dict(backup_action, ["thrust_x", "thrust_y"])
+        backup_action_dict = self._get_action_dict(backup_action, ["x_thrust", "y_thrust"])
+
+        # TODO: Remove this 2D hack
+        backup_action_dict["z_thrust"] = 0
 
         return backup_action_dict
 
@@ -101,7 +105,7 @@ class DockingRTA(ExplicitSimplexModule):
         action_vec = []  # TODO: Make more general
         for _, v in action.items():
             action_vec.extend(list(v))
-        return np.ndarray(action_vec)
+        return np.array(action_vec)
 
     def _get_action_dict(self, action, keys):
         action_dict = OrderedDict()  # TODO: Find a better way to construct dict
@@ -113,7 +117,7 @@ class DockingRTA(ExplicitSimplexModule):
         state_vector = []
         for _, v in observation.items():
             state_vector.extend(list(next(iter(v.values()))))
-        return np.ndarray(state_vector)
+        return np.array(state_vector)
 
 
 class Constraint_rel_vel(ConstraintModule):

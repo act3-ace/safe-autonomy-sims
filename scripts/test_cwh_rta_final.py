@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 
 
-class RllibExperimentValidator(BaseExperimentValidator):
+class RTAExperimentValidator(BaseExperimentValidator):
     """
     ray_config: dictionary to be fed into ray init, validated by ray init call
     env_config: environment configuration, validated by environment class
@@ -87,7 +87,7 @@ class RllibExperimentValidator(BaseExperimentValidator):
         return v
 
 
-class RllibPolicyValidator(BasePolicyValidator):
+class RTAPolicyValidator(BasePolicyValidator):
     """
     policy_class: callable policy class None will use default from trainer
     train: should this policy be trained
@@ -104,21 +104,23 @@ class RllibPolicyValidator(BasePolicyValidator):
     train: bool = True
 
 
-def make_action(agent_name,x_thrust,y_thrust,z_thrust):
-    action = OrderedDict()
-    action[agent_name] = OrderedDict()
-    action[agent_name]['X_thrust'] = OrderedDict()
-    action[agent_name]['X_thrust']['x_thrust'] = np.array([x_thrust],dtype=np.float32)
-    action[agent_name]['Y_thrust'] = OrderedDict()
-    action[agent_name]['Y_thrust']['y_thrust'] = np.array([y_thrust],dtype=np.float32)
-    action[agent_name]['Z_thrust'] = OrderedDict()
-    action[agent_name]['Z_thrust']['z_thrust'] = np.array([z_thrust],dtype=np.float32)
+def make_action(agent_name, x_thrust, y_thrust, z_thrust):
+    action = {
+        agent_name: {
+            "RTAGlue": {
+                "RTAGlue":
+                    (
+                        {'x_thrust': np.array([x_thrust], dtype=np.float32)},
+                        {'y_thrust': np.array([y_thrust], dtype=np.float32)},
+                        {'z_thrust': np.array([z_thrust], dtype=np.float32)},
+                    )
+            }
+        }
+    }
     return action
 
 
-
-
-class RllibExperiment(BaseExperiment):
+class RTAExperiment(BaseExperiment):
     """
     Now is modified
     The Rllib Experiment is an experiment for running
@@ -127,15 +129,15 @@ class RllibExperiment(BaseExperiment):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.config = typing.cast(RllibExperimentValidator, self.config)
+        self.config = typing.cast(RTAExperimentValidator, self.config)
 
     @classmethod
     def get_validator(cls):
-        return RllibExperimentValidator
+        return RTAExperimentValidator
 
     @classmethod
     def get_policy_validator(cls):
-        return RllibPolicyValidator
+        return RTAPolicyValidator
 
     def run_experiment(self, args: argparse.Namespace) -> None:
 
@@ -202,13 +204,12 @@ class RllibExperiment(BaseExperiment):
 
         actions = []
         for _ in range(num_steps):
-            actions.append(make_action("blue0",1,-1,-2))
-
+            actions.append(make_action("blue0", 1000, 1000, 1000))
 
         for i in range(num_steps):
             data = env.step(actions[i])
             print(data)
-            print('completed step=',i)
+            print('completed step=', i)
 
         # loop thru list and call step
         # test with normal docking config
