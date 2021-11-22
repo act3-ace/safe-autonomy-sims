@@ -127,7 +127,7 @@ class Constraint_rel_vel(ConstraintModule):
         self.v1 = v1
 
     def h_x(self, state_vec):
-        return self.v0 + self.v1 * (np.linalg.norm(state_vec[0:2]) - np.linalg.norm(state_vec[2:4]))
+        return (self.v0 + self.v1 * np.linalg.norm(state_vec[0:2])) - np.linalg.norm(state_vec[2:4])
 
     def grad(self, state_vec):
         Hs = np.array([[2 * self.v1**2, 0, 0, 0], [0, 2 * self.v1**2, 0, 0], [0, 0, -2, 0], [0, 0, 0, -2]])
