@@ -196,23 +196,61 @@ class RTAExperiment(BaseExperiment):
         # setup action
 
         # setup for loop for specified number of steps
-        num_steps = 10
+        num_steps = 1000
 
         # setup a list of actions
         #actions = [make_action('blue0',-1.0,1.0,2.0),make_action('blue0',-3.0,2.0,2.0),make_action('blue0',-1.0,1.0,4.0)]
         # make sure you have a list of actions i.e. ordered dicts
 
         actions = []
-        for _ in range(num_steps):
-            actions.append(make_action("blue0", 1000, 1000, 1000))
+        for i in range(num_steps):
+            actions.append(make_action("blue0", 2*i, 2*i, 2*i))
+
+
+        all_data = []
 
         for i in range(num_steps):
             data = env.step(actions[i])
             print(data)
             print('completed step=', i)
+            all_data.append(data)
 
         # loop thru list and call step
         # test with normal docking config
+
+        self.plot_pos_vel(all_data)
+
+    def plot_pos_vel(self, data):
+        from matplotlib import pyplot as plt
+
+        fig, (pos_ax, vel_x_ax, vel_y_ax) = plt.subplots(1, 3)
+
+        pos_x = [d[0]["blue0"]["ObserveSensor_Sensor_Position"]["direct_observation"][0] for d in data]
+        pos_y = [d[0]["blue0"]["ObserveSensor_Sensor_Position"]["direct_observation"][1] for d in data]
+        pos_ax.plot(pos_x, pos_y)
+        pos_ax.set_title("Position")
+        pos_ax.set_xlabel("x")
+        pos_ax.set_ylabel("y")
+
+        vel_x = [i for i in range(len(data))]
+        vel_x_y = [d[0]["blue0"]["ObserveSensor_Sensor_Velocity"]["direct_observation"][0] for d in data]
+        vel_x_ax.plot(vel_x, vel_x_y)
+        vel_x_ax.plot(vel_x, [-10 for _ in range(len(vel_x))])  # constraint
+        vel_x_ax.plot(vel_x, [10 for _ in range(len(vel_x))])  # constraint
+        vel_x_ax.set_title("X Velocity")
+        vel_x_ax.set_xlabel("time")
+        vel_x_ax.set_ylabel("x velocity")
+
+        vel_y_y = [d[0]["blue0"]["ObserveSensor_Sensor_Velocity"]["direct_observation"][1] for d in data]
+        vel_y_ax.plot(vel_x, vel_y_y)
+        vel_y_ax.plot(vel_x, [-10 for _ in range(len(vel_x))])  # constraint
+        vel_y_ax.plot(vel_x, [10 for _ in range(len(vel_x))])  # constraint
+        vel_y_ax.set_title("Y Velocity")
+        vel_y_ax.set_xlabel("time")
+        vel_y_ax.set_ylabel("y velocity")
+
+
+        plt.show()
 
     def _select_rllib_config(self, platform: typing.Optional[str]) -> typing.Dict[str, typing.Any]:
         """Extract the rllib config for the proper computational platform
