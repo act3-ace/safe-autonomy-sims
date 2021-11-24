@@ -20,4 +20,7 @@
   "sim_config": {
       "step_size": 1
   },
+  "episode_parameter_provider": {
+    "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+  },
 }
