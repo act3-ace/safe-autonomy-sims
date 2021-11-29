@@ -1,10 +1,1 @@
-
-
-
-# mkdocs plugins
-mkdocs-git-revision-date-localized-plugin
-pymdown-extensions
-mkdocs-macros-plugin
-mkdocs-material
-mkdocs-pdf-export-plugin
-inari[mkdocs]
+act3-rl-core
