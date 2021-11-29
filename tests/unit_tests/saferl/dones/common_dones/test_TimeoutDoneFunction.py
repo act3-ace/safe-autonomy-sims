@@ -81,6 +81,7 @@ def cut(cut_name, agent_name, max_sim_time):
         The name of the component under test
     agent_name : str
         The name of the agent
+    max_sim_time :
 
     Returns
     -------
