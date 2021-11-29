@@ -7,6 +7,7 @@ Author: John McCarroll
 import numpy as np
 import pytest
 from act3_rl_core.dones.done_func_base import DoneStatusCodes
+
 from saferl.dones.docking_dones import SuccessfulDockingDoneFunction
 
 test_configs = [
