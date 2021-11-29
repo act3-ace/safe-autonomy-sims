@@ -22,6 +22,7 @@ if __name__ == '__main__':
         'mypy-protobuf',
         'pylint',
         'pytest',
+        'pytest-mock'
         'pytest-cov',
         'pytest-order',
         'yapf',
