@@ -50,6 +50,27 @@ def next_observation():
 
 
 @pytest.fixture()
+def state():
+    """
+    A fixture for creating a StateDict populated with the structure expected by the DoneFunction.
+
+    Parameters
+    ----------
+    agent_name : str
+        The name of the agent
+    cut_name : str
+        The name of the component under test
+
+    Returns
+    -------
+    state : StateDict
+        The populated StateDict
+    """
+    state = StateDict({})
+    return state
+
+
+@pytest.fixture()
 def next_state(agent_name, cut_name):
     """
     A fixture for creating a StateDict populated with the structure expected by the DoneFunction.
@@ -67,6 +88,48 @@ def next_state(agent_name, cut_name):
         The populated StateDict
     """
     state = StateDict({"episode_state": {agent_name: {cut_name: None}}})
+    return state
+
+
+@pytest.fixture()
+def observation_space():
+    """
+    A fixture for creating a StateDict populated with the structure expected by the RewardFunction.
+
+    Parameters
+    ----------
+    agent_name : str
+        The name of the agent
+    cut_name : str
+        The name of the component under test
+
+    Returns
+    -------
+    state : StateDict
+        The populated StateDict
+    """
+    state = StateDict({})
+    return state
+
+
+@pytest.fixture()
+def observation_units():
+    """
+    A fixture for creating a StateDict populated with the structure expected by the RewardFunction.
+
+    Parameters
+    ----------
+    agent_name : str
+        The name of the agent
+    cut_name : str
+        The name of the component under test
+
+    Returns
+    -------
+    state : StateDict
+        The populated StateDict
+    """
+    state = StateDict({})
     return state
 
 
