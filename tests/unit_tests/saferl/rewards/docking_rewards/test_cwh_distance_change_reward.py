@@ -161,7 +161,7 @@ def next_state(agent_name, cut_name):
 
 
 @pytest.fixture()
-def call_results(cut, observation, action, next_observation, next_state, platform):
+def call_results(cut, observation, action, next_observation, state, next_state, observation_space, observation_units, platform):
     """
     A fixture responsible for calling the MaxDistanceDoneFunction and returning the results.
 
@@ -191,9 +191,14 @@ def call_results(cut, observation, action, next_observation, next_state, platfor
         return results
 
 
+
+# expected value -- idk
+# platform position,
+#far awy from docking region, mid way to docking region , close to docking region, then at docking region
+
 @pytest.mark.unit_test
 @pytest.mark.parametrize("platform_position,max_distance,expected_value,expected_status", test_configs, indirect=True)
-def test_call(call_results, next_state, agent_name, cut_name, expected_value, expected_status):
+def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the MaxDistanceDoneFunction behaves as intended.
 
