@@ -18,7 +18,7 @@ address: null
 # If true will start dashboard on localhost (default)
 include_dashboard: False
 # If set will ignore reinit errors
-ignore_reinit_error: False
+ignore_reinit_error: True
 #If true, then output from all of the worker processes on all nodes will be directed to the driver.
 log_to_driver: True
 # If set will use local mode which ignores remote workers. used for debugging
