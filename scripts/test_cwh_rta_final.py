@@ -196,7 +196,7 @@ class RTAExperiment(BaseExperiment):
         # setup action
 
         # setup for loop for specified number of steps
-        num_steps = 1000
+        num_steps = 100
 
         # setup a list of actions
         #actions = [make_action('blue0',-1.0,1.0,2.0),make_action('blue0',-3.0,2.0,2.0),make_action('blue0',-1.0,1.0,4.0)]
@@ -204,12 +204,14 @@ class RTAExperiment(BaseExperiment):
 
         actions = []
         for i in range(num_steps):
-            actions.append(make_action("blue0", 2*i, 2*i, 2*i))
+            actions.append(make_action("blue0", 0.05, .1, 0))
 
 
         all_data = []
 
         for i in range(num_steps):
+            if i == 500:
+                print(1)
             data = env.step(actions[i])
             print(data)
             print('completed step=', i)
@@ -223,7 +225,7 @@ class RTAExperiment(BaseExperiment):
     def plot_pos_vel(self, data):
         from matplotlib import pyplot as plt
 
-        fig, (pos_ax, vel_x_ax, vel_y_ax) = plt.subplots(1, 3)
+        fig, ((pos_ax, pos_vel_ax), (vel_x_ax, vel_y_ax)) = plt.subplots(2,2)
 
         pos_x = [d[0]["blue0"]["ObserveSensor_Sensor_Position"]["direct_observation"][0] for d in data]
         pos_y = [d[0]["blue0"]["ObserveSensor_Sensor_Position"]["direct_observation"][1] for d in data]
@@ -234,23 +236,44 @@ class RTAExperiment(BaseExperiment):
 
         vel_x = [i for i in range(len(data))]
         vel_x_y = [d[0]["blue0"]["ObserveSensor_Sensor_Velocity"]["direct_observation"][0] for d in data]
+        self.plot_constraint_line(vel_x_ax, vel_x, [10 for _ in range(len(vel_x))])
+        self.plot_constraint_line(vel_x_ax, vel_x, [-10 for _ in range(len(vel_x))])
         vel_x_ax.plot(vel_x, vel_x_y)
-        vel_x_ax.plot(vel_x, [-10 for _ in range(len(vel_x))])  # constraint
-        vel_x_ax.plot(vel_x, [10 for _ in range(len(vel_x))])  # constraint
+        vel_span = max(vel_x_y) - min(vel_x_y)
+        vel_x_ax.set_ylim(min(vel_x_y)-.1*vel_span, max(vel_x_y)+.1*vel_span)
         vel_x_ax.set_title("X Velocity")
         vel_x_ax.set_xlabel("time")
         vel_x_ax.set_ylabel("x velocity")
 
         vel_y_y = [d[0]["blue0"]["ObserveSensor_Sensor_Velocity"]["direct_observation"][1] for d in data]
+        self.plot_constraint_line(vel_y_ax, vel_x, [10 for _ in range(len(vel_x))])
+        self.plot_constraint_line(vel_y_ax, vel_x, [-10 for _ in range(len(vel_x))])
         vel_y_ax.plot(vel_x, vel_y_y)
-        vel_y_ax.plot(vel_x, [-10 for _ in range(len(vel_x))])  # constraint
-        vel_y_ax.plot(vel_x, [10 for _ in range(len(vel_x))])  # constraint
+        vel_span = max(vel_y_y) - min(vel_y_y)
+        vel_y_ax.set_ylim(min(vel_y_y)-.1*vel_span, max(vel_y_y)+.1*vel_span)
         vel_y_ax.set_title("Y Velocity")
         vel_y_ax.set_xlabel("time")
         vel_y_ax.set_ylabel("y velocity")
 
+        vel_t = np.sqrt(np.array(vel_x_y, dtype=float)**2 + np.array(vel_y_y, dtype=float)**2)
+        r_t = np.sqrt(np.array(pos_x, dtype=float)**2 + np.array(pos_y, dtype=float)**2)
+        vel_limit_nmt = 0.2 + r_t * 2 * 0.001027
+        self.plot_constraint_line(pos_vel_ax, r_t, vel_limit_nmt)
+        self.plot_constraint_line(pos_vel_ax, r_t, [10 for _ in range(len(r_t))])
+        self.plot_constraint_line(pos_vel_ax, r_t, [-10 for _ in range(len(r_t))])
+        pos_vel_ax.plot(r_t, vel_t)
+        vel_span = max(vel_t) - min(vel_t)
+        pos_vel_ax.set_ylim(min(vel_t)-.1*vel_span, max(vel_t)+.1*vel_span)
+        pos_vel_ax.set_title("Velocity vs Distance to Chief")
+        pos_vel_ax.set_xlabel("distance")
+        pos_vel_ax.set_ylabel("velocity")
+
 
         plt.show()
+
+    def plot_constraint_line(self, ax, x, y, border_linewidth=10, color='r', border_alpha=0.25):
+        ax.plot(x, y, color, linewidth=border_linewidth, alpha=border_alpha)
+        ax.plot(x, y, color)
 
     def _select_rllib_config(self, platform: typing.Optional[str]) -> typing.Dict[str, typing.Any]:
         """Extract the rllib config for the proper computational platform
