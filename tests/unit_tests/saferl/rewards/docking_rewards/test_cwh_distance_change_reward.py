@@ -1,11 +1,14 @@
+from unittest import mock
+
+import numpy as np
 import pytest
-from saferl.rewards.docking_rewards import CWHDistanceChangeReward
+import pytest_mock
 from act3_rl_core.libraries import OrderedDict
 from act3_rl_core.libraries.StateDict import StateDict
+
 from saferl.platforms.cwh import CWHPlatform
-from unittest import mock
-import numpy as np
-import pytest_mock
+from saferl.rewards.docking_rewards import CWHDistanceChangeReward
+
 #from act3_rl_core.dones.done_func_base import DoneStatusCodes
 #from act3_rl_core.libraries.state_dict import StateDict
 
@@ -33,6 +36,7 @@ def observation():
 
 
 #-----------------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def platform_position(request):
