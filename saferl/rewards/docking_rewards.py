@@ -7,6 +7,7 @@ import numpy as np
 from act3_rl_core.libraries.environment_dict import RewardDict
 from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
+from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
 
@@ -74,8 +75,9 @@ class CWHDistanceChangeReward(RewardFuncBase):
         reward = RewardDict()
         val = 0
 
-        # question, less brittle way to refer to platforms?
-        position = next_state.sim_platforms[0].position
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+        position = deputy.position
+
         distance = np.linalg.norm(position)
         self._dist_buffer.append(distance)
 
@@ -97,9 +99,10 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     scale: float
     timeout: float
     docking_region_radius: float
+    max_vel_constraint: float
 
 
-class DockingSuccessRewardFunction(RewardFuncBase):
+class DockingSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
     """
@@ -150,16 +153,20 @@ class DockingSuccessRewardFunction(RewardFuncBase):
         reward = RewardDict()
         value = 0
 
-        position = next_state.sim_platforms[0].position
-        sim_time = next_state.sim_platforms[0].sim_time
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+
+        position = deputy.position
+        sim_time = deputy.sim_time
+        velocity_vector = deputy.velocity
 
         origin = np.array([0, 0, 0])
         docking_region_radius = self.config.docking_region_radius
+        velocity = np.linalg.norm(velocity_vector)
 
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        if in_docking:
+        if in_docking and velocity < self.config.max_vel_constraint:
             value = self.config.scale
             if self.config.timeout:
                 # Add time reward component, if timeout specified
@@ -188,7 +195,7 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     max_vel_constraint: float
 
 
-class DockingFailureRewardFunction(RewardFuncBase):
+class DockingFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
     """
@@ -239,12 +246,16 @@ class DockingFailureRewardFunction(RewardFuncBase):
         reward = RewardDict()
         value = 0
 
-        sim_time = next_state.sim_platforms[0].sim_time
-        position = next_state.sim_platforms[0].position
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+
+        position = deputy.position
+        sim_time = deputy.sim_time
+        velocity_vector = deputy.velocity
+
         distance = np.linalg.norm(position)
-        velocity_vector = next_state.sim_platforms[0].velocity
         velocity = np.linalg.norm(velocity_vector)
 
+        # TODO: update to chief location when multiple platforms enabled
         origin = np.array([0, 0, 0])
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= self.config.docking_region_radius
@@ -261,75 +272,3 @@ class DockingFailureRewardFunction(RewardFuncBase):
 
         reward[self.config.agent_name] = value
         return reward
-
-
-if __name__ == "__main__":
-    # from collections import OrderedDict
-
-    from saferl.simulators.cwh_simulator import CWHSimulator
-
-    tmp_config = {
-        "step_size": 1,
-        "agent_configs": {
-            "blue0": {
-                "sim_config": {},
-                "platform_config": [
-                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                        "name": "X Thrust", "axis": 0
-                    }),
-                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                        "name": "Y Thrust", "axis": 1
-                    }),
-                    ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                        "name": "Z Thrust", "axis": 2
-                    }),
-                    ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}),
-                    ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {}),
-                ],
-            }
-        },
-    }
-
-    reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}
-
-    tmp = CWHSimulator(**tmp_config)
-    first_state = tmp.reset(reset_config)
-
-    success_reward_fn = DockingSuccessRewardFunction(agent_name="blue0", scale=1, timeout=50, docking_region_radius=25)
-
-    failure_reward_fn = DockingFailureRewardFunction(
-        agent_name="blue0",
-        timeout_reward=1,
-        distance_reward=2,
-        crash_reward=3,
-        timeout=50,
-        docking_distance=5,
-        max_goal_distance=40000,
-        docking_region_radius=25,
-        max_vel_constraint=10
-    )
-
-    for i in range(5):
-        curr_state = tmp.step()
-
-        success_reward = success_reward_fn(
-            observation=OrderedDict(),
-            action=OrderedDict(),
-            next_observation=OrderedDict(),
-            next_state=curr_state,
-            state=curr_state,
-            observation_space=StateDict(),
-            observation_units=StateDict()
-        )
-        failure_reward = failure_reward_fn(
-            observation=OrderedDict(),
-            action=OrderedDict(),
-            next_observation=OrderedDict(),
-            next_state=curr_state,
-            state=curr_state,
-            observation_space=StateDict(),
-            observation_units=StateDict()
-        )
-
-        print(success_reward)
-        print(failure_reward)
