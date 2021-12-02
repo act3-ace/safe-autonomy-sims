@@ -1,15 +1,13 @@
+from collections import OrderedDict
 from unittest import mock
 
 import numpy as np
 import pytest
 import pytest_mock
-from collections import OrderedDict
 from act3_rl_core.libraries.state_dict import StateDict
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.rewards.docking_rewards import CWHDistanceChangeReward
-from act3_rl_core.libraries.state_dict import StateDict
-
 
 # test_configs = [
 #
@@ -18,10 +16,7 @@ from act3_rl_core.libraries.state_dict import StateDict
 #     (np.array([11, 0, 0]), 10, True,None),
 # ]
 
-test_configs = [
-    (np.array([0,0,0]),np.array([1,0,0]),2,2)
-]
-
+test_configs = [(np.array([0, 0, 0]), np.array([1, 0, 0]), 2, 2)]
 
 
 @pytest.fixture
@@ -51,6 +46,7 @@ def platform_position1(request):
         Three element array describing platform's 3D position
     """
     return request.param
+
 
 @pytest.fixture()
 def platform_position2(request):
@@ -91,7 +87,6 @@ def expected_value(request):
         The expected value of the boolean assigned to describe if the agent is done or not
     """
     return request.param
-
 
 
 @pytest.fixture()
@@ -162,7 +157,19 @@ def next_state(agent_name, cut_name):
 
 
 @pytest.fixture()
-def call_results(cut, platform_position1, platform_position2,observation, action, next_observation, state, next_state, observation_space, observation_units, platform):
+def call_results(
+    cut,
+    platform_position1,
+    platform_position2,
+    observation,
+    action,
+    next_observation,
+    state,
+    next_state,
+    observation_space,
+    observation_units,
+    platform
+):
     """
     A fixture responsible for calling the MaxDistanceDoneFunction and returning the results.
 
@@ -189,18 +196,18 @@ def call_results(cut, platform_position1, platform_position2,observation, action
     with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
         platform.position = platform_position1
         func.return_value = platform
-        results = cut(observation, action, next_observation, state, next_state,observation_space,observation_units)
+        results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
 
         platform.position = platform_position2
         func.return_value = platform
-        results2 = cut(observation, action, next_observation, state, next_state,observation_space,observation_units)
+        results2 = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
         return results2
-
 
 
 # expected value -- idk
 # platform position,
 #far awy from docking region, mid way to docking region , close to docking region, then at docking region
+
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize("platform_position1, platform_position2, scale, expected_value", test_configs, indirect=True)
