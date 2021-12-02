@@ -10,6 +10,7 @@ from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBase
 from numpy_ringbuffer import RingBuffer
 
 
+
 class CWHDistanceChangeRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward

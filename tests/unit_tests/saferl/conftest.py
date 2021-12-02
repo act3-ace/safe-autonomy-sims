@@ -143,7 +143,7 @@ def agent_name():
     str
         The common agent name
     """
-    return "safety_buddy"
+    return "blue0"
 
 
 @pytest.fixture()
