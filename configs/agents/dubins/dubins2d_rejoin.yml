@@ -24,6 +24,11 @@
     "episode_parameter_provider": {
       "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
     },
+    "simulator_reset_parameters": {
+      "heading": 0,
+      "position": [ 0, 0 ],
+      "speed": 50
+    },
     "glues": [
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
@@ -79,7 +84,10 @@
             "name": "RejoinDistanceChangeReward",
             "functor": "saferl.rewards.rejoin_rewards.RejoinDistanceChangeReward",
             "config": {
-                "scale": 1.0e-2
+                "reward": 1.0e-4,
+                "rejoin_region_radius": 100,
+                "offset_values": [ 500, 500 ],
+                "lead": "red0",
             }
         },
     ],

@@ -43,9 +43,7 @@ class Dubins2dSimulatorResetValidator(BaseSimulatorResetValidator):
     Validator for the SimulatorReset operation for Dubins2D
     """
 
-    agent_initialization: typing.Optional[typing.Dict[str, Dubins2dPlatformConfigValidator]] = {
-        "blue0": Dubins2dPlatformConfigValidator(position=[0, 1], speed=100, heading=0)
-    }
+    platforms: typing.Dict[str, Dubins2dPlatformConfigValidator]
 
 
 class Dubins2dSimulator(SafeRLSimulator):
@@ -106,7 +104,7 @@ class Dubins2dSimulator(SafeRLSimulator):
 
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
-            init_params = config.agent_initialization[agent_id]
+            init_params = config.platforms[agent_id]
             entity.reset(
                 **{
                     "x": init_params.position[0], "y": init_params.position[1], "heading": init_params.heading, "v": init_params.speed
@@ -152,9 +150,7 @@ class Dubins3dSimulatorResetValidator(BaseSimulatorResetValidator):
     Validator for the SimulatorReset operation for Dubins3D
     """
 
-    agent_initialization: typing.Optional[typing.Dict[str, Dubins3dPlatformConfigValidator]] = {
-        "blue0": Dubins3dPlatformConfigValidator(position=[0, 1, 2], speed=100, heading=0, gamma=0, roll=0)
-    }
+    platforms: typing.Dict[str, Dubins3dPlatformConfigValidator]
 
 
 class Dubins3dSimulator(SafeRLSimulator):
@@ -214,7 +210,7 @@ class Dubins3dSimulator(SafeRLSimulator):
 
         config = self.get_reset_validator()(**config)
         for agent_id, entity in self.sim_entities.items():
-            init_params = config.agent_initialization[agent_id]
+            init_params = config.platforms[agent_id]
             entity.reset(
                 **{
                     "x": init_params.position[0],
