@@ -13,14 +13,24 @@
 # ---------------------------------------------------------------------------
 
 {
-  "simulator": "Dubins2dSimulator",
+  "simulator": {
+    "type": "Dubins2dSimulator",
+    "config": {
+      "step_size": 1
+    },
+  },
   "platforms": "DubinsSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "horizon": 2000,
-  "sim_config": {
-      "step_size": 1
-  },
   "episode_parameter_provider": {
     "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
   },
+  "dones": {
+    "shared": [
+      {
+        "functor": "saferl.dones.rejoin_dones.RejoinDone",
+        "config": {},
+      }
+    ]
+  }
 }
