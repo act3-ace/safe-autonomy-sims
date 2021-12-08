@@ -212,9 +212,9 @@ class HeadingProp(BoxProp):
     """
 
     name: str = "heading"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.pi * 2]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-math.pi * 2]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["rad"]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-math.pi * 2]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-math.pi * 2]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
     description: str = "Heading Sensor Properties"
 
 
