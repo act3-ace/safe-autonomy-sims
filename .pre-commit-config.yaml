@@ -1,5 +1,5 @@
 # https://github.com/apache/airflow/blob/master/.pre-commit-config.yaml
-exclude: saferl_sim|.*\.md
+exclude: .*\.md
 default_language_version:
   python: python3.8
 repos:
