@@ -9,14 +9,19 @@ from act3_rl_core.libraries.state_dict import StateDict
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.rewards.docking_rewards import CWHDistanceChangeReward
 
-# test_configs = [
-#
-#     (np.array([9, 0, 0]), 10, False, None),
-#     (np.array([10, 0, 0]), 10, False, None),
-#     (np.array([11, 0, 0]), 10, True,None),
-# ]
 
-test_configs = [(np.array([0, 0, 0]), np.array([1, 0, 0]), 2, 2)]
+test_configs = [
+                # case 1
+                (np.array([0, 0, 0]), np.array([1, 0, 0]), 2, 2),
+                # case 2
+                (np.array([1,1,1]),np.array([4,4,4]), 0.5, 0.5 * np.sqrt(27)),
+                # case 3 - large number case
+                (np.array([100,100,100]),np.array([1000,1000,1000]), 0.4, 0.4 * np.sqrt(3*(900*900))),
+                # edge case 1
+                (np.array([0, 0, 0]), np.array([0, 0, 0]), 2, 0),
+                # edge case 2
+                (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
+                ]
 
 
 @pytest.fixture
@@ -30,9 +35,6 @@ def observation():
         Placeholder array
     """
     return np.array([0, 0, 0])
-
-
-#-----------------------------------------------------------------------------------
 
 
 @pytest.fixture()
@@ -63,15 +65,6 @@ def platform_position2(request):
 
 @pytest.fixture()
 def scale(request):
-    """
-    Parameterized fixture for returning the max_distance passed to the MaxDistanceDoneFunction's constructor, as defined
-    in test_configs.
-
-    Returns
-    -------
-    int
-        The max allowed distance in a docking episode
-    """
     return request.param
 
 
@@ -116,7 +109,7 @@ def platform(mocker, platform_position, platform_position2, agent_name):
 @pytest.fixture()
 def cut(cut_name, agent_name, scale):
     """
-    A fixture that instantiates a MaxDistanceDoneFunction and returns it.
+    A fixture that instantiates a CWHDistanceChangeReward Function and returns it.
 
     Parameters
     ----------
@@ -138,7 +131,7 @@ def cut(cut_name, agent_name, scale):
 @pytest.fixture()
 def next_state(agent_name, cut_name):
     """
-    A fixture for creating a StateDict populated with the structure expected by the MaxDistanceDoneFunction.
+    A fixture for creating a StateDict populated with the structure expected by the CWHDistanceChangeReward Function.
 
     Parameters
     ----------
@@ -171,11 +164,11 @@ def call_results(
     platform
 ):
     """
-    A fixture responsible for calling the MaxDistanceDoneFunction and returning the results.
+    A fixture responsible for calling the CWHDistanceChangeReward and returning the results.
 
     Parameters
     ----------
-    cut : MaxDistanceDoneFunction
+    cut : CWHDistanceChangeReward
         The component under test
     observation : numpy.ndarray
         The observation array
@@ -213,14 +206,14 @@ def call_results(
 @pytest.mark.parametrize("platform_position1, platform_position2, scale, expected_value", test_configs, indirect=True)
 def test_reward_function(call_results, agent_name, expected_value):
     """
-    A parameterized test to ensure that the MaxDistanceDoneFunction behaves as intended.
+    A parameterized test to ensure that the CWHDistanceChangeReward behaves as intended.
 
     Parameters
     ----------
     call_results : DoneDict
-        The resulting DoneDict from calling the MaxDistanceDoneFunction
+        The resulting DoneDict from calling the CWHDistanceChangeReward
     next_state : StateDict
-        The StateDict that may have been mutated by the MaxDistanceDoneFunction
+        The StateDict that may have been mutated by the CWHDistanceChangeReward
     agent_name : str
         The name of the agent
     cut_name : str
