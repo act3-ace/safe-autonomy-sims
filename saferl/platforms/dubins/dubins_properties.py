@@ -2,7 +2,6 @@
 This module defines the measurement and control properties for Dubins aircraft sensors and controllers.
 """
 
-import math
 import typing
 
 import numpy as np
@@ -235,7 +234,7 @@ class FlightPathProp(BoxProp):
     """
 
     name: str = "flight_path"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-math.pi * 2]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [math.pi * 2]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-10000000.0]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [10000000.0]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
     description: str = "Flight Path Sensor Properties"
