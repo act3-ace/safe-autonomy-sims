@@ -1,27 +1,29 @@
-from collections import OrderedDict
+"""
+Unit tests for the CWHDistanceChangeReward function from the docking_rewards module
+"""
+
 from unittest import mock
 
 import numpy as np
 import pytest
-import pytest_mock
+
+# this is very much needed
 from act3_rl_core.libraries.state_dict import StateDict
 
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.rewards.docking_rewards import CWHDistanceChangeReward
 
-
 test_configs = [
-                # case 1
-                (np.array([0, 0, 0]), np.array([1, 0, 0]), 2, 2),
-                # case 2
-                (np.array([1,1,1]),np.array([4,4,4]), 0.5, 0.5 * np.sqrt(27)),
-                # case 3 - large number case
-                (np.array([100,100,100]),np.array([1000,1000,1000]), 0.4, 0.4 * np.sqrt(3*(900*900))),
-                # edge case 1
-                (np.array([0, 0, 0]), np.array([0, 0, 0]), 2, 0),
-                # edge case 2
-                (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
-                ]
+    # case 1
+    (np.array([0, 0, 0]), np.array([1, 0, 0]), 2, 2),
+    # case 2
+    (np.array([1, 1, 1]), np.array([4, 4, 4]), 0.5, 0.5 * np.sqrt(27)),
+    # case 3 - large number case
+    (np.array([100, 100, 100]), np.array([1000, 1000, 1000]), 0.4, 0.4 * np.sqrt(3 * (900 * 900))),
+    # edge case 1
+    (np.array([0, 0, 0]), np.array([0, 0, 0]), 2, 0),
+    # edge case 2
+    (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
+]
 
 
 @pytest.fixture
@@ -65,6 +67,9 @@ def platform_position2(request):
 
 @pytest.fixture()
 def scale(request):
+    """
+    Get the 'scale' parameter from the test config
+    """
     return request.param
 
 
