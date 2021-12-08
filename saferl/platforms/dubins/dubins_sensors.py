@@ -7,7 +7,7 @@ from act3_rl_core.simulators.base_parts import BaseSensor
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
-from saferl.simulators.dubins_simulator import Dubins2dSimulator
+from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
 
 class DubinsSensor(BaseSensor):
@@ -57,6 +57,11 @@ PluginLibrary.AddClassToGroup(
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
+PluginLibrary.AddClassToGroup(
+    PositionSensor, "Sensor_Position", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
 
 
 class VelocitySensor(DubinsSensor):
@@ -88,6 +93,11 @@ class VelocitySensor(DubinsSensor):
 PluginLibrary.AddClassToGroup(
     VelocitySensor, "Sensor_Velocity", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    VelocitySensor, "Sensor_Velocity", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
 
@@ -123,6 +133,11 @@ PluginLibrary.AddClassToGroup(
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
+PluginLibrary.AddClassToGroup(
+    HeadingSensor, "Sensor_Heading", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
 
 
 class FlightPathSensor(DubinsSensor):
@@ -147,16 +162,14 @@ class FlightPathSensor(DubinsSensor):
         float
             flight path angle
         """
-        return self.parent_platform.gamma
+        return np.array([np.deg2rad(self.parent_platform.flight_path_angle)], dtype=np.float32)
 
 
-# PluginLibrary.AddClassToGroup(
-#     FlightPathSensor, "Sensor_Flight_Path_Angle", {
-#         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
-#     }
-# )
-
-# TODO: Add to plugin group
+PluginLibrary.AddClassToGroup(
+    FlightPathSensor, "Sensor_Flight_Path_Angle", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
 
 # class TimeSensor(DubinsSensor):
 #     """

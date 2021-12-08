@@ -7,7 +7,7 @@ from __future__ import annotations
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
-from saferl.simulators.dubins_simulator import Dubins2dSimulator
+from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
 
 class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
@@ -38,3 +38,4 @@ class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
 
 PluginLibrary.AddClassToGroup(DubinsAvailablePlatformTypes, "DubinsSimulator_Platforms", {"simulator": Dubins2dSimulator})
+PluginLibrary.AddClassToGroup(DubinsAvailablePlatformTypes, "DubinsSimulator_Platforms", {"simulator": Dubins3dSimulator})
