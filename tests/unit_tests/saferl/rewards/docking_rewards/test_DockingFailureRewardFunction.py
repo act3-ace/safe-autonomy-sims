@@ -1,30 +1,31 @@
-from collections import OrderedDict
+"""
+Unit tests for the DockingFailureReward function from the docking_rewards module
+"""
+
 from unittest import mock
 
 import numpy as np
 import pytest
-import pytest_mock
 from act3_rl_core.libraries.state_dict import StateDict
 
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.rewards.docking_rewards import DockingFailureReward
-
 
 # modify for the test cases
 
 # test input
-# ['platform_position', 'velocity', 'sim_time', 'timeout', 'timeout_reward', 'distance_reward', 'crash_reward', 'max_goal_distance', 'docking_region_radius', 'max_vel_constraint', 'expected_value']
+# ['platform_position', 'velocity', 'sim_time', 'timeout', 'timeout_reward',
+# ... 'distance_reward', 'crash_reward', 'max_goal_distance', 'docking_region_radius',
+# ... 'max_vel_constraint', 'expected_value']
 test_configs = [
-                # test for crash
-                (np.array([0, 0, 0]),5.0,200,2000,-1,-1,-1, 40000,0.5,0,-1),
-                # test for max distance
-                (np.array([50000, 50000, 50000]),5.0,200,2000,-1,-1,-1, 40000,0.5,0,-1),
-                # test for max velocity exceeded
-                (np.array([0.01, 0.01, 0.01]),20.0,200,2000,-1,-1,-1, 40000,0.5,10,-1),
-                # test for a successful case, in docking therefore no failure reward,
-                (np.array([500, 500, 500]),8.0,200,2000,-1,-1,-1, 40000,0.5,10,0)    
-                ]
-
+    # test for crash
+    (np.array([0, 0, 0]), 5.0, 200, 2000, -1, -1, -1, 40000, 0.5, 0, -1),
+    # test for max distance
+    (np.array([50000, 50000, 50000]), 5.0, 200, 2000, -1, -1, -1, 40000, 0.5, 0, -1),
+    # test for max velocity exceeded
+    (np.array([0.01, 0.01, 0.01]), 20.0, 200, 2000, -1, -1, -1, 40000, 0.5, 10, -1),
+    # test for a successful case, in docking therefore no failure reward,
+    (np.array([500, 500, 500]), 8.0, 200, 2000, -1, -1, -1, 40000, 0.5, 10, 0)
+]
 
 
 @pytest.fixture
@@ -68,7 +69,7 @@ def expected_value(request):
 
 
 @pytest.fixture()
-def platform(mocker, platform_position,  agent_name):
+def platform(mocker, platform_position, agent_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -90,68 +91,83 @@ def platform(mocker, platform_position,  agent_name):
     test_platform.position = platform_position
     return test_platform
 
+
 @pytest.fixture()
 def timeout(request):
+    """
+    Return 'timeout' value from the test config
+    """
     return request.param
+
 
 @pytest.fixture()
 def timeout_reward(request):
+    """
+    Return 'timeout_reward' value from the test config input
+    """
     return request.param
 
 
 @pytest.fixture()
 def distance_reward(request):
+    """
+    Return 'distance_reward' value from the test config input
+    """
     return request.param
+
 
 @pytest.fixture()
 def crash_reward(request):
+    """
+    Return 'crash_reward' value from the test config input
+    """
     return request.param
 
 
 @pytest.fixture()
 def max_goal_distance(request):
+    """
+    Return 'max_goal_distance' value from the test config input
+    """
     return request.param
+
 
 @pytest.fixture()
 def docking_region_radius(request):
+    """
+    Return 'docking_region_radius' value from the test config input
+    """
     return request.param
+
 
 @pytest.fixture()
 def max_vel_constraint(request):
+    """
+    Return 'max_vel_constraint' value from the test config input
+    """
     return request.param
+
 
 @pytest.fixture()
 def sim_time(request):
+    """
+    Return 'sim_time'  (time of the simulation)  value from the test config input
+    """
     return request.param
+
 
 @pytest.fixture()
 def velocity(request):
+    """
+    Return 'velocity'  value from the test config input
+    """
     return request.param
-
-@pytest.fixture()
-def cut(cut_name, agent_name, timeout, timeout_reward,distance_reward,crash_reward,max_goal_distance,docking_region_radius,max_vel_constraint):
-    """
-    A fixture that instantiates a DockingFailureRewardFunction and returns it.
-
-    Parameters
-    ----------
-    cut_name : str
-        The name of the component under test
-    agent_name : str
-        The name of the agent
-
-    Returns
-    -------
-    DockingFailureRewardFunction
-        An instantiated component under test
-    """
-    return DockingFailureReward(name=cut_name,agent_name=agent_name, timeout=timeout, timeout_reward=timeout_reward, distance_reward=distance_reward,crash_reward=crash_reward, max_goal_distance=max_goal_distance,docking_region_radius=docking_region_radius,max_vel_constraint=max_vel_constraint)
 
 
 @pytest.fixture()
 def next_state(agent_name, cut_name):
     """
-    A fixture for creating a StateDict populated with the structure expected by the CWHDistanceChangeReward
+    A fixture for creating a StateDict populated with the structure expected by the DockingFailureReward
 
     Parameters
     ----------
@@ -167,6 +183,46 @@ def next_state(agent_name, cut_name):
     """
     state = StateDict({"episode_state": {agent_name: {cut_name: None}}})
     return state
+
+
+@pytest.fixture()
+def cut(
+    cut_name,
+    agent_name,
+    timeout,
+    timeout_reward,
+    distance_reward,
+    crash_reward,
+    max_goal_distance,
+    docking_region_radius,
+    max_vel_constraint
+):
+    """
+    A fixture that instantiates a DockingFailureRewardFunction and returns it.
+
+    Parameters
+    ----------
+    cut_name : str
+        The name of the component under test
+    agent_name : str
+        The name of the agent
+
+    Returns
+    -------
+    DockingFailureRewardFunction
+        An instantiated component under test
+    """
+    return DockingFailureReward(
+        name=cut_name,
+        agent_name=agent_name,
+        timeout=timeout,
+        timeout_reward=timeout_reward,
+        distance_reward=distance_reward,
+        crash_reward=crash_reward,
+        max_goal_distance=max_goal_distance,
+        docking_region_radius=docking_region_radius,
+        max_vel_constraint=max_vel_constraint
+    )
 
 
 @pytest.fixture()
@@ -215,9 +271,15 @@ def call_results(
         results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
         return results
 
+
 #timeout_reward,distance_reward,crash_reward,timeout_reward,max_goal_distance,docking_region_radius,max_vel_constraint
 @pytest.mark.unit_test
-@pytest.mark.parametrize("platform_position, velocity, sim_time, timeout, timeout_reward, distance_reward, crash_reward, max_goal_distance, docking_region_radius, max_vel_constraint, expected_value", test_configs, indirect=True)
+@pytest.mark.parametrize(
+    "platform_position, velocity, sim_time, timeout, timeout_reward, distance_reward, \
+    crash_reward, max_goal_distance, docking_region_radius, max_vel_constraint, expected_value",
+    test_configs,
+    indirect=True
+)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the DockingFailureRewardFunction behaves as intended.
