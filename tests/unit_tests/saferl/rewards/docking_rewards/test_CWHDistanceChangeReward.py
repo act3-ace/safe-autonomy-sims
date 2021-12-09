@@ -26,8 +26,8 @@ test_configs = [
 ]
 
 
-@pytest.fixture
-def observation():
+@pytest.fixture(name='observation')
+def fixture_observation():
     """
     Generic fixture for creating a naive observation for running Done and Reward function tests.
 
@@ -39,8 +39,8 @@ def observation():
     return np.array([0, 0, 0])
 
 
-@pytest.fixture()
-def platform_position1(request):
+@pytest.fixture(name='platform_position1')
+def fixture_platform_position1(request):
     """
     Parameterized fixture for returning platform position defined in test_configs.
 
@@ -52,8 +52,8 @@ def platform_position1(request):
     return request.param
 
 
-@pytest.fixture()
-def platform_position2(request):
+@pytest.fixture(name='platform_position2')
+def fixture_platform_position2(request):
     """
     Parameterized fixture for returning platform position defined in test_configs.
 
@@ -65,16 +65,16 @@ def platform_position2(request):
     return request.param
 
 
-@pytest.fixture()
-def scale(request):
+@pytest.fixture(name='scale')
+def fixture_scale(request):
     """
     Get the 'scale' parameter from the test config
     """
     return request.param
 
 
-@pytest.fixture()
-def expected_value(request):
+@pytest.fixture(name='expected_value')
+def fixture_expected_value(request):
     """
     Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
     in the DoneDict returned by the MaxDistanceDoneFunction.
@@ -87,8 +87,8 @@ def expected_value(request):
     return request.param
 
 
-@pytest.fixture()
-def platform(mocker, platform_position, platform_position2, agent_name):
+@pytest.fixture(name='platform')
+def fixture_platform(mocker, platform_position, agent_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -111,8 +111,8 @@ def platform(mocker, platform_position, platform_position2, agent_name):
     return test_platform
 
 
-@pytest.fixture()
-def cut(cut_name, agent_name, scale):
+@pytest.fixture(name='cut')
+def fixture_cut(cut_name, agent_name, scale):
     """
     A fixture that instantiates a CWHDistanceChangeReward Function and returns it.
 
@@ -133,8 +133,8 @@ def cut(cut_name, agent_name, scale):
     return CWHDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name)
 
 
-@pytest.fixture()
-def next_state(agent_name, cut_name):
+@pytest.fixture(name='next_state')
+def fixture_next_state(agent_name, cut_name):
     """
     A fixture for creating a StateDict populated with the structure expected by the CWHDistanceChangeReward Function.
 
@@ -154,8 +154,8 @@ def next_state(agent_name, cut_name):
     return state
 
 
-@pytest.fixture()
-def call_results(
+@pytest.fixture(name='call_results')
+def fixture_call_results(
     cut,
     platform_position1,
     platform_position2,
@@ -194,7 +194,7 @@ def call_results(
     with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
         platform.position = platform_position1
         func.return_value = platform
-        results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
+        _ = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
 
         platform.position = platform_position2
         func.return_value = platform

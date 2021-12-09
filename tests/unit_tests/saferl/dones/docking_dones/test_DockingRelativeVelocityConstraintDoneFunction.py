@@ -21,8 +21,8 @@ test_configs = [
 ]
 
 
-@pytest.fixture()
-def platform_velocity(request):
+@pytest.fixture(name='platform_velocity')
+def fixture_platform_velocity(request):
     """
     Parameterized fixture for returning platform velocity defined in test_configs.
 
@@ -34,8 +34,8 @@ def platform_velocity(request):
     return request.param
 
 
-@pytest.fixture()
-def target_name():
+@pytest.fixture(name='target_name')
+def fixture_target_name():
     """
     Fixture for returning target's name.
 
@@ -47,8 +47,8 @@ def target_name():
     return "target"
 
 
-@pytest.fixture()
-def target_velocity(request):
+@pytest.fixture(name='target_velocity')
+def fixture_target_velocity(request):
     """
     Parameterized fixture for returning target velocity defined in test_configs.
 
@@ -60,8 +60,8 @@ def target_velocity(request):
     return request.param
 
 
-@pytest.fixture()
-def target_position():
+@pytest.fixture(name='target_position')
+def fixture_target_position():
     """
     Placeholder fixture for returning target position.
 
@@ -73,8 +73,8 @@ def target_position():
     return None
 
 
-@pytest.fixture()
-def target(mocker, target_position, target_velocity, target_name):
+@pytest.fixture(name='target')
+def fixture_target(mocker, target_position, target_velocity, target_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -100,8 +100,8 @@ def target(mocker, target_position, target_velocity, target_name):
     return test_target_platform
 
 
-@pytest.fixture()
-def constraint_velocity(request):
+@pytest.fixture(name='constraint_velocity')
+def fixture_constraint_velocity(request):
     """
     Parameterized fixture for returning the constraint_velocity (the maximum acceptable relative velocity between
     the deputy and the target) passed to the DockingRelativeVelocityConstraintDoneFunction's constructor, as
@@ -115,8 +115,8 @@ def constraint_velocity(request):
     return request.param
 
 
-@pytest.fixture()
-def cut(cut_name, agent_name, constraint_velocity):
+@pytest.fixture(name='cut')
+def fixture_cut(cut_name, agent_name, constraint_velocity):
     """
     A fixture that instantiates a DockingRelativeVelocityConstraintDoneFunction and returns it.
 
@@ -140,8 +140,8 @@ def cut(cut_name, agent_name, constraint_velocity):
     )
 
 
-@pytest.fixture()
-def call_results(cut, observation, action, next_observation, next_state, platform, target):
+@pytest.fixture(name='call_results')
+def fixture_call_results(cut, observation, action, next_observation, next_state, platform, target):
     """
     A fixture responsible for calling the DockingVelocityLimitDoneFunction and returning the results.
 
