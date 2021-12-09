@@ -10,8 +10,8 @@ import pytest_mock
 from act3_rl_core.libraries.state_dict import StateDict
 
 
-@pytest.fixture
-def observation():
+@pytest.fixture(name='observation')
+def fixture_observation():
     """
     Generic fixture for creating a naive observation for running Done and Reward function tests.
 

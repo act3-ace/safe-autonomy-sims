@@ -42,8 +42,8 @@ test_configs = [
 #     return np.array([0, 0, 0])
 
 
-@pytest.fixture()
-def platform_position(request):
+@pytest.fixture(name='platform_position')
+def fixture_platform_position(request):
     """
     Parameterized fixture for returning platform position defined in test_configs.
 
@@ -55,8 +55,8 @@ def platform_position(request):
     return request.param
 
 
-@pytest.fixture()
-def expected_value(request):
+@pytest.fixture(name='expected_value')
+def fixture_expected_value(request):
     """
     Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
     in the DoneDict returned by the DockingFailureRewardFunction.
@@ -69,8 +69,8 @@ def expected_value(request):
     return request.param
 
 
-@pytest.fixture()
-def platform(mocker, platform_position, agent_name):
+@pytest.fixture(name='platform')
+def fixture_platform(mocker, platform_position, agent_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -93,88 +93,88 @@ def platform(mocker, platform_position, agent_name):
     return test_platform
 
 
-@pytest.fixture()
-def scale(request):
+@pytest.fixture(name='scale')
+def fixture_scale(request):
     """
     Get 'scale' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def timeout(request):
+@pytest.fixture(name='timeout')
+def fixture_timeout(request):
     """
     Get the 'timeout' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def timeout_reward(request):
+@pytest.fixture(name='timeout_reward')
+def fixture_timeout_reward(request):
     """
     Get the 'timeout_reward' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def distance_reward(request):
+@pytest.fixture(name='distance_reward')
+def fixture_distance_reward(request):
     """
     Get the 'distance_reward' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def crash_reward(request):
+@pytest.fixture(name='crash_reward')
+def fixture_crash_reward(request):
     """
     Get the 'crash_reward' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def max_goal_distance(request):
+@pytest.fixture(name='max_goal_distance')
+def fixture_max_goal_distance(request):
     """
     Get the 'max_goal_distance' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def docking_region_radius(request):
+@pytest.fixture(name='docking_region_radius')
+def fixture_docking_region_radius(request):
     """
     Get the 'docking_region_radius' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def max_vel_constraint(request):
+@pytest.fixture(name='max_vel_constraint')
+def fixture_max_vel_constraint(request):
     """
     Get the 'max_vel_constraint' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def sim_time(request):
+@pytest.fixture(name='sim_time')
+def fixutre_sim_time(request):
     """
     Get the 'sim_time' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def velocity(request):
+@pytest.fixture(name='velocity')
+def fixture_velocity(request):
     """
     Get the 'velocity' parameter from the test config input
     """
     return request.param
 
 
-@pytest.fixture()
-def cut(cut_name, scale, agent_name, timeout, docking_region_radius, max_vel_constraint):
+@pytest.fixture(name='cut')
+def fixture_cut(cut_name, scale, agent_name, timeout, docking_region_radius, max_vel_constraint):
     """
     A fixture that instantiates a DockingFailureRewardFunction and returns it.
 
@@ -221,8 +221,8 @@ def cut(cut_name, scale, agent_name, timeout, docking_region_radius, max_vel_con
 #     return state
 
 
-@pytest.fixture()
-def call_results(
+@pytest.fixture(name='call_results')
+def fixture_call_results(
     cut,
     platform_position,
     observation,
