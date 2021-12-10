@@ -6,7 +6,6 @@ Author: John McCarroll
 
 import numpy as np
 import pytest
-import pytest_mock
 from act3_rl_core.libraries.state_dict import StateDict
 
 
@@ -23,8 +22,8 @@ def fixture_observation():
     return np.array([0, 0, 0])
 
 
-@pytest.fixture
-def action():
+@pytest.fixture(name='action')
+def fixture_action():
     """
     Generic fixture for creating a naive action for running Done and Reward function tests.
 
@@ -36,8 +35,8 @@ def action():
     return np.array([0, 0, 0])
 
 
-@pytest.fixture
-def next_observation():
+@pytest.fixture(name='next_observation')
+def fixture_next_observation():
     """
     Generic fixture for creating a naive observation for running Done and Reward function tests.
 
@@ -49,8 +48,8 @@ def next_observation():
     return np.array([0, 0, 0])
 
 
-@pytest.fixture()
-def state():
+@pytest.fixture(name='state')
+def fixture_state():
     """
     A fixture for creating a StateDict populated with the structure expected by the DoneFunction.
 
@@ -70,8 +69,8 @@ def state():
     return state
 
 
-@pytest.fixture()
-def next_state(agent_name, cut_name):
+@pytest.fixture(name='next_state')
+def fixture_next_state(agent_name, cut_name):
     """
     A fixture for creating a StateDict populated with the structure expected by the DoneFunction.
 
@@ -91,8 +90,8 @@ def next_state(agent_name, cut_name):
     return state
 
 
-@pytest.fixture()
-def observation_space():
+@pytest.fixture(name='observation_space')
+def fixture_observation_space():
     """
     A fixture for creating a StateDict populated with the structure expected by the RewardFunction.
 
@@ -112,8 +111,8 @@ def observation_space():
     return state
 
 
-@pytest.fixture()
-def observation_units():
+@pytest.fixture(name='observation_units')
+def fixture_observation_units():
     """
     A fixture for creating a StateDict populated with the structure expected by the RewardFunction.
 
@@ -133,8 +132,8 @@ def observation_units():
     return state
 
 
-@pytest.fixture
-def agent_name():
+@pytest.fixture(name='agent_name')
+def fixture_agent_name():
     """
     Fixture to define a common agent name for tests.
 
@@ -146,8 +145,8 @@ def agent_name():
     return "blue0"
 
 
-@pytest.fixture()
-def cut_name():
+@pytest.fixture(name='cut_name')
+def fixture_cut_name():
     """
     Fixture to define a common name for the Component Under Test.
 
@@ -159,8 +158,8 @@ def cut_name():
     return "cut"
 
 
-@pytest.fixture()
-def platform_position():
+@pytest.fixture(name='platform_position')
+def fixture_platform_position():
     """
     placeholder fixture to be overridden by testing modules for returning platform position.
 
@@ -172,8 +171,8 @@ def platform_position():
     return np.array([0, 0, 0])
 
 
-@pytest.fixture()
-def platform_velocity():
+@pytest.fixture(name='platform_velocity')
+def fixture_platform_velocity():
     """
     placeholder fixture to be overridden by testing modules for returning platform velocity.
 
@@ -185,8 +184,8 @@ def platform_velocity():
     return np.array([0, 0, 0])
 
 
-@pytest.fixture()
-def platform(mocker, platform_position, platform_velocity, agent_name):
+@pytest.fixture(name='platform')
+def fixture_platform(mocker, platform_position, platform_velocity, agent_name):
     """
     A fixture to create a mock platform with a position property
 
