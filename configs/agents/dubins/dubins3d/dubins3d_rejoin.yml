@@ -28,7 +28,7 @@
     "simulator_reset_parameters": {
       "heading": 0,
       "position": [ 0, 0, 0 ],
-      "speed": 50,
+      "v": 200,
       "gamma": 0,
       "roll": 0
     },

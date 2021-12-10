@@ -26,8 +26,8 @@
     },
     "simulator_reset_parameters": {
       "heading": 0,
-      "position": [1000, 0],
-      "speed": 50
+      "position": [1000, 0, 0],
+      "v": 200
     },
     "glues": [
         {
