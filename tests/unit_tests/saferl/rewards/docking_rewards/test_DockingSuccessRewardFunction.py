@@ -6,7 +6,6 @@ from unittest import mock
 
 import numpy as np
 import pytest
-from act3_rl_core.libraries.state_dict import StateDict
 
 from saferl.rewards.docking_rewards import DockingSuccessReward
 

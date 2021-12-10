@@ -5,7 +5,6 @@ Author: John McCarroll
 """
 
 import pytest
-import pytest_mock
 from act3_rl_core.dones.done_func_base import DoneStatusCodes
 from act3_rl_core.libraries.state_dict import StateDict
 
@@ -19,8 +18,8 @@ test_configs = [
 ]
 
 
-@pytest.fixture()
-def max_sim_time(request):
+@pytest.fixture(name='max_sim_time')
+def fixture_max_sim_time(request):
     """
     Parameterized fixture for returning the max_distance passed to the TimeoutDoneFunction's constructor, as
     defined in test_configs.
@@ -33,8 +32,8 @@ def max_sim_time(request):
     return request.param
 
 
-@pytest.fixture()
-def sim_time(request):
+@pytest.fixture(name='sim_time')
+def fixture_sim_time(request):
     """
     Parameterized fixture for returning the max_distance passed to the TimeoutDoneFunction's constructor, as
     defined in test_configs.
@@ -47,8 +46,8 @@ def sim_time(request):
     return request.param
 
 
-@pytest.fixture()
-def next_state(mocker, agent_name, cut_name, sim_time):
+@pytest.fixture(name='next_state')
+def fixture_next_state(mocker, agent_name, cut_name, sim_time):
     """
     A fixture for creating a StateDict populated with the structure expected by the DoneFunction.
 
@@ -70,8 +69,8 @@ def next_state(mocker, agent_name, cut_name, sim_time):
     return state
 
 
-@pytest.fixture()
-def cut(cut_name, agent_name, max_sim_time):
+@pytest.fixture(name='cut')
+def fixture_cut(cut_name, agent_name, max_sim_time):
     """
     A fixture that instantiates a TimeoutDoneFunction and returns it.
 

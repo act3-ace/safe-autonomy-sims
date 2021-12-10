@@ -1,6 +1,5 @@
 """
 This module holds unit tests and fixtures for the DockingRelativeVelocityConstraintDoneFunction.
-
 Author: John McCarroll
 """
 
@@ -8,7 +7,6 @@ from unittest import mock
 
 import numpy as np
 import pytest
-import pytest_mock
 from act3_rl_core.dones.done_func_base import DoneStatusCodes
 
 from saferl.dones.docking_dones import DockingRelativeVelocityConstraintDoneFunction
