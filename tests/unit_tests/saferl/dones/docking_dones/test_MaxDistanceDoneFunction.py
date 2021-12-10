@@ -18,8 +18,8 @@ test_configs = [
 ]
 
 
-@pytest.fixture()
-def platform_position(request):
+@pytest.fixture(name='platform_position')
+def fixture_platform_position(request):
     """
     Parameterized fixture for returning platform position defined in test_configs.
 
@@ -31,8 +31,8 @@ def platform_position(request):
     return request.param
 
 
-@pytest.fixture()
-def max_distance(request):
+@pytest.fixture(name='max_distance')
+def fixture_max_distance(request):
     """
     Parameterized fixture for returning the max_distance passed to the MaxDistanceDoneFunction's constructor, as defined
     in test_configs.
@@ -45,8 +45,8 @@ def max_distance(request):
     return request.param
 
 
-@pytest.fixture()
-def cut(cut_name, agent_name, max_distance):
+@pytest.fixture(name='cut')
+def fixture_cut(cut_name, agent_name, max_distance):
     """
     A fixture that instantiates a MaxDistanceDoneFunction and returns it.
 
