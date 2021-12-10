@@ -18,8 +18,8 @@ test_configs = [
 ]
 
 
-@pytest.fixture()
-def platform_velocity(request):
+@pytest.fixture(name='platform_velocity')
+def fixture_platform_velocity(request):
     """
     Parameterized fixture for returning platform position defined in test_configs.
 
@@ -31,8 +31,8 @@ def platform_velocity(request):
     return request.param
 
 
-@pytest.fixture()
-def velocity_limit(request):
+@pytest.fixture(name='velocity_limit')
+def fixture_velocity_limit(request):
     """
     Parameterized fixture for returning the max_distance passed to the SuccessfulDockingDoneFunction's constructor, as
     defined in test_configs.
@@ -45,7 +45,7 @@ def velocity_limit(request):
     return request.param
 
 
-@pytest.fixture()
+@pytest.fixture(name='cut')
 def cut(cut_name, agent_name, velocity_limit):
     """
     A fixture that instantiates a DockingVelocityLimitDoneFunction and returns it.
