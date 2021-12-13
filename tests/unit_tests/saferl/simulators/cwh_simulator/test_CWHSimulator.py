@@ -4,8 +4,8 @@ This module defines tests for the CWHSimulator class.
 Author: John McCarroll
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from saferl.simulators.cwh_simulator import CWHSimulator
 
@@ -40,11 +40,7 @@ entity_config = {
 }
 num_steps = 5
 action = [1, 2, 3]
-attr_targets = {
-    'x': 0,
-    'y': 1,
-    'state': np.array([1, 2, 3])
-}
+attr_targets = {'x': 0, 'y': 1, 'state': np.array([1, 2, 3])}
 
 # Define test assay
 test_configs = [
