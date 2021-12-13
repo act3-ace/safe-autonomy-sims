@@ -21,6 +21,9 @@ class Dubins2dSimulator(SafeRLSimulator):
         }
 
 
+PluginLibrary.AddClassToGroup(Dubins2dSimulator, "Dubins2dSimulator", {})
+
+
 class Dubins3dSimulator(SafeRLSimulator):
     """
     A class that contains all essential components of a Dubins 3D simulation

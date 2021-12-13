@@ -26,10 +26,10 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
 
     Parameters
     ----------
-    agent_initialization: dict
-        Contains individual initialization dicts for each agent. Key is agent name, value is agent's initialization dict.
+    platforms: dict
+        Contains individual initialization dicts for each agent. Key is platform name, value is platform's initialization dict.
     """
-    agent_initialization: typing.Optional[typing.Dict[str, typing.Dict]] = {}
+    platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
 
 
 class SafeRLSimulator(BaseSimulator):
@@ -59,7 +59,7 @@ class SafeRLSimulator(BaseSimulator):
         config = self.get_reset_validator()(**config)
         self._state.clear()
         self.clock = 0.0
-        self.sim_entities = self.construct_sim_entities(config.agent_initialization)
+        self.sim_entities = self.construct_sim_entities(config.platforms)
         self._state.sim_platforms = self.construct_platforms()
         self.update_sensor_measurements()
         return self._state
@@ -68,14 +68,14 @@ class SafeRLSimulator(BaseSimulator):
     def _construct_platform_map(self) -> dict:
         ...
 
-    def construct_sim_entities(self, agent_initialization: dict = None) -> dict:
+    def construct_sim_entities(self, platforms: dict = None) -> dict:
         """
         Gets the correct backend simulation entity for each agent.
 
         Parameters
         ----------
-        agent_initialization: dict
-            Agent initialization entry from reset config containing initialization parameters for backend sim entities
+        platforms: dict
+            Platforms initialization entry from reset config containing initialization parameters for backend sim entities
 
         Returns
         -------
@@ -88,10 +88,10 @@ class SafeRLSimulator(BaseSimulator):
             sim_config = agent_config.sim_config
             sim_config_kwargs = sim_config.get("kwargs", {})
 
-            if agent_initialization is None:
+            if platforms is None:
                 agent_reset_config = {}
             else:
-                agent_reset_config = agent_initialization.get(agent_id, {})
+                agent_reset_config = platforms.get(agent_id, {})
 
             entity_kwargs = {**sim_config_kwargs, **agent_reset_config}
 
