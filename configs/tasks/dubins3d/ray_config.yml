@@ -12,17 +12,15 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # ---------------------------------------------------------------------------
 
-{
-  "simulator": {
-    "type": "CWHSimulator",
-    "config": {
-      "step_size": 1
-    },
-  },
-  "platforms": "CWHSimulator_Platforms",
-  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
-  "horizon": 2000,
-  "episode_parameter_provider": {
-    "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
-  },
-}
+address: null
+# Password for redis cluster
+_redis_password: null
+# If true will start dashboard on localhost (default)
+include_dashboard: False
+# If set will ignore reinit errors
+ignore_reinit_error: False
+#If true, then output from all of the worker processes on all nodes will be directed to the driver.
+log_to_driver: True
+# If set will use local mode which ignores remote workers. used for debugging
+local_mode: True
+_temp_dir: /tmp//ray_logs/

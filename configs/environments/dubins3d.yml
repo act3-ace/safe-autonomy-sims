@@ -14,15 +14,23 @@
 
 {
   "simulator": {
-    "type": "CWHSimulator",
+    "type": "Dubins3dSimulator",
     "config": {
       "step_size": 1
     },
   },
-  "platforms": "CWHSimulator_Platforms",
+  "platforms": "DubinsSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "horizon": 2000,
   "episode_parameter_provider": {
     "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
   },
+  "dones": {
+    "shared": [
+      {
+        "functor": "saferl.dones.rejoin_dones.RejoinDone",
+        "config": {},
+      }
+    ]
+  }
 }
