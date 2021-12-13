@@ -3,10 +3,12 @@ Contains implementations of the necessary done functions for the rejoin environm
 Namely three done funcitons : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
 """
 import typing
+from collections import OrderedDict
 
 import numpy as np
-from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
+from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase
 from act3_rl_core.libraries.environment_dict import DoneDict
+from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 
@@ -82,7 +84,12 @@ class SuccessfulRejoinDoneFunction(DoneFuncBase):
 
         # all 3 pieces
         rejoin_region_radius = self.config.rejoin_region_radius
-        lead_orientation = lead_aircraft_platform.lead_orientation
+        lead_orientation = lead_aircraft_platform.orientation
+
+        # Match offset dims
+        if len(self.config.offset_values) < 3:
+            for _ in range(3 - len(self.config.offset_values)):
+                self.config.offset_values.append(0.0)
         offset_vector = np.array(self.config.offset_values)
 
         # rotate vector then add it to the lead center
@@ -242,4 +249,48 @@ class CrashDoneFunction(DoneFuncBase):
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
+        return done
+
+
+class RejoinDone(SharedDoneFuncBase):
+    """
+    Done function that determines whether the other agent is done.
+    """
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action: OrderedDict,
+        next_observation: OrderedDict,
+        next_state: StateDict,
+        local_dones: DoneDict,
+        local_done_info: OrderedDict
+    ) -> DoneDict:
+        """
+        Logic that returns the done condition given the current environment conditions
+
+        Params
+        ------
+        observation : np.ndarray
+             current observation from environment
+        action : np.ndarray
+             current action to be applied
+        next_observation : np.ndarray
+             incoming observation from environment
+        next_state : np.ndarray
+             incoming state from environment
+
+        Returns
+        -------
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
+
+        """
+
+        done = DoneDict()
+
+        all_done = local_dones["blue0"]
+
+        for k in local_dones.keys():
+            done[k] = all_done
         return done

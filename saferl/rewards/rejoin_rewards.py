@@ -84,11 +84,16 @@ class DubinsRejoinSuccessReward(RewardFuncBase):
 
         # get necessary platforms
         lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
-        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+        wingman_agent_platform = get_platform_by_name(next_state, self.config.agent_name)
 
         # all 3 pieces
         rejoin_region_radius = self.config.rejoin_region_radius
-        lead_orientation = lead_aircraft_platform.lead_orientation
+        lead_orientation = lead_aircraft_platform.orientation
+
+        # Match offset dims
+        if len(self.config.offset_values) < 3:
+            for _ in range(3 - len(self.config.offset_values)):
+                self.config.offset_values.append(0.0)
         offset_vector = np.array(self.config.offset_values)
 
         # rotate vector then add it to the lead center
@@ -129,16 +134,16 @@ class RejoinDistanceChangeReward(RewardFuncBase):
     A reward function that provides a reward proportional to the change in distance from the rejoin distance.
     """
 
-    def __init__(self, prev_dist, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.prev_dist = prev_dist
+        self.prev_dist = None
 
     @classmethod
     def get_validator(cls):
         """
             Method to return class's Validator.
             """
-        return DubinsRejoinSuccessRewardValidator
+        return RejoinDistanceChangeRewardValidator
 
     def __call__(
         self,
@@ -180,11 +185,15 @@ class RejoinDistanceChangeReward(RewardFuncBase):
         reward = RewardDict()
 
         lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
-        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+        wingman_agent_platform = get_platform_by_name(next_state, self.config.agent_name)
 
         # all 3 pieces
-        # rejoin_region_radius = self.config.rejoin_region_radius
-        lead_orientation = lead_aircraft_platform.lead_orientation
+        lead_orientation = lead_aircraft_platform.orientation
+
+        # Match offset dims
+        if len(self.config.offset_values) < 3:
+            for _ in range(3 - len(self.config.offset_values)):
+                self.config.offset_values.append(0.0)
         offset_vector = np.array(self.config.offset_values)
 
         # rotate vector then add it to the lead center
@@ -192,8 +201,80 @@ class RejoinDistanceChangeReward(RewardFuncBase):
         rejoin_region_center = lead_aircraft_platform.position + rotated_vector
 
         radial_distance = np.linalg.norm(np.array(wingman_agent_platform.position) - rejoin_region_center)
-        diff_distance = self.prev_dist - radial_distance
+
+        # Set initial distance
+        if self.prev_dist is None:
+            self.prev_dist = radial_distance
+            diff_distance = self.prev_dist
+        else:
+            diff_distance = self.prev_dist - radial_distance
 
         reward[self.config.agent_name] = self.config.reward * diff_distance
+
+        return reward
+
+
+class RejoinRewardValidator(RewardFuncBaseValidator):
+    """
+        Validator for the RejoinReward Reward Function
+
+        Attributes
+        ----------
+        reward : float
+            reward for accomplishing the task
+            """
+    reward: float
+
+
+class RejoinReward(RewardFuncBase):
+    """
+    A reward function that provides a reward proportional to the change in distance from the rejoin distance.
+    """
+
+    @classmethod
+    def get_validator(cls):
+        """
+            Method to return class's Validator.
+            """
+        return RejoinRewardValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        """
+            This method returns the reward specified in it's configuration.
+
+            Parameters
+            ----------
+            observation : OrderedDict
+                The observations available to the agent from the previous state.
+            action :
+                The last action performed by the agent.
+            next_observation : OrderedDict
+                The observations available to the agent from the current state.
+            state : StateDict
+                The previous state of the simulation.
+            next_state : StateDict
+                The current state of the simulation.
+            observation_space : StateDict
+                The agent's observation space.
+            observation_units : StateDict
+                The units corresponding to values in the observation_space?
+
+            Returns
+            -------
+            reward : float
+                The agent's reward.
+            """
+
+        reward = RewardDict()
+        reward[self.config.agent_name] = self.config.reward
 
         return reward
