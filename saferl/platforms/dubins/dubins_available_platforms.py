@@ -7,7 +7,7 @@ from __future__ import annotations
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
-from saferl.simulators.dubins_simulator import Dubins2dSimulator
+from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
 
 class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
@@ -29,12 +29,13 @@ class DubinsAvailablePlatformTypes(BaseAvailablePlatformTypes):
         if "name" not in config:
             raise RuntimeError("Attempting to parse a PlatformType from name/model config, but both are not given!")
 
-        if config["name"] == "Dubins2d":
+        if config["name"] == "DUBINS2D":
             return DubinsAvailablePlatformTypes.DUBINS2D
-        if config["name"] == "Dubins3d":
+        if config["name"] == "DUBINS3D":
             return DubinsAvailablePlatformTypes.DUBINS3D
 
         raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')
 
 
 PluginLibrary.AddClassToGroup(DubinsAvailablePlatformTypes, "DubinsSimulator_Platforms", {"simulator": Dubins2dSimulator})
+PluginLibrary.AddClassToGroup(DubinsAvailablePlatformTypes, "DubinsSimulator_Platforms", {"simulator": Dubins3dSimulator})
