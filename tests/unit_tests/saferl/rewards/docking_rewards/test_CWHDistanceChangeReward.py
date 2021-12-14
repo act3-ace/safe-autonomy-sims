@@ -7,9 +7,6 @@ from unittest import mock
 import numpy as np
 import pytest
 
-# this is very much needed
-from act3_rl_core.libraries.state_dict import StateDict  # noqa W0611
-
 from saferl.rewards.docking_rewards import CWHDistanceChangeReward
 
 test_configs = [
