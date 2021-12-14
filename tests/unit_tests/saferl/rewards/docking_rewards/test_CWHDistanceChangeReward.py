@@ -25,6 +25,7 @@ test_configs = [
     (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
 ]
 
+
 @pytest.fixture(name='observation')
 def fixture_observation():
     """
