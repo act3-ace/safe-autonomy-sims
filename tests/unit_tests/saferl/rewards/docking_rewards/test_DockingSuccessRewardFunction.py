@@ -27,20 +27,6 @@ test_configs = [
     (np.array([0.5, 0.5, 0.5]), 7.0, 1.0, 200, 2000, 0.5, 10, 0),
 ]
 
-#
-# @pytest.fixture
-# def observation():
-#     """
-#     Generic fixture for creating a naive observation for running Done and Reward function tests.
-#
-#     Returns
-#     -------
-#     numpy.ndarray
-#         Placeholder array
-#     """
-#     return np.array([0, 0, 0])
-
-
 @pytest.fixture(name='platform_position')
 def fixture_platform_position(request):
     """
@@ -197,7 +183,6 @@ def fixture_cut(cut_name, scale, agent_name, timeout, docking_region_radius, max
         docking_region_radius=docking_region_radius,
         max_vel_constraint=max_vel_constraint
     )
-
 
 
 @pytest.fixture(name='call_results')
