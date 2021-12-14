@@ -187,7 +187,7 @@ def fixture_platform_velocity():
 @pytest.fixture(name='platform')
 def fixture_platform(mocker, platform_position, platform_velocity, agent_name):
     """
-    A fixture to create a mock platform with a position property
+    A fixture to create a mock platform with a position property and velocity property
 
     Parameters
     ----------

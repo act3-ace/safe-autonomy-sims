@@ -199,26 +199,6 @@ def fixture_cut(cut_name, scale, agent_name, timeout, docking_region_radius, max
     )
 
 
-# @pytest.fixture()
-# def next_state(agent_name, cut_name):
-#     """
-#     A fixture for creating a StateDict populated with the structure expected by the CWHDistanceChangeReward
-#
-#     Parameters
-#     ----------
-#     agent_name : str
-#         The name of the agent
-#     cut_name : str
-#         The name of the component under test
-#
-#     Returns
-#     -------
-#     state : StateDict
-#         The populated StateDict
-#     """
-#     state = StateDict({"episode_state": {agent_name: {cut_name: None}}})
-#     return state
-
 
 @pytest.fixture(name='call_results')
 def fixture_call_results(
