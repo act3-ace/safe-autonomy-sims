@@ -157,7 +157,7 @@ def fixture_max_vel_constraint(request):
 
 
 @pytest.fixture(name='sim_time')
-def fixutre_sim_time(request):
+def fixture_sim_time(request):
     """
     Get the 'sim_time' parameter from the test config input
     """

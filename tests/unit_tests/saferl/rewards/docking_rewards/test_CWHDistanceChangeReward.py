@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 # this is very much needed
-from act3_rl_core.libraries.state_dict import StateDict
+from act3_rl_core.libraries.state_dict import StateDict  # noqa W0611
 
 from saferl.rewards.docking_rewards import CWHDistanceChangeReward
 
@@ -24,19 +24,6 @@ test_configs = [
     # edge case 2
     (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
 ]
-
-
-@pytest.fixture(name='observation')
-def fixture_observation():
-    """
-    Generic fixture for creating a naive observation for running Done and Reward function tests.
-
-    Returns
-    -------
-    numpy.ndarray
-        Placeholder array
-    """
-    return np.array([0, 0, 0])
 
 
 @pytest.fixture(name='platform_position1')
@@ -87,30 +74,6 @@ def fixture_expected_value(request):
     return request.param
 
 
-@pytest.fixture(name='platform')
-def fixture_platform(mocker, platform_position, agent_name):
-    """
-    A fixture to create a mock platform with a position property
-
-    Parameters
-    ----------
-    mocker : fixture
-        A pytest-mock fixture which exposes unittest.mock functions
-    platform_position : numpy.ndarray
-        The platform's 3D position
-    agent_name : str
-        The name of the agent
-
-    Returns
-    -------
-    test_platform : MagicMock
-        A mock of a platform with a position property
-    """
-    test_platform = mocker.MagicMock(name=agent_name)
-    test_platform.position = platform_position
-    return test_platform
-
-
 @pytest.fixture(name='cut')
 def fixture_cut(cut_name, agent_name, scale):
     """
@@ -131,27 +94,6 @@ def fixture_cut(cut_name, agent_name, scale):
         An instantiated component under test
     """
     return CWHDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name)
-
-
-@pytest.fixture(name='next_state')
-def fixture_next_state(agent_name, cut_name):
-    """
-    A fixture for creating a StateDict populated with the structure expected by the CWHDistanceChangeReward Function.
-
-    Parameters
-    ----------
-    agent_name : str
-        The name of the agent
-    cut_name : str
-        The name of the component under test
-
-    Returns
-    -------
-    state : StateDict
-        The populated StateDict
-    """
-    state = StateDict({"episode_state": {agent_name: {cut_name: None}}})
-    return state
 
 
 @pytest.fixture(name='call_results')
