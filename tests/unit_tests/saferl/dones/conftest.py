@@ -13,7 +13,7 @@ import pytest
 def expected_value(request):
     """
     Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
-    in the DoneDict returned by the SuccessfulDockingDoneFunction.
+    in the DoneDict returned
 
     Returns
     -------
@@ -26,8 +26,7 @@ def expected_value(request):
 @pytest.fixture()
 def expected_status(request):
     """
-    Parameterized fixture for comparison to the expected DoneStatus to be assigned to the next_state StateDict by the
-    SuccessfulDockingDoneFunction.
+    Parameterized fixture for comparison to the expected DoneStatus to be assigned to the next_state StateDict
 
     Returns
     -------
@@ -40,11 +39,12 @@ def expected_status(request):
 @pytest.fixture()
 def call_results(cut, observation, action, next_observation, next_state, platform):
     """
-    A fixture responsible for calling the DockingVelocityLimitDoneFunction and returning the results.
+    A fixture responsible for calling the appropriate component under test and returns the results.
+    This variation of the function is specific to docking_dones
 
     Parameters
     ----------
-    cut : DockingVelocityLimitDoneFunction
+    cut : DoneFunction
         The component under test
     observation : numpy.ndarray
         The observation array
