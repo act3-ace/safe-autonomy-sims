@@ -27,8 +27,6 @@ test_configs = [
 ]
 
 
-
-
 @pytest.fixture(name='expected_value')
 def fixture_expected_value(request):
     """
