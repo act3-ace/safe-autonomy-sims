@@ -37,12 +37,12 @@ def fixture_platform_position(request):
 @pytest.fixture(name='platform_velocity')
 def fixture_platform_velocity(request):
     """
-    Parameterized fixture for returning platform position defined in test_configs.
+    Parameterized fixture for returning platform velocity defined in test_configs.
 
     Returns
     -------
     numpy.ndarray
-        Three element array describing platform's 3D position
+        Three element array describing platform's 3D velocity
     """
     return request.param
 
@@ -50,7 +50,7 @@ def fixture_platform_velocity(request):
 @pytest.fixture(name='docking_region_radius')
 def fixture_docking_region_radius(request):
     """
-    Parameterized fixture for returning the max_distance passed to the MaxDistanceDoneFunction's constructor, as defined
+    Parameterized fixture for returning the docking_region_radius passed to the SuccessfulDockingDoneFunction's constructor, as defined
     in test_configs.
 
     Returns
@@ -64,13 +64,13 @@ def fixture_docking_region_radius(request):
 @pytest.fixture(name='velocity_limit')
 def fixture_velocity_limit(request):
     """
-    Parameterized fixture for returning the max_distance passed to the SuccessfulDockingDoneFunction's constructor, as
+    Parameterized fixture for returning the velocity_limit passed to the SuccessfulDockingDoneFunction's constructor, as
     defined in test_configs.
 
     Returns
     -------
     int
-        The max allowed distance in a docking episode
+        The max allowed velocity in a docking episode
     """
     return request.param
 

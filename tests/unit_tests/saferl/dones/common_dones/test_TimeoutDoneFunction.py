@@ -21,8 +21,8 @@ test_configs = [
 @pytest.fixture(name='max_sim_time')
 def fixture_max_sim_time(request):
     """
-    Parameterized fixture for returning the max_distance passed to the TimeoutDoneFunction's constructor, as
-    defined in test_configs.
+    Parameterized fixture for returning the, max_sim_time, max allowed time in the simulation,
+    which is passed to the TimeoutDoneFunction's constructor, as defined in test_configs.
 
     Returns
     -------
@@ -35,13 +35,13 @@ def fixture_max_sim_time(request):
 @pytest.fixture(name='sim_time')
 def fixture_sim_time(request):
     """
-    Parameterized fixture for returning the max_distance passed to the TimeoutDoneFunction's constructor, as
-    defined in test_configs.
+    Parameterized fixture for returning the 'sim_time', i.e. current time of the simulation,
+    passed to the TimeoutDoneFunction's constructor, as  defined in test_configs.
 
     Returns
     -------
     int
-        The max allowed distance in a docking episode
+        The max allowed time in simulation in a docking episode
     """
     return request.param
 
@@ -80,7 +80,7 @@ def fixture_cut(cut_name, agent_name, max_sim_time):
         The name of the component under test
     agent_name : str
         The name of the agent
-    max_sim_time :
+    max_sim_time : float
 
     Returns
     -------

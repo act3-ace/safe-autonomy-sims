@@ -25,7 +25,6 @@ test_configs = [
     (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
 ]
 
-
 @pytest.fixture(name='observation')
 def fixture_observation():
     """
@@ -77,12 +76,12 @@ def fixture_scale(request):
 def fixture_expected_value(request):
     """
     Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
-    in the DoneDict returned by the MaxDistanceDoneFunction.
+    in the RewardDict returned by the MaxDistanceDoneFunction.
 
     Returns
     -------
-    bool
-        The expected value of the boolean assigned to describe if the agent is done or not
+    float
+        The expected value of the reward function
     """
     return request.param
 
@@ -122,12 +121,12 @@ def fixture_cut(cut_name, agent_name, scale):
         The name of the component under test
     agent_name : str
         The name of the agent
-    max_distance : int
-        The max distance passed to the MaxDistanceDoneFunction constructor
+    scale : float
+        value by which rewards can be scaled
 
     Returns
     -------
-    MaxDistanceDoneFunction
+    CWHDistanceChangeReward
         An instantiated component under test
     """
     return CWHDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name)
@@ -188,8 +187,8 @@ def fixture_call_results(
 
     Returns
     -------
-    results : DoneDict
-        The resulting DoneDict from calling the MaxDistanceDoneFunction
+    results : RewardDict
+        The resulting RewardDict from calling the MaxDistanceDoneFunction
     """
     with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
         platform.position = platform_position1
