@@ -268,8 +268,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
         curr_vel_mag = np.linalg.norm(np.array(deputy.velocity) - np.array(target.velocity))
 
-        if curr_vel_mag > self.config.constraint_velocity:
-            done[self.agent] = True
+        done[self.agent] = curr_vel_mag > self.config.constraint_velocity
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE

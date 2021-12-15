@@ -93,7 +93,7 @@ class CWHDistanceChangeReward(RewardFuncBase):
 class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward
-    timeout: The max time for an episode                                              TODO: [optional]
+    timeout: The max time for an episode         TODO: [optional]
     docking_region_radius: The radius of the docking region in meters
     """
     scale: float
