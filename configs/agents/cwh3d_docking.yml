@@ -21,6 +21,9 @@
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"}
     ],
+    "episode_parameter_provider": {
+        "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
     "glues": [
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
@@ -56,15 +59,20 @@
             "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
+
             },
         },
         {
             "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
+              "velocity_limit": 10,
             },
         },
     ],
+    "episode_parameter_provider": {
+      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
     "rewards": [
         {
             "name": "CWHDistanceChangeReward",

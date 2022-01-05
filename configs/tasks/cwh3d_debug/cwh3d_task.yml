@@ -44,4 +44,3 @@ config:
   ray_config: [!include ray_config.yml, *ray_config_updates]
   env_config: [!include ../../environments/cwh3d.yml, *env_config_updates]
   tune_config: [!include tune_config.yml, *tune_config_updates]
-

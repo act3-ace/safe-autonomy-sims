@@ -86,6 +86,18 @@ class DubinsPlatform(BasePlatform):
         return self._platform.heading
 
     @property
+    def orientation(self):
+        """
+        The orientation of the platform
+
+        Returns
+        -------
+        scipy.Rotation
+            The scipy rotation of the platform
+        """
+        return self._platform.orientation
+
+    @property
     def sim_time(self):
         """
         The current simulation time in seconds.
