@@ -1,0 +1,101 @@
+# ---------------------------------------------------------------------------
+# //
+#
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning (RL) Core contributed by the:
+#  -  () Team
+#  - Safe Autonomy (SA) Team
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ---------------------------------------------------------------------------
+
+"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"config": {
+    "parts": [
+        {"part": "Controller_Acceleration", "config": {"axis": 0}},
+        {"part": "Controller_YawRate", "config": {"axis": 1}},
+        {"part": "Sensor_Position"},
+        {"part": "Sensor_Velocity"},
+        {"part": "Sensor_Heading"},
+        {"part": "Sensor_Flight_Path_Angle"},
+    ],
+    "episode_parameter_provider": {
+      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
+    "simulator_reset_parameters": {
+      "heading": 0,
+      "position": [ 0, 0, 0 ],
+      "v": 200,
+      "gamma": 0,
+      "roll": 0
+    },
+    "glues": [
+        {
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config": {
+                "controller": "Controller_Acceleration",
+            },
+        },
+        {
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config":{
+                "controller": "Controller_YawRate",
+            }
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Position"},
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Velocity"},
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Heading"},
+        },
+        {
+          "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+          "config": { "sensor": "Sensor_Flight_Path_Angle" },
+        },
+    ],
+    "dones": [
+        {
+            "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
+            "config":{
+                "max_distance": 10000,
+                "lead": "red0",
+            },
+        },
+        {
+            "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
+            "config":{
+                "safety_margin": 10,
+                "lead": "red0",
+            },
+        },
+        {
+            "functor": "saferl.dones.rejoin_dones.SuccessfulRejoinDoneFunction",
+            "config":{
+                "rejoin_region_radius": 100,
+                "offset_values": [500, 500, 0],
+                "lead": "red0",
+            },
+        },
+    ],
+    "rewards": [
+        {
+            "name": "RejoinDistanceChangeReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinDistanceChangeReward",
+            "config": {
+                "reward": 1.0e-4,
+                "rejoin_region_radius": 100,
+                "offset_values": [ 500, 500, 0 ],
+                "lead": "red0",
+            }
+        },
+    ],
+}

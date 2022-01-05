@@ -60,6 +60,13 @@ PluginLibrary.AddClassToGroup(
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     },
 )
+PluginLibrary.AddClassToGroup(
+    AccelerationController,
+    "Controller_Acceleration",
+    {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    },
+)
 
 
 class YawRateController(RateController):
@@ -72,6 +79,11 @@ class YawRateController(RateController):
 PluginLibrary.AddClassToGroup(
     YawRateController, "Controller_YawRate", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    YawRateController, "Controller_YawRate", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
 
