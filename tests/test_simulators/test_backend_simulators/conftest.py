@@ -44,9 +44,9 @@ def entity(initial_entity_state):
 
 
 @pytest.fixture
-def acted_entity(num_steps, entity, action):
+def acted_entity(num_steps, entity, control):
     for i in range(num_steps):
-        entity.step(1, action)
+        entity.step(1, control)
 
     return entity
 

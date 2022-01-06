@@ -14,7 +14,7 @@ def num_steps(request):
 
 
 @pytest.fixture
-def action(request):
+def control(request):
     return request.param
 
 
