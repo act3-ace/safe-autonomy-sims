@@ -9,8 +9,33 @@ import numpy as np
 
 
 @pytest.fixture
-def initial_entity_state(request):
+def initial_position(request):
     return request.param
+
+
+@pytest.fixture
+def initial_velocity(request):
+    return request.param
+
+
+@pytest.fixture
+def initial_entity_state(initial_position, initial_velocity):
+    return initial_position + initial_velocity
+
+
+# @pytest.fixture
+# def target_position(request):
+#     return request.param
+#
+#
+# @pytest.fixture
+# def target_velocity(request):
+#     return request.param
+#
+#
+# @pytest.fixture
+# def target_entity_state(target_position, target_velocity):
+#     return target_position + target_velocity
 
 
 @pytest.fixture
