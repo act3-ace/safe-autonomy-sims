@@ -71,9 +71,9 @@ def evaluate(entity, attr_targets, error_bound=None):
         for key, value in attr_targets.items():
             if type(value) in [np.ndarray, list]:
                 # handle array case
-                value = np.array(value)
-                np.abs(np.subtract(entity.__getattribute__(key), value))
-                in_bounds = value <= error_bound
+                value = np.array(value, dtype=np.float64)
+                differences = np.abs(np.subtract(entity.__getattribute__(key), value))
+                in_bounds = differences <= error_bound
                 assert np.all(in_bounds), \
                     "Expected attribute {} values to be {} +/- {} but instead received {}".format(
                         key, value, error_bound, entity.__getattribute__(key))
