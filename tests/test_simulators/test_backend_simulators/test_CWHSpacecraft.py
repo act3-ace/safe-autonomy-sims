@@ -39,5 +39,3 @@ test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywo
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_CWHSpacecraft(acted_entity, action, num_steps, attr_targets, error_bound):
     evaluate(acted_entity, attr_targets, error_bound=error_bound)
-
-# TODO: overriden entity just spits out entity w/ init values... need to step!
