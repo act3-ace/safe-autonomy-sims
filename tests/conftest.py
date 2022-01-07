@@ -3,6 +3,37 @@ This module defines fixtures and functions common to the entire test suite.
 """
 
 import yaml
+import numpy as np
+
+
+def execute_strings(value):
+    """
+    A recursive helper function to convert string expressions (read from a file) into numerical floats.
+
+    Parameters
+    ----------
+    value
+        A value to be converted or modified based on string format.
+
+    Returns
+    -------
+    value
+        Either the original value or the result of an expression encoded in the string
+    """
+
+    if type(value) is str:
+        # convert numbers + expressions into floats
+        try:
+            value = eval(value)
+        except:
+            pass
+    elif type(value) is dict:
+        for k, v in value.items():
+            value[k] = execute_strings(v)
+    elif type(value) is list:
+        for i in range(0, len(value)):
+            value[i] = execute_strings(value[i])
+    return value
 
 
 def read_test_cases(file_path, parameter_keywords):
@@ -33,7 +64,8 @@ def read_test_cases(file_path, parameter_keywords):
             for keyword in parameter_keywords:
                 # iteratively search for given keywords
                 if keyword in test_case:
-                    values.append(test_case[keyword])
+                    value = execute_strings(test_case[keyword])
+                    values.append(value)
                 else:
                     # TODO: raise error if invalid keyword
                     values.append(None)
