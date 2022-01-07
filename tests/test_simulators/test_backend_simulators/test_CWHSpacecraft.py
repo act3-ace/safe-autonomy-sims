@@ -13,24 +13,6 @@ from tests.test_simulators.test_backend_simulators.conftest import evaluate
 from tests.conftest import read_test_cases
 
 
-# override entity + state fixtures
-# @pytest.fixture
-# def initial_position(request):
-#     # ex [x, y, z]
-#     return request.param
-#
-#
-# @pytest.fixture
-# def initial_velocity(request):
-#     # ex [x_dot, y_dot, z_dot]
-#     return request.param
-#
-#
-# @pytest.fixture
-# def initial_entity_state(initial_position, initial_velocity):
-#     return initial_position + initial_velocity
-
-
 @pytest.fixture
 def entity(initial_entity_state):
     entity = CWHSpacecraft(name="tests")
