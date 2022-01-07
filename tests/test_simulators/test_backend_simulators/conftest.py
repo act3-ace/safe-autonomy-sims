@@ -9,38 +9,26 @@ import numpy as np
 
 
 @pytest.fixture
-def initial_position(request):
+def attr_init(request):
     return request.param
 
 
 @pytest.fixture
-def initial_velocity(request):
-    return request.param
-
-
-@pytest.fixture
-def initial_entity_state(initial_position, initial_velocity):
-    return initial_position + initial_velocity
-
-
-# @pytest.fixture
-# def target_position(request):
-#     return request.param
-#
-#
-# @pytest.fixture
-# def target_velocity(request):
-#     return request.param
-#
-#
-# @pytest.fixture
-# def target_entity_state(target_position, target_velocity):
-#     return target_position + target_velocity
+def initial_entity_state(attr_init):
+    # common fixture that composes an entity's initial state array based on attr_init dict read in from yaml config file
+    # (order of KVPs should be preserved from yaml file)
+    if type(attr_init) is dict:
+        initial_state = []
+        for key, value in attr_init.items():
+            initial_state += value
+    return np.array(initial_state)
 
 
 @pytest.fixture
 def entity(initial_entity_state):
-    return None
+    # Placeholder fixture - each backend simulation test module should override this fixture to return a constructed
+    # entity (specifically the CUT)
+    raise NotImplementedError
 
 
 @pytest.fixture

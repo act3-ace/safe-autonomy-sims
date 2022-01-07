@@ -35,7 +35,7 @@ def read_test_cases(file_path, parameter_keywords):
                 if keyword in test_case:
                     values.append(test_case[keyword])
                 else:
-                    # TODO: raise error if bad keyword
+                    # TODO: raise error if invalid keyword
                     values.append(None)
             # add test case to list of cases
             test_cases.append(values)
