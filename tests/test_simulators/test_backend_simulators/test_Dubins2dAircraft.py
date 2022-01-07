@@ -1,17 +1,29 @@
 """
-This module defines tests for the Dubins2dAircraft entity.
+This module defines tests for the Dubins2dAircraft acted_entity.
 
 Author: John McCarroll
 """
 
 import pytest
-import numpy as np
+import os
 
 from saferl_sim.dubins.entities import Dubins2dAircraft
 from tests.test_simulators.test_backend_simulators.conftest import evaluate
+from tests.conftest import read_test_cases
 
 
-# override entity fixture
+# Define test assay
+test_cases_file_path = os.path.abspath("../../test_cases/Dubins2dAircraft_test_cases.yaml")
+# TODO: parameterized_fixture_keywords + delimeter have become common...
+parameterized_fixture_keywords = ["attr_init",
+                                  "control",
+                                  "num_steps",
+                                  "attr_targets",
+                                  "error_bound"]
+delimiter = ","
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+
 @pytest.fixture
 def entity(initial_entity_state):
     entity = Dubins2dAircraft(name="tests")
@@ -22,18 +34,6 @@ def entity(initial_entity_state):
     return entity
 
 
-# Define tests assay
-test_configs = [
-    (
-        np.array([0, 0, 0, 0, 0, 0]),                                                       # initial_state
-        1,                                                                                  # num_steps
-        {'heading_rate': 0.1, 'acceleration': 10},                                          # action
-        {'position': [0, 0, 0], 'heading': 0.1, 'v': 0, 'acceleration': [0, 0, 0]},         # attr_targets
-        0.1                                                                                 # error_bound
-    ),
-]
-
-
-@pytest.mark.parametrize("initial_entity_state,action,num_steps,attr_targets,error_bound", test_configs, indirect=True)
-def test_Dubins2dAircraft(entity, action, num_steps, attr_targets, error_bound):
-    evaluate(entity, attr_targets, error_bound=error_bound)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+def test_Dubins2dAircraft(acted_entity, control, num_steps, attr_targets, error_bound):
+    evaluate(acted_entity, attr_targets, error_bound=error_bound)

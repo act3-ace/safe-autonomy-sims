@@ -1,8 +1,8 @@
 # No control:
 - case: At_origin_stationary
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, 0]
+    position: [0, 0, 0]
+    velocity: [0, 0, 0]
   num_steps: 10
   attr_targets:
     position: [0, 0, 0]
@@ -10,8 +10,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_positive_x
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [2, 0, 0]
+    position: [0, 0, 0]
+    velocity: [2, 0, 0]
   num_steps: 10
   attr_targets:
     position: [19.999648425520753, -0.2053981946620434, 0.0]
@@ -19,8 +19,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_negative_x
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [-2, 0, 0]
+    position: [0, 0, 0]
+    velocity: [-2, 0, 0]
   num_steps: 10
   attr_targets:
     position: [-19.999648425520753, 0.2053981946620434, 0.0]
@@ -28,8 +28,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_positive_y
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 2, 0]
+    position: [0, 0, 0]
+    velocity: [0, 2, 0]
   num_steps: 10
   attr_targets:
     position: [0.2053981946620434, 19.99859370208301, 0.0]
@@ -37,8 +37,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_negative_y
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, -2, 0]
+    position: [0, 0, 0]
+    velocity: [0, -2, 0]
   num_steps: 10
   attr_targets:
     position: [-0.2053981946620434, -19.99859370208301, 0.0]
@@ -46,8 +46,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_positive_z
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, 2]
+    position: [0, 0, 0]
+    velocity: [0, 0, 2]
   num_steps: 10
   attr_targets:
     position: [0.0, 0.0, 19.999648425520753]
@@ -55,8 +55,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_negative_z
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, -2]
+    position: [0, 0, 0]
+    velocity: [0, 0, -2]
   num_steps: 10
   attr_targets:
     position: [0.0, 0.0, -19.999648425520753]
@@ -64,8 +64,8 @@
   error_bound: 0.0000001
 - case: At_origin_moving_all_directions
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [3, -4, 8]
+    position: [0, 0, 0]
+    velocity: [3, -4, 8]
   num_steps: 10
   attr_targets:
     position: [29.588676248957043, -40.305284696159084, 79.99859370208301]
@@ -73,8 +73,8 @@
   error_bound: 0.0000001
 - case: At_positive_point_1_stationary
   attr_init:
-    initial_position: [1795, 293, 590]
-    initial_velocity: [0, 0, 0]
+    position: [1795, 293, 590]
+    velocity: [0, 0, 0]
   num_steps: 10
   attr_targets:
     position: [1795.283983287192, 292.9980556542578, 589.9688857679771]
@@ -82,8 +82,8 @@
   error_bound: 0.0000001
 - case: At_positive_point_2_stationary
   attr_init:
-    initial_position: [-424, -342, -748]
-    initial_velocity: [0, 0, 0]
+    position: [-424, -342, -748]
+    velocity: [0, 0, 0]
   num_steps: 10
   attr_targets:
     position: [-424.0670801748019, -341.9995407227885, -747.9605534821134]
@@ -91,8 +91,8 @@
   error_bound: 0.0000001
 - case: At_positive_point_3_stationary
   attr_init:
-    initial_position: [-241, 1932, 738]
-    initial_velocity: [0, 0, 0]
+    position: [-241, 1932, 738]
+    velocity: [0, 0, 0]
   num_steps: 10
   attr_targets:
     position: [-241.03812811822468, 1932.0002610514339, 737.9610808419782]
@@ -100,8 +100,8 @@
   error_bound: 0.0000001
 - case: At_positive_point_1_moving
   attr_init:
-    initial_position: [1795, 293, 590]
-    initial_velocity: [2.81649526,  -4.41614603, -19.03240191]
+    position: [1795, 293, 590]
+    velocity: [2.81649526,  -4.41614603, -19.03240191]
   num_steps: 10
   attr_targets:
     position: [1822.994906572302, 248.55044904190027, 399.6482123213723]
@@ -109,8 +109,8 @@
   error_bound: 0.0000001
 - case: At_positive_point_2_moving
   attr_init:
-    initial_position: [-424, -342, -748]
-    initial_velocity: [3.3033103 , -17.06746379,  10.78131432]
+    position: [-424, -342, -748]
+    velocity: [3.3033103 , -17.06746379,  10.78131432]
   num_steps: 10
   attr_targets:
     position: [-392.78737097956406, -513.0014246394147, -640.1493054995972]
@@ -118,8 +118,8 @@
   error_bound: 0.0000001
 - case: At_positive_point_3_moving
   attr_init:
-    initial_position: [-241, 1932, 738]
-    initial_velocity: [-11.31675638, -14.37759259,   8.03893148]
+    position: [-241, 1932, 738]
+    velocity: [-11.31675638, -14.37759259,   8.03893148]
   num_steps: 10
   attr_targets:
     position: [-355.68026835764533, 1789.3966654056303, 818.3489825004037]
@@ -128,8 +128,8 @@
 # With Control:
 - case: At_origin_stationary_max_control
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, 0]
+    position: [0, 0, 0]
+    velocity: [0, 0, 0]
   control: [1, 1, 1]
   num_steps: 10
   attr_targets:
@@ -138,8 +138,8 @@
   error_bound: 0.0000001
 - case: At_origin_stationary_min_control
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, 0]
+    position: [0, 0, 0]
+    velocity: [0, 0, 0]
   control: [-1, -1, -1]
   num_steps: 10
   attr_targets:
@@ -148,8 +148,8 @@
   error_bound: 0.0000001
 - case: At_origin_stationary_max_control_exceeded
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, 0]
+    position: [0, 0, 0]
+    velocity: [0, 0, 0]
   control: [1.1, 1.1, 1.1]
   num_steps: 10
   attr_targets:
@@ -158,8 +158,8 @@
   error_bound: 0.0000001
 - case: At_origin_stationary_min_control
   attr_init:
-    initial_position: [0, 0, 0]
-    initial_velocity: [0, 0, 0]
+    position: [0, 0, 0]
+    velocity: [0, 0, 0]
   control: [-1.1, -1.1, -1.1]
   num_steps: 10
   attr_targets:
@@ -168,8 +168,8 @@
   error_bound: 0.0000001
 - case: random_inputs_1
   attr_init:
-    initial_position: [378.43311614769686, -899.1465249919404, 48.827473316718624]
-    initial_velocity: [7.373886360503278, -5.387059196674235, -1.605257585437565]
+    position: [378.43311614769686, -899.1465249919404, 48.827473316718624]
+    velocity: [7.373886360503278, -5.387059196674235, -1.605257585437565]
   control: [-0.08432175853896218, -0.3730198625677763, -0.6434655524178474]
   num_steps: 15
   attr_targets:
@@ -178,8 +178,8 @@
   error_bound: 0.0000001
 - case: random_inputs_2
   attr_init:
-    initial_position: [401.0710014944277, -524.8182691047782, 125.17724674622104]
-    initial_velocity: [-9.575557314121877, 6.880063127211869, -5.5428664275674695]
+    position: [401.0710014944277, -524.8182691047782, 125.17724674622104]
+    velocity: [-9.575557314121877, 6.880063127211869, -5.5428664275674695]
   control: [-0.27372446784455806, -0.4075755672077819, 0.7043004899796548]
   num_steps: 59
   attr_targets:
@@ -188,8 +188,8 @@
   error_bound: 0.0000001
 - case: random_inputs_3
   attr_init:
-    initial_position: [-523.1457315141807, -248.7512703155934, 904.8316967095891]
-    initial_velocity: [5.2410919696930165, -5.7675255661019715, -9.383970813566798]
+    position: [-523.1457315141807, -248.7512703155934, 904.8316967095891]
+    velocity: [5.2410919696930165, -5.7675255661019715, -9.383970813566798]
   control: [-0.601994261048153, -0.6380545923556369, 0.5967382067922504]
   num_steps: 59
   attr_targets:

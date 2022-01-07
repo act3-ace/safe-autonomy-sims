@@ -20,7 +20,7 @@ def initial_entity_state(attr_init):
     if type(attr_init) is dict:
         initial_state = []
         for key, value in attr_init.items():
-            initial_state += value
+            initial_state += value if type(value) in [list, np.ndarray] else [value]
     return np.array(initial_state)
 
 
