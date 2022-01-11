@@ -13,7 +13,7 @@ from tests.conftest import read_test_cases
 
 
 # Define test assay
-test_cases_file_path = os.path.abspath("../../test_cases/Dubins2dAircraft_test_cases.yaml")
+test_cases_file_path = os.path.abspath("/test_cases/Dubins2dAircraft_test_cases.yaml")
 # TODO: parameterized_fixture_keywords + delimeter have become common...
 parameterized_fixture_keywords = ["attr_init",
                                   "control",
@@ -24,6 +24,7 @@ delimiter = ","
 test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
+# override entity fixture
 @pytest.fixture
 def entity(initial_entity_state):
     entity = Dubins2dAircraft(name="tests")
