@@ -4,9 +4,11 @@ This module contains the base Simulator class used by the saferl team's CWH and 
 
 import abc
 import typing
+import collections.abc
 
 import numpy as np
 from act3_rl_core.libraries.state_dict import StateDict
+from act3_rl_core.libraries.units import ValueWithUnits
 from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
 
@@ -95,6 +97,10 @@ class SafeRLSimulator(BaseSimulator):
 
             entity_kwargs = {**sim_config_kwargs, **agent_reset_config}
 
+            for key, val in entity_kwargs.items():
+                if isinstance(val, ValueWithUnits):
+                    entity_kwargs[key] = val.value
+
             entity_class = self.platform_map[sim_config.get('platform', 'default')][0]
             sim_entities[agent_id] = entity_class(name=agent_id, **entity_kwargs)
 
@@ -142,3 +148,4 @@ class SafeRLSimulator(BaseSimulator):
         self.update_sensor_measurements()
         self.clock += self.config.step_size
         return self._state
+        
