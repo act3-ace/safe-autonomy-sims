@@ -4,10 +4,8 @@ This module implements 2D and 3D Aircraft entities with Dubins phyiscs dynamics 
 
 import abc
 import math
-import typing
 
 import numpy as np
-from pydantic import validator
 from scipy.spatial.transform import Rotation
 
 from saferl_sim.base_models.entities import BaseEntity, BaseEntityValidator, BaseODESolverDynamics
@@ -177,7 +175,7 @@ class Dubins2dAircraft(BaseDubinsAircraft):
         )
 
     def _build_state(self):
-        return np.array(self.config.x, self.config.y, self.config.heading, self.config.v, dtype=np.float32)
+        return np.array([self.config.x, self.config.y, self.config.heading, self.config.v], dtype=np.float32)
 
     @property
     def x(self):
@@ -343,7 +341,10 @@ class Dubins3dAircraft(BaseDubinsAircraft):
         return Dubins3dAircraftValidator
 
     def _build_state(self):
-        return np.array(self.config.x, self.config.y, self.config.z, self.config.heading, self.config.gamma, self.config.roll, self.config.v, dtype=np.float32)
+        return np.array(
+            [self.config.x, self.config.y, self.config.z, self.config.heading, self.config.gamma, self.config.roll, self.config.v],
+            dtype=np.float32
+        )
 
     @property
     def x(self):
