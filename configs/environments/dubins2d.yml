@@ -19,9 +19,10 @@
       "step_size": 1
     },
   },
+  "simulator_reset_parameters": {
+  },
   "platforms": "DubinsSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
-  "horizon": 2000,
   "episode_parameter_provider": {
     "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
   },
