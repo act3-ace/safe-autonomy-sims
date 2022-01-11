@@ -18,8 +18,12 @@ class BaseDubinsAircraftValidator(BaseEntityValidator):
 
     Parameters
     ----------
-    position : list[float]
-        Initial 3d position vector in x, y, z
+    x : float
+        Initial x position
+    y : float
+        Initial y position
+    z : float
+        Initial z position
     heading : float
         Initial angle of velocity vector relative to x-axis. Right hand rule sign convention.
     v : float
@@ -31,29 +35,11 @@ class BaseDubinsAircraftValidator(BaseEntityValidator):
         Improper list length for parameter 'position'
     """
 
-    position: typing.List[float] = [0, 0, 0]
+    x: float = 0
+    y: float = 0
+    z: float = 0
     heading: float = 0
     v: float = 200
-
-    @validator("position")
-    def check_3d_vec_len(cls, v, field):
-        """checks 3d vector field for length 3
-
-        Parameters
-        ----------
-        v : typing.List[float]
-            vector quantity to check
-        field : string
-            name of validator field
-
-        Returns
-        -------
-        typing.List[float]
-            v
-        """
-        if len(v) != 3:
-            raise ValueError(f"{field.name} provided to BaseDubinsAircraftValidator is not length 3")
-        return v
 
 
 class BaseDubinsAircraft(BaseEntity):
@@ -191,7 +177,7 @@ class Dubins2dAircraft(BaseDubinsAircraft):
         )
 
     def _build_state(self):
-        return np.array(self.config.position[0:2] + [self.config.heading, self.config.v], dtype=np.float32)
+        return np.array(self.config.x, self.config.y, self.config.heading, self.config.v, dtype=np.float32)
 
     @property
     def x(self):
@@ -357,7 +343,7 @@ class Dubins3dAircraft(BaseDubinsAircraft):
         return Dubins3dAircraftValidator
 
     def _build_state(self):
-        return np.array(self.config.position + [self.config.heading, self.config.gamma, self.config.roll, self.config.v], dtype=np.float32)
+        return np.array(self.config.x, self.config.y, self.config.z, self.config.heading, self.config.gamma, self.config.roll, self.config.v, dtype=np.float32)
 
     @property
     def x(self):
