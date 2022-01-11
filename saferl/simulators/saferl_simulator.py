@@ -4,7 +4,6 @@ This module contains the base Simulator class used by the saferl team's CWH and 
 
 import abc
 import typing
-import collections.abc
 
 import numpy as np
 from act3_rl_core.libraries.state_dict import StateDict
@@ -148,4 +147,3 @@ class SafeRLSimulator(BaseSimulator):
         self.update_sensor_measurements()
         self.clock += self.config.step_size
         return self._state
-        
