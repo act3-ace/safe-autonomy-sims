@@ -15,23 +15,10 @@ from tests.conftest import read_test_cases
 # Define test assay
 test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/SuccessfulRejoinDoneFunction_test_cases.yaml")
 parameterized_fixture_keywords = [
-    "rejoin_region_radius", "lead_orientation", "offset_values", "lead_position", "expected_value", "expected_status"
+    "rejoin_region_radius", "offset_values", "lead_orientation", "lead_position", "platform_position", "expected_value", "expected_status"
 ]
 delimiter = ","
 test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
-
-
-@pytest.fixture(name='lead_name')
-def fixture_lead_name():
-    """
-    Fixture for returning lead's name.
-
-    Returns
-    -------
-    str
-        name of the lead platform
-    """
-    return "lead"
 
 
 @pytest.fixture(name='lead_orientation')
@@ -58,34 +45,6 @@ def fixture_lead_position(request):
         Three element array describing lead's 3D position vector
     """
     return request.param
-
-
-@pytest.fixture(name='lead')
-def fixture_lead(mocker, lead_position, lead_orientation, lead_name):
-    """
-    A fixture to create a mock platform with a position property
-
-    Parameters
-    ----------
-    mocker : fixture
-        A pytest-mock fixture which exposes unittest.mock functions
-    lead_position : numpy.ndarray
-        The platform's 3D positional vector
-    lead_orientation : scipy.spatial.transform.Rotation
-        The platform's 3D velocity vector
-    lead_name : str
-        The name of the agent
-
-
-    Returns
-    -------
-    test_lead_platform : MagicMock
-        A mock of a platform with a position property
-    """
-    test_lead_platform = mocker.MagicMock(name=lead_name)
-    test_lead_platform.position = lead_position
-    test_lead_platform.orientation = lead_orientation
-    return test_lead_platform
 
 
 @pytest.fixture(name="rejoin_region_radius")

@@ -4,6 +4,7 @@
   lead_orientation: Rotation.identity()
   offset_values: [-4.9, 0.0, 0.0]
   lead_position: np.array([15, 0, 0])
+  platform_position: np.array([0, 0, 0])
   expected_value: False
   expected_status: None
 - case: inside rejoin region
@@ -11,6 +12,7 @@
   lead_orientation: Rotation.identity()
   offset_values: [-5.1, 0.0, 0.0]
   lead_position: np.array([15, 0, 0])
+  platform_position: np.array([0, 0, 0])
   expected_value: True
   expected_status: DoneStatusCodes.WIN
 - case: on rejoin region boundary
@@ -18,5 +20,6 @@
   lead_orientation: Rotation.identity()
   offset_values: [-5.0, 0.0, 0.0]
   lead_position: np.array([15, 0, 0])
+  platform_position: np.array([0, 0, 0])
   expected_value: True
   expected_status: DoneStatusCodes.WIN
