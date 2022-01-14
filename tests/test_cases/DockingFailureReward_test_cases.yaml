@@ -1,7 +1,7 @@
 # Test each failure path
 - case: crash
   platform_position: np.array([0, 0, 0])
-  velocity: 5.0
+  platform_velocity: 5.0
   sim_time: 200
   timeout: 2000
   timeout_reward: -1
@@ -13,7 +13,7 @@
   expected_value: -1
 - case: max distance exceedance
   platform_position: np.array([50000, 50000, 50000])
-  velocity: 5.0
+  platform_velocity: 5.0
   sim_time: 200
   timeout: 2000
   timeout_reward: -1
@@ -25,7 +25,7 @@
   expected_value: -1
 - case: max velocity exceedance
   platform_position: np.array([0.01, 0.01, 0.01])
-  velocity: 20.0
+  platform_velocity: 20.0
   sim_time: 200
   timeout: 2000
   timeout_reward: -1
@@ -37,7 +37,7 @@
   expected_value: -1
 - case: no failure
   platform_position: np.array([500, 500, 500])
-  velocity: 8.0
+  platform_velocity: 8.0
   sim_time: 200
   timeout: 2000
   timeout_reward: -1

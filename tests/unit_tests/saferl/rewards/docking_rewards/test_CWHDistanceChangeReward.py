@@ -50,20 +50,6 @@ def fixture_scale(request):
     return request.param
 
 
-@pytest.fixture(name='expected_value')
-def fixture_expected_value(request):
-    """
-    Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
-    in the RewardDict returned by the MaxDistanceDoneFunction.
-
-    Returns
-    -------
-    float
-        The expected value of the reward function
-    """
-    return request.param
-
-
 @pytest.fixture(name='cut')
 def fixture_cut(cut_name, agent_name, scale):
     """
