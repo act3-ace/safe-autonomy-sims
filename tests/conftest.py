@@ -28,7 +28,7 @@ def execute_strings(value):
     """
 
     if type(value) is str:
-        # convert numbers + expressions into floats
+        # convert numbers + expressions into floats + instantiate python library calls
         try:
             value = eval(value)
         except:
