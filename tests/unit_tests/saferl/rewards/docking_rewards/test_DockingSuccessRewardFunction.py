@@ -2,30 +2,21 @@
 Unit tests for the DockingSuccessReward function from the docking_rewards module
 """
 
+import os
 from unittest import mock
 
-import numpy as np
 import pytest
 
 from saferl.rewards.docking_rewards import DockingSuccessReward
+from tests.conftest import delimiter, read_test_cases
 
-# modify for the test cases
-
-# test input
-# "platform_position, velocity, scale, sim_time, timeout, docking_region_radius, max_vel_constraint, expected_value"
-
-test_configs = [
-    # successful docking test 1
-    (np.array([0, 0, 0]), 5.0, 1.0, 200, 2000, 0.5, 10, 1.9),
-    # successful docking test 2
-    (np.array([0.2, 0.2, 0.2]), 7.0, 1.0, 200, 2000, 0.5, 10, 1.9),
-    # unsuccessful docking test 1
-    (np.array([1, 1, 1]), 5.0, 1.0, 400, 2000, 0.5, 10, 0),
-    # unsuccessful docking test 2
-    (np.array([0.2, 0.2, 0.2]), 20.0, 1.0, 200, 2000, 0.5, 10, 0),
-    # unsuccessful docking test 3
-    (np.array([0.5, 0.5, 0.5]), 7.0, 1.0, 200, 2000, 0.5, 10, 0),
+# Define test assay
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/DockingSuccessRewardFunction_test_cases.yaml")
+parameterized_fixture_keywords = [
+    "platform_position", "velocity", "scale", "sim_time", "timeout", "docking_region_radius", "max_vel_constraint", "expected_value"
 ]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
 
 @pytest.fixture(name='platform_position')
 def fixture_platform_position(request):
@@ -232,13 +223,8 @@ def fixture_call_results(
         return results
 
 
-#timeout_reward,distance_reward,crash_reward,timeout_reward,max_goal_distance,docking_region_radius,max_vel_constraint
 @pytest.mark.unit_test
-@pytest.mark.parametrize(
-    "platform_position, velocity, scale, sim_time, timeout, docking_region_radius, max_vel_constraint, expected_value",
-    test_configs,
-    indirect=True
-)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the DockingSuccessRewardFunction behaves as intended.
@@ -247,12 +233,8 @@ def test_reward_function(call_results, agent_name, expected_value):
     ----------
     call_results : DoneDict
         The resulting DoneDict from calling the DockingSuccessRewardFunction
-    next_state : StateDict
-        The StateDict that may have been mutated by the DockingSuccessRewardFunction
     agent_name : str
         The name of the agent
-    cut_name : str
-        The name of the component under test
     expected_value : float
         The expected value from the reward function
     """
