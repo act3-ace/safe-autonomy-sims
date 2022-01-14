@@ -1,0 +1,49 @@
+# Test each failure path
+- case: crash
+  platform_position: np.array([0, 0, 0])
+  velocity: 5.0
+  sim_time: 200
+  timeout: 2000
+  timeout_reward: -1
+  distance_reward: -1
+  crash_reward: -1
+  max_goal_distance: 40000
+  docking_region_radius: 0.5
+  max_vel_constraint: 0
+  expected_value: -1
+- case: max distance exceedance
+  platform_position: np.array([50000, 50000, 50000])
+  velocity: 5.0
+  sim_time: 200
+  timeout: 2000
+  timeout_reward: -1
+  distance_reward: -1
+  crash_reward: -1
+  max_goal_distance: 40000
+  docking_region_radius: 0.5
+  max_vel_constraint: 0
+  expected_value: -1
+- case: max velocity exceedance
+  platform_position: np.array([0.01, 0.01, 0.01])
+  velocity: 20.0
+  sim_time: 200
+  timeout: 2000
+  timeout_reward: -1
+  distance_reward: -1
+  crash_reward: -1
+  max_goal_distance: 40000
+  docking_region_radius: 0.5
+  max_vel_constraint: 10
+  expected_value: -1
+- case: no failure
+  platform_position: np.array([500, 500, 500])
+  velocity: 8.0
+  sim_time: 200
+  timeout: 2000
+  timeout_reward: -1
+  distance_reward: -1
+  crash_reward: -1
+  max_goal_distance: 40000
+  docking_region_radius: 0.5
+  max_vel_constraint: 10
+  expected_value: 0

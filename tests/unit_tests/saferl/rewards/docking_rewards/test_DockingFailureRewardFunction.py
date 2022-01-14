@@ -1,30 +1,31 @@
 """
 Unit tests for the DockingFailureReward function from the docking_rewards module
 """
+import os
 from unittest import mock
 
-import numpy as np
 import pytest
 from act3_rl_core.libraries.state_dict import StateDict
 
 from saferl.rewards.docking_rewards import DockingFailureReward
+from tests.conftest import delimiter, read_test_cases
 
-# modify for the test cases
-
-# test input
-# ['platform_position', 'velocity', 'sim_time', 'timeout', 'timeout_reward',
-# ... 'distance_reward', 'crash_reward', 'max_goal_distance', 'docking_region_radius',
-# ... 'max_vel_constraint', 'expected_value']
-test_configs = [
-    # test for crash
-    (np.array([0, 0, 0]), 5.0, 200, 2000, -1, -1, -1, 40000, 0.5, 0, -1),
-    # test for max distance
-    (np.array([50000, 50000, 50000]), 5.0, 200, 2000, -1, -1, -1, 40000, 0.5, 0, -1),
-    # test for max velocity exceeded
-    (np.array([0.01, 0.01, 0.01]), 20.0, 200, 2000, -1, -1, -1, 40000, 0.5, 10, -1),
-    # test for a successful case, in docking therefore no failure reward,
-    (np.array([500, 500, 500]), 8.0, 200, 2000, -1, -1, -1, 40000, 0.5, 10, 0)
+# Define test assay
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/DockingFailureReward_test_cases.yaml")
+parameterized_fixture_keywords = [
+    "platform_position",
+    "velocity",
+    "sim_time",
+    "timeout",
+    "timeout_reward",
+    "distance_reward",
+    "crash_reward",
+    "max_goal_distance",
+    "docking_region_radius",
+    "max_vel_constraint",
+    "expected_value"
 ]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='expected_value')
@@ -245,14 +246,8 @@ def fixture_call_results(
         return results
 
 
-#timeout_reward,distance_reward,crash_reward,timeout_reward,max_goal_distance,docking_region_radius,max_vel_constraint
 @pytest.mark.unit_test
-@pytest.mark.parametrize(
-    "platform_position, velocity, sim_time, timeout, timeout_reward, distance_reward, \
-    crash_reward, max_goal_distance, docking_region_radius, max_vel_constraint, expected_value",
-    test_configs,
-    indirect=True
-)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the DockingFailureRewardFunction behaves as intended.
