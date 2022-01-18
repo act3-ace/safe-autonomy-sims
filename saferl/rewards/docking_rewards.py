@@ -107,6 +107,7 @@ class DockingSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
     """
+
     def __init__(self, **kwargs) -> None:
         self.config: DockingSuccessRewardValidator
         super().__init__(**kwargs)
@@ -155,7 +156,7 @@ class DockingSuccessReward(RewardFuncBase):
         """
 
         reward = RewardDict()
-        value = 0
+        value = 0.0
 
         deputy = get_platform_by_name(next_state, self.config.agent_name)
 
@@ -203,6 +204,7 @@ class DockingFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
     """
+
     def __init__(self, **kwargs) -> None:
         self.config: DockingFailureRewardValidator
         super().__init__(**kwargs)
@@ -251,7 +253,7 @@ class DockingFailureReward(RewardFuncBase):
         """
 
         reward = RewardDict()
-        value = 0
+        value = 0.0
 
         deputy = get_platform_by_name(next_state, self.config.agent_name)
 
