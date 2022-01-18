@@ -27,6 +27,7 @@ test_configs = [
     (np.array([0.5, 0.5, 0.5]), 7.0, 1.0, 200, 2000, 0.5, 10, 0),
 ]
 
+
 @pytest.fixture(name='platform_position')
 def fixture_platform_position(request):
     """
