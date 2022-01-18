@@ -1,1 +1,1 @@
-act3-rl-core
+act3-rl-core==1.29.3
