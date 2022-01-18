@@ -65,9 +65,6 @@ class ThrustController(CWHController):
         contains configuration proprties
 
     """
-    def __init__(self, **kwargs) -> None:
-        self.config: ThrustControllerValidator
-        super().__init__(**kwargs)
 
     def __init__(
         self,
@@ -76,6 +73,7 @@ class ThrustController(CWHController):
         control_properties=cwh_props.ThrustProp,
         exclusiveness=set()  # type: ignore # noqa: F821
     ):  # pylint: disable=W0102
+        self.config: ThrustControllerValidator
         super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
     @property
