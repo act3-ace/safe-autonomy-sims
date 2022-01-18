@@ -33,8 +33,11 @@ class SuccessfulRejoinDoneFunction(DoneFuncBase):
     """
     Done function that details whether a successful rejoin has been made or not.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: SuccessfulRejoinDoneValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Returns the validator for this done function.
@@ -123,8 +126,11 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     """
     Done function that determines if the wingman  has exceeded the max distance threshold and has exited the bounds of the simulation.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: MaxDistanceDoneValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Returns the validator for this done function.
@@ -196,8 +202,11 @@ class CrashDoneFunction(DoneFuncBase):
     """
     Done function that determines whether a crash occured or not.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: CrashDoneValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Returns the validator for this done function.

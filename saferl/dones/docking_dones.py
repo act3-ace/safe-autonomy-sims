@@ -22,8 +22,11 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     """
     A done function that determines if the max distance has been traveled or not.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: MaxDistanceDoneValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Params
@@ -90,8 +93,11 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if deputy has successfully docked with the cheif or not.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: SuccessfulDockingDoneValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Params
@@ -165,8 +171,11 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
     """
     This done fucntion determines whether the velocity limit has been exceeded or not.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: DockingVelocityLimitDoneFunctionValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Params
@@ -226,8 +235,11 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     """
     A done function that checks if the docking velocity relative to a target object has exceeded a certain specified threshold velocity.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: DockingRelativeVelocityConstraintDoneFunctionValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Params

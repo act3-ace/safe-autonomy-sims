@@ -35,8 +35,11 @@ class DubinsRejoinSuccessReward(RewardFuncBase):
     """
     This function determines the reward for when the wingman successfully enters the rejoin region
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: DubinsRejoinSuccessRewardValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Method to return class's Validator.
@@ -135,10 +138,11 @@ class RejoinDistanceChangeReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs):
+        self.config: RejoinDistanceChangeRewardValidator
         super().__init__(**kwargs)
         self.prev_dist = None
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
             Method to return class's Validator.
@@ -230,8 +234,11 @@ class RejoinReward(RewardFuncBase):
     """
     A reward function that provides a reward proportional to the change in distance from the rejoin distance.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: RejoinRewardValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
             Method to return class's Validator.

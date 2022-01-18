@@ -25,10 +25,11 @@ class CWHDistanceChangeReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs):
+        self.config: CWHDistanceChangeRewardValidator
         super().__init__(**kwargs)
         self._dist_buffer = RingBuffer(capacity=2, dtype=float)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Method to return class's Validator.
@@ -106,8 +107,11 @@ class DockingSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: DockingSuccessRewardValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Method to return class's Validator.
@@ -199,8 +203,11 @@ class DockingFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: DockingFailureRewardValidator
+        super().__init__(**kwargs)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Method to return class's Validator.

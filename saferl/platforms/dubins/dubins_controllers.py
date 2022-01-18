@@ -3,7 +3,7 @@ This module contains controllers for the Dubins platform.
 """
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
+from act3_rl_core.simulators.base_parts import BaseController, BaseAgentPlatformGlueValidator
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
@@ -23,7 +23,7 @@ class DubinsController(BaseController):
 # TODO: Find a better way to save actions to platform instead of storing an axis in the saved vector
 
 
-class RateControllerValidator(BaseControllerValidator):
+class RateControllerValidator(BaseAgentPlatformGlueValidator):
     """Generic rate controller validator.
 
     axis: index in combined control vector for this controller's output action
@@ -35,7 +35,11 @@ class RateControllerValidator(BaseControllerValidator):
 class RateController(DubinsController):
     """Generic rate controller. Writes control action to platform's control vector and reads applied action from platform."""
 
-    @classmethod
+    def __init__(self, **kwargs) -> None:
+        self.config: RateControllerValidator
+        super().__init__(**kwargs)
+
+    @property
     def get_validator(cls):
         return RateControllerValidator
 

@@ -4,7 +4,7 @@ This module contains controllers for the CWH platform.
 
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
+from act3_rl_core.simulators.base_parts import BaseController, BaseAgentPlatformGlueValidator
 
 import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
@@ -45,7 +45,7 @@ class CWHController(BaseController):
         raise NotImplementedError
 
 
-class ThrustControllerValidator(BaseControllerValidator):
+class ThrustControllerValidator(BaseAgentPlatformGlueValidator):
     """
     Controller config validator for the ThrustController
     """
@@ -65,6 +65,9 @@ class ThrustController(CWHController):
         contains configuration proprties
 
     """
+    def __init__(self, **kwargs) -> None:
+        self.config: ThrustControllerValidator
+        super().__init__(**kwargs)
 
     def __init__(
         self,
@@ -75,7 +78,7 @@ class ThrustController(CWHController):
     ):  # pylint: disable=W0102
         super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
 
-    @classmethod
+    @property
     def get_validator(cls):
         """
         Params
