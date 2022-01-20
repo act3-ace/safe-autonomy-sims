@@ -3,7 +3,7 @@ This module contains controllers for the Dubins platform.
 """
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseController, BaseControllerValidator
+from act3_rl_core.simulators.base_parts import BaseController, BasePlatformPartValidator
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
@@ -23,7 +23,7 @@ class DubinsController(BaseController):
 # TODO: Find a better way to save actions to platform instead of storing an axis in the saved vector
 
 
-class RateControllerValidator(BaseControllerValidator):
+class RateControllerValidator(BasePlatformPartValidator):
     """Generic rate controller validator.
 
     axis: index in combined control vector for this controller's output action
@@ -35,8 +35,12 @@ class RateControllerValidator(BaseControllerValidator):
 class RateController(DubinsController):
     """Generic rate controller. Writes control action to platform's control vector and reads applied action from platform."""
 
-    @classmethod
-    def get_validator(cls):
+    def __init__(self, **kwargs) -> None:
+        self.config: RateControllerValidator
+        super().__init__(**kwargs)
+
+    @property
+    def get_validator(self):
         return RateControllerValidator
 
     def apply_control(self, control: np.ndarray) -> None:
@@ -50,7 +54,7 @@ class AccelerationController(RateController):
     """Applies acceleration control to dubins platform"""
 
     def __init__(self, parent_platform, config, control_properties=dubins_props.AccelerationProp):
-        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config)
 
 
 PluginLibrary.AddClassToGroup(
@@ -72,8 +76,8 @@ PluginLibrary.AddClassToGroup(
 class YawRateController(RateController):
     """Applies Yaw control to dubins platform"""
 
-    def __init__(self, parent_platform, config, control_properties=dubins_props.YawRateProp, exclusiveness=set()):  # pylint: disable=W0102
-        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
+    def __init__(self, parent_platform, config, control_properties=dubins_props.YawRateProp):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config)
 
 
 PluginLibrary.AddClassToGroup(
@@ -106,10 +110,9 @@ class CombinedTurnRateAccelerationController(DubinsController):
         parent_platform,  # type: ignore # noqa: F821
         config,
         control_properties=dubins_props.YawAndAccelerationProp,
-        exclusiveness=set(),
     ):  # pylint: disable=W0102
 
-        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config)
 
     def apply_control(self, control: np.ndarray) -> None:
         self.parent_platform.save_action_to_platform(action=control)
@@ -145,9 +148,8 @@ class CombinedPitchRollAccelerationController(DubinsController):
         parent_platform,  # type: ignore # noqa: F821
         config,
         control_properties=dubins_props.PitchRollAndAccelerationProp,
-        exclusiveness=set(),
     ):  # pylint: disable=W0102
-        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config)
 
     def apply_control(self, control: np.ndarray) -> None:
         self.parent_platform.save_action_to_platform(action=control)
@@ -182,8 +184,8 @@ PluginLibrary.AddClassToGroup(
 class RollRateController(RateController):
     """Applies roll rate control to dubins platform"""
 
-    def __init__(self, parent_platform, config, control_properties=dubins_props.RollRateProp, exclusiveness=set()):  # pylint: disable=W0102
-        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config, exclusiveness=exclusiveness)
+    def __init__(self, parent_platform, config, control_properties=dubins_props.RollRateProp):  # pylint: disable=W0102
+        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config)
 
 
 PluginLibrary.AddClassToGroup(

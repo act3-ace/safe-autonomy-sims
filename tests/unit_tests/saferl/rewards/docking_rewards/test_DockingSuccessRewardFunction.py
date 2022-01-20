@@ -27,19 +27,6 @@ test_configs = [
     (np.array([0.5, 0.5, 0.5]), 7.0, 1.0, 200, 2000, 0.5, 10, 0),
 ]
 
-#
-# @pytest.fixture
-# def observation():
-#     """
-#     Generic fixture for creating a naive observation for running Done and Reward function tests.
-#
-#     Returns
-#     -------
-#     numpy.ndarray
-#         Placeholder array
-#     """
-#     return np.array([0, 0, 0])
-
 
 @pytest.fixture(name='platform_position')
 def fixture_platform_position(request):
@@ -57,13 +44,13 @@ def fixture_platform_position(request):
 @pytest.fixture(name='expected_value')
 def fixture_expected_value(request):
     """
-    Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
-    in the DoneDict returned by the DockingFailureRewardFunction.
+    Parameterized fixture for comparison to the expected value of reward to be found corresponding to the agent_name (the key)
+    in the RewardDict returned by the DockingSuccessRewardFunction.
 
     Returns
     -------
     bool
-        The expected value of the boolean assigned to describe if the agent is done or not
+        The expected value of the reward functino
     """
     return request.param
 
@@ -157,7 +144,7 @@ def fixture_max_vel_constraint(request):
 
 
 @pytest.fixture(name='sim_time')
-def fixutre_sim_time(request):
+def fixture_sim_time(request):
     """
     Get the 'sim_time' parameter from the test config input
     """
@@ -175,7 +162,7 @@ def fixture_velocity(request):
 @pytest.fixture(name='cut')
 def fixture_cut(cut_name, scale, agent_name, timeout, docking_region_radius, max_vel_constraint):
     """
-    A fixture that instantiates a DockingFailureRewardFunction and returns it.
+    A fixture that instantiates a DockingSuccessRewardFunction and returns it.
 
     Parameters
     ----------
@@ -186,7 +173,7 @@ def fixture_cut(cut_name, scale, agent_name, timeout, docking_region_radius, max
 
     Returns
     -------
-    DockingFailureRewardFunction
+    DockingSuccessRewardFunction
         An instantiated component under test
     """
     return DockingSuccessReward(
@@ -197,27 +184,6 @@ def fixture_cut(cut_name, scale, agent_name, timeout, docking_region_radius, max
         docking_region_radius=docking_region_radius,
         max_vel_constraint=max_vel_constraint
     )
-
-
-# @pytest.fixture()
-# def next_state(agent_name, cut_name):
-#     """
-#     A fixture for creating a StateDict populated with the structure expected by the CWHDistanceChangeReward
-#
-#     Parameters
-#     ----------
-#     agent_name : str
-#         The name of the agent
-#     cut_name : str
-#         The name of the component under test
-#
-#     Returns
-#     -------
-#     state : StateDict
-#         The populated StateDict
-#     """
-#     state = StateDict({"episode_state": {agent_name: {cut_name: None}}})
-#     return state
 
 
 @pytest.fixture(name='call_results')
@@ -236,11 +202,11 @@ def fixture_call_results(
     velocity,
 ):
     """
-    A fixture responsible for calling the DockingFailureRewardFunction and returning the results.
+    A fixture responsible for calling the DockingSuccessRewardFunction and returning the results.
 
     Parameters
     ----------
-    cut : DockingFailureRewardFunction
+    cut : DockingSuccessRewardFunction
         The component under test
     observation : numpy.ndarray
         The observation array
@@ -249,14 +215,14 @@ def fixture_call_results(
     next_observation : numpy.ndarray
         The next_observation array
     next_state : StateDict
-        The StateDict that the DockingFailureRewardFunction mutates
+        The StateDict that the DockingSuccessRewardFunction mutates
     platform : MagicMock
-        The mock platform to be returned to the DockingFailureRewardFunction when it uses get_platform_by_name()
+        The mock platform to be returned to the DockingSuccessRewardFunction when it uses get_platform_by_name()
 
     Returns
     -------
-    results : DoneDict
-        The resulting DoneDict from calling the DockingFailureRewardFunction
+    results : RewardDict
+        The resulting RewardDict from calling the DockingSuccessRewardFunction
     """
     with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
         platform.position = platform_position
@@ -276,21 +242,19 @@ def fixture_call_results(
 )
 def test_reward_function(call_results, agent_name, expected_value):
     """
-    A parameterized test to ensure that the DockingFailureRewardFunction behaves as intended.
+    A parameterized test to ensure that the DockingSuccessRewardFunction behaves as intended.
 
     Parameters
     ----------
     call_results : DoneDict
-        The resulting DoneDict from calling the DockingFailureRewardFunction
+        The resulting DoneDict from calling the DockingSuccessRewardFunction
     next_state : StateDict
-        The StateDict that may have been mutated by the DockingFailureRewardFunction
+        The StateDict that may have been mutated by the DockingSuccessRewardFunction
     agent_name : str
         The name of the agent
     cut_name : str
         The name of the component under test
-    expected_value : bool
-        The expected bool corresponding to whether the agent's episode is done or not
-    expected_status : None or DoneStatusCodes
-        The expected status corresponding to the status of the agent's episode
+    expected_value : float
+        The expected value from the reward function
     """
     assert call_results[agent_name] == expected_value
