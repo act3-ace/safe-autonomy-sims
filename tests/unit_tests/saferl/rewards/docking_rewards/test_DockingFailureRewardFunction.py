@@ -27,19 +27,6 @@ test_configs = [
 ]
 
 
-@pytest.fixture(name='platform_position')
-def fixture_platform_position(request):
-    """
-    Parameterized fixture for returning platform position defined in test_configs.
-
-    Returns
-    -------
-    numpy.ndarray
-        Three element array describing platform's 3D position
-    """
-    return request.param
-
-
 @pytest.fixture(name='expected_value')
 def fixture_expected_value(request):
     """
@@ -48,8 +35,8 @@ def fixture_expected_value(request):
 
     Returns
     -------
-    bool
-        The expected value of the boolean assigned to describe if the agent is done or not
+    float
+        The expected value of the reward function
     """
     return request.param
 
@@ -153,7 +140,7 @@ def fixture_velocity(request):
 @pytest.fixture(name='next_state')
 def fixture_next_state(agent_name, cut_name):
     """
-    A fixture for creating a StateDict populated with the structure expected by the DockingFailureReward
+    A fixture for creating a StateDict populated with the structure expected by the DockingFailureRewardFunction
 
     Parameters
     ----------
@@ -246,8 +233,8 @@ def fixture_call_results(
 
     Returns
     -------
-    results : DoneDict
-        The resulting DoneDict from calling the DockingFailureRewardFunction
+    results : RewardDict
+        The resulting RewardDict from calling the DockingFailureRewardFunction
     """
     with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
         platform.position = platform_position
@@ -272,17 +259,11 @@ def test_reward_function(call_results, agent_name, expected_value):
 
     Parameters
     ----------
-    call_results : DoneDict
-        The resulting DoneDict from calling the DockingFailureRewardFunction
-    next_state : StateDict
-        The StateDict that may have been mutated by the DockingFailureRewardFunction
+    call_results : RewardDict
+        The resulting RewardDict from calling the DockingFailureRewardFunction
     agent_name : str
         The name of the agent
-    cut_name : str
-        The name of the component under test
     expected_value : bool
         The expected bool corresponding to whether the agent's episode is done or not
-    expected_status : None or DoneStatusCodes
-        The expected status corresponding to the status of the agent's episode
     """
     assert call_results[agent_name] == expected_value

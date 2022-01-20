@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------------------
+# //
+#
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning (RL) Core contributed by the:
+#  -  () Team
+#  - Safe Autonomy (SA) Team
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ---------------------------------------------------------------------------
+
+"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"config": {
+    "parts": [
+        {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
+        {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
+        {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2, properties: {name: "z_thrust"}}},
+        {"part": "Sensor_Position"},
+        {"part": "Sensor_Velocity"}
+    ],
+    "episode_parameter_provider": {
+      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
+    "glues": [
+        {
+          "functor": "saferl.glues.rta_glue.RTAGlue",
+          "wrapped": [
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+              },
+            },
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+                "index": 1
+              }
+            },
+            {
+              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "config": {
+                "controller": "Controller_Thrust",
+                "index": 2
+              }
+            },
+          ]
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Position", "normalization": {"enabled": False}},
+        },
+        {
+            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "config": {"sensor": "Sensor_Velocity", "normalization": {"enabled": False}},
+        },
+    ],
+    "dones": [
+        {
+            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
+            "config":{
+                "max_distance": 40000,
+
+            },
+        },
+        {
+            "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
+            "config":{
+              "docking_region_radius": 0.5,
+              "velocity_limit": 10,
+            },
+        },
+    ],
+    "rewards": [
+        {
+            "name": "CWHDistanceChangeReward",
+            "functor": "saferl.rewards.docking_rewards.CWHDistanceChangeReward",
+            "config": {
+                "scale": 1.0e-2
+            }
+        },
+    ],
+}
