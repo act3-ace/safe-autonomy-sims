@@ -41,12 +41,12 @@ class SafeRLSimulator(BaseSimulator):
     It is also responsible for reporting the simulation state at each timestep.
     """
 
-    @classmethod
-    def get_simulator_validator(cls):
+    @property
+    def get_simulator_validator(self):
         return SafeRLSimulatorValidator
 
-    @classmethod
-    def get_reset_validator(cls):
+    @property
+    def get_reset_validator(self):
         return SafeRLSimulatorResetValidator
 
     def __init__(self, **kwargs):
@@ -57,7 +57,7 @@ class SafeRLSimulator(BaseSimulator):
         self.clock = 0.0
 
     def reset(self, config):
-        config = self.get_reset_validator()(**config)
+        config = self.get_reset_validator(**config)
         self._state.clear()
         self.clock = 0.0
         self.sim_entities = self.construct_sim_entities(config.platforms)
