@@ -45,7 +45,7 @@ class SuccessfulRejoinDoneFunction(DoneFuncBase):
         super().__init__(**kwargs)
 
     @property
-    def get_validator(cls):
+    def get_validator(self) -> typing.Type[DoneFuncBaseValidator]:
         """
         Returns the validator for this done function.
 
@@ -139,7 +139,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         super().__init__(**kwargs)
 
     @property
-    def get_validator(cls):
+    def get_validator(self) -> typing.Type[DoneFuncBaseValidator]:
         """
         Returns the validator for this done function.
 
@@ -216,7 +216,7 @@ class CrashDoneFunction(DoneFuncBase):
         super().__init__(**kwargs)
 
     @property
-    def get_validator(cls):
+    def get_validator(self) -> typing.Type[DoneFuncBaseValidator]:
         """
         Returns the validator for this done function.
 
@@ -283,7 +283,21 @@ class RejoinDone(SharedDoneFuncBase):
     Done function that determines whether the other agent is done.
     """
 
-    def get_validator(cls):
+    @property
+    def get_validator(self) -> typing.Type[SharedDoneFuncBaseValidator]:
+        """
+        Returns the validator for this done function.
+
+        Params
+        ------
+        cls : class constructor
+
+        Returns
+        -------
+        RejoinDoneValidator
+            done function validator
+
+        """
         return RejoinDoneValidator
 
     def __call__(
