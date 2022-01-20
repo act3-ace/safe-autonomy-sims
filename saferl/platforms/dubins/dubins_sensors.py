@@ -33,7 +33,7 @@ class PositionSensor(DubinsSensor):
     """
 
     def __init__(self, parent_platform, config, measurement_properties=dubins_props.PositionProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -70,7 +70,7 @@ class VelocitySensor(DubinsSensor):
     """
 
     def __init__(self, parent_platform, config, measurement_properties=dubins_props.VelocityProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -108,7 +108,7 @@ class HeadingSensor(DubinsSensor):
     """
 
     def __init__(self, parent_platform, config, measurement_properties=dubins_props.HeadingProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -146,7 +146,7 @@ class FlightPathSensor(DubinsSensor):
     """
 
     def __init__(self, parent_platform, config, measurement_properties=dubins_props.FlightPathProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config, exclusiveness=set())
+        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
