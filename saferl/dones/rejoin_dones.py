@@ -6,7 +6,13 @@ import typing
 from collections import OrderedDict
 
 import numpy as np
-from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase
+from act3_rl_core.dones.done_func_base import (
+    DoneFuncBase,
+    DoneFuncBaseValidator,
+    DoneStatusCodes,
+    SharedDoneFuncBase,
+    SharedDoneFuncBaseValidator,
+)
 from act3_rl_core.libraries.environment_dict import DoneDict
 from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
@@ -264,10 +270,21 @@ class CrashDoneFunction(DoneFuncBase):
         return done
 
 
+class RejoinDoneValidator(SharedDoneFuncBaseValidator):
+    """
+    agent_name : str
+        The name of the agent whom will determine the done status of the episode
+    """
+    agent_name: typing.Optional[str]
+
+
 class RejoinDone(SharedDoneFuncBase):
     """
     Done function that determines whether the other agent is done.
     """
+
+    def get_validator(cls):
+        return RejoinDoneValidator
 
     def __call__(
         self,
@@ -301,7 +318,7 @@ class RejoinDone(SharedDoneFuncBase):
 
         done = DoneDict()
 
-        all_done = local_dones["blue0"]
+        all_done = local_dones[self.config.agent_name]
 
         for k in local_dones.keys():
             done[k] = all_done
