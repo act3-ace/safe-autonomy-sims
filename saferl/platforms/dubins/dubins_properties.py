@@ -165,8 +165,8 @@ class PositionProp(BoxProp):
     """
 
     name: str = "position"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-100000000.0] * 3
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [100000000.0] * 3
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-500000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [500000.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["ft"] * 3
     description: str = "Position Sensor Properties"
 
@@ -188,8 +188,8 @@ class VelocityProp(BoxProp):
     """
 
     name: str = "velocity"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-100000000.0] * 3
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1000000000.0] * 3
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-2000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["ft/s"] * 3
     description: str = "Velocity Sensor Properties"
 
@@ -211,8 +211,8 @@ class HeadingProp(BoxProp):
     """
 
     name: str = "heading"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-10000000.0]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [10000000.0]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-np.pi]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.pi]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
     description: str = "Heading Sensor Properties"
 
@@ -234,7 +234,7 @@ class FlightPathProp(BoxProp):
     """
 
     name: str = "flight_path"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-10000000.0]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [10000000.0]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-np.pi]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.pi]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
     description: str = "Flight Path Sensor Properties"
