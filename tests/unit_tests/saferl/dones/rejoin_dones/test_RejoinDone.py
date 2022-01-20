@@ -81,7 +81,7 @@ def fixture_local_dones(agent_name, done_status):
 
 
 @pytest.fixture(name='cut')
-def fixture_cut(cut_name):
+def fixture_cut(cut_name, agent_name):
     """
     A fixture that instantiates a CrashDoneFunction and returns it.
 
@@ -98,7 +98,7 @@ def fixture_cut(cut_name):
         An instantiated component under test
     """
 
-    return RejoinDone(name=cut_name)
+    return RejoinDone(name=cut_name, agent_name=agent_name)
 
 
 @pytest.fixture(name='call_results')
@@ -147,5 +147,5 @@ def test_call(call_results, expected_status):
         The expected status corresponding to the status of the agent's episode
     """
 
-    for name, status in call_results.values():
+    for name, status in call_results.items():
         assert status == expected_status, "Expected agent {} to have status {} but received {}".format(name, expected_status, status)
