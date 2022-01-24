@@ -58,6 +58,10 @@ class RTAAgent(TrainableBaseAgent):
     Trainable RTA Agent
     """
 
-    @classmethod
+    def __init__(self, **kwargs) -> None:
+        self.config: ExtendedAgentParser
+        super().__init__(**kwargs)
+
+    @property
     def get_validator(cls):
         return ExtendedAgentParser

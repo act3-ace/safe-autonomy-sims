@@ -47,11 +47,12 @@ class RTAGlue(BaseMultiWrapperGlue):
     """
 
     def __init__(self, **kwargs):
+        self.config: RTAGlueValidator
         super().__init__(**kwargs)
         self.controller_glues = self._get_controller_glues(self)
         self.config.rta = self.config.rta()
 
-    @classmethod
+    @property
     def get_validator(cls):
         return RTAGlueValidator
 

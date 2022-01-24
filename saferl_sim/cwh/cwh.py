@@ -1,10 +1,8 @@
 """
 This module implements 3D a point mass spacecraft with Clohessy-Wilshire phyiscs dynamics in non-intertial orbital Hill's reference frame
 """
-import typing
 
 import numpy as np
-from pydantic import validator
 from scipy.spatial.transform import Rotation
 
 from saferl_sim.base_models.entities import BaseEntity, BaseEntityValidator, BaseLinearODESolverDynamics
@@ -25,28 +23,12 @@ class CWHSpacecraftValidator(BaseEntityValidator):
     ValueError
         Improper list lengths for parameters 'position', 'velocity'
     """
-    position: typing.List[float] = [0, 0, 0]
-    velocity: typing.List[float] = [0, 0, 0]
-
-    @validator("position", "velocity")
-    def check_3d_vec_len(cls, v, field):
-        """checks 3d vector field for length 3
-
-        Parameters
-        ----------
-        v : typing.List[float]
-            vector quantity to check
-        field : string
-            name of validator field
-
-        Returns
-        -------
-        typing.List[float]
-            v
-        """
-        if len(v) != 3:
-            raise ValueError(f"{field.name} provided to CWHSpacecraftValidator is not length 3")
-        return v
+    x: float = 0
+    y: float = 0
+    z: float = 0
+    xdot: float = 0
+    ydot: float = 0
+    zdot: float = 0
 
 
 class CWHSpacecraft(BaseEntity):
@@ -97,7 +79,9 @@ class CWHSpacecraft(BaseEntity):
         return CWHSpacecraftValidator
 
     def _build_state(self):
-        state = np.array(self.config.position + self.config.velocity, dtype=np.float32)
+        state = np.array(
+            [self.config.x, self.config.y, self.config.z] + [self.config.xdot, self.config.ydot, self.config.zdot], dtype=np.float32
+        )
 
         return state
 

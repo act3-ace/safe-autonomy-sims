@@ -18,7 +18,11 @@ class TimeoutDoneFunction(DoneFuncBase):
     A done function that determines if the max episode time has been reached.
     """
 
-    @classmethod
+    def __init__(self, **kwargs) -> None:
+        self.config: TimeoutDoneValidator
+        super().__init__(**kwargs)
+
+    @property
     def get_validator(cls):
         """
         Params
