@@ -28,11 +28,12 @@ def test_parseMethod_emptyconfig():
 
 @pytest.mark.unit_test
 def test_parseMethod_wrong_name():
+    # the model key gets injected in here test and see what goes wrong here.
     config = {'name':'H'}
     with pytest.raises(RuntimeError) as excinfo:
         CWHAvailablePlatformTypes.ParseFromNameModel(config)
 
-    assert 'did not match a known platform type' in str(execinfo.value)
+    assert 'did not match a known platform type' in str(excinfo.value)
 
 @pytest.mark.unit_test
 def test_parseMethod_correct_config():
