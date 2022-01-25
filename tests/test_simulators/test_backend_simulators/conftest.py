@@ -63,10 +63,10 @@ def evaluate(entity, attr_targets, error_bound=None):
                 differences = np.abs(np.subtract(entity.__getattribute__(key), value))
                 in_bounds = differences <= error_bound
                 assert np.all(in_bounds), \
-                    "Expected attribute {} values to be {} +/- {} but instead received {}".format(
-                        key, value, error_bound, entity.__getattribute__(key))
+                    "Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}".format(
+                        key, value, error_bound, entity.__getattribute__(key), differences)
             else:
                 # compare entity value and target value
                 assert abs(entity.__getattribute__(key) - value) <= error_bound, \
-                    "Expected attribute {} value to be {} +/- {} but instead received {}".format(
-                        key, value, error_bound, entity.__getattribute__(key))
+                    "Expected attribute {} value to be {} +/- {} but instead received {} with an error of +/- {}".format(
+                        key, value, error_bound, entity.__getattribute__(key), differences)
