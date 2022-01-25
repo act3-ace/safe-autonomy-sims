@@ -212,3 +212,32 @@
     heading: 1.7453292519943295
     v: 300
   error_bound: 0.00001
+# state limits
+- case: velocity lower bound from origin
+  attr_init:
+    position: [0, 0]
+    heading: 0
+    v: 200
+  control:
+    heading_rate: 0
+    acceleration: -10
+  num_steps: 10
+  attr_targets:
+    position: [2000, 0, 0]
+    heading: 0
+    v: 200
+  error_bound: 0.00001
+- case: velocity upper bound from origin
+  attr_init:
+    position: [0, 0]
+    heading: 0
+    v: 400
+  control:
+    heading_rate: 0
+    acceleration: 10
+  num_steps: 10
+  attr_targets:
+    position: [4000, 0, 0]
+    heading: 0
+    v: 400
+  error_bound: 0.00001
