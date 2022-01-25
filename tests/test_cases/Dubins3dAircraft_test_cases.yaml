@@ -108,7 +108,7 @@
     acceleration: 0
   num_steps: 36
   attr_targets:
-     position: [0, 0, 0]
+     position: [0, 0, 4432]
      heading: 0
      gamma: 0
      roll: 0.8261734686908949
@@ -127,7 +127,7 @@
     acceleration: 0
   num_steps: 18
   attr_targets:
-    position: [0, 2291.831180523293, 0]
+    position: [0, 2291.831180523293, 4432]
     heading: -np.pi
     gamma: 0
     roll: 0.8261734686908949
