@@ -1,5 +1,5 @@
 # No Control
-- case: From Origin v 200
+- ID: From Origin v 200
   attr_init:
     position: [0, 0]
     heading: 0
@@ -13,7 +13,7 @@
     heading: 0
     v: 200
   error_bound: 0.00001
-- case: From Origin v 289 at angle
+- ID: From Origin v 289 at angle
   attr_init:
     position: [0, 0]
     heading: -127*np.pi/180
@@ -27,7 +27,8 @@
     heading: -127*np.pi/180
     v: 289
   error_bound: 0.00001
-- case: From Offset v 289 at angle
+  proportional_error_bound: 0.01
+- ID: From Offset v 289 at angle
   attr_init:
     position: [-473, 77638]
     heading: -127*np.pi/180
@@ -42,7 +43,7 @@
     v: 289
   error_bound: 0.00001
 # No Acceleration with Turn
-- case: Full Circle v 200
+- ID: Full Circle v 200
   attr_init:
    position: [0, 0]
    heading: 0
@@ -56,7 +57,7 @@
    heading: 0
    v: 200
   error_bound: 0.00001
-- case: Half Circle v 200
+- ID: Half Circle v 200
   attr_init:
    position: [0, 0]
    heading: 0
@@ -70,7 +71,7 @@
    heading: -np.pi
    v: 200
   error_bound: 0.00001
-- case: 3/4 Circle v 200
+- ID: 3/4 Circle v 200
   attr_init:
    position: [0, 0]
    heading: 0
@@ -84,7 +85,7 @@
    heading: -np.pi/2
    v: 200
   error_bound: 0.00001
-- case: 140 deg Circle v 200
+- ID: 140 deg Circle v 200
   attr_init:
     position: [0, 0]
     heading: 0
@@ -98,7 +99,7 @@
     heading: 14*np.pi/18
     v: 200
   error_bound: 0.00001
-- case: 140 deg Circle v 373
+- ID: 140 deg Circle v 373
   attr_init:
     position: [0, 0]
     heading: 0
@@ -112,7 +113,7 @@
     heading: 14*np.pi/18
     v: 373
   error_bound: 0.00001
-- case: 140 deg Circle v 373 negative slow turn
+- ID: 140 deg Circle v 373 negative slow turn
   attr_init:
     position: [0, 0]
     heading: 0
@@ -127,7 +128,7 @@
     v: 373
   error_bound: 0.00001
 # Acceleration with No Turn
-- case: From origin max acceleration
+- ID: From origin max acceleration
   attr_init:
     position: [0, 0]
     heading: 0
@@ -141,7 +142,7 @@
     heading: 0
     v: 400
   error_bound: 0.00001
-- case: From origin max deceleration
+- ID: From origin max deceleration
   attr_init:
     position: [0, 0]
     heading: 0
@@ -155,7 +156,7 @@
     heading: 0
     v: 200
   error_bound: 0.00001
-- case: From origin exceed max acceleration
+- ID: From origin exceed max acceleration
   attr_init:
     position: [0, 0]
     heading: 0
@@ -169,7 +170,7 @@
     heading: 0
     v: 400
   error_bound: 0.00001
-- case: From origin exceed max deceleration
+- ID: From origin exceed max deceleration
   attr_init:
     position: [0, 0]
     heading: 0
@@ -183,7 +184,7 @@
     heading: 0
     v: 200
   error_bound: 0.00001
-- case: From offset, random direction, medium acceleration
+- ID: From offset, random direction, medium acceleration
   attr_init:
     position: [974, -632]
     heading: -.452*np.pi
@@ -198,7 +199,7 @@
     v: 352
   error_bound: 0.00001
 # Acceleration with Turn
-- case: From origin low acceleration
+- ID: From origin low acceleration
   attr_init:
     position: [0, 0]
     heading: 0
@@ -213,7 +214,7 @@
     v: 300
   error_bound: 0.00001
 # state limits
-- case: velocity lower bound from origin
+- ID: velocity lower bound from origin
   attr_init:
     position: [0, 0]
     heading: 0
@@ -227,7 +228,7 @@
     heading: 0
     v: 200
   error_bound: 0.00001
-- case: velocity upper bound from origin
+- ID: velocity upper bound from origin
   attr_init:
     position: [0, 0]
     heading: 0

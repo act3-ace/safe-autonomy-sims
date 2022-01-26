@@ -26,3 +26,8 @@ def attr_targets(request):
 @pytest.fixture
 def error_bound(request):
     return request.param
+
+
+@pytest.fixture
+def proportional_error_bound(request):
+    return request.param

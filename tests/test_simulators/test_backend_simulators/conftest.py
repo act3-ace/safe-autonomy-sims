@@ -39,34 +39,41 @@ def acted_entity(num_steps, entity, control):
     return entity
 
 
-def evaluate(entity, attr_targets, error_bound=None):
+def evaluate(entity, attr_targets, error_bound=None, proportional_error_bound=0):
     # evaluation
     if error_bound is None:
         # direct comparison
         for key, value in attr_targets.items():
             if type(value) in [np.ndarray, list]:
                 # handle array case
-                assert np.array_equal(entity.__getattribute__(key), value), \
-                    "Expected attribute {} values to be {} but instead received {}".format(
-                        key, value, entity.__getattribute__(key))
+                result = entity.__getattribute__(key)
+                assert np.array_equal(result, value), \
+                    "Error of {}! Expected attribute {} values to be {} but instead received {}".format(
+                        np.array(value) - np.array(result), key, value, result)
             else:
                 # compare entity value and target value
-                assert entity.__getattribute__(key) == value, \
-                    "Expected attribute {} value(s) to be {} but instead received {}".format(
-                        key, value, entity.__getattribute__(key))
+                result = entity.__getattribute__(key)
+                assert result == value, \
+                    "Error of {}! Expected attribute {} value(s) to be {} but instead received {}".format(
+                        value - result, key, value, result)
     else:
         # bounded comparison
         for key, value in attr_targets.items():
             if type(value) in [np.ndarray, list]:
                 # handle array case
                 value = np.array(value, dtype=np.float64)
-                differences = np.abs(np.subtract(entity.__getattribute__(key), value))
-                in_bounds = differences <= error_bound
+                result = entity.__getattribute__(key)
+                differences = np.abs(np.subtract(result, value))
+                error_bounds = result * proportional_error_bound + error_bound
+                in_bounds = differences <= error_bounds
                 assert np.all(in_bounds), \
                     "Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}".format(
-                        key, value, error_bound, entity.__getattribute__(key), differences)
+                        key, value, error_bound, result, differences)
             else:
                 # compare entity value and target value
-                assert abs(entity.__getattribute__(key) - value) <= error_bound, \
+                error_bound = error_bound + proportional_error_bound
+                result = entity.__getattribute__(key)
+                difference = abs(value - result)
+                assert abs(result - value) <= error_bound, \
                     "Expected attribute {} value to be {} +/- {} but instead received {} with an error of +/- {}".format(
-                        key, value, error_bound, entity.__getattribute__(key), differences)
+                        key, value, error_bound, result, difference)
