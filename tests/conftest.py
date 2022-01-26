@@ -6,6 +6,9 @@ import yaml
 import numpy as np
 
 
+delimiter = ","
+
+
 def execute_strings(value):
     """
     A recursive helper function to convert string expressions (read from a file) into numerical floats.
@@ -56,6 +59,7 @@ def read_test_cases(file_path, parameter_keywords):
     """
 
     test_cases = []
+    IDs = []
     with open(file_path, 'r') as file:
         file_contents = yaml.safe_load(file)
         for test_case in file_contents:
@@ -69,7 +73,14 @@ def read_test_cases(file_path, parameter_keywords):
                 else:
                     # TODO: raise error if invalid keyword
                     values.append(None)
+
+            # collect test case IDs
+            if "ID" in test_case:
+                IDs.append(test_case["ID"])
+            else:
+                IDs.append(None)                # TODO: how to skip an ID?
+
             # add test case to list of cases
             test_cases.append(values)
 
-    return test_cases
+    return test_cases, IDs
