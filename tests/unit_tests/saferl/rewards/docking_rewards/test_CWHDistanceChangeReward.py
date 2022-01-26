@@ -2,25 +2,18 @@
 Unit tests for the CWHDistanceChangeReward function from the docking_rewards module
 """
 
+import os
 from unittest import mock
 
-import numpy as np
 import pytest
 
 from saferl.rewards.docking_rewards import CWHDistanceChangeReward
+from tests.conftest import delimiter, read_test_cases
 
-test_configs = [
-    # case 1
-    (np.array([0, 0, 0]), np.array([1, 0, 0]), 2, 2),
-    # case 2
-    (np.array([1, 1, 1]), np.array([4, 4, 4]), 0.5, 0.5 * np.sqrt(27)),
-    # case 3 - large number case
-    (np.array([100, 100, 100]), np.array([1000, 1000, 1000]), 0.4, 0.4 * np.sqrt(3 * (900 * 900))),
-    # edge case 1
-    (np.array([0, 0, 0]), np.array([0, 0, 0]), 2, 0),
-    # edge case 2
-    (np.array([1, 1, 1]), np.array([1, 1, 1]), 1.5, 0),
-]
+# Define test assay
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/CWHDistanceChangeReward_test_cases.yaml")
+parameterized_fixture_keywords = ["platform_position1", "platform_position2", "scale", "expected_value"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='platform_position1')
@@ -53,20 +46,6 @@ def fixture_platform_position2(request):
 def fixture_scale(request):
     """
     Get the 'scale' parameter from the test config
-    """
-    return request.param
-
-
-@pytest.fixture(name='expected_value')
-def fixture_expected_value(request):
-    """
-    Parameterized fixture for comparison to the expected boolean to be found corresponding to the agent_name (the key)
-    in the RewardDict returned by the MaxDistanceDoneFunction.
-
-    Returns
-    -------
-    float
-        The expected value of the reward function
     """
     return request.param
 
@@ -141,13 +120,8 @@ def fixture_call_results(
         return results2
 
 
-# expected value -- idk
-# platform position,
-#far awy from docking region, mid way to docking region , close to docking region, then at docking region
-
-
 @pytest.mark.unit_test
-@pytest.mark.parametrize("platform_position1, platform_position2, scale, expected_value", test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the CWHDistanceChangeReward behaves as intended.
@@ -156,15 +130,9 @@ def test_reward_function(call_results, agent_name, expected_value):
     ----------
     call_results : DoneDict
         The resulting DoneDict from calling the CWHDistanceChangeReward
-    next_state : StateDict
-        The StateDict that may have been mutated by the CWHDistanceChangeReward
     agent_name : str
         The name of the agent
-    cut_name : str
-        The name of the component under test
     expected_value : bool
         The expected bool corresponding to whether the agent's episode is done or not
-    expected_status : None or DoneStatusCodes
-        The expected status corresponding to the status of the agent's episode
     """
     assert call_results[agent_name] == expected_value

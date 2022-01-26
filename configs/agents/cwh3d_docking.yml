@@ -24,6 +24,14 @@
     "episode_parameter_provider": {
         "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
     },
+    "simulator_reset_parameters": {
+      "x": 10,
+      "y": 10,
+      "z": 10,
+      "xdot": 0,
+      "ydot": 0,
+      "zdot": 0,
+    },
     "glues": [
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",

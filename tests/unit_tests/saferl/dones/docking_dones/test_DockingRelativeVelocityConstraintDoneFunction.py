@@ -3,20 +3,20 @@ This module holds unit tests and fixtures for the DockingRelativeVelocityConstra
 Author: John McCarroll
 """
 
+import os
 from unittest import mock
 
-import numpy as np
 import pytest
-from act3_rl_core.dones.done_func_base import DoneStatusCodes
 
 from saferl.dones.docking_dones import DockingRelativeVelocityConstraintDoneFunction
+from tests.conftest import delimiter, read_test_cases
 
-test_configs = [
-    # (platform_velocity, target_velocity, constraint_velocity, expected_value, expected_status),
-    (np.array([19, 0, 0]), np.array([10, 0, 0]), 10, False, None),
-    (np.array([20, 0, 0]), np.array([10, 0, 0]), 10, False, None),
-    (np.array([21, 0, 0]), np.array([10, 0, 0]), 10, True, DoneStatusCodes.LOSE),
-]
+# Define test assay
+test_cases_file_path = os.path.join(
+    os.path.split(__file__)[0], "../../../../test_cases/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
+)
+parameterized_fixture_keywords = ["platform_velocity", "target_velocity", "constraint_velocity", "expected_value", "expected_status"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='platform_velocity')
@@ -32,19 +32,6 @@ def fixture_platform_velocity(request):
     return request.param
 
 
-@pytest.fixture(name='target_name')
-def fixture_target_name():
-    """
-    Fixture for returning target's name.
-
-    Returns
-    -------
-    str
-        name of the target platform
-    """
-    return "target"
-
-
 @pytest.fixture(name='target_velocity')
 def fixture_target_velocity(request):
     """
@@ -56,46 +43,6 @@ def fixture_target_velocity(request):
         Three element array describing target's 3D velocity vector
     """
     return request.param
-
-
-@pytest.fixture(name='target_position')
-def fixture_target_position():
-    """
-    Placeholder fixture for returning target position.
-
-    Returns
-    -------
-    NoneType
-        None
-    """
-    return None
-
-
-@pytest.fixture(name='target')
-def fixture_target(mocker, target_position, target_velocity, target_name):
-    """
-    A fixture to create a mock platform with a position property
-
-    Parameters
-    ----------
-    mocker : fixture
-        A pytest-mock fixture which exposes unittest.mock functions
-    target_position : numpy.ndarray
-        The platform's 3D positional vector
-    target_velocity : numpy.ndarray
-        The platform's 3D velocity vector
-    target_name : str
-        The name of the agent
-
-    Returns
-    -------
-    test_target_platform : MagicMock
-        A mock of a platform with a position property
-    """
-    test_target_platform = mocker.MagicMock(name=target_name)
-    test_target_platform.position = target_position
-    test_target_platform.velocity = target_velocity
-    return test_target_platform
 
 
 @pytest.fixture(name='constraint_velocity')
@@ -114,7 +61,7 @@ def fixture_constraint_velocity(request):
 
 
 @pytest.fixture(name='cut')
-def fixture_cut(cut_name, agent_name, constraint_velocity):
+def fixture_cut(cut_name, agent_name, constraint_velocity, target_name):
     """
     A fixture that instantiates a DockingRelativeVelocityConstraintDoneFunction and returns it.
 
@@ -126,13 +73,14 @@ def fixture_cut(cut_name, agent_name, constraint_velocity):
         The name of the agent
     constraint_velocity : int
         The velocity limit passed to the DockingRelativeVelocityConstraintDoneFunction constructor
+    target_name : str
+        The name of the target agent
 
     Returns
     -------
     DockingRelativeVelocityConstraintDoneFunction
         An instantiated component under test
     """
-    target_name = "target"
     return DockingRelativeVelocityConstraintDoneFunction(
         name=cut_name, agent_name=agent_name, constraint_velocity=constraint_velocity, target=target_name
     )
@@ -157,6 +105,8 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         The StateDict that the DockingVelocityLimitDoneFunction mutates
     platform : MagicMock
         The mock platform to be returned to the DockingVelocityLimitDoneFunction when it uses get_platform_by_name()
+    target : MagicMock
+        The mock target to be returned to the DockingVelocityLimitDoneFunction when it uses get_platform_by_name()
 
     Returns
     -------
@@ -176,9 +126,7 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(
-    "platform_velocity,target_velocity,constraint_velocity,expected_value,expected_status", test_configs, indirect=True
-)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_call(call_results, next_state, agent_name, cut_name, expected_value, expected_status):
     """
     A parameterized test to ensure that the DockingRelativeVelocityConstraintDoneFunction behaves as intended.
