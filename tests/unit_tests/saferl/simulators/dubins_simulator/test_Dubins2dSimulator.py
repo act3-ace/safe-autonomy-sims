@@ -66,3 +66,32 @@ def test_Dubins2dSimulator(tmp_config, num_steps, action, attr_targets):
 
     for key, value in attr_targets:
         assert state.sim_platforms[0].getattr(key) == value
+
+
+@pytest.fixture(name='cut')
+def fixture_cut(step_size, agent_configs):
+    return Dubins2dSimulator(step_size=step_size, agent_configs=agent_configs)
+
+
+@pytest.mark.unit_test
+def test_reset(cut, reset_config, expected_state):
+    state = cut.reset(reset_config)
+    assert state == expected_state
+
+
+@pytest.mark.unit_test
+def test_construct_sim_entities(cut, expected_sim_entities):
+    sim_entities = cut.construct_sim_entities()
+    assert sim_entities == expected_sim_entities
+
+
+@pytest.mark.unit_test
+def test_construct_platforms(cut, expected_sim_platforms):
+    sim_platforms = cut.construct_platforms()
+    assert sim_platforms == expected_sim_platforms
+
+
+@pytest.mark.unit_test
+def test_step(cut, expected_state):
+    state = cut.step()
+    assert state == expected_state

@@ -9,3 +9,11 @@ class Dubins2dAircraftFactory(factory.Factory):
 
     name = "blue0"
     integration_method = "RK45"
+
+
+class Dubins3dAircraftFactory(factory.Factory):
+    class Meta:
+        model = e.Dubins3dAircraft
+
+    name = "blue0"
+    integration_method = "RK45"
