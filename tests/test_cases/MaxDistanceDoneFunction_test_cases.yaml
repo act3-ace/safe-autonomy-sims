@@ -17,20 +17,3 @@
   platform_position: np.array([0, 0, 0])
   expected_value: False
   expected_status: None
-
-# Simple Boundary Testing
-- case: below max distance
-  platform_position: np.array([9, 0, 0])
-  max_distance: 10
-  expected_value: False
-  expected_status: None
-- case: at max distance
-  platform_position: np.array([10, 0, 0])
-  max_distance: 10
-  expected_value: False
-  expected_status: None
-- case: above max distance
-  platform_position: np.array([11, 0, 0])
-  max_distance: 10
-  expected_value: True
-  expected_status: DoneStatusCodes.LOSE
