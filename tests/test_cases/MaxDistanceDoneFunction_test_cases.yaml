@@ -1,19 +1,19 @@
 # Simple boundary testing
 - case: outside max distance
   max_distance: 10000
-  lead_position: np.array([10001, 0, 0])
-  platform_position: np.array([0, 0, 0])
+  platform_position: np.array([10001, 0, 0])
+  lead_position: np.array([0, 0, 0])
   expected_value: True
   expected_status: DoneStatusCodes.LOSE
 - case: inside max distance
   max_distance: 10000
-  lead_position: np.array([9999, 0, 0])
-  platform_position: np.array([0, 0, 0])
+  platform_position: np.array([9999, 0, 0])
+  lead_position: np.array([0, 0, 0])
   expected_value: False
   expected_status: None
 - case: at max distance
   max_distance: 10000
-  lead_position: np.array([10000, 0, 0])
-  platform_position: np.array([0, 0, 0])
+  platform_position: np.array([10000, 0, 0])
+  lead_position: np.array([0, 0, 0])
   expected_value: False
   expected_status: None
