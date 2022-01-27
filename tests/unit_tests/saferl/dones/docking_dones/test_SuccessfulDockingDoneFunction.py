@@ -4,21 +4,19 @@ This module holds unit tests and fixtures for the SuccessfulDockingDoneFunction.
 Author: John McCarroll
 """
 
-import numpy as np
+import os
+
 import pytest
-from act3_rl_core.dones.done_func_base import DoneStatusCodes
 
 from saferl.dones.docking_dones import SuccessfulDockingDoneFunction
+from tests.conftest import delimiter, read_test_cases
 
-test_configs = [
-    # (platform_position, platform_velocity, docking_region_radius, velocity_limit, expected_value, expected_status),
-    (np.array([9, 0, 0]), np.array([0, 0, 0]), 10, 10, True, DoneStatusCodes.WIN),
-    (np.array([10, 0, 0]), np.array([0, 0, 0]), 10, 10, True, DoneStatusCodes.WIN),
-    (np.array([11, 0, 0]), np.array([0, 0, 0]), 10, 10, False, None),
-    (np.array([9, 0, 0]), np.array([9, 0, 0]), 10, 10, True, DoneStatusCodes.WIN),
-    (np.array([9, 0, 0]), np.array([10, 0, 0]), 10, 10, True, DoneStatusCodes.WIN),
-    (np.array([9, 0, 0]), np.array([11, 0, 0]), 10, 10, True, DoneStatusCodes.LOSE),
+# Define test assay
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/SuccessfulDockingDoneFunction_test_cases.yaml")
+parameterized_fixture_keywords = [
+    "platform_position", "platform_velocity", "docking_region_radius", "velocity_limit", "expected_value", "expected_status"
 ]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='platform_position')
@@ -102,9 +100,7 @@ def fixture_cut(cut_name, agent_name, docking_region_radius, velocity_limit):
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(
-    "platform_position,platform_velocity,docking_region_radius,velocity_limit,expected_value,expected_status", test_configs, indirect=True
-)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_call(call_results, next_state, agent_name, cut_name, expected_value, expected_status):
     """
     A parameterized test to ensure that the SuccessfulDockingDoneFunction behaves as intended.

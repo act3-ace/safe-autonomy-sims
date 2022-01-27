@@ -7,6 +7,7 @@ import typing
 
 import numpy as np
 from act3_rl_core.libraries.state_dict import StateDict
+from act3_rl_core.libraries.units import ValueWithUnits
 from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
 
@@ -40,12 +41,12 @@ class SafeRLSimulator(BaseSimulator):
     It is also responsible for reporting the simulation state at each timestep.
     """
 
-    @classmethod
-    def get_simulator_validator(cls):
+    @property
+    def get_simulator_validator(self):
         return SafeRLSimulatorValidator
 
-    @classmethod
-    def get_reset_validator(cls):
+    @property
+    def get_reset_validator(self):
         return SafeRLSimulatorResetValidator
 
     def __init__(self, **kwargs):
@@ -56,7 +57,7 @@ class SafeRLSimulator(BaseSimulator):
         self.clock = 0.0
 
     def reset(self, config):
-        config = self.get_reset_validator()(**config)
+        config = self.get_reset_validator(**config)
         self._state.clear()
         self.clock = 0.0
         self.sim_entities = self.construct_sim_entities(config.platforms)
@@ -94,6 +95,10 @@ class SafeRLSimulator(BaseSimulator):
                 agent_reset_config = platforms.get(agent_id, {})
 
             entity_kwargs = {**sim_config_kwargs, **agent_reset_config}
+
+            for key, val in entity_kwargs.items():
+                if isinstance(val, ValueWithUnits):
+                    entity_kwargs[key] = val.value
 
             entity_class = self.platform_map[sim_config.get('platform', 'default')][0]
             sim_entities[agent_id] = entity_class(name=agent_id, **entity_kwargs)
