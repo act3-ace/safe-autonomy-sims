@@ -28,7 +28,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         super().__init__(**kwargs)
 
     @property
-    def get_validator(cls):
+    def get_validator(self):
         """
         Params
         ------
@@ -292,44 +292,38 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         return done
 
 
-if __name__ == "__main__":
-    from collections import OrderedDict
-
-    from saferl.simulators.cwh_simulator import CWHSimulator
-
-    tmp_config = {
-        "step_size": 1,
-        "agent_configs": {
-            "blue0": {
-                "sim_config": {},
-                "platform_config": [
-                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
-                        "name": "X Thrust", "axis": 0
-                    }),
-                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
-                        "name": "Y Thrust", "axis": 1
-                    }),
-                    ("space.cwh.platforms.cwh_controllers.ThrustController", {
-                        "name": "Z Thrust", "axis": 2
-                    }),
-                    ("space.cwh.platforms.cwh_sensors.PositionSensor", {}),
-                    ("space.cwh.platforms.cwh_sensors.VelocitySensor", {}),
-                ],
-            }
-        },
-    }
-
-    reset_config = {"agent_initialization": {"blue0": {"position": [0, 0, 0], "velocity": [0, 0, 0]}}}
-
-    tmp = CWHSimulator(**tmp_config)
-    state = tmp.reset(reset_config)
-
-    dist_done_fn = MaxDistanceDoneFunction(agent_name="blue0", max_distance=40000)
-    docking_done_fn = SuccessfulDockingDoneFunction(agent_name="blue0", docking_region_radius=0.5)
-
-    for i in range(5):
-        state = tmp.step()
-        dist_done = dist_done_fn(observation=OrderedDict(), action=OrderedDict(), next_observation=OrderedDict(), next_state=state)
-        docking_done = docking_done_fn(observation=OrderedDict(), action=OrderedDict(), next_observation=OrderedDict(), next_state=state)
-        # print(dist_done)
-        print(docking_done)
+# if __name__ == "__main__":
+#     from act3_rl_core.libraries.state_dict import StateDict
+#
+#     import saferl.platforms.cwh.cwh_controllers as c
+#     import saferl.platforms.cwh.cwh_sensors as s
+#     from saferl.platforms.cwh.cwh_platform import CWHPlatform
+#     from saferl_sim.cwh.cwh import CWHSpacecraft
+#
+#     agent_name = "blue0"
+#     lead_name = "lead"
+#     cut_name = "MaxDistanceDone"
+#     max_distance = 10000
+#
+#     observation = np.array([0, 0, 0])
+#     action = np.array([0, 0, 0])
+#     next_observation = np.array([0, 0, 0])
+#
+#     aircraft = CWHSpacecraft
+#     aircraft_config = [
+#         (c.ThrustController, {
+#             'axis': 0
+#         }), (c.ThrustController, {
+#             'axis': 1
+#         }), (c.ThrustController, {
+#             'axis': 2
+#         }), (s.PositionSensor, {}), (s.VelocitySensor, {})
+#     ]
+#     platform = CWHPlatform(platform_name=agent_name, platform=aircraft(name=agent_name, x=10001), platform_config=aircraft_config)
+#
+#     state = StateDict({"episode_state": {agent_name: {cut_name: None}}, "sim_platforms": [platform]})
+#
+#     max_dist_done = MaxDistanceDoneFunction(agent_name=agent_name, name=cut_name, max_distance=max_distance)
+#     done_dict = max_dist_done(observation=observation, action=action, next_observation=next_observation, next_state=state)
+#
+#     print(done_dict)
