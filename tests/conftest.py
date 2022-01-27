@@ -1,14 +1,21 @@
 """
-This module defines fixtures and functions common to the entire test suite.
+This module defines fixtures, functions, and constants common to the entire test suite.
+Python packages used in test case configs must be imported to this module for error free value loading.
+
+Author: John McCarroll
 """
 
 import yaml
 import numpy as np
+from scipy.spatial.transform import Rotation
+from act3_rl_core.dones.done_func_base import DoneStatusCodes
 
 
+# Define constants
 delimiter = ","
 
 
+# Define functions
 def execute_strings(value):
     """
     A recursive helper function to convert string expressions (read from a file) into numerical floats.
@@ -25,7 +32,7 @@ def execute_strings(value):
     """
 
     if type(value) is str:
-        # convert numbers + expressions into floats
+        # convert numbers + expressions into floats + execute python library calls
         try:
             value = eval(value)
         except:

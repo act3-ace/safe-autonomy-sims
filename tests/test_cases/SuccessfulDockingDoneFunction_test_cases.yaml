@@ -1,0 +1,43 @@
+# Simple Boundary Testing
+- case: inside docking boundary region and below velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([0, 0, 0])
+  docking_region_radius: 10
+  velocity_limit: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.WIN
+- case: on docking region boundary and below velocity constraint
+  platform_position: np.array([10, 0, 0])
+  platform_velocity: np.array([0, 0, 0])
+  docking_region_radius: 10
+  velocity_limit: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.WIN
+- case: outside docking region boundary and below velocity constraint
+  platform_position: np.array([11, 0, 0])
+  platform_velocity: np.array([0, 0, 0])
+  docking_region_radius: 10
+  velocity_limit: 10
+  expected_value: False
+  expected_status: None
+- case: inside docking region boundary and below velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([9, 0, 0])
+  docking_region_radius: 10
+  velocity_limit: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.WIN
+- case: inside docking region boundary and at velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([10, 0, 0])
+  docking_region_radius: 10
+  velocity_limit: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.WIN
+- case: inside docking region boundary and above velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([11, 0, 0])
+  docking_region_radius: 10
+  velocity_limit: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.LOSE

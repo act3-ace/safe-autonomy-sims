@@ -4,18 +4,18 @@ This module holds unit tests and fixtures for the TimeoutDoneFunction.
 Author: John McCarroll
 """
 
+import os
+
 import pytest
-from act3_rl_core.dones.done_func_base import DoneStatusCodes
 from act3_rl_core.libraries.state_dict import StateDict
 
 from saferl.dones.common_dones import TimeoutDoneFunction
+from tests.conftest import delimiter, read_test_cases
 
-test_configs = [
-    # (sim_time,max_sim_time,expected_value,expected_status),
-    (9, 10, False, None),
-    (10, 10, True, DoneStatusCodes.LOSE),
-    (11, 10, True, DoneStatusCodes.LOSE),
-]
+# Define test assay
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/TimeoutDoneFunction_test_cases.yaml")
+parameterized_fixture_keywords = ["sim_time", "max_sim_time", "expected_value", "expected_status"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='max_sim_time')
@@ -91,7 +91,7 @@ def fixture_cut(cut_name, agent_name, max_sim_time):
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize("sim_time,max_sim_time,expected_value,expected_status", test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_call(call_results, next_state, agent_name, cut_name, expected_value, expected_status):
     """
     A parameterized test to ensure that the TimeoutDoneFunction behaves as intended.
