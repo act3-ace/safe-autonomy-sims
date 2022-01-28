@@ -11,13 +11,12 @@ import pytest
 from act3_rl_core.libraries.environment_dict import DoneDict
 
 from saferl.dones.rejoin_dones import RejoinDone
-from tests.conftest import read_test_cases
+from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/RejoinDone_test_cases.yaml")
 parameterized_fixture_keywords = ["agent_name", "done_status", "expected_status"]
-delimiter = ","
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name="agent_name")
@@ -134,7 +133,7 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_call(call_results, expected_status):
     """
     A parameterized test to ensure that the CrashDoneFunction behaves as intended.
