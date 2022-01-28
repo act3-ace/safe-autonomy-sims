@@ -57,8 +57,8 @@
    position: [0, 0, 0]
    heading: 0
    v: 200
-  error_bound: 0.00001
-  proportional_error_bound: 0.01
+  error_bound: 0.001
+  proportional_error_bound: 0.001
 - ID: Half Circle v 200
   attr_init:
    position: [0, 0]
@@ -70,10 +70,10 @@
   num_steps: 18
   attr_targets:
    position: [0, 2291.831180523293, 0]
-   heading: -np.pi
+   heading: np.pi
    v: 200
-  error_bound: 0.00001
-  proportional_error_bound: 0.01
+  error_bound: 0.001
+  proportional_error_bound: 0.001
 - ID: 3/4 Circle v 200
   attr_init:
    position: [0, 0]

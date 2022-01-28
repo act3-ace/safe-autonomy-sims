@@ -113,8 +113,8 @@
      gamma: 0
      roll: 0.8261734686908949
      v: 200
-  error_bound: 0.0001
-  proportional_error_bound: 0.01
+  error_bound: 0.001
+  proportional_error_bound: 0.001
 - ID: Half Circle v 200
   attr_init:
     position: [0, 0, 4432]
@@ -129,12 +129,12 @@
   num_steps: 18
   attr_targets:
     position: [0, 2291.831180523293, 4432]
-    heading: -np.pi
+    heading: np.pi
     gamma: 0
     roll: 0.8261734686908949
     v: 200
-  error_bound: 0.0001
-  proportional_error_bound: 0.01
+  error_bound: 0.001
+  proportional_error_bound: 0.001
 - ID: 3/4 Circle v 200
   attr_init:
     position: [0, 0, 0]
@@ -487,7 +487,7 @@
     gamma: 0.3490658503988659
     roll: -1.0471975511965976
     v: 278
-  error_bound: 0.0001
+  error_bound: 0.001
   proportional_error_bound: 0.01
 - ID: gamma lower limit, random start
   attr_init:
@@ -503,12 +503,12 @@
   num_steps: 14
   attr_targets:
     position: [-6687.360832097276, 3996.848515159524, 5623.5835846869595]
-    heading: -4.817014794255778
+    heading: 1.4661705129238083
     gamma: -0.3490658503988659
     roll: -1.0471975511965976
     v: 400
   error_bound: 0.0001
-  proportional_error_bound: 0.001
+  proportional_error_bound: 0.005
 - ID: roll upper limit from origin
   attr_init:
     position: [ 0, 0, 0 ]
