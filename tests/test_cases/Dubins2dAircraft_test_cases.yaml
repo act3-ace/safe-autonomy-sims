@@ -27,7 +27,7 @@
     heading: -127*np.pi/180
     v: 289
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: From Offset v 289 at angle
   attr_init:
     position: [-473, 77638]
@@ -42,7 +42,7 @@
     heading: -127*np.pi/180
     v: 289
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 # No Acceleration with Turn
 - ID: Full Circle v 200
   attr_init:
@@ -88,7 +88,7 @@
    heading: -np.pi/2
    v: 200
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: 140 deg Circle v 200
   attr_init:
     position: [0, 0]
@@ -118,7 +118,7 @@
     heading: 14*np.pi/18
     v: 373
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: 140 deg Circle v 373 negative slow turn
   attr_init:
     position: [0, 0]
@@ -133,7 +133,7 @@
     heading: -14*np.pi/18
     v: 373
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 # Acceleration with No Turn
 - ID: From origin max acceleration
   attr_init:
@@ -149,7 +149,7 @@
     heading: 0
     v: 400
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: From origin max deceleration
   attr_init:
     position: [0, 0]
@@ -164,7 +164,7 @@
     heading: 0
     v: 200
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: From origin exceed max acceleration
   attr_init:
     position: [0, 0]
@@ -179,7 +179,7 @@
     heading: 0
     v: 400
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: From origin exceed max deceleration
   attr_init:
     position: [0, 0]
@@ -194,7 +194,7 @@
     heading: 0
     v: 200
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 - ID: From offset, random direction, medium acceleration
   attr_init:
     position: [974, -632]
@@ -224,7 +224,7 @@
     heading: 1.7453292519943295
     v: 300
   error_bound: 0.00001
-  proportional_error_bound: 0.01
+  proportional_error_bound: 0.001
 # state limits
 - ID: velocity lower bound from origin
   attr_init:
@@ -256,7 +256,7 @@
   error_bound: 0.00001
 - ID: velocity lower bound, random start
   attr_init:
-    position: [1580.5502287188506, -244.60405927896912, 0]
+    position: [1580.5502287188506, -244.60405927896912]
     heading: -2.446404694593627
     v: 200
   control:
@@ -268,6 +268,7 @@
     heading: -2.446404694593627
     v: 200
   error_bound: 0.00001
+  proportional_error_bound: 0.001
 - ID: velocity upper bound, random start
   attr_init:
     position: [420.54985883684327, 1438.2662616212865]
@@ -282,3 +283,4 @@
     heading: 0.2638053275159513
     v: 400
   error_bound: 0.00001
+  proportional_error_bound: 0.001

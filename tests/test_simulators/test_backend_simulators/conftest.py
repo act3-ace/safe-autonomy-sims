@@ -64,7 +64,7 @@ def evaluate(entity, attr_targets, error_bound=None, proportional_error_bound=0)
                 value = np.array(value, dtype=np.float64)
                 result = entity.__getattribute__(key)
                 differences = np.abs(np.subtract(result, value))
-                error_bounds = result * proportional_error_bound + error_bound
+                error_bounds = np.abs(result) * proportional_error_bound + error_bound
                 in_bounds = differences <= error_bounds
                 assert np.all(in_bounds), \
                     "Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}".format(
