@@ -125,7 +125,7 @@ class HeadingSensor(DubinsSensor):
             heading of aircraft
         """
 
-        return np.array([np.deg2rad(self.parent_platform.heading)], dtype=np.float32)
+        return np.array([self.parent_platform.heading], dtype=np.float32)
 
 
 PluginLibrary.AddClassToGroup(
