@@ -49,5 +49,4 @@ def test_parseMethod_correct_config():
 def test_CWHtuple():
     # remember you are dealing with a enum here
     tup = CWHAvailablePlatformTypes.CWH.value
-    print('tup=', tup)
     assert tup == (1, )

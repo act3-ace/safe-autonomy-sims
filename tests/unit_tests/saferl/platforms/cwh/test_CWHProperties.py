@@ -4,9 +4,10 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 
-from saferl.platforms.cwh.cwh_properties import ThrustProp, PositionProp,VelocityProp
+from saferl.platforms.cwh.cwh_properties import PositionProp, ThrustProp, VelocityProp
 
 #saferl/platforms/cwh/cwh_properties.py
+
 
 def test_ThrustProp():
     obj = ThrustProp()
