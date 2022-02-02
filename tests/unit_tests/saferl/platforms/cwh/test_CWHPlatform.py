@@ -2,17 +2,10 @@
 Tests for the CWHPlatform module
 """
 
-from unittest import mock
-from unittest.mock import MagicMock
-
 import numpy as np
 import pytest
 
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl_sim.cwh.cwh import CWHSpacecraft
-"""
-Tests for get_applied_action
-"""
+# tests for get_applied_action
 
 
 @pytest.mark.unit_test
@@ -31,7 +24,7 @@ get_applied_tests = [(np.array([15., 16., 17.])), (np.array([100., 100., 100.]))
 
 
 @pytest.fixture(name='applied_action')
-def applied_action(request):
+def applied_action(request):  # pylint: disable=W0621
     """
     fixture to obtain the parameter 'applied_action' from a list
     """
@@ -40,27 +33,25 @@ def applied_action(request):
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize('applied_action', get_applied_tests, indirect=True)
-def test_CWHPlatform_getAppliedAction(cwh_platform, applied_action):
+def test_CWHPlatform_getAppliedAction(cwh_platform, applied_action):  # pylint: disable=W0621
     """
     Test CWHPlatform - get_applied_action() method
     This is a parametrized test with 'get_applied_tests' being the test cases
     """
-    cwh_platform._last_applied_action = applied_action
+    cwh_platform._last_applied_action = applied_action  # pylint: disable=W0212
 
     result = cwh_platform.get_applied_action()
     assert np.array_equiv(result, applied_action)
 
 
-"""
-Tests for save_action_to_platform
-"""
+#Tests for save_action_to_platform
 
 action_to_platform_tests = [(np.array([5., 6., 7.])), (np.array([10., 10., 10.])), (np.array([1000., 1000., 1000.]))]
 
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize('applied_action', action_to_platform_tests, indirect=True)
-def test_CWHPlatform_saveActionToPlatform(cwh_platform, applied_action):
+def test_CWHPlatform_saveActionToPlatform(cwh_platform, applied_action):  # pylint: disable=W0621
     """
     Tests for CWHPlatform method - save_action_to_platform(),
     This is a parametrized test, where the tests are in the action_to_platform_tests
@@ -69,14 +60,12 @@ def test_CWHPlatform_saveActionToPlatform(cwh_platform, applied_action):
     cwh_platform.save_action_to_platform(applied_action[1], 1)
     cwh_platform.save_action_to_platform(applied_action[2], 2)
 
-    assert cwh_platform._last_applied_action[0] == applied_action[0]
-    assert cwh_platform._last_applied_action[1] == applied_action[1]
-    assert cwh_platform._last_applied_action[2] == applied_action[2]
+    assert cwh_platform._last_applied_action[0] == applied_action[0]  #pylint: disable=W0212
+    assert cwh_platform._last_applied_action[1] == applied_action[1]  #pylint: disable=W0212
+    assert cwh_platform._last_applied_action[2] == applied_action[2]  #pylint: disable=W0212
 
 
-"""
-Test position attribute
-"""
+#Test position attribute
 
 pos_attr_tests = [
     (np.array([0., 0., 0.]), np.array([0., 0., 0.])), (np.array([50., 100., 150.]), np.array([50., 100., 150.])),
@@ -93,11 +82,8 @@ def test_position_attribute(cwh_platform_pos, pos_expected):
     assert np.array_equiv(cwh_platform_pos.position, pos_expected)
 
 
-"""
-Tests for velocity attribute
-"""
+#Tests for velocity attribute
 
-# pos,
 vel_attr_tests = [
     ([0., 0., 0.], np.array([0., 0., 0.])), ([1., 2., 3.], np.array([1., 2., 3.])), ([10., 10., 10.], np.array([10., 10., 10.])),
     ([1000., 1000., 1000.], np.array([1000., 1000., 1000.]))
@@ -114,9 +100,7 @@ def test_velocity_attrbute(cwh_platform_vel, vel_expected):
     assert np.array_equiv(calced, vel_expected)
 
 
-"""
-Tests for sim_time attribute , accessor and mutator
-"""
+#Tests for sim_time attribute , accessor and mutator
 
 
 @pytest.mark.unit_test
@@ -141,7 +125,7 @@ def setup_sim_time_platform(cwh_platform, set_to_time):
     """
     fixture to set sim_time with respect to the cwh_platform
     """
-    cwh_platform._sim_time = set_to_time
+    cwh_platform._sim_time = set_to_time  #pylint: disable=W0212
     return cwh_platform
 
 
@@ -167,12 +151,10 @@ def test_simtime_setter(cwh_platform, set_to_time):
     parametrized test for to test if sim_time property setter method
     """
     cwh_platform.sim_time = set_to_time
-    assert cwh_platform._sim_time == set_to_time
+    assert cwh_platform._sim_time == set_to_time  #pylint: disable=W0212
 
 
-"""
-Tests for 'operable' property
-"""
+#Tests for 'operable' property
 
 
 @pytest.mark.unit_test

@@ -4,9 +4,7 @@ Conftest file for the CWH platform tests
 
 import pytest
 
-import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl.platforms.cwh.cwh_sensors import CWHSensor, PositionSensor, VelocitySensor
 from saferl_sim.cwh.cwh import CWHSpacecraft
 
 
@@ -15,10 +13,11 @@ def setup_CWHSpacecraft():
     """
     Setup a basic cwh_spacecraft
     """
-    add_args = {'name':'CWH'}
+    add_args = {'name': 'CWH'}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft
+
 
 @pytest.fixture(name='cwh_platform')
 def setup_cwhplatform(cwh_spacecraft):
@@ -29,10 +28,8 @@ def setup_cwhplatform(cwh_spacecraft):
     platform_name = 'blue0'
     platform_config = []
 
-    platform_obj = CWHPlatform(platform_name,cwh_spacecraft,platform_config)
+    platform_obj = CWHPlatform(platform_name, cwh_spacecraft, platform_config)
     return platform_obj
-
-
 
 
 @pytest.fixture(name='pos_input')
@@ -42,6 +39,7 @@ def fixture_pos_input(request):
     from parameter list
     """
     return request.param
+
 
 @pytest.fixture(name='pos_expected')
 def fixture_pos_expected(request):
@@ -56,10 +54,11 @@ def setup_CWHSpacecraft_pos(pos_input):
     """
     based off a certain position construct a CWHSpacecraft at a certain position
     """
-    add_args = {'name':'CWH','x':pos_input[0], 'y':pos_input[1],'z':pos_input[2]}
+    add_args = {'name': 'CWH', 'x': pos_input[0], 'y': pos_input[1], 'z': pos_input[2]}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft
+
 
 @pytest.fixture(name='cwh_platform_pos')
 def setup_cwhplatform_pos(cwh_spacecraft_pos):
@@ -70,8 +69,9 @@ def setup_cwhplatform_pos(cwh_spacecraft_pos):
     platform_name = 'blue0'
     platform_config = []
 
-    platform_obj = CWHPlatform(platform_name,cwh_spacecraft_pos,platform_config)
+    platform_obj = CWHPlatform(platform_name, cwh_spacecraft_pos, platform_config)
     return platform_obj
+
 
 @pytest.fixture(name='vel_input')
 def fixture_vel_input(request):
@@ -80,6 +80,7 @@ def fixture_vel_input(request):
     from parameter list
     """
     return request.param
+
 
 @pytest.fixture(name='vel_expected')
 def fixture_vel_expected(request):
@@ -94,10 +95,11 @@ def setup_CWHSpacecraft_vel(vel_input):
     """
     setup a CWHSpacecraft at a certain velocity
     """
-    add_args = {'name':'CWH','xdot':vel_input[0], 'ydot':vel_input[1],'zdot':vel_input[2]}
+    add_args = {'name': 'CWH', 'xdot': vel_input[0], 'ydot': vel_input[1], 'zdot': vel_input[2]}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft
+
 
 @pytest.fixture(name='cwh_platform_vel')
 def setup_cwhplatform_vel(cwh_spacecraft_vel):
@@ -107,5 +109,5 @@ def setup_cwhplatform_vel(cwh_spacecraft_vel):
     platform_name = 'blue0'
     platform_config = []
 
-    platform_obj = CWHPlatform(platform_name,cwh_spacecraft_vel,platform_config)
+    platform_obj = CWHPlatform(platform_name, cwh_spacecraft_vel, platform_config)
     return platform_obj
