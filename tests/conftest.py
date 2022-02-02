@@ -31,10 +31,13 @@ def wrap_angle(angle, max=np.pi):
     -------
         The wrapped angle.
     """
-    if abs(angle) >= max:
+    if abs(angle) > max:
         shifted_angle = angle + max
         wrapped_angle = shifted_angle % (2 * max)
         angle = wrapped_angle - max if wrapped_angle != 0.0 else wrapped_angle
+    elif angle == -max:
+        # handle -pi discontinuity
+        angle *= -1
     return angle
 
 
@@ -68,7 +71,7 @@ def execute_strings(value):
     return value
 
 
-def enforce_defaults(value, keyword, functions):
+def preprocess_values(value, keyword, functions):
     """
     A recursive helper function to
 
@@ -86,7 +89,7 @@ def enforce_defaults(value, keyword, functions):
     if type(value) is dict:
         for k, v in value.items():
             # default = defaults[k] if k in defaults else None
-            value[k] = enforce_defaults(v, k, functions)
+            value[k] = preprocess_values(v, k, functions)
 
     # default processing
     if keyword in functions:
@@ -140,7 +143,7 @@ def read_test_cases(file_path, parameter_keywords):
                 # iteratively search for given keywords
                 if keyword in test_case:
                     value = execute_strings(test_case[keyword])
-                    value = enforce_defaults(value, keyword, functions)
+                    value = preprocess_values(value, keyword, functions)
                     values.append(value)
                 elif keyword in defaults:
                     values.append(defaults[keyword])
@@ -160,4 +163,12 @@ def read_test_cases(file_path, parameter_keywords):
     return test_cases, IDs
 
 
-print(read_test_cases("test_cases/Dubins2dAircraft_test_cases.yaml", ['attr_targets', 'heading', 'position']))
+print(read_test_cases("test_cases/Dubins3dAircraft_test_cases.yaml", ['attr_targets']))
+
+
+# ["attr_init",
+# "control",
+# "num_steps",
+# "attr_targets",
+# "error_bound",
+# "proportional_error_bound"]

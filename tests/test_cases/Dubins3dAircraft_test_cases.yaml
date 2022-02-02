@@ -1,3 +1,11 @@
+# Define Defaults and value processing functions
+- ID: defaults
+  defaults:
+    error_bound: 0.0001
+#    proportional_error_bound: 0.0001
+  functions:
+    heading: wrap_angle
+
 #  No Control:
 - ID: From Origin v 200
   attr_init:
@@ -17,7 +25,6 @@
     gamma: 0
     roll: 0
     v: 200
-  error_bound: 0.0001
 - ID: From Origin v 289 at angle
   attr_init:
     position: [0, 0, 324234]
@@ -36,7 +43,6 @@
     gamma: 0
     roll: 0
     v: 289
-  error_bound: 0.0001
 - ID: From Offset v 289 at angle
   attr_init:
     position: [-473, 77638, -233]
@@ -55,7 +61,6 @@
     gamma: 0
     roll: 0
     v: 289
-  error_bound: 0.0001
 - ID: From Origin v 200 with positive pitch
   attr_init:
     position: [0, 0, 0]
@@ -74,7 +79,6 @@
     gamma: np.pi/9
     roll: 0
     v: 200
-  error_bound: 0.0001
 - ID: From Origin v 200 with negative pitch
   attr_init:
     position: [0, 0, 0]
@@ -93,7 +97,6 @@
     gamma: -np.pi/18
     roll: 0
     v: 200
-  error_bound: 0.0001
 #  No Acceleration with Turn:
 - ID: Full Circle v 200
   attr_init:
@@ -153,7 +156,6 @@
     gamma: 0
     roll: 0.8261734686908949
     v: 200
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: 140 deg Circle v 200
   attr_init:
@@ -173,7 +175,6 @@
     gamma: 0
     roll: 0.8261734686908949
     v: 200
-  error_bound: 0.0001
 - ID: 140 deg Circle v 373 negative slow turn
   attr_init:
     position: [0, 0, -4632]
@@ -192,7 +193,6 @@
     gamma: 0
     roll: -0.5934401760570118
     v: 373
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 #  Acceleration with No Turn:
 - ID: From origin max acceleration
@@ -213,7 +213,6 @@
     gamma: 0
     roll: 0
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: From origin max deceleration
   attr_init:
@@ -233,7 +232,6 @@
     gamma: 0
     roll: 0
     v: 200
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: From origin exceed max acceleration
   attr_init:
@@ -253,7 +251,6 @@
     gamma: 0
     roll: 0
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: From origin exceed max deceleration
   attr_init:
@@ -273,7 +270,6 @@
     gamma: 0
     roll: 0
     v: 200
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: From offset, random direction, medium acceleration
   attr_init:
@@ -293,7 +289,6 @@
     gamma: 0
     roll: 0
     v: 352
-  error_bound: 0.0001
 #  Acceleration with Turn:
 - ID: From origin low acceleration
   attr_init:
@@ -313,7 +308,6 @@
     gamma: 0.0
     roll: 1.0471975511965976
     v: 300
-  error_bound: 0.0001
 - ID: From origin pitch and roll rate max positive
   attr_init:
     position: [0, 0, 0]
@@ -332,7 +326,6 @@
     gamma: 0.3490658503988659
     roll: 0.8726646259971648
     v: 300
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: From offset pitch and roll rate small negative
   attr_init:
@@ -352,7 +345,6 @@
     gamma: -0.3490658503988659
     roll: -0.4363323129985824
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.005
 # state limits
 - ID: velocity upper limit from origin
@@ -373,7 +365,6 @@
     gamma: 0
     roll: 0
     v: 400
-  error_bound: 0.0001
 - ID: velocity lower limit from origin
   attr_init:
     position: [ 0, 0, 0 ]
@@ -392,7 +383,6 @@
     gamma: 0
     roll: 0
     v: 200
-  error_bound: 0.0001
 - ID: velocity upper limit, random start
   attr_init:
     position: [ -2809.7948376246586, -2660.6793814319763, 403.9143504118553 ]
@@ -411,7 +401,6 @@
     gamma: 0.04400375503988813
     roll: -0.2568367289832032
     v: 400
-  error_bound: 0.0001
 - ID: velocity lower limit, random start
   attr_init:
     position: [ 2523.084083055622, -3386.085018938586, 2443.4257377727326 ]
@@ -430,7 +419,6 @@
     gamma: 0.2165764665440848
     roll: -0.13088936735306703
     v: 200
-  error_bound: 0.0001
 - ID: gamma upper limit from origin
   attr_init:
     position: [ 0, 0, 0 ]
@@ -449,7 +437,6 @@
     gamma: 0.3490658503988659
     roll: 0
     v: 200
-  error_bound: 0.0001
 - ID: gamma lower limit from origin
   attr_init:
     position: [ 0, 0, 0 ]
@@ -468,7 +455,6 @@
     gamma: -0.3490658503988659
     roll: 0
     v: 200
-  error_bound: 0.0001
 - ID: gamma upper limit, random start
   attr_init:
     position: [ -870.9695491985198, 1286.7693430900035, 4178.759126389558 ]
@@ -507,7 +493,6 @@
     gamma: -0.3490658503988659
     roll: -1.0471975511965976
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.005
 - ID: roll upper limit from origin
   attr_init:
@@ -527,7 +512,6 @@
     gamma: 0
     roll: 1.0471975511965976
     v: 275
-  error_bound: 0.0001
   proportional_error_bound: 0.01
 - ID: roll lower limit from origin
   attr_init:
@@ -547,7 +531,6 @@
     gamma: 0
     roll: -1.0471975511965976
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: roll upper limit, random start
   attr_init:
@@ -567,7 +550,6 @@
     gamma: 0.3490658503988659
     roll: 1.0471975511965976
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.001
 - ID: roll lower limit, random start
   attr_init:
@@ -587,5 +569,4 @@
     gamma: -0.00535204774206656
     roll: -1.0471975511965976
     v: 400
-  error_bound: 0.0001
   proportional_error_bound: 0.005
