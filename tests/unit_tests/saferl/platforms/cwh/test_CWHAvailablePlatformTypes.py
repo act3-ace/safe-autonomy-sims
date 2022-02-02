@@ -5,19 +5,6 @@ from frozendict import frozendict
 
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 
-# define 3-6 separate config as a variables
-# parametrize the main function to take in the vars and test against them
-"""
-1. Make a config no name -- should get RuntimeError
-2. Make a config with name NOT 'CWH' -- Runtime Error
-3. Make a config with name = 'CWH' -- get a variable back
-"""
-"""
-Issue with test :
-
-no 'model' key in config in the first place
-"""
-
 
 @pytest.mark.unit_test
 def test_parseMethod_emptyconfig():
