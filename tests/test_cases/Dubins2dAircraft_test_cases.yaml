@@ -1,3 +1,11 @@
+# Define Defaults and value processing functions
+- ID: defaults
+  defaults:
+    error_bound: 0.001
+    proportional_error_bound: 0.0001
+  functions:
+    heading: wrap_angle
+
 # No Control
 - ID: From Origin v 200
   attr_init:
@@ -70,7 +78,7 @@
   num_steps: 18
   attr_targets:
    position: [0, 2291.831180523293, 0]
-   heading: np.pi
+   heading: -np.pi
    v: 200
   error_bound: 0.001
   proportional_error_bound: 0.001

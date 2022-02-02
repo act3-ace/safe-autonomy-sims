@@ -16,6 +16,28 @@ delimiter = ","
 
 
 # Define functions
+def wrap_angle(angle, max=np.pi):
+    """
+    Wraps angle between -pi and pi by default.
+
+    Parameters
+    ----------
+    angle: float
+        Given angle in radians
+    max: float
+        The max positive angle allowed
+
+    Returns
+    -------
+        The wrapped angle.
+    """
+    if abs(angle) >= max:
+        shifted_angle = angle + max
+        wrapped_angle = shifted_angle % (2 * max)
+        angle = wrapped_angle - max if wrapped_angle != 0.0 else wrapped_angle
+    return angle
+
+
 def execute_strings(value):
     """
     A recursive helper function to convert string expressions (read from a file) into numerical floats.
@@ -46,6 +68,38 @@ def execute_strings(value):
     return value
 
 
+def enforce_defaults(value, keyword, functions):
+    """
+    A recursive helper function to
+
+    Parameters
+    ----------
+    value
+        A value to be converted or modified based on string format.
+
+    Returns
+    -------
+    value
+        Either the original value or the result of an expression encoded in the string
+    """
+
+    if type(value) is dict:
+        for k, v in value.items():
+            # default = defaults[k] if k in defaults else None
+            value[k] = enforce_defaults(v, k, functions)
+
+    # default processing
+    if keyword in functions:
+        function_string = functions[keyword].split()[0]  # clean input
+        function_string += "({})".format(value)
+        try:
+            value = eval(function_string)
+        except Exception as e:
+            print(e)
+
+    return value
+
+
 def read_test_cases(file_path, parameter_keywords):
     """
     A util function for parameterized tests which searches a YAML test case config file and constructs a list of
@@ -67,8 +121,18 @@ def read_test_cases(file_path, parameter_keywords):
 
     test_cases = []
     IDs = []
+    defaults = {}
+    functions = {}
+
     with open(file_path, 'r') as file:
         file_contents = yaml.safe_load(file)
+
+        if file_contents[0]["ID"] == "defaults":
+            # if defaults defined for test assay
+            constants = file_contents.pop(0)
+            defaults = constants["defaults"]
+            functions = constants["functions"]
+
         for test_case in file_contents:
             # iterate through read test cases
             values = []
@@ -76,7 +140,10 @@ def read_test_cases(file_path, parameter_keywords):
                 # iteratively search for given keywords
                 if keyword in test_case:
                     value = execute_strings(test_case[keyword])
+                    value = enforce_defaults(value, keyword, functions)
                     values.append(value)
+                elif keyword in defaults:
+                    values.append(defaults[keyword])
                 else:
                     # TODO: raise error if invalid keyword
                     values.append(None)
@@ -85,9 +152,12 @@ def read_test_cases(file_path, parameter_keywords):
             if "ID" in test_case:
                 IDs.append(test_case["ID"])
             else:
-                IDs.append(None)                # TODO: how to skip an ID?
+                IDs.append("unnamed test")                # TODO: how to skip an ID?
 
             # add test case to list of cases
             test_cases.append(values)
 
     return test_cases, IDs
+
+
+print(read_test_cases("test_cases/Dubins2dAircraft_test_cases.yaml", ['attr_targets', 'heading', 'position']))
