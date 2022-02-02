@@ -10,6 +10,9 @@ from saferl.platforms.cwh.cwh_properties import PositionProp, ThrustProp, Veloci
 
 
 def test_ThrustProp():
+    """
+    Assess that ThrustProp entities are what they are expected to be
+    """
     obj = ThrustProp()
     assert obj.name == 'thrust'
     assert obj.low == [-1.0]
@@ -19,6 +22,9 @@ def test_ThrustProp():
 
 
 def test_PositionProp():
+    """
+    Assess that PositionProp entities are what they are expected to be
+    """
     obj = PositionProp()
     assert obj.name == 'position'
     assert obj.low == [-80000.0] * 3
@@ -28,6 +34,9 @@ def test_PositionProp():
 
 
 def test_VelocityProp():
+    """
+    Assess that VelocityProp entities are what they are expected to be 
+    """
     obj = VelocityProp()
     assert obj.name == 'velocity'
     assert obj.low == [-10000.0] * 3

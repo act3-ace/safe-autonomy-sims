@@ -8,6 +8,9 @@ from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTyp
 
 @pytest.mark.unit_test
 def test_parseMethod_emptyconfig():
+    """
+    Test for the method - parse, checking empty config case
+    """
     config = {}
     with pytest.raises(RuntimeError) as excinfo:
         CWHAvailablePlatformTypes.ParseFromNameModel(config)
@@ -17,6 +20,11 @@ def test_parseMethod_emptyconfig():
 
 @pytest.mark.unit_test
 def test_parseMethod_wrong_name():
+    """
+    Test for the method - parse, checking case where wrong value provided for
+    'name property '
+    """
+
     # the model key gets injected in here test and see what goes wrong here.
     config = {'name': 'H'}
     with pytest.raises(RuntimeError) as excinfo:
@@ -27,6 +35,10 @@ def test_parseMethod_wrong_name():
 
 @pytest.mark.unit_test
 def test_parseMethod_correct_config():
+    """
+    Test for the method - parse, checking case for basic case ,
+    """
+
     config = {'name': 'CWH'}
     ret_val = CWHAvailablePlatformTypes.ParseFromNameModel(config)
     assert ret_val.value == (1, )
@@ -34,6 +46,10 @@ def test_parseMethod_correct_config():
 
 @pytest.mark.unit_test
 def test_CWHtuple():
+    """
+    Check that the tuple value is correct for CWH enum
+    """
+
     # remember you are dealing with a enum here
     tup = CWHAvailablePlatformTypes.CWH.value
     assert tup == (1, )
