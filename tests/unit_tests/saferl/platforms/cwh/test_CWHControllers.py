@@ -7,10 +7,10 @@ import pytest
 from saferl.platforms.cwh.cwh_controllers import CWHController, ThrustController, ThrustControllerValidator
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl_sim.cwh.cwh import CWHSpacecraft
-
 """
 Tests for the CHWController Interface
 """
+
 
 @pytest.mark.unit_test
 def test_CWHController_name():
@@ -54,43 +54,29 @@ def test_CWHController_get_applied_control():
     with pytest.raises(NotImplementedError) as excinfo:
         val = obj.get_applied_control()
 
-"""
-Test the following : CWHController, ThrustControllerValidator, ThrustController
-"""
 
-
-"""
-Tests for CWHController
-
-parent_platform= <saferl.platforms.cwh.cwh_platform.CWHPlatform object at 0x7f5b6d1e0a90>
-config= {'name': 'X Thrust', 'axis': 0, 'properties': {'name': 'x_thrust'}}
-control_properties= <class 'saferl.platforms.cwh.cwh_properties.ThrustProp'>
-"""
 """
 Tests for ThrustController
 """
 
-
-@pytest.fixture(name='cwh_spacecraft')
-def setup_CWHSpacecraft():
-    add_args = {'name':'CWH'}
-    spcft = CWHSpacecraft(**add_args)
-    return spcft
-
-@pytest.fixture(name='cwh_platform')
-def setup_cwhplatform(cwh_spacecraft):
-
-    platform_name = 'blue0'
-    platform_config = []
-
-    platform_obj = CWHPlatform(platform_name,cwh_spacecraft,platform_config)
-    return platform_obj
-
 configs = [
-            ({'name': 'X Thrust', "axis": 0, 'properties': {'name': 'x_thrust'}}),
-            ({"name": "Y Thrust", "axis": 1,'properties': {'name': "y_thrust"}}),
-            ({"name": "Z Thrust", "axis": 2, 'properties': {'name': "z_thrust"}}),
-          ]
+    ({
+        'name': 'X Thrust', "axis": 0, 'properties': {
+            'name': 'x_thrust'
+        }
+    }),
+    ({
+        "name": "Y Thrust", "axis": 1, 'properties': {
+            'name': "y_thrust"
+        }
+    }),
+    ({
+        "name": "Z Thrust", "axis": 2, 'properties': {
+            'name': "z_thrust"
+        }
+    }),
+]
+
 
 @pytest.fixture(name='config')
 def get_config(request):
@@ -98,22 +84,23 @@ def get_config(request):
 
 
 @pytest.fixture(name='thrust_controller')
-def setup_thrustcontroller(cwh_platform,config):
-    controller = ThrustController(cwh_platform,config)
+def setup_thrustcontroller(cwh_platform, config):
+    controller = ThrustController(cwh_platform, config)
     return controller
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize('config',configs,indirect=True)
-def test_apply_control(thrust_controller,config):
+@pytest.mark.parametrize('config', configs, indirect=True)
+def test_apply_control(thrust_controller, config):
     action = 10.
     thrust_controller.apply_control(action)
     assert thrust_controller.parent_platform._last_applied_action[config['axis']] == action
 
+
 @pytest.mark.unit_test
-@pytest.mark.parametrize('config',configs,indirect=True)
-def test_get_applied_action(thrust_controller,config):
-    dummy_arr = np.array([10.,20.,30.])
+@pytest.mark.parametrize('config', configs, indirect=True)
+def test_get_applied_action(thrust_controller, config):
+    dummy_arr = np.array([10., 20., 30.])
     thrust_controller.parent_platform._last_applied_action = dummy_arr
 
     assert thrust_controller.get_applied_control() == thrust_controller.parent_platform._last_applied_action[config['axis']]
