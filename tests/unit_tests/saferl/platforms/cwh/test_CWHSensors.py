@@ -1,13 +1,14 @@
-from unittest import mock
+"""
+ Tests for the cwh_sensors module
+"""
+
 from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 
 import saferl.platforms.cwh.cwh_properties as cwh_props
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.platforms.cwh.cwh_sensors import CWHSensor, PositionSensor, VelocitySensor
-from saferl_sim.cwh.cwh import CWHSpacecraft
 
 
 @pytest.mark.unit_test
@@ -18,8 +19,8 @@ def test_CWHSensor_interface():
     platform = MagicMock()
     sensor = CWHSensor(platform, {}, cwh_props.ThrustProp)
     dummy_state = np.array([0., 0., 0.])
-    with pytest.raises(NotImplementedError) as excinfo:
-        sensor._calculate_measurement(dummy_state)
+    with pytest.raises(NotImplementedError):
+        sensor._calculate_measurement(dummy_state)  #pylint: disable=W0212
 
 
 @pytest.fixture(name='pos_sensor')
@@ -42,18 +43,16 @@ pos_sensor_tests = [
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize("pos_input,pos_expected", pos_sensor_tests, indirect=True)
-def test_PositionSensor_calc_msmt(pos_sensor, pos_input, pos_expected):
+def test_PositionSensor_calc_msmt(pos_sensor, pos_expected):
     """
     parametrized test for the _calculate_measurement method of the Position Sensor
     """
     state = np.array([0., 0., 0.])
-    calced = pos_sensor._calculate_measurement(state)
+    calced = pos_sensor._calculate_measurement(state)  #pylint: disable=W0212
     assert np.array_equiv(calced, pos_expected)
 
 
-"""
-Tests for velocity sensor
-"""
+#Tests for velocity sensor
 
 
 @pytest.fixture(name='vel_sensor')
@@ -76,11 +75,11 @@ vel_sensor_tests = [
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize("vel_input,vel_expected", vel_sensor_tests, indirect=True)
-def test_VelocitySensor_calc_msmt(vel_sensor, vel_input, vel_expected):
+def test_VelocitySensor_calc_msmt(vel_sensor, vel_expected):
     """
     Tests for the _calculate_measurement method of a VelocitySensor
     """
 
     state = np.array([0., 0., 0.])
-    calced = vel_sensor._calculate_measurement(state)
+    calced = vel_sensor._calculate_measurement(state)  #pylint: disable=W0212
     assert np.array_equiv(calced, vel_expected)

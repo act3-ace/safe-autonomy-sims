@@ -1,7 +1,7 @@
-from unittest import mock
-
+"""
+Tests for the CWHAvailablePlatformTypes module
+"""
 import pytest
-from frozendict import frozendict
 
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 

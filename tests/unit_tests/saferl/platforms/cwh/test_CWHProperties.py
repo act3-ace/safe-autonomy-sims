@@ -1,14 +1,12 @@
-from unittest import mock
-from unittest.mock import MagicMock
-
-import numpy as np
+"""
+Tests for the CWHProperties module
+"""
 import pytest
 
 from saferl.platforms.cwh.cwh_properties import PositionProp, ThrustProp, VelocityProp
 
-#saferl/platforms/cwh/cwh_properties.py
 
-
+@pytest.mark.unit_test
 def test_ThrustProp():
     """
     Assess that ThrustProp entities are what they are expected to be
@@ -21,6 +19,7 @@ def test_ThrustProp():
     assert obj.description == 'Direct Thrust Control'
 
 
+@pytest.mark.unit_test
 def test_PositionProp():
     """
     Assess that PositionProp entities are what they are expected to be
@@ -33,9 +32,10 @@ def test_PositionProp():
     assert obj.description == "Position Sensor Properties"
 
 
+@pytest.mark.unit_test
 def test_VelocityProp():
     """
-    Assess that VelocityProp entities are what they are expected to be 
+    Assess that VelocityProp entities are what they are expected to be
     """
     obj = VelocityProp()
     assert obj.name == 'velocity'

@@ -1,19 +1,21 @@
+"""
+Tests for the CWHControllers module of the cwh platform.
+"""
+
 from unittest import mock
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 
-from saferl.platforms.cwh.cwh_controllers import CWHController, ThrustController, ThrustControllerValidator
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl_sim.cwh.cwh import CWHSpacecraft
-"""
-Tests for the CHWController Interface
-"""
+from saferl.platforms.cwh.cwh_controllers import CWHController, ThrustController
 
 
+# CWHController Interface Tests
 @pytest.mark.unit_test
 def test_CWHController_name():
+    """
+    Of the CWHController interface test the name attribute
+    """
 
     mock_platform = mock.MagicMock()
     mock_config = {'name': 'blue0'}
@@ -29,6 +31,9 @@ def test_CWHController_name():
 
 @pytest.mark.unit_test
 def test_CWHController_applycontrol():
+    """
+    Test CWHController interface method - applycontrol
+    """
 
     mock_platform = mock.MagicMock()
     mock_config = {'name': 'blue0'}
@@ -37,12 +42,15 @@ def test_CWHController_applycontrol():
     obj = CWHController(mock_platform, mock_config, mock_control_props)
     dummy_np_arr = np.array([0., 0., 0.])
 
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(NotImplementedError):
         obj.apply_control(dummy_np_arr)
 
 
 @pytest.mark.unit_test
 def test_CWHController_get_applied_control():
+    """
+    Test the CWHController interface - get_applied_control method
+    """
 
     mock_platform = mock.MagicMock()
     mock_config = {'name': 'blue0'}
@@ -51,13 +59,11 @@ def test_CWHController_get_applied_control():
     obj = CWHController(mock_platform, mock_config, mock_control_props)
     dummy_np_arr = np.array([0., 0., 0.])
 
-    with pytest.raises(NotImplementedError) as excinfo:
-        val = obj.get_applied_control()
+    with pytest.raises(NotImplementedError):
+        obj.get_applied_control()
 
 
-"""
-Tests for ThrustController
-"""
+# Tests for ThrustController
 
 configs = [
     ({
@@ -80,11 +86,17 @@ configs = [
 
 @pytest.fixture(name='config')
 def get_config(request):
+    """
+    retrieve the parameter 'config' from a list of parameters
+    """
     return request.param
 
 
 @pytest.fixture(name='thrust_controller')
 def setup_thrustcontroller(cwh_platform, config):
+    """
+    A method to create a ThrustController.
+    """
     controller = ThrustController(cwh_platform, config)
     return controller
 
@@ -92,15 +104,22 @@ def setup_thrustcontroller(cwh_platform, config):
 @pytest.mark.unit_test
 @pytest.mark.parametrize('config', configs, indirect=True)
 def test_apply_control(thrust_controller, config):
+    """
+    Parametrized test for the apply_control method of ThrustController
+    """
     action = 10.
     thrust_controller.apply_control(action)
-    assert thrust_controller.parent_platform._last_applied_action[config['axis']] == action
+    assert thrust_controller.parent_platform._last_applied_action[config['axis']] == action  # pylint: disable=W0212
 
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize('config', configs, indirect=True)
 def test_get_applied_action(thrust_controller, config):
-    dummy_arr = np.array([10., 20., 30.])
-    thrust_controller.parent_platform._last_applied_action = dummy_arr
+    """
+    Parametrized test for the get_applied_control method of ThrustController
+    """
 
-    assert thrust_controller.get_applied_control() == thrust_controller.parent_platform._last_applied_action[config['axis']]
+    dummy_arr = np.array([10., 20., 30.])
+    thrust_controller.parent_platform._last_applied_action = dummy_arr  # pylint: disable=W0212
+
+    assert thrust_controller.get_applied_control() == thrust_controller.parent_platform._last_applied_action[config['axis']]  # pylint: disable=W0212
