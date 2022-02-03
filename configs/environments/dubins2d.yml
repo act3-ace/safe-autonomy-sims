@@ -30,7 +30,7 @@
     "shared": [
       {
         "functor": "saferl.dones.rejoin_dones.RejoinDone",
-        "config": {},
+        "config": {agent_name: "blue0"},
       }
     ]
   },
