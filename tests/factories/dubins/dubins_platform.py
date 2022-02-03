@@ -11,9 +11,13 @@ class Dubins2dPlatformFactory(BasePlatformFactory):
     class Meta:
         model = p.Dubins2dPlatform
 
-    name = factory.Faker('first_name_nonbinary')
-    platform = factory.SubFactory(Dubins2dAircraftFactory, name=name)
-    parts_list = [
+    platform_name = factory.Faker('first_name_nonbinary')
+    platform = factory.SubFactory(
+        Dubins2dAircraftFactory,
+        name=platform_name,
+    )
+
+    platform_config = [
         (c.AccelerationController, {'axis': 0}),
         (c.YawRateController, {'axis': 1}),
         (s.PositionSensor, {}),
@@ -27,8 +31,8 @@ class Dubins3dPlatformFactory(BasePlatformFactory):
         model = p.Dubins3dPlatform
 
     platform = factory.SubFactory(Dubins3dAircraftFactory)
-    name = factory.Faker('first_name_nonbinary')
-    parts_list = [
+    platform_name = factory.Faker('first_name_nonbinary')
+    platform_config = [
         (c.AccelerationController, {'axis': 0}),
         (c.YawRateController, {'axis': 1}),
         (s.PositionSensor, {}),

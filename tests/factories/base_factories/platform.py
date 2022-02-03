@@ -8,4 +8,4 @@ class BasePlatformFactory(factory.Factory):
 
     platform_name = None
     platform = None
-    parts_list = []
+    platform_config = []

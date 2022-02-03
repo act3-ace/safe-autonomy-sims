@@ -28,6 +28,16 @@ class DubinsPlatform(BasePlatform):
         self._last_applied_action = None
         self._sim_time = 0.0
 
+    def __eq__(self, other):
+        if isinstance(other, DubinsPlatform):
+            eq = (self.velocity == other.velocity).all()
+            eq = eq and (self.position == other.position).all()
+            eq = eq and (self.orientation.as_euler("zyx") == other.orientation.as_euler("zyx")).all()
+            eq = eq and self.heading == other.heading
+            eq = eq and self.sim_time == other.sim_time
+            return eq
+        return False
+
     def get_applied_action(self):
         """returns the action stored in this platform
 

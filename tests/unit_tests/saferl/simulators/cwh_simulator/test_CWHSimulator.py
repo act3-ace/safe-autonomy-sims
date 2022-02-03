@@ -1,66 +1,129 @@
 """
 This module defines tests for the CWHSimulator class.
 
-Author: John McCarroll
+Author: Jamie Cunningham
 """
+import os
 
-import numpy as np
 import pytest
+from act3_rl_core.libraries.state_dict import StateDict
 
 from saferl.simulators.cwh_simulator import CWHSimulator
-
-
-@pytest.fixture
-def tmp_config(entity_config):
-    tmp_config = {
-        "step_size": 1,
-        "agent_configs": entity_config,
-    }
-    return tmp_config
-
-
-# define test params
-entity_config = {
-    "blue0": {
-        "sim_config": {},
-        "platform_config": [
-            ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                "name": "X Thrust", "axis": 0
-            }),
-            ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                "name": "Y Thrust", "axis": 1
-            }),
-            ("saferl.platforms.cwh.cwh_controllers.ThrustController", {
-                "name": "Z Thrust", "axis": 2
-            }),
-            ("saferl.platforms.cwh.cwh_sensors.PositionSensor", {}),
-            ("saferl.platforms.cwh.cwh_sensors.VelocitySensor", {}),
-        ],
-    }
-}
-num_steps = 5
-action = [1, 2, 3]
-attr_targets = {'x': 0, 'y': 1, 'state': np.array([1, 2, 3])}
+from tests.conftest import delimiter, read_test_cases
+from tests.factories.cwh.cwh_platform import CWHPlatformFactory
 
 # Define test assay
-test_configs = [
-    (5, entity_config, 1, attr_targets),
-]
+test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/CWHSimulator_test_cases/")
 
 
-@pytest.mark.parametrize("num_steps,entity_config,action,attr_targets", test_configs, indirect=True)
-def test_CWHSimulator(tmp_config, num_steps, action, attr_targets):
+@pytest.fixture(name='step_size')
+def fixture_step_size(request):
+    """Returns simulator step size for test"""
+    return request.param
 
-    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}
 
-    tmp = CWHSimulator(**tmp_config)
-    state = tmp.reset(reset_config)
+@pytest.fixture(name='agent_configs')
+def fixture_agent_configs():
+    """Returns valid agent configuration for testing"""
+    configs = {
+        "blue0": {
+            "sim_config": {
+                "name": 'CWH'
+            }, "platform_config": CWHPlatformFactory.platform_config
+        },
+    }
+    return configs
 
-    for i in range(num_steps):
-        state.sim_platforms[0]._controllers[0].apply_control(action[0])
-        state.sim_platforms[0]._controllers[1].apply_control(action[1])
-        state.sim_platforms[0]._controllers[2].apply_control(action[2])
-        state = tmp.step()
 
-    for key, value in attr_targets.items():
-        assert state.sim_platforms[0].__getattribute__(key) == value
+@pytest.fixture(name='reset_config')
+def fixture_reset_config(request):
+    """Returns reset configuration from test assay"""
+    return request.param
+
+
+@pytest.fixture(name='expected_state')
+def fixture_expected_state(expected_sim_platforms):
+    """Returns valid expected state dict build from test assay settings"""
+    state = StateDict({
+        "sim_platforms": expected_sim_platforms,
+    })
+    return state
+
+
+@pytest.fixture(name='expected_sim_entities')
+def fixture_expected_sim_entities(expected_sim_platforms):
+    """Returns dict of valid sim entities built from test assay platforms"""
+    entities = {plat.name: plat._platform for plat in expected_sim_platforms}  # pylint: disable=W0212
+    return entities
+
+
+@pytest.fixture(name='expected_platform_configs')
+def fixture_expected_platform_configs(request):
+    """Returns platform configs for expected platforms in test assay"""
+    return request.param
+
+
+@pytest.fixture(name='expected_sim_platforms')
+def fixture_expected_sim_platforms(expected_platform_configs):
+    """Returns iterable of expected platforms built from test assay platform configs"""
+    platforms = tuple([CWHPlatformFactory(**(expected_platform_configs[0]))])
+    return platforms
+
+
+@pytest.fixture(name='cut')
+def fixture_cut(step_size, agent_configs):
+    """Returns an initialized CWHSimulator"""
+    return CWHSimulator(step_size=step_size, agent_configs=agent_configs)
+
+
+test_cases_file_path = os.path.join(test_cases_dir, "reset_test_cases.yaml")
+parameterized_fixture_keywords = ["reset_config", "expected_platform_configs", "step_size"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+
+@pytest.mark.unit_test
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+def test_reset(cut, reset_config, expected_state):
+    """Tests the reset method of the CWHSimulator"""
+    state = cut.reset(reset_config)
+    assert state == expected_state
+
+
+test_cases_file_path = os.path.join(test_cases_dir, "construct_sim_entities_test_cases.yaml")
+parameterized_fixture_keywords = ["expected_platform_configs", "step_size"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+
+@pytest.mark.unit_test
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+def test_construct_sim_entities(cut, expected_sim_entities):
+    """Tests the construct_sim_entities method of the CWHSimulator"""
+    sim_entities = cut.construct_sim_entities()
+    assert sim_entities == expected_sim_entities
+
+
+test_cases_file_path = os.path.join(test_cases_dir, "construct_platforms_test_cases.yaml")
+parameterized_fixture_keywords = ["expected_platform_configs", "step_size"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+
+@pytest.mark.unit_test
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+def test_construct_platforms(cut, expected_sim_platforms):
+    """Tests the construct_platforms method of the CWHSimulator"""
+    sim_platforms = cut.construct_platforms()
+    assert sim_platforms == expected_sim_platforms
+
+
+test_cases_file_path = os.path.join(test_cases_dir, "step_test_cases.yaml")
+parameterized_fixture_keywords = ["reset_config", "expected_platform_configs", "step_size"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+
+@pytest.mark.unit_test
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+def test_step(cut, reset_config, expected_state):
+    """Tests the step method of the CWHSimulator"""
+    cut.reset(reset_config)
+    state = cut.step()
+    assert state == expected_state

@@ -1,5 +1,5 @@
 """
-This module defines tests for the Dubins2dSimulator class.
+This module defines tests for the Dubins3dSimulator class.
 
 Author: Jamie Cunningham
 """
@@ -8,12 +8,12 @@ import os
 import pytest
 from act3_rl_core.libraries.state_dict import StateDict
 
-from saferl.simulators.dubins_simulator import Dubins2dSimulator
+from saferl.simulators.dubins_simulator import Dubins3dSimulator
 from tests.conftest import delimiter, read_test_cases
-from tests.factories.dubins.dubins_platform import Dubins2dPlatformFactory
+from tests.factories.dubins.dubins_platform import Dubins3dPlatformFactory
 
 # Define test assay
-test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/Dubins2dSimulator_test_cases/")
+test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/Dubins3dSimulator_test_cases/")
 
 
 @pytest.fixture(name='step_size')
@@ -29,12 +29,12 @@ def fixture_agent_configs():
         "blue0": {
             "sim_config": {
                 "name": 'DUBINS2D'
-            }, "platform_config": Dubins2dPlatformFactory.platform_config
+            }, "platform_config": Dubins3dPlatformFactory.platform_config
         },
         "red0": {
             "sim_config": {
                 "name": 'DUBINS2D'
-            }, "platform_config": Dubins2dPlatformFactory.platform_config
+            }, "platform_config": Dubins3dPlatformFactory.platform_config
         }
     }
     return configs
@@ -71,14 +71,14 @@ def fixture_expected_platform_configs(request):
 @pytest.fixture(name='expected_sim_platforms')
 def fixture_expected_sim_platforms(expected_platform_configs):
     """Returns iterable of expected platforms built from test assay platform configs"""
-    platforms = (Dubins2dPlatformFactory(**(expected_platform_configs[0])), Dubins2dPlatformFactory(**(expected_platform_configs[1])))
+    platforms = (Dubins3dPlatformFactory(**(expected_platform_configs[0])), Dubins3dPlatformFactory(**(expected_platform_configs[1])))
     return platforms
 
 
 @pytest.fixture(name='cut')
 def fixture_cut(step_size, agent_configs):
-    """Returns an initialized Dubins2dSimulator"""
-    return Dubins2dSimulator(step_size=step_size, agent_configs=agent_configs)
+    """Returns an initialized Dubins3dSimulator"""
+    return Dubins3dSimulator(step_size=step_size, agent_configs=agent_configs)
 
 
 test_cases_file_path = os.path.join(test_cases_dir, "reset_test_cases.yaml")
@@ -89,7 +89,7 @@ test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywo
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_reset(cut, reset_config, expected_state):
-    """Tests the reset method of the Dubins2dSimulator"""
+    """Tests the reset method of the Dubins3dSimulator"""
     state = cut.reset(reset_config)
     assert state == expected_state
 
@@ -102,7 +102,7 @@ test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywo
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_construct_sim_entities(cut, expected_sim_entities):
-    """Tests the construct_sim_entities method of the Dubins2dSimulator"""
+    """Tests the construct_sim_entities method of the Dubins3dSimulator"""
     sim_entities = cut.construct_sim_entities()
     assert sim_entities == expected_sim_entities
 
@@ -115,7 +115,7 @@ test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywo
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_construct_platforms(cut, expected_sim_platforms):
-    """Tests the construct_platforms method of the Dubins2dSimulator"""
+    """Tests the construct_platforms method of the Dubins3dSimulator"""
     sim_platforms = cut.construct_platforms()
     assert sim_platforms == expected_sim_platforms
 
@@ -128,7 +128,7 @@ test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywo
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
 def test_step(cut, reset_config, expected_state):
-    """Tests the step method of the Dubins2dSimulator"""
+    """Tests the step method of the Dubins3dSimulator"""
     cut.reset(reset_config)
     state = cut.step()
     assert state == expected_state
