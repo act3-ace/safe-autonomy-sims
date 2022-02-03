@@ -3,11 +3,25 @@ This module defines tests for the Dubins2dSimulator class.
 
 Author: John McCarroll
 """
+import os
+from collections import OrderedDict, defaultdict, deque
 
 import numpy as np
 import pytest
+from act3_rl_core.libraries.state_dict import StateDict
 
+from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform
 from saferl.simulators.dubins_simulator import Dubins2dSimulator
+from saferl_sim.dubins.entities import Dubins2dAircraft
+from tests.conftest import delimiter, read_test_cases
+from tests.factories.dubins.dubins_platform import Dubins2dPlatformFactory
+
+# Define test assay
+test_cases_file_path = os.path.join(
+    os.path.split(__file__)[0], "../../../../test_cases/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
+)
+parameterized_fixture_keywords = ["platform_velocity", "target_velocity", "constraint_velocity", "expected_value", "expected_status"]
+test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture
@@ -19,53 +33,29 @@ def tmp_config(entity_config):
     return tmp_config
 
 
-# define test params
-entity_config = {
-    "blue0": {
-        "sim_config": {},
-        "platform_config": [
-            # ("saferl.platforms.dubins.dubins_controllers.CombinedTurnRateAccelerationController", {
-            #     "name": "YawAccControl"
-            # }),
-            ("saferl.platforms.dubins.dubins_controllers.YawRateController", {
-                "name": "YawRateControl", "axis": 0
-            }),
-            ("saferl.platforms.dubins.dubins_controllers.AccelerationController", {
-                "name": "AccelerationControl", "axis": 1
-            }),
-            ("saferl.platforms.dubins.dubins_sensors.PositionSensor", {}),
-            ("saferl.platforms.dubins.dubins_sensors.VelocitySensor", {}),
-            ("saferl.platforms.dubins.dubins_sensors.HeadingSensor", {}),
-        ],
-    }
-}
-num_steps = 5
-action = [1, 2, 3]
-attr_targets = {'x': 0, 'y': 1, 'state': np.array([1, 2, 3])}
-
-# Define test assay
-test_configs = [
-    (5, entity_config, 1, attr_targets),
-]
+@pytest.fixture(name='expected_state')
+def fixture_expected_state(expected_sim_platforms):
+    state = StateDict(
+        {
+            "sim_platforms": expected_sim_platforms,
+            "episode_history": defaultdict(),
+            "episode_state": OrderedDict(),
+            "step_state": OrderedDict()
+        }
+    )
+    return state
 
 
-@pytest.mark.parametrize("num_steps,entity_config,action,attr_targets", test_configs, indirect=True)
-def test_Dubins2dSimulator(tmp_config, num_steps, action, attr_targets):
+@pytest.fixture(name='expected_sim_entities')
+def fixture_expected_sim_entities(expected_sim_platforms):
+    entities = {plat.name: plat._platform for plat in expected_sim_platforms}
+    return entities
 
-    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "velocity": [0, 0, 0]}}}
 
-    tmp = Dubins2dSimulator(**tmp_config)
-    state = tmp.reset(reset_config)
-
-    for i in range(num_steps):
-        state.sim_platforms[0]._controllers[0].apply_control(action[0])
-        state.sim_platforms[0]._controllers[1].apply_control(action[1])
-        state.sim_platforms[0]._controllers[2].apply_control(action[2])
-
-        state = tmp.step()
-
-    for key, value in attr_targets:
-        assert state.sim_platforms[0].getattr(key) == value
+@pytest.fixture(name='expected_sim_platforms')
+def fixture_expected_sim_platforms(platform_configs):
+    platforms = (Dubins2dPlatformFactory(**plat_cfg) for plat_cfg in platform_configs)
+    return platforms
 
 
 @pytest.fixture(name='cut')
