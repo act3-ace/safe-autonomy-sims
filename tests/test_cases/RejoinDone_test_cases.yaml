@@ -1,0 +1,19 @@
+# Happy path testing
+- case: winning status
+  agent_name: blue0
+  done_status: DoneStatusCodes.WIN
+  expected_status: DoneStatusCodes.WIN
+- case: losing status
+  agent_name: blue0
+  done_status: DoneStatusCodes.LOSE
+  expected_status: DoneStatusCodes.LOSE
+# None
+- case: no done status
+  agent_name: blue0
+  done_status: None
+  expected_status: None
+# Different name
+- case: different agent name
+  agent_name: literally_anything_else
+  done_status: DoneStatusCodes.DRAW
+  expected_status: DoneStatusCodes.DRAW
