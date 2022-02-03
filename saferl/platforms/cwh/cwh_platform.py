@@ -36,6 +36,14 @@ class CWHPlatform(BasePlatform):
         """
         return self._last_applied_action
 
+    def __eq__(self, other):
+        if isinstance(other, CWHPlatform):
+            eq = (self.velocity == other.velocity).all()
+            eq = eq and (self.position == other.position).all()
+            eq = eq and self.sim_time == other.sim_time
+            return eq
+        return False
+
     def save_action_to_platform(self, action, axis):
         """
         saves an action to the platform if it matches

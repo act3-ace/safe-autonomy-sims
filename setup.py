@@ -36,7 +36,8 @@ if __name__ == '__main__':
         'fish',
         'watchdog',
         'speedscope',
-        'pandas-profiling'
+        'pandas-profiling',
+        'factory'
     ]
 
     docs_require = [
