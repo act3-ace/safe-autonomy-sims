@@ -21,7 +21,7 @@ parameterized_fixture_keywords = ["attr_init",
                                   "attr_targets",
                                   "error_bound",
                                   "proportional_error_bound"]
-test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs, angles = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 # override entity fixture
@@ -39,4 +39,4 @@ def entity(initial_entity_state):
 def test_Dubins2dAircraft(acted_entity, control, num_steps, attr_targets, error_bound, proportional_error_bound):
     if proportional_error_bound is None:
         proportional_error_bound = 0
-    evaluate(acted_entity, attr_targets, error_bound=error_bound, proportional_error_bound=proportional_error_bound)
+    evaluate(acted_entity, attr_targets, angles, error_bound=error_bound, proportional_error_bound=proportional_error_bound)
