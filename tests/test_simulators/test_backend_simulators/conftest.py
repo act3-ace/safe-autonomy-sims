@@ -6,6 +6,7 @@ Author: John McCarroll
 
 import pytest
 import numpy as np
+import math
 
 
 @pytest.fixture
@@ -39,30 +40,49 @@ def acted_entity(num_steps, entity, control):
     return entity
 
 
-def evaluate(entity, attr_targets, error_bound=None, proportional_error_bound=0):
+def evaluate(entity, attr_targets, angles, error_bound=None, proportional_error_bound=0):
     # evaluation
-    if error_bound is None:
-        # direct comparison
-        for key, value in attr_targets.items():
+    for key, value in attr_targets.items():
+        # get expected and actual results
+        if type(value) is list:
+            value = np.array(value, dtype=np.float64)
+        result = entity.__getattribute__(key)
+
+        # angle wrapping
+        if key in angles:
+            if len(angles[key]) > 1:
+                # variables compared are lists
+                for index, is_angle in enumerate(angles[key]):
+                    if is_angle:
+                        diff = abs(value[index] - result[index]) % (2*np.pi)
+                        result[index] = diff
+                        value[index] = 0.0          # replace value w/ expected difference after angle wrapping
+            else:
+                # variables compared are single values
+                if angles[key][0]:
+                    wrapped_difference = math.fmod(abs(value - result), 2 * np.pi)
+                    error = min(wrapped_difference, 2*np.pi - wrapped_difference)
+                    result = error
+                    value = 0.0              # replace value w/ expected difference after angle wrapping
+
+        if error_bound is None:
+            # direct comparison
             if type(value) in [np.ndarray, list]:
                 # handle array case
-                result = entity.__getattribute__(key)
                 assert np.array_equal(result, value), \
                     "Error of {}! Expected attribute {} values to be {} but instead received {}".format(
                         np.array(value) - np.array(result), key, value, result)
             else:
                 # compare entity value and target value
-                result = entity.__getattribute__(key)
                 assert result == value, \
                     "Error of {}! Expected attribute {} value(s) to be {} but instead received {}".format(
                         value - result, key, value, result)
-    else:
-        # bounded comparison
-        for key, value in attr_targets.items():
+        else:
+            # bounded comparison
             if type(value) in [np.ndarray, list]:
                 # handle array case
-                value = np.array(value, dtype=np.float64)
-                result = entity.__getattribute__(key)
+                # value = np.array(value, dtype=np.float64)
+                # result = entity.__getattribute__(key)
                 differences = np.abs(np.subtract(result, value))
                 error_bounds = np.abs(result) * proportional_error_bound + error_bound
                 in_bounds = differences <= error_bounds
@@ -72,7 +92,7 @@ def evaluate(entity, attr_targets, error_bound=None, proportional_error_bound=0)
             else:
                 # compare entity value and target value
                 error_bound = error_bound + proportional_error_bound
-                result = entity.__getattribute__(key)
+                # result = entity.__getattribute__(key)
                 difference = abs(value - result)
                 assert abs(result - value) <= error_bound, \
                     "Expected attribute {} value to be {} +/- {} but instead received {} with an error of +/- {}".format(

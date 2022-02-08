@@ -133,8 +133,9 @@ def read_test_cases(file_path, parameter_keywords):
         if file_contents[0]["ID"] == "defaults":
             # if defaults defined for test assay
             constants = file_contents.pop(0)
-            defaults = constants["defaults"]
-            functions = constants["functions"]
+            defaults = constants["defaults"] if "defaults" in constants else {}
+            functions = constants["functions"] if "functions" in constants else {}
+            angles = constants["angles"] if "angles" in constants else {}
 
         for test_case in file_contents:
             # iterate through read test cases
@@ -160,15 +161,4 @@ def read_test_cases(file_path, parameter_keywords):
             # add test case to list of cases
             test_cases.append(values)
 
-    return test_cases, IDs
-
-
-print(read_test_cases("test_cases/Dubins3dAircraft_test_cases.yaml", ['attr_targets']))
-
-
-# ["attr_init",
-# "control",
-# "num_steps",
-# "attr_targets",
-# "error_bound",
-# "proportional_error_bound"]
+    return test_cases, IDs, angles
