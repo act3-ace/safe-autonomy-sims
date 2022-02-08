@@ -1,0 +1,21 @@
+- step_size: 1
+  expected_platform_configs: [
+        {
+            "platform_name": "blue0",
+            "platform__x": 0, "platform__y": 0, "platform__z": 0,
+            "platform__xdot": 0, "platform__ydot": 0, "platform__zdot": 0
+        },
+    ]
+  reset_config: {
+        "platforms": {
+            "blue0": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "xdot": 0,
+                "ydot": 0,
+                "zdot": 0
+            },
+
+        }
+    }

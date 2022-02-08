@@ -30,8 +30,9 @@
     "shared": [
       {
         "functor": "saferl.dones.rejoin_dones.RejoinDone",
-        "config": {},
+        "config": {agent_name: "blue0"},
       }
     ]
-  }
+  },
+  "sanity_check_obs": 1,  # Raise for faster runs
 }
