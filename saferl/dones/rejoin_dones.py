@@ -275,7 +275,7 @@ class RejoinDoneValidator(SharedDoneFuncBaseValidator):
     agent_name : str
         The name of the agent whom will determine the done status of the episode
     """
-    agent_name: typing.Optional[str]
+    agent_name: str
 
 
 class RejoinDone(SharedDoneFuncBase):

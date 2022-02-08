@@ -78,6 +78,14 @@ class CWHSpacecraft(BaseEntity):
     def _get_config_validator(cls):
         return CWHSpacecraftValidator
 
+    def __eq__(self, other):
+        if isinstance(other, CWHSpacecraft):
+            eq = (self.velocity == other.velocity).all()
+            eq = eq and (self.position == other.position).all()
+            eq = eq and (self.orientation.as_euler("zyx") == other.orientation.as_euler("zyx")).all()
+            return eq
+        return False
+
     def _build_state(self):
         state = np.array(
             [self.config.x, self.config.y, self.config.z] + [self.config.xdot, self.config.ydot, self.config.zdot], dtype=np.float32

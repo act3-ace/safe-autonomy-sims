@@ -48,6 +48,15 @@ class BaseDubinsAircraft(BaseEntity):
     def _get_config_validator(cls):
         return BaseDubinsAircraftValidator
 
+    def __eq__(self, other):
+        if isinstance(other, BaseDubinsAircraft):
+            eq = (self.velocity == other.velocity).all()
+            eq = eq and (self.position == other.position).all()
+            eq = eq and (self.orientation.as_euler("zyx") == other.orientation.as_euler("zyx")).all()
+            eq = eq and self.heading == other.heading
+            return eq
+        return False
+
     @property
     @abc.abstractmethod
     def v(self):
@@ -173,6 +182,18 @@ class Dubins2dAircraft(BaseDubinsAircraft):
         super().__init__(
             dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map, **kwargs
         )
+
+    def __eq__(self, other):
+        if isinstance(other, Dubins2dAircraft):
+            eq = (self.velocity == other.velocity).all()
+            eq = eq and (self.position == other.position).all()
+            eq = eq and (self.acceleration == other.acceleration).all()
+            eq = eq and (self.orientation.as_euler("zyx") == other.orientation.as_euler("zyx")).all()
+            eq = eq and self.heading == other.heading
+            eq = eq and self.roll == other.roll
+            eq = eq and self.gamma == other.gamma
+            return eq
+        return False
 
     def _build_state(self):
         return np.array([self.config.x, self.config.y, self.config.heading, self.config.v], dtype=np.float32)
@@ -335,6 +356,19 @@ class Dubins3dAircraft(BaseDubinsAircraft):
         super().__init__(
             dynamics, control_default=control_default, control_min=control_min, control_max=control_max, control_map=control_map, **kwargs
         )
+
+    def __eq__(self, other):
+        if isinstance(other, Dubins3dAircraft):
+            eq = (self.velocity == other.velocity).all()
+            eq = eq and (self.position == other.position).all()
+            eq = eq and (self.acceleration == other.acceleration).all()
+            eq = eq and (self.orientation.as_euler("zyx") == other.orientation.as_euler("zyx")).all()
+            eq = eq and self.heading == other.heading
+            eq = eq and self.roll == other.roll
+            eq = eq and self.gamma == other.gamma
+            eq = eq and self.v == other.v
+            return eq
+        return False
 
     @classmethod
     def _get_config_validator(cls):
