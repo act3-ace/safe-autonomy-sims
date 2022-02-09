@@ -19,7 +19,7 @@ parameterized_fixture_keywords = ["attr_init",
                                   "num_steps",
                                   "attr_targets",
                                   "error_bound"]
-test_configs, IDs, angles = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 # override entity fixture
@@ -35,4 +35,4 @@ def entity(initial_entity_state):
 
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_CWHSpacecraft(acted_entity, control, num_steps, attr_targets, error_bound):
-    evaluate(acted_entity, attr_targets, angles, error_bound=error_bound)
+    evaluate(acted_entity, attr_targets, error_bound=error_bound)

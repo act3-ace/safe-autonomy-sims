@@ -120,6 +120,8 @@ def read_test_cases(file_path, parameter_keywords):
     -------
     test_cases : list
         A list of tuples with positionally organized test case values found in the YAML file.
+    IDs : list
+        A list of strings describing individual test cases
     """
 
     test_cases = []
@@ -130,12 +132,11 @@ def read_test_cases(file_path, parameter_keywords):
     with open(file_path, 'r') as file:
         file_contents = yaml.safe_load(file)
 
-        if file_contents[0]["ID"] == "defaults":
+        if file_contents[0].get("ID") == "defaults":
             # if defaults defined for test assay
             constants = file_contents.pop(0)
-            defaults = constants["defaults"] if "defaults" in constants else {}
-            functions = constants["functions"] if "functions" in constants else {}
-            angles = constants["angles"] if "angles" in constants else {}
+            defaults = constants.get("defaults", {})
+            functions = constants.get("functions", {})
 
         for test_case in file_contents:
             # iterate through read test cases
@@ -153,12 +154,9 @@ def read_test_cases(file_path, parameter_keywords):
                     values.append(None)
 
             # collect test case IDs
-            if "ID" in test_case:
-                IDs.append(test_case["ID"])
-            else:
-                IDs.append("unnamed test")                # TODO: how to skip an ID?
+            IDs.append(test_case.get("ID", "unnamed test"))
 
             # add test case to list of cases
             test_cases.append(values)
 
-    return test_cases, IDs, angles
+    return test_cases, IDs
