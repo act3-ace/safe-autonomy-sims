@@ -3,8 +3,8 @@
   defaults:
     error_bound: 0.001
     proportional_error_bound: 0.0001
-  angles:
-    heading: [True]               # currently requiring all angle bools to be lists
+    angles:
+      heading: [True]               # currently requiring all angle bools to be lists
 
 # No Control
 - ID: From Origin v 200
