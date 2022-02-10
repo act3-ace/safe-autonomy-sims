@@ -24,7 +24,7 @@ parameterized_fixture_keywords = [
     "max_vel_constraint",
     "expected_value"
 ]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='timeout')
@@ -160,55 +160,8 @@ def fixture_cut(
     )
 
 
-# @pytest.fixture(name='call_results')
-# def fixture_call_results(
-#     cut,
-#     platform_position,
-#     observation,
-#     action,
-#     next_observation,
-#     state,
-#     next_state,
-#     observation_space,
-#     observation_units,
-#     platform,
-#     sim_time,
-#     platform_velocity,
-# ):
-#     """
-#     A fixture responsible for calling the DockingFailureRewardFunction and returning the results.
-#
-#     Parameters
-#     ----------
-#     cut : DockingFailureRewardFunction
-#         The component under test
-#     observation : numpy.ndarray
-#         The observation array
-#     action : numpy.ndarray
-#         The action array
-#     next_observation : numpy.ndarray
-#         The next_observation array
-#     next_state : StateDict
-#         The StateDict that the DockingFailureRewardFunction mutates
-#     platform : MagicMock
-#         The mock platform to be returned to the DockingFailureRewardFunction when it uses get_platform_by_name()
-#
-#     Returns
-#     -------
-#     results : RewardDict
-#         The resulting RewardDict from calling the DockingFailureRewardFunction
-#     """
-#     with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
-#         platform.position = platform_position
-#         platform.platform_velocity = platform_velocity
-#         platform.sim_time = sim_time
-#         func.return_value = platform
-#         results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
-#         return results
-
-
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the DockingFailureRewardFunction behaves as intended.
