@@ -1,0 +1,19 @@
+# Simple boundary testing
+- case: outside safety margin
+  safety_margin: 100
+  lead_position: np.array([101, 0, 0])
+  platform_position: np.array([0, 0, 0])
+  expected_value: False
+  expected_status: None
+- case: inside safety margin
+  safety_margin: 10000
+  lead_position: np.array([99, 0, 0])
+  platform_position: np.array([0, 0, 0])
+  expected_value: True
+  expected_status: DoneStatusCodes.LOSE
+- case: at safety margin
+  safety_margin: 10000
+  lead_position: np.array([100, 0, 0])
+  platform_position: np.array([0, 0, 0])
+  expected_value: True
+  expected_status: DoneStatusCodes.LOSE
