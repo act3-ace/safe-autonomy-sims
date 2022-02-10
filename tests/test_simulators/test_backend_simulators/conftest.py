@@ -50,6 +50,8 @@ def evaluate(entity, attr_targets, angles=None, error_bound=None, proportional_e
     if angles is None:
         angles = {}
 
+    error_message = ''
+
     for attr_name, expected in attr_targets.items():
         # get expected and actual results
         if type(expected) is list:
@@ -58,8 +60,8 @@ def evaluate(entity, attr_targets, angles=None, error_bound=None, proportional_e
 
         if error_bound is None:
             # direct comparison
-            assert np.array_equal(result, expected), \
-                "Expected attribute {} values to be {} but instead received {}".format(
+            if not np.array_equal(result, expected):
+                error_message += "Expected attribute {} values to be {} but instead received {}\n".format(
                     attr_name, expected, result)
 
         else:
@@ -70,9 +72,12 @@ def evaluate(entity, attr_targets, angles=None, error_bound=None, proportional_e
                 assert angle_wrap.shape == result.shape, "If angles are specified as a list, they must match the shape of the attr vector"
 
             in_bounds, diff, error_margin = bounded_compare(expected, result, error_bound, proportional_error_bound, angle_wrap)
-            assert in_bounds, \
-                    "Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}".format(
-                        attr_name, expected, error_margin, result, diff)
+            if not in_bounds:
+                error_message += "Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}\n".format(
+                    attr_name, expected, error_margin, result, diff)
+
+    failed = bool(error_message)
+    assert not failed, error_message
 
 
 def bounded_compare(expected, result, error_bound, proportional_error_bound, angle_wrap):
