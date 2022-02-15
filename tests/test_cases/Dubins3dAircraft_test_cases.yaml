@@ -1,0 +1,571 @@
+# Define Defaults and value processing functions
+- ID: defaults
+  defaults:
+    error_bound: 0.0001
+    angles:
+      heading: [True]               # currently requiring all angle bools to be lists
+
+#  No Control:
+- ID: From Origin v 200
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [2000, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+- ID: From Origin v 289 at angle
+  attr_init:
+    position: [0, 0, 324234]
+    heading: -127*np.pi/180
+    gamma: 0
+    roll: 0
+    v: 289
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [2890*np.cos(-127*np.pi/180), 2890*np.sin(-127*np.pi/180), 324234]
+    heading: -127*np.pi/180
+    gamma: 0
+    roll: 0
+    v: 289
+- ID: From Offset v 289 at angle
+  attr_init:
+    position: [-473, 77638, -233]
+    heading: -127*np.pi/180
+    gamma: 0
+    roll: 0
+    v: 289
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [-473 + 2890*np.cos(-127*np.pi/180), 77638 + 2890*np.sin(-127*np.pi/180), -233]
+    heading: -127*np.pi/180
+    gamma: 0
+    roll: 0
+    v: 289
+- ID: From Origin v 200 with positive pitch
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: np.pi/9
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [1879.3852415718168, 0, -684.0402866513374]
+    heading: 0
+    gamma: np.pi/9
+    roll: 0
+    v: 200
+- ID: From Origin v 200 with negative pitch
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: -np.pi/18
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [1969.615506024416, 0, 347.2963553338607]
+    heading: 0
+    gamma: -np.pi/18
+    roll: 0
+    v: 200
+#  No Acceleration with Turn:
+- ID: Full Circle v 200
+  attr_init:
+    position: [0, 0, 4432]
+    heading: 0
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 36
+  attr_targets:
+     position: [0, 0, 4432]
+     heading: 0
+     gamma: 0
+     roll: 0.8261734686908949
+     v: 200
+  error_bound: 0.001
+  proportional_error_bound: 0.001
+- ID: Half Circle v 200
+  attr_init:
+    position: [0, 0, 4432]
+    heading: 0
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 18
+  attr_targets:
+    position: [0, 2291.831180523293, 4432]
+    heading: -np.pi
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+  error_bound: 0.001
+  proportional_error_bound: 0.001
+- ID: 3/4 Circle v 200
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 27
+  attr_targets:
+    position: [-1145.9155902616465, 1145.9155902616465, 0]
+    heading: -np.pi/2
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+  proportional_error_bound: 0.001
+- ID: 140 deg Circle v 200
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 14
+  attr_targets:
+    position: [736.5803431668237, 2023.7378604649844, 0]
+    heading: 14*np.pi/18
+    gamma: 0
+    roll: 0.8261734686908949
+    v: 200
+- ID: 140 deg Circle v 373 negative slow turn
+  attr_init:
+    position: [0, 0, -4632]
+    heading: 0
+    gamma: 0
+    roll: -0.5934401760570118
+    v: 373
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 42
+  attr_targets:
+    position: [4121.167020018379, -11322.813329301589, -4632]
+    heading: -14*np.pi/18
+    gamma: 0
+    roll: -0.5934401760570118
+    v: 373
+  proportional_error_bound: 0.001
+#  Acceleration with No Turn:
+- ID: From origin max acceleration
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 96.5
+  num_steps: 10
+  attr_targets:
+    position: [3792.746113989637, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 400
+  proportional_error_bound: 0.001
+- ID: From origin max deceleration
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 400
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: -96.5
+  num_steps: 10
+  attr_targets:
+    position: [2207.2538860103623, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  proportional_error_bound: 0.001
+- ID: From origin exceed max acceleration
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 100
+  num_steps: 10
+  attr_targets:
+    position: [3792.746113989637, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 400
+  proportional_error_bound: 0.001
+- ID: From origin exceed max deceleration
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 400
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: -100
+  num_steps: 10
+  attr_targets:
+    position: [2207.2538860103623, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  proportional_error_bound: 0.001
+- ID: From offset, random direction, medium acceleration
+  attr_init:
+    position: [974, -632, 0]
+    heading: -.452*np.pi
+    gamma: 0
+    roll: 0
+    v: 212
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 14
+  num_steps: 10
+  attr_targets:
+    position: [1397.636161320535, -3419.9979201609176, 0]
+    heading: -.452*np.pi
+    gamma: 0
+    roll: 0
+    v: 352
+#  Acceleration with Turn:
+- ID: From origin low acceleration
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: np.pi/3
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 10
+  num_steps: 10
+  attr_targets:
+    position: [550.3827627711091, 1941.6506568326454, 0.0]
+    heading: 2.2592546022621693
+    gamma: 0.0
+    roll: 1.0471975511965976
+    v: 300
+- ID: From origin pitch and roll rate max positive
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: np.pi/18
+    roll_rate: np.pi/36
+    acceleration: 10
+  num_steps: 10
+  attr_targets:
+    position: [2268.6404906099037, 513.4192558198043, -785.1068115801492]
+    heading: 0.6111944640411373
+    gamma: 0.3490658503988659
+    roll: 0.8726646259971648
+    v: 300
+  proportional_error_bound: 0.001
+- ID: From offset pitch and roll rate small negative
+  attr_init:
+    position: [749.324, -653, 2832]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 218
+  control:
+    gamma_rate: -np.pi/54
+    roll_rate: -np.pi/72
+    acceleration: 25
+  num_steps: 10
+  attr_targets:
+    position: [3935.4807700356214, -910.5099328828469, 3701.657406502394]
+    heading: -0.2000865023203074
+    gamma: -0.3490658503988659
+    roll: -0.4363323129985824
+    v: 400
+  proportional_error_bound: 0.005
+# state limits
+- ID: velocity upper limit from origin
+  attr_init:
+    position: [0, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 400
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 25
+  num_steps: 10
+  attr_targets:
+    position: [4000, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 400
+- ID: velocity lower limit from origin
+  attr_init:
+    position: [ 0, 0, 0 ]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: -25
+  num_steps: 10
+  attr_targets:
+    position: [2000, 0, 0]
+    heading: 0
+    gamma: 0
+    roll: 0
+    v: 200
+- ID: velocity upper limit, random start
+  attr_init:
+    position: [ -2809.7948376246586, -2660.6793814319763, 403.9143504118553 ]
+    heading: 2.151117265049747
+    gamma: 0.04400375503988813
+    roll: -0.2568367289832032
+    v: 400
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: 25
+  num_steps: 17
+  attr_targets:
+    position: [-5445.932437507885, 3560.8585198859673, 104.78537337775663]
+    heading: 1.7920330500446686
+    gamma: 0.04400375503988813
+    roll: -0.2568367289832032
+    v: 400
+- ID: velocity lower limit, random start
+  attr_init:
+    position: [ 2523.084083055622, -3386.085018938586, 2443.4257377727326 ]
+    heading: 0.26826382283735656
+    gamma: 0.2165764665440848
+    roll: -0.13088936735306703
+    v: 200
+  control:
+    gamma_rate: 0
+    roll_rate: 0
+    acceleration: -25
+  num_steps: 16
+  attr_targets:
+    position: [5618.214387189504, -3079.0781085942613, 1755.7862716856562]
+    heading: -0.07053000795796088
+    gamma: 0.2165764665440848
+    roll: -0.13088936735306703
+    v: 200
+- ID: gamma upper limit from origin
+  attr_init:
+    position: [ 0, 0, 0 ]
+    heading: 0
+    gamma: np.pi/9
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: np.pi/36
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [ 1879.385241571817, 0, -684.0402866513374 ]
+    heading: 0
+    gamma: 0.3490658503988659
+    roll: 0
+    v: 200
+- ID: gamma lower limit from origin
+  attr_init:
+    position: [ 0, 0, 0 ]
+    heading: 0
+    gamma: -np.pi/9
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: -np.pi/36
+    roll_rate: 0
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [1879.385241571817, 0.0, 684.0402866513374]
+    heading: 0
+    gamma: -0.3490658503988659
+    roll: 0
+    v: 200
+- ID: gamma upper limit, random start
+  attr_init:
+    position: [ -870.9695491985198, 1286.7693430900035, 4178.759126389558 ]
+    heading: -2.305265712267584
+    gamma: np.pi/9
+    roll: 0
+    v: 200
+  control:
+    gamma_rate: np.pi/36
+    roll_rate: -0.7746765058791479
+    acceleration: 6
+  num_steps: 13
+  attr_targets:
+    position: [-3361.8664172941235, 166.9266140148527, 3116.1025410767056]
+    heading: -3.53334480398913
+    gamma: 0.3490658503988659
+    roll: -1.0471975511965976
+    v: 278
+  error_bound: 0.001
+  proportional_error_bound: 0.01
+- ID: gamma lower limit, random start
+  attr_init:
+    position: [ -4271.301252271999, 1795.0750895550088, 4164.297639416975 ]
+    heading: -2.6041110405641805
+    gamma: -np.pi/9
+    roll: -0.8231277659368769
+    v: 200
+  control:
+    gamma_rate: -np.pi/36
+    roll_rate: -0.023194984251548447
+    acceleration: 15
+  num_steps: 14
+  attr_targets:
+    position: [-6687.360832097276, 3996.848515159524, 5623.5835846869595]
+    heading: -4.817014794255778
+    gamma: -0.3490658503988659
+    roll: -1.0471975511965976
+    v: 400
+  proportional_error_bound: 0.005
+- ID: roll upper limit from origin
+  attr_init:
+    position: [ 0, 0, 0 ]
+    heading: 0
+    gamma: 0
+    roll: np.pi/3
+    v: 275
+  control:
+    gamma_rate: 0
+    roll_rate: np.pi/36
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [1218.9158792645678, 1954.1557829217713, 0.0]
+    heading: 2.026184526526937
+    gamma: 0
+    roll: 1.0471975511965976
+    v: 275
+  proportional_error_bound: 0.01
+- ID: roll lower limit from origin
+  attr_init:
+    position: [ 0, 0, 0 ]
+    heading: 0
+    gamma: 0
+    roll: -np.pi/3
+    v: 400
+  control:
+    gamma_rate: 0
+    roll_rate: -np.pi/36
+    acceleration: 0
+  num_steps: 10
+  attr_targets:
+    position: [2826.2306963237684, -2363.645834509253, 0.0]
+    heading: -1.3930018619872695
+    gamma: 0
+    roll: -1.0471975511965976
+    v: 400
+  proportional_error_bound: 0.001
+- ID: roll upper limit, random start
+  attr_init:
+    position: [ -2261.614129173681, 2461.672282067553, 398.75286159654854 ]
+    heading: 0.15716792408318456
+    gamma: 0.09082491966308542
+    roll: np.pi/3
+    v: 326
+  control:
+    gamma_rate: 0.08680670462838444
+    roll_rate: np.pi/36
+    acceleration: 6
+  num_steps: 15
+  attr_targets:
+    position: [-1462.8233271705953, 6582.413671311859, -1374.408809050044]
+    heading: 2.428384705842141
+    gamma: 0.3490658503988659
+    roll: 1.0471975511965976
+    v: 400
+  proportional_error_bound: 0.001
+- ID: roll lower limit, random start
+  attr_init:
+    position: [ 1577.811380679885, 4173.571774833306, 1150.9888834920123 ]
+    heading: -0.3821680267819957
+    gamma: -0.09619145971255624
+    roll: -np.pi/3
+    v: 349
+  control:
+    gamma_rate: 0.005677463248155605
+    roll_rate: -np.pi/36
+    acceleration: 4
+  num_steps: 16
+  attr_targets:
+    position: [1317.8233652051888, -597.1252032472657, 1452.2711512676]
+    heading: -2.7348454364755486
+    gamma: -0.00535204774206656
+    roll: -1.0471975511965976
+    v: 400
+  proportional_error_bound: 0.005
