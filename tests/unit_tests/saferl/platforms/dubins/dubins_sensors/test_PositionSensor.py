@@ -40,10 +40,9 @@ def fixture_expected_position(request):
 
 
 @pytest.fixture(name='dubins_platform')
-def setup_dubins_platform_pos(position):
+def mock_dubins_platform(position):
     """
-    based off a CWHSpacecraft set at a certain position create the appropriate
-    CWHPlatform
+    Returns a mock for a DubinsPlatform with a position attirbute
     """
     mock_platform = mock.MagicMock()
     mock_platform.position = np.array(position)
@@ -64,10 +63,10 @@ def setup_position_sensor(dubins_platform):
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
-def test_PositionSensor_calc_msmt(position_sensor, expected_position):
+def test_calculate_measurement(position_sensor, expected_position):
     """
     parametrized test for the _calculate_measurement method of the PositionSensor
     """
     state = np.array([0., 0., 0.])
-    calced = position_sensor._calculate_measurement(state)  #pylint: disable=W0212
-    assert np.array_equiv(calced, expected_position)
+    result = position_sensor._calculate_measurement(state)  #pylint: disable=W0212
+    assert np.array_equiv(result, expected_position)
