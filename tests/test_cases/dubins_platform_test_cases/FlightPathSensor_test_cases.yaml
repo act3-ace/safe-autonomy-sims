@@ -1,0 +1,13 @@
+# Simple accuracy tests
+- ID: case 1
+  flight_path: 0
+  expected_flight_path: np.deg2rad(0)
+- ID: case 2
+  flight_path: 180
+  expected_flight_path: np.deg2rad(180)
+- ID: case 3
+  flight_path: -180
+  expected_flight_path: np.deg2rad(-180)
+- ID: case 4
+  flight_path: 45
+  expected_flight_path: np.deg2rad(45)
