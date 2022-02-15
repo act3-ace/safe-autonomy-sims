@@ -1,13 +1,13 @@
 # Simple accuracy tests
 - ID: case 1
-  position: [0., 0., 0.]
-  expected_position: np.array([0., 0., 0.])
+  velocity: [0., 0., 0.]
+  expected_velocity: np.array([0., 0., 0.])
 - ID: case 2
-  position: [ 1., 2., 3. ]
-  expected_position: np.array([1., 2., 3.])
+  velocity: [ 1., 2., 3. ]
+  expected_velocity: np.array([1., 2., 3.])
 - ID: case 3
-  position: [ 10000., 10000., 10000. ]
-  expected_position: np.array([10000., 10000., 10000.])
+  velocity: [ 10000., 10000., 10000. ]
+  expected_velocity: np.array([10000., 10000., 10000.])
 - ID: case 4
-  position: [ 10., 10., 10. ]
-  expected_position: np.array([10., 10., 10.])
+  velocity: [ 10., 10., 10. ]
+  expected_velocity: np.array([10., 10., 10.])
