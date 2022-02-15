@@ -24,8 +24,7 @@ test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_
 @pytest.fixture(name='position')
 def fixture_position(request):
     """
-    obtain pos_input, the value to set a CWH platform postion at,
-    from parameter list
+    Obtains position value from parameter list
     """
     return request.param
 
@@ -33,8 +32,7 @@ def fixture_position(request):
 @pytest.fixture(name='expected_position')
 def fixture_expected_position(request):
     """
-    obtain pos_input, the value to set a CWH platform postion at,
-    from parameter list
+    Obtains expected position value from parameter list
     """
     return request.param
 
