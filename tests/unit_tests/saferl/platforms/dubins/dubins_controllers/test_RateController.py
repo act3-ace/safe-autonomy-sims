@@ -46,7 +46,7 @@ def test_apply_control(rate_controller, config, control):
 
 
 @pytest.mark.unit_test
-def test_get_applied_action(rate_controller):
+def test_get_applied_action(rate_controller, config):
     """
     Test for the get_applied_control method of RateController
     """
@@ -54,4 +54,4 @@ def test_get_applied_action(rate_controller):
     dummy_arr = np.array([10., 20., 30.])
     rate_controller.parent_platform._last_applied_action = dummy_arr  # pylint: disable=W0212
 
-    assert np.array_equal(rate_controller.get_applied_control(), dummy_arr)  # pylint: disable=W0212
+    assert np.array_equal(rate_controller.get_applied_control(), [dummy_arr[config.get("axis")]])  # pylint: disable=W0212
