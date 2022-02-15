@@ -24,8 +24,7 @@ test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_
 @pytest.fixture(name='velocity')
 def fixture_velocity(request):
     """
-    obtain pos_input, the value to set a CWH platform postion at,
-    from parameter list
+    Obtains velocity value from parameter list
     """
     return request.param
 
@@ -33,8 +32,7 @@ def fixture_velocity(request):
 @pytest.fixture(name='expected_velocity')
 def fixture_expected_velocity(request):
     """
-    obtain pos_input, the value to set a CWH platform postion at,
-    from parameter list
+    Obtains expected velocity value from parameter list
     """
     return request.param
 
