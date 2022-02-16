@@ -37,7 +37,8 @@ if __name__ == '__main__':
         'watchdog',
         'speedscope',
         'pandas-profiling',
-        'factory'
+        'factory',
+        'opencv-python',
     ]
 
     docs_require = [
