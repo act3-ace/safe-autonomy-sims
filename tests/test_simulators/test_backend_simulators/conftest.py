@@ -68,7 +68,7 @@ def evaluate(entity, attr_targets, angles=None, error_bound=None, proportional_e
             angle_wrap = angles.get(attr_name, False)
             if isinstance(angle_wrap, list):
                 angle_wrap = np.array(angle_wrap, dtype=bool)
-                assert isinstance(result, np.ndarray), "if anles are specified as a list, attribute must be a numpy ndarray"
+                assert isinstance(result, np.ndarray), "If angles are specified as a list, attribute must be a numpy ndarray"
                 assert angle_wrap.shape == result.shape, "If angles are specified as a list, they must match the shape of the attr vector"
 
             in_bounds, diff, error_margin = bounded_compare(expected, result, error_bound, proportional_error_bound, angle_wrap)
