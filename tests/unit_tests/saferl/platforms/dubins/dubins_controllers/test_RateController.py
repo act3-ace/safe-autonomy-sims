@@ -10,6 +10,15 @@ import numpy as np
 import pytest
 
 from saferl.platforms.dubins.dubins_controllers import RateController
+from saferl.platforms.dubins.dubins_properties import YawRateProp
+
+
+@pytest.fixture(name="control_properties")
+def get_control_properties():
+    """
+    Returns a friendly prop class
+    """
+    return YawRateProp
 
 
 @pytest.fixture(name="rate_controller")
@@ -32,7 +41,7 @@ def test_constructor(control_properties, config):
     cut = RateController(control_properties=control_properties, parent_platform=parent_platform, config=config)
 
     assert cut.config.axis == config.get("axis")
-    assert cut._properties == control_properties()  # pylint: disable=W0212
+    assert isinstance(cut._properties, control_properties)  # pylint: disable=W0212
     assert cut._parent_platform == parent_platform  # pylint: disable=W0212
 
 
