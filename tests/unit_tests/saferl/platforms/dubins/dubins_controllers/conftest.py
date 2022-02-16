@@ -42,11 +42,3 @@ def get_config():
 
     axis = 2
     return {"axis": axis}
-
-
-@pytest.fixture(name="control_properties")
-def get_control_properties():
-    """
-    Return a mock of control_properties
-    """
-    return mock.MagicMock(return_value="props")
