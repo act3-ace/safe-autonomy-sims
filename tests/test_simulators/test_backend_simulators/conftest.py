@@ -4,10 +4,8 @@ This module holds fixtures common to all backend simulator tests.
 Author: John McCarroll
 """
 
-from cv2 import exp
 import pytest
 import numpy as np
-import math
 
 
 @pytest.fixture
