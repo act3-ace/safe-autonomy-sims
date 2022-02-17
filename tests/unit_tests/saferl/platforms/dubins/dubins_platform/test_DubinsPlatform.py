@@ -14,22 +14,6 @@ from saferl.platforms.dubins.dubins_platform import DubinsPlatform
 from tests.conftest import delimiter, read_test_cases
 
 
-@pytest.fixture(name="platform_name")
-def get_platform_name():
-    """
-    Returns string of platform's name
-    """
-    return "cut"
-
-
-@pytest.fixture(name="platform")
-def get_platform():
-    """
-    Returns a mock platform object
-    """
-    return mock.MagicMock(name="platform")
-
-
 @pytest.fixture(name="dubins_platform")
 def get_dubins_platform(platform_name, platform):
     """
@@ -295,7 +279,7 @@ def test_DubinsPlatform_saveActionToPlatform(dubins_platform, action):  # pylint
     """
     # test no axis path
     dubins_platform.save_action_to_platform(action)
-    assert np.array_equal(dubins_platform._last_applied_action, action)  #pylint: disable=W0212
+    assert np.array_equal(dubins_platform._last_applied_action, action)  # pylint: disable=W0212
 
     # test axis path
     new_action = 49.536
@@ -303,4 +287,4 @@ def test_DubinsPlatform_saveActionToPlatform(dubins_platform, action):  # pylint
     dubins_platform.save_action_to_platform(new_action, axis=axis)
     action[axis] = new_action
 
-    assert np.array_equal(dubins_platform._last_applied_action, action)  #pylint: disable=W0212
+    assert np.array_equal(dubins_platform._last_applied_action, action)  # pylint: disable=W0212
