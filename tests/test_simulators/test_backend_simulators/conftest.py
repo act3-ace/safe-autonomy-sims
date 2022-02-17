@@ -6,6 +6,7 @@ Author: John McCarroll
 
 import pytest
 import numpy as np
+from numbers import Number
 
 
 @pytest.fixture
@@ -56,22 +57,25 @@ def evaluate(entity, attr_targets, angles=None, error_bound=None, proportional_e
             expected = np.array(expected, dtype=np.float64)
         result = entity.__getattribute__(attr_name)
 
+        angle_wrap = angles.get(attr_name, False)
+        if isinstance(angle_wrap, list):
+            angle_wrap = np.array(angle_wrap, dtype=bool)
+            assert isinstance(result, np.ndarray), "If angles are specified as a list, attribute must be a numpy ndarray"
+            assert angle_wrap.shape == result.shape, "If angles are specified as a list, they must match the shape of the attr vector"
+
         if error_bound is None:
             # direct comparison
-            if not np.array_equal(result, expected):
+            result_wrapped = wrap_angles(result, angle_wrap)
+            expected_wrapped = wrap_angles(expected, angle_wrap)
+
+            if not np.array_equal(result_wrapped, expected_wrapped):
                 error_message += "\t--Expected attribute {} values to be {} but instead received {}\n".format(
-                    attr_name, expected, result)
+                    attr_name, expected_wrapped, result_wrapped)
 
         else:
-            angle_wrap = angles.get(attr_name, False)
-            if isinstance(angle_wrap, list):
-                angle_wrap = np.array(angle_wrap, dtype=bool)
-                assert isinstance(result, np.ndarray), "If angles are specified as a list, attribute must be a numpy ndarray"
-                assert angle_wrap.shape == result.shape, "If angles are specified as a list, they must match the shape of the attr vector"
-
             in_bounds, diff, error_margin = bounded_compare(expected, result, error_bound, proportional_error_bound, angle_wrap)
             if not in_bounds:
-                error_message += "\t--Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}\n".format(
+                error_message += "\t--Expected attribute {} values to be {} +/- {} but instead received {} with error +/- {}\n".format(
                     attr_name, expected, error_margin, result, diff)
 
     failed = bool(error_message)
@@ -83,8 +87,19 @@ def bounded_compare(expected, result, error_bound, proportional_error_bound, ang
 
     # compute error difference and apply angle wrapping
     diff = np.abs(result - expected)
-    if not isinstance(diff, np.ndarray):
-        diff = np.array(diff, dtype=np.float64)
-    diff[angle_wrap] = (diff[angle_wrap] + np.pi) % (2*np.pi) - np.pi
+    diff = wrap_angles(diff, angle_wrap)
 
     return np.all(diff <= error_margin), diff, error_margin
+
+def wrap_angles(x, angle_wrap):
+    if angle_wrap:
+        if isinstance(x, np.ndarray):
+            x[angle_wrap] = wrap_angle_quantity(x[angle_wrap])
+        else:
+            assert isinstance(x, (np.number, Number)), \
+                f"if angle wrapped quanitity is not a numpy array, it must be a numeric type. Instead found type {type(x)}."
+            x = wrap_angle_quantity(x)
+    return x
+
+def wrap_angle_quantity(x):
+    return (x + np.pi) % (2*np.pi) - np.pi
