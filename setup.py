@@ -38,7 +38,6 @@ if __name__ == '__main__':
         'speedscope',
         'pandas-profiling',
         'factory',
-        'opencv-python',
     ]
 
     docs_require = [
