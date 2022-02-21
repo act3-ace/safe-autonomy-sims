@@ -2,12 +2,15 @@
 Tests for the CWHPlatform module
 """
 
+import os
+
 import numpy as np
 import pytest
 
+from tests.conftest import delimiter, read_test_cases
+
+
 # tests for get_applied_action
-
-
 @pytest.mark.unit_test
 def test_CWHPlatform_getAppliedAction_default(cwh_platform):
     """
@@ -20,89 +23,107 @@ def test_CWHPlatform_getAppliedAction_default(cwh_platform):
     assert np.array_equiv(platform_obj.get_applied_action(), expected)
 
 
-get_applied_tests = [(np.array([15., 16., 17.])), (np.array([100., 100., 100.])), (np.array([5000., 5000., 5000.]))]
-
-
 @pytest.fixture(name='applied_action')
-def applied_action(request):  # pylint: disable=W0621
+def get_applied_action(request):  # pylint: disable=W0621
     """
     fixture to obtain the parameter 'applied_action' from a list
     """
     return request.param
 
 
-@pytest.mark.unit_test
-@pytest.mark.parametrize('applied_action', get_applied_tests, indirect=True)
-def test_CWHPlatform_getAppliedAction(cwh_platform, applied_action):  # pylint: disable=W0621
+class Test_get_applied_action:
     """
-    Test CWHPlatform - get_applied_action() method
-    This is a parametrized test with 'get_applied_tests' being the test cases
+    Class to define parameterized applied_action tests and fixtures
     """
-    cwh_platform._last_applied_action = applied_action  # pylint: disable=W0212
+    # Define test assay
+    test_cases_file_path = os.path.join(
+        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_get_applied_action_test_cases.yaml"
+    )
+    parameterized_fixture_keywords = ["applied_action"]
+    test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
-    result = cwh_platform.get_applied_action()
-    assert np.array_equiv(result, applied_action)
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
+    def test_CWHPlatform_getAppliedAction(self, cwh_platform, applied_action):  # pylint: disable=W0621
+        """
+        Test CWHPlatform - get_applied_action() method
+        This is a parametrized test with 'get_applied_tests' being the test cases
+        """
+        cwh_platform._last_applied_action = applied_action  # pylint: disable=W0212
+
+        result = cwh_platform.get_applied_action()
+        assert np.array_equiv(result, applied_action)
 
 
-#Tests for save_action_to_platform
-
-action_to_platform_tests = [(np.array([5., 6., 7.])), (np.array([10., 10., 10.])), (np.array([1000., 1000., 1000.]))]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize('applied_action', action_to_platform_tests, indirect=True)
-def test_CWHPlatform_saveActionToPlatform(cwh_platform, applied_action):  # pylint: disable=W0621
+class Test_save_action_to_platform:
     """
-    Tests for CWHPlatform method - save_action_to_platform(),
-    This is a parametrized test, where the tests are in the action_to_platform_tests
+    Tests for save_action_to_platform
     """
-    cwh_platform.save_action_to_platform(applied_action[0], 0)
-    cwh_platform.save_action_to_platform(applied_action[1], 1)
-    cwh_platform.save_action_to_platform(applied_action[2], 2)
+    # Define test assay
+    test_cases_file_path = os.path.join(
+        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_save_action_to_platform_test_cases.yaml"
+    )
+    parameterized_fixture_keywords = ["applied_action"]
+    test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
-    assert cwh_platform._last_applied_action[0] == applied_action[0]  #pylint: disable=W0212
-    assert cwh_platform._last_applied_action[1] == applied_action[1]  #pylint: disable=W0212
-    assert cwh_platform._last_applied_action[2] == applied_action[2]  #pylint: disable=W0212
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
+    def test_CWHPlatform_saveActionToPlatform(self, cwh_platform, applied_action):  # pylint: disable=W0621
+        """
+        Tests for CWHPlatform method - save_action_to_platform(),
+        This is a parametrized test, where the tests are in the action_to_platform_tests
+        """
+
+        cwh_platform.save_action_to_platform(applied_action[0][0], 0)  # TODO: fix needless 2d array
+        cwh_platform.save_action_to_platform(applied_action[0][1], 1)
+        cwh_platform.save_action_to_platform(applied_action[0][2], 2)
+
+        assert cwh_platform._last_applied_action[0] == applied_action[0][0]  #pylint: disable=W0212
+        assert cwh_platform._last_applied_action[1] == applied_action[0][1]  #pylint: disable=W0212
+        assert cwh_platform._last_applied_action[2] == applied_action[0][2]  #pylint: disable=W0212
 
 
-#Test position attribute
-
-pos_attr_tests = [
-    (np.array([0., 0., 0.]), np.array([0., 0., 0.])), (np.array([50., 100., 150.]), np.array([50., 100., 150.])),
-    (np.array([10000., 10000., 10000.]), np.array([10000., 10000., 10000.]))
-]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize("pos_input,pos_expected", pos_attr_tests, indirect=True)
-def test_position_attribute(cwh_platform_pos, pos_expected):
+class Test_position_attribute:
     """
-    Test CWHPlatform - position property
+    Test position attribute
     """
-    assert np.array_equiv(cwh_platform_pos.position, pos_expected)
+    # Define test assay
+    test_cases_file_path = os.path.join(
+        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_position_attribute_test_cases.yaml"
+    )
+    parameterized_fixture_keywords = ["pos_input", "pos_expected"]
+    test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
+    def test_position_attribute(self, cwh_platform_pos, pos_expected):
+        """
+        Test CWHPlatform - position property
+        """
+        assert np.array_equiv(cwh_platform_pos.position, pos_expected)
 
 
-#Tests for velocity attribute
-
-vel_attr_tests = [
-    ([0., 0., 0.], np.array([0., 0., 0.])), ([1., 2., 3.], np.array([1., 2., 3.])), ([10., 10., 10.], np.array([10., 10., 10.])),
-    ([1000., 1000., 1000.], np.array([1000., 1000., 1000.]))
-]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize("vel_input,vel_expected", vel_attr_tests, indirect=True)
-def test_velocity_attrbute(cwh_platform_vel, vel_expected):
+class Test_velocity_attribute:
     """
-    Test for velocity property getter method
+    Tests for velocity attribute
     """
-    calced = cwh_platform_vel.velocity
-    assert np.array_equiv(calced, vel_expected)
+
+    vel_attr_tests = [
+        ([0., 0., 0.], np.array([0., 0., 0.])), ([1., 2., 3.], np.array([1., 2., 3.])), ([10., 10., 10.], np.array([10., 10., 10.])),
+        ([1000., 1000., 1000.], np.array([1000., 1000., 1000.]))
+    ]
+
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize("vel_input,vel_expected", vel_attr_tests, indirect=True)
+    def test_velocity_attrbute(cwh_platform_vel, vel_expected):
+        """
+        Test for velocity property getter method
+        """
+        calced = cwh_platform_vel.velocity
+        assert np.array_equiv(calced, vel_expected)
 
 
 #Tests for sim_time attribute , accessor and mutator
-
-
 @pytest.mark.unit_test
 def test_sim_time_default(cwh_platform):
     """
@@ -155,8 +176,6 @@ def test_simtime_setter(cwh_platform, set_to_time):
 
 
 #Tests for 'operable' property
-
-
 @pytest.mark.unit_test
 def test_is_operable(cwh_platform):
     """
