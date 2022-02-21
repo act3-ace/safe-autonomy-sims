@@ -37,7 +37,7 @@ if __name__ == '__main__':
         'watchdog',
         'speedscope',
         'pandas-profiling',
-        'factory'
+        'factory',
     ]
 
     docs_require = [

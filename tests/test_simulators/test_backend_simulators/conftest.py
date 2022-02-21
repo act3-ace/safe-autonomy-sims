@@ -6,7 +6,7 @@ Author: John McCarroll
 
 import pytest
 import numpy as np
-import math
+from numbers import Number
 
 
 @pytest.fixture
@@ -45,58 +45,61 @@ def acted_entity(num_steps, entity, control):
     return entity
 
 
-def evaluate(entity, attr_targets, angles={}, error_bound=None, proportional_error_bound=0):
-    # evaluation
-    for key, value in attr_targets.items():
-        # get expected and actual results
-        if type(value) is list:
-            value = np.array(value, dtype=np.float64)
-        result = entity.__getattribute__(key)
+def evaluate(entity, attr_targets, angles=None, error_bound=None, proportional_error_bound=0):
+    if angles is None:
+        angles = {}
 
-        # angle wrapping
-        if key in angles:
-            if len(angles[key]) > 1:
-                # variables compared are lists
-                for index, is_angle in enumerate(angles[key]):
-                    if is_angle:
-                        diff = abs(value[index] - result[index]) % (2*np.pi)
-                        error = min(wrapped_difference, 2 * np.pi - wrapped_difference)
-                        result[index] = error
-                        value[index] = 0.0          # replace value w/ expected difference after angle wrapping
-            else:
-                # variables compared are single values
-                if angles[key][0]:
-                    wrapped_difference = math.fmod(abs(value - result), 2 * np.pi)
-                    error = min(wrapped_difference, 2*np.pi - wrapped_difference)
-                    result = error
-                    value = 0.0              # replace value w/ expected difference after angle wrapping
+    error_message = ''
+
+    for attr_name, expected in attr_targets.items():
+        # get expected and actual results
+        if type(expected) is list:
+            expected = np.array(expected, dtype=np.float64)
+        result = entity.__getattribute__(attr_name)
+
+        angle_wrap = angles.get(attr_name, False)
+        if isinstance(angle_wrap, list):
+            angle_wrap = np.array(angle_wrap, dtype=bool)
+            assert isinstance(result, np.ndarray), "If angles are specified as a list, attribute must be a numpy ndarray"
+            assert angle_wrap.shape == result.shape, "If angles are specified as a list, they must match the shape of the attr vector"
 
         if error_bound is None:
             # direct comparison
-            if type(value) in [np.ndarray, list]:
-                # handle array case
-                assert np.array_equal(result, value), \
-                    "Error of {}! Expected attribute {} values to be {} but instead received {}".format(
-                        np.array(value) - np.array(result), key, value, result)
-            else:
-                # compare entity value and target value
-                assert result == value, \
-                    "Error of {}! Expected attribute {} value(s) to be {} but instead received {}".format(
-                        value - result, key, value, result)
+            result_wrapped = wrap_angles(result, angle_wrap)
+            expected_wrapped = wrap_angles(expected, angle_wrap)
+
+            if not np.array_equal(result_wrapped, expected_wrapped):
+                error_message += "\t--Expected attribute {} values to be {} but instead received {}\n".format(
+                    attr_name, expected_wrapped, result_wrapped)
+
         else:
-            # bounded comparison
-            if type(value) in [np.ndarray, list]:
-                # handle array case
-                differences = np.abs(np.subtract(result, value))
-                error_bounds = np.abs(result) * proportional_error_bound + error_bound
-                in_bounds = differences <= error_bounds
-                assert np.all(in_bounds), \
-                    "Expected attribute {} values to be {} +/- {} but instead received {} with an error of +/- {}".format(
-                        key, value, error_bound, result, differences)
-            else:
-                # compare entity value and target value
-                error_bound = error_bound + proportional_error_bound
-                difference = abs(value - result)
-                assert abs(result - value) <= error_bound, \
-                    "Expected attribute {} value to be {} +/- {} but instead received {} with an error of +/- {}".format(
-                        key, value, error_bound, result, difference)
+            in_bounds, diff, error_margin = bounded_compare(expected, result, error_bound, proportional_error_bound, angle_wrap)
+            if not in_bounds:
+                error_message += "\t--Expected attribute {} values to be {} +/- {} but instead received {} with error +/- {}\n".format(
+                    attr_name, expected, error_margin, result, diff)
+
+    failed = bool(error_message)
+    assert not failed, '\n'+error_message
+
+
+def bounded_compare(expected, result, error_bound, proportional_error_bound, angle_wrap):
+    error_margin = np.abs(result) * proportional_error_bound + error_bound
+
+    # compute error difference and apply angle wrapping
+    diff = np.abs(result - expected)
+    diff = wrap_angles(diff, angle_wrap)
+
+    return np.all(diff <= error_margin), diff, error_margin
+
+def wrap_angles(x, angle_wrap):
+    if angle_wrap:
+        if isinstance(x, np.ndarray):
+            x[angle_wrap] = wrap_angle_quantity(x[angle_wrap])
+        else:
+            assert isinstance(x, (np.number, Number)), \
+                f"if angle wrapped quanitity is not a numpy array, it must be a numeric type. Instead found type {type(x)}."
+            x = wrap_angle_quantity(x)
+    return x
+
+def wrap_angle_quantity(x):
+    return (x + np.pi) % (2*np.pi) - np.pi
