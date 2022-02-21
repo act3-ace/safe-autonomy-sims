@@ -407,10 +407,10 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         vel_limit = self.velocity_limit(state)
 
         violation = rel_vel_mag - vel_limit
-        violated = rel_vel_mag >= vel_limit
+        violated = rel_vel_mag > vel_limit
         if self.config.lower_bound:
             violation *= -1
-            violated = rel_vel_mag <= vel_limit
+            violated = rel_vel_mag < vel_limit
 
         return violated, violation
 
@@ -510,10 +510,10 @@ class DockingSuccessReward(RewardFuncBase):
         vel_limit = self.velocity_limit(state)
 
         violation = rel_vel_mag - vel_limit
-        violated = rel_vel_mag >= vel_limit
+        violated = rel_vel_mag > vel_limit
         if self.config.lower_bound:
             violation *= -1
-            violated = rel_vel_mag <= vel_limit
+            violated = rel_vel_mag < vel_limit
 
         return violated, violation
 
@@ -662,10 +662,10 @@ class DockingFailureReward(RewardFuncBase):
         vel_limit = self.velocity_limit(state)
 
         violation = rel_vel_mag - vel_limit
-        violated = rel_vel_mag >= vel_limit
+        violated = rel_vel_mag > vel_limit
         if self.config.lower_bound:
             violation *= -1
-            violated = rel_vel_mag <= vel_limit
+            violated = rel_vel_mag < vel_limit
 
         return violated, violation
 
