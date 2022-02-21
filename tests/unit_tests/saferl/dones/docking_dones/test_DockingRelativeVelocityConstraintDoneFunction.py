@@ -13,7 +13,7 @@ from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/docking/dones/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = ["platform_velocity", "target_velocity", "constraint_velocity", "expected_value", "expected_status"]
 test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)

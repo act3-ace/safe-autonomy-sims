@@ -1,0 +1,49 @@
+- case: case 1
+  platform_position1: np.array([0, 0, 0])
+  platform_position2: np.array([1, 0, 0])
+  scale: 2
+  a: math.inf
+  c: 2.0
+  pivot: 1.0
+  pivot_ratio: 2.0
+  expected_value: 2 * (2 * (math.exp(-(math.log(2)/1) * np.linalg.norm([1, 0, 0])) - math.exp(-(math.log(2)/1) * np.linalg.norm([0, 0, 0]))))
+
+- case: case 2
+  platform_position1: np.array([1, 1, 1])
+  platform_position2: np.array([4, 4, 4])
+  scale: 0.5
+  a: math.inf
+  c: 2.0
+  pivot: 1.0
+  pivot_ratio: 2.0
+  expected_value: 0.5 * (2 * (math.exp(-(math.log(2)/1) * np.linalg.norm([1, 1, 1])) - math.exp(-(math.log(2)/1) * np.linalg.norm([4, 4, 4]))))
+
+- case: case 3 - large numbers
+  platform_position1: np.array([100, 100, 100])
+  platform_position2: np.array([1000, 1000, 1000])
+  scale: 0.4
+  a: math.inf
+  c: 2.0
+  pivot: 1.0
+  pivot_ratio: 2.0
+  expected_value: 0.4 * (2 * (math.exp(-(math.log(2)/1) * np.linalg.norm([100, 100, 100])) - math.exp(-(math.log(2)/1) * np.linalg.norm([1000, 1000, 1000]))))
+
+- case: edge case 1
+  platform_position1: np.array([0, 0, 0])
+  platform_position2: np.array([0, 0, 0])
+  scale: 2
+  a: math.inf
+  c: 2.0
+  pivot: 1.0
+  pivot_ratio: 2.0
+  expected_value: 2 * (2 * (math.exp(-(math.log(2)/1) * np.linalg.norm([0, 0, 0])) - math.exp(-(math.log(2)/1) * np.linalg.norm([0, 0, 0]))))
+
+- case: edge case 2
+  platform_position1: np.array([1, 1, 1])
+  platform_position2: np.array([1, 1, 1])
+  scale: 1.5
+  a: math.inf
+  c: 2.0
+  pivot: 1.0
+  pivot_ratio: 2.0
+  expected_value: 1.5 * (2 * (math.exp(-(math.log(2)/1) * np.linalg.norm([1, 1, 1])) - math.exp(-(math.log(2)/1) * np.linalg.norm([1, 1, 1]))))
