@@ -183,7 +183,7 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         assert not (self.config.a == math.inf and self.config.pivot == math.inf), "Both 'a' and 'pivot' cannot be specified."
         assert self.config.a != math.inf or self.config.pivot != math.inf, "Either 'a' or 'pivot' must be specified."
 
-        if self.config.a:
+        if self.config.a != math.inf:
             self.a = self.config.a
         else:
             self.a = math.log(self.config.pivot_ratio) / self.config.pivot
