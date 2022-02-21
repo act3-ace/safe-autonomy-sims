@@ -2,6 +2,7 @@
  Tests for the cwh_sensors module
 """
 
+import os
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -9,6 +10,7 @@ import pytest
 
 import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_sensors import CWHSensor, PositionSensor, VelocitySensor
+from tests.conftest import delimiter, read_test_cases
 
 
 @pytest.mark.unit_test
@@ -35,26 +37,28 @@ def setup_pos_sensor(cwh_platform_pos):
     return pos_sensor
 
 
-pos_sensor_tests = [
-    ([0., 0., 0.], np.array([0., 0., 0.])), ([1., 2., 3.], np.array([1., 2., 3.])),
-    ([10000., 10000., 10000.], np.array([10000., 10000., 10000.]))
-]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize("pos_input,pos_expected", pos_sensor_tests, indirect=True)
-def test_PositionSensor_calc_msmt(pos_sensor, pos_expected):
+class TestPositionSensor:
     """
-    parametrized test for the _calculate_measurement method of the Position Sensor
+    The class defines unit tests for the PositionSensor
     """
-    state = np.array([0., 0., 0.])
-    calced = pos_sensor._calculate_measurement(state)  #pylint: disable=W0212
-    assert np.array_equiv(calced, pos_expected)
+    test_cases_file_path = os.path.join(
+        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/position_sensor_test_cases.yaml"
+    )
+    parameterized_fixture_keywords = ["pos_input", "pos_expected"]
+    test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
+    def test_PositionSensor_calc_msmt(self, pos_sensor, pos_expected):
+        """
+        parametrized test for the _calculate_measurement method of the Position Sensor
+        """
+        state = np.array([0., 0., 0.])
+        calced = pos_sensor._calculate_measurement(state)  #pylint: disable=W0212
+        assert np.array_equiv(calced, pos_expected)
 
 
 #Tests for velocity sensor
-
-
 @pytest.fixture(name='vel_sensor')
 def setup_vel_sensor(cwh_platform_vel):
     """
@@ -66,20 +70,23 @@ def setup_vel_sensor(cwh_platform_vel):
     return vel_sensor
 
 
-# pos,
-vel_sensor_tests = [
-    ([0., 0., 0.], np.array([0., 0., 0.])), ([1., 2., 3.], np.array([1., 2., 3.])), ([10., 10., 10.], np.array([10., 10., 10.])),
-    ([10000., 10000., 10000.], np.array([10000., 10000., 10000.]))
-]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize("vel_input,vel_expected", vel_sensor_tests, indirect=True)
-def test_VelocitySensor_calc_msmt(vel_sensor, vel_expected):
+class TestVelocitySensor:
     """
-    Tests for the _calculate_measurement method of a VelocitySensor
+    The class defines unit tests for the VelocitySensor
     """
+    test_cases_file_path = os.path.join(
+        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/velocity_sensor_test_cases.yaml"
+    )
+    parameterized_fixture_keywords = ["vel_input", "vel_expected"]
+    test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
-    state = np.array([0., 0., 0.])
-    calced = vel_sensor._calculate_measurement(state)  #pylint: disable=W0212
-    assert np.array_equiv(calced, vel_expected)
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize("vel_input,vel_expected", test_configs, indirect=True, ids=IDs)
+    def test_VelocitySensor_calc_msmt(self, vel_sensor, vel_expected):
+        """
+        Tests for the _calculate_measurement method of a VelocitySensor
+        """
+
+        state = np.array([0., 0., 0.])
+        calced = vel_sensor._calculate_measurement(state)  #pylint: disable=W0212
+        assert np.array_equiv(calced, vel_expected)

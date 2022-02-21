@@ -1,0 +1,9 @@
+- ID: case 1
+  pos_input: [0., 0., 0.]
+  pos_expected: np.array([0., 0., 0.])
+- ID: case 2
+  pos_input: [1., 2., 3.]
+  pos_expected: np.array([1., 2., 3.])
+- ID: case 3
+  pos_input: [10000., 10000., 10000.]
+  pos_expected: np.array([10000., 10000., 10000.])
