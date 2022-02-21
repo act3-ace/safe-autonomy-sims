@@ -107,15 +107,15 @@ class Test_velocity_attribute:
     """
     Tests for velocity attribute
     """
-
-    vel_attr_tests = [
-        ([0., 0., 0.], np.array([0., 0., 0.])), ([1., 2., 3.], np.array([1., 2., 3.])), ([10., 10., 10.], np.array([10., 10., 10.])),
-        ([1000., 1000., 1000.], np.array([1000., 1000., 1000.]))
-    ]
+    test_cases_file_path = os.path.join(
+        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_velocity_attribute_test_cases.yaml"
+    )
+    parameterized_fixture_keywords = ["vel_input", "vel_expected"]
+    test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
     @pytest.mark.unit_test
-    @pytest.mark.parametrize("vel_input,vel_expected", vel_attr_tests, indirect=True)
-    def test_velocity_attrbute(cwh_platform_vel, vel_expected):
+    @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
+    def test_velocity_attrbute(self, cwh_platform_vel, vel_expected):
         """
         Test for velocity property getter method
         """
@@ -150,29 +150,35 @@ def setup_sim_time_platform(cwh_platform, set_to_time):
     return cwh_platform
 
 
-time_prop_tests = [(10.5), (100.), (200.)]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize("set_to_time", time_prop_tests, indirect=True)
-def test_simtime_property(simtime_platform, set_to_time):
+class Test_simtime_property:
     """
-    parametrized test for to test if sim_time property getter method
+    Test simtime property
     """
-    assert simtime_platform.sim_time == set_to_time
+    time_prop_tests = [(10.5), (100.), (200.)]
+
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize("set_to_time", time_prop_tests, indirect=True)
+    def test_simtime_property(self, simtime_platform, set_to_time):
+        """
+        parametrized test for to test if sim_time property getter method
+        """
+        assert simtime_platform.sim_time == set_to_time
 
 
-time_accsr_tests = [(10.5), (100.), (200.)]
-
-
-@pytest.mark.unit_test
-@pytest.mark.parametrize("set_to_time", time_accsr_tests, indirect=True)
-def test_simtime_setter(cwh_platform, set_to_time):
+class Test_simtime_setter_property:
     """
-    parametrized test for to test if sim_time property setter method
+    Test the setter method for simtime property
     """
-    cwh_platform.sim_time = set_to_time
-    assert cwh_platform._sim_time == set_to_time  #pylint: disable=W0212
+    time_accsr_tests = [(10.5), (100.), (200.)]
+
+    @pytest.mark.unit_test
+    @pytest.mark.parametrize("set_to_time", time_accsr_tests, indirect=True)
+    def test_simtime_setter(self, cwh_platform, set_to_time):
+        """
+        parametrized test for to test if sim_time property setter method
+        """
+        cwh_platform.sim_time = set_to_time
+        assert cwh_platform._sim_time == set_to_time  #pylint: disable=W0212
 
 
 #Tests for 'operable' property
