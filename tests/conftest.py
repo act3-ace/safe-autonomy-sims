@@ -6,6 +6,7 @@ Author: John McCarroll
 """
 
 import yaml
+import math
 import numpy as np
 
 from scipy.spatial.transform import Rotation
@@ -84,3 +85,10 @@ def read_test_cases(file_path, parameter_keywords):
             test_cases.append(values)
 
     return test_cases
+
+
+if __name__ == "__main__":
+    file_path = "/home/jcunningham/code/safe-autonomy-sims/tests/test_cases/docking/rewards/DockingDistanceExponentialChangeReward_test_cases.yaml"
+    parameterized_fixture_keywords = ["platform_position1", "platform_position2", "scale", "c", "a", "pivot", "pivot_ratio", "expected_value"]
+
+    test_cases = read_test_cases(file_path=file_path, parameter_keywords=parameterized_fixture_keywords)

@@ -407,10 +407,10 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         vel_limit = self.velocity_limit(state)
 
         violation = rel_vel_mag - vel_limit
-        violated = rel_vel_mag <= vel_limit
+        violated = rel_vel_mag >= vel_limit
         if self.config.lower_bound:
             violation *= -1
-            violated = rel_vel_mag >= vel_limit
+            violated = rel_vel_mag <= vel_limit
 
         return violated, violation
 
@@ -510,10 +510,10 @@ class DockingSuccessReward(RewardFuncBase):
         vel_limit = self.velocity_limit(state)
 
         violation = rel_vel_mag - vel_limit
-        violated = rel_vel_mag <= vel_limit
+        violated = rel_vel_mag >= vel_limit
         if self.config.lower_bound:
             violation *= -1
-            violated = rel_vel_mag >= vel_limit
+            violated = rel_vel_mag <= vel_limit
 
         return violated, violation
 
@@ -662,10 +662,10 @@ class DockingFailureReward(RewardFuncBase):
         vel_limit = self.velocity_limit(state)
 
         violation = rel_vel_mag - vel_limit
-        violated = rel_vel_mag <= vel_limit
+        violated = rel_vel_mag >= vel_limit
         if self.config.lower_bound:
             violation *= -1
-            violated = rel_vel_mag >= vel_limit
+            violated = rel_vel_mag <= vel_limit
 
         return violated, violation
 
@@ -713,8 +713,6 @@ class DockingFailureReward(RewardFuncBase):
         position = deputy.position
         sim_time = deputy.sim_time
 
-        distance = np.linalg.norm(position)
-
         # TODO: update to chief location when multiple platforms enabled
         origin = np.array([0, 0, 0])
         radial_distance = np.linalg.norm(np.array(position) - origin)
@@ -725,7 +723,7 @@ class DockingFailureReward(RewardFuncBase):
         if sim_time > self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
-        elif distance >= self.config.max_goal_distance:
+        elif radial_distance >= self.config.max_goal_distance:
             # agent exceeded max distance from goal
             value = self.config.distance_reward
         elif in_docking and violated:

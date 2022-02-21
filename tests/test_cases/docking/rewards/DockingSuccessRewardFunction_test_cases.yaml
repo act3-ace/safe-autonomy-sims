@@ -6,7 +6,11 @@
   sim_time: 200
   timeout: 2000
   docking_region_radius: 0.5
-  max_vel_constraint: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: True
   expected_value: 1.9
 - case: successful docking test 2
   platform_position: np.array([0.2, 0.2, 0.2])

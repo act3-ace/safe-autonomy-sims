@@ -12,7 +12,9 @@ from saferl.dones.docking_dones import SuccessfulDockingDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
-test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/SuccessfulDockingDoneFunction_test_cases.yaml")
+test_cases_file_path = os.path.join(
+    os.path.split(__file__)[0], "../../../../test_cases/docking/dones/SuccessfulDockingDoneFunction_test_cases.yaml"
+)
 parameterized_fixture_keywords = [
     "platform_position", "platform_velocity", "docking_region_radius", "velocity_limit", "expected_value", "expected_status"
 ]
