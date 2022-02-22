@@ -15,8 +15,8 @@
 "agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
-        {"part": "Controller_Acceleration", "config": {"axis": 0}},
-        {"part": "Controller_YawRate", "config": {"axis": 1}},
+        {"part": "Controller_YawRate", "config": {"axis": 0}},
+        { "part": "Controller_Acceleration", "config": { "axis": 1 } },
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
         {"part": "Sensor_Heading"},
