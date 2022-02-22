@@ -14,7 +14,7 @@ from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/rejoin/dones/SuccessfulRejoinDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/dones/rejoin/SuccessfulRejoinDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
     "rejoin_region_radius", "offset_values", "lead_orientation", "lead_position", "platform_position", "expected_value", "expected_status"

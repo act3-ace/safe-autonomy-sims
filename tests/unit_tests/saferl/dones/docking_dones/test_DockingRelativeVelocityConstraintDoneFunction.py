@@ -4,7 +4,6 @@ Author: John McCarroll
 """
 
 import os
-from unittest import mock
 
 import pytest
 
@@ -13,7 +12,7 @@ from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/docking/dones/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
     "platform_velocity",
@@ -119,44 +118,6 @@ def fixture_cut(
         mean_motion=mean_motion,
         lower_bound=lower_bound,
     )
-
-
-@pytest.fixture(name='call_results')
-def fixture_call_results(cut, observation, action, next_observation, next_state, platform):
-    """
-    A fixture responsible for calling the DockingVelocityLimitDoneFunction and returning the results.
-
-    Parameters
-    ----------
-    cut : DockingVelocityLimitDoneFunction
-        The component under test
-    observation : numpy.ndarray
-        The observation array
-    action : numpy.ndarray
-        The action array
-    next_observation : numpy.ndarray
-        The next_observation array
-    next_state : StateDict
-        The StateDict that the DockingVelocityLimitDoneFunction mutates
-    platform : MagicMock
-        The mock platform to be returned to the DockingVelocityLimitDoneFunction when it uses get_platform_by_name()
-    target : MagicMock
-        The mock target to be returned to the DockingVelocityLimitDoneFunction when it uses get_platform_by_name()
-
-    Returns
-    -------
-    results : DoneDict
-        The resulting DoneDict from calling the DockingVelocityLimitDoneFunction
-    """
-    with mock.patch("saferl.dones.docking_dones.get_platform_by_name") as func:
-        # construct iterable of return values (platforms)
-        platforms = []
-        for _ in test_configs:
-            platforms.append(platform)
-        func.side_effect = platforms
-
-        results = cut(observation, action, next_observation, next_state)
-        return results
 
 
 @pytest.mark.unit_test
