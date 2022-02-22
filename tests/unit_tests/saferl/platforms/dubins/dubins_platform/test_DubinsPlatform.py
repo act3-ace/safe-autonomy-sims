@@ -74,7 +74,7 @@ class Test__eq__:
 
     # Define test assay
     test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../../test_cases/dubins_platform_test_cases/DubinsPlatform__eq__test_cases.yaml"
+        os.path.split(__file__)[0], "../../../../../test_cases/platforms/dubins/DubinsPlatform__eq__test_cases.yaml"
     )
     parameterized_fixture_keywords = [
         "velocity1",

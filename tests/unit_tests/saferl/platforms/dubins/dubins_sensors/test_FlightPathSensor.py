@@ -15,7 +15,7 @@ from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../../test_cases/dubins_platform_test_cases/FlightPathSensor_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../../test_cases/platforms/dubins/FlightPathSensor_test_cases.yaml"
 )
 parameterized_fixture_keywords = ["flight_path", "expected_flight_path"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
