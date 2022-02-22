@@ -4,6 +4,7 @@ This module contains functions that define common terminal conditions across env
 
 from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from act3_rl_core.libraries.environment_dict import DoneDict
+from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 
 class TimeoutDoneValidator(DoneFuncBaseValidator):
@@ -58,8 +59,8 @@ class TimeoutDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # get sim time
-        sim_time = next(iter(next_state.sim_platforms)).sim_time
-        # sim_time = DoneFuncBase._get_platform_time(next(iter(next_state.sim_platforms)))
+        platform = get_platform_by_name(next_state, self.agent)
+        sim_time = platform.sim_time
 
         done[self.agent] = sim_time >= self.config.max_sim_time
 
