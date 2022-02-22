@@ -27,7 +27,7 @@ parameterized_fixture_keywords = [
     "lower_bound",
     "expected_value"
 ]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='platform_position')
@@ -166,7 +166,7 @@ def fixture_cut(
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the DockingSuccessRewardFunction behaves as intended.

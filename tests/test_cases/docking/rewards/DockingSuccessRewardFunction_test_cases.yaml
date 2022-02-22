@@ -1,5 +1,5 @@
 # test successes
-- case: successful docking test 1
+- ID: successful docking test 1
   platform_position: np.array([0, 0, 0])
   platform_velocity: 5.0
   scale: 1.0
@@ -12,7 +12,7 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: 1.9
-- case: successful docking test 2
+- ID: successful docking test 2
   platform_position: np.array([0.2, 0.2, 0.2])
   platform_velocity: 7.0
   scale: 1.0
@@ -25,7 +25,7 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: 1.9
-- case: unsuccessful docking test 1
+- ID: unsuccessful docking test 1
   platform_position: np.array([1, 1, 1])
   platform_velocity: 5.0
   scale: 1.0
@@ -38,7 +38,7 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: 0
-- case: unsuccessful docking test 2
+- ID: unsuccessful docking test 2
   platform_position: np.array([0.2, 0.2, 0.2])
   platform_velocity: 20.0
   scale: 1.0
@@ -51,7 +51,7 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: 0
-- case: unsuccessful docking test 3
+- ID: unsuccessful docking test 3
   platform_position: np.array([0.5, 0.5, 0.5])
   platform_velocity: 7.0
   scale: 1.0

@@ -15,7 +15,7 @@ test_cases_file_path = os.path.join(
     os.path.split(__file__)[0], "../../../../test_cases/docking/rewards/DockingDistanceChangeReward_test_cases.yaml"
 )
 parameterized_fixture_keywords = ["platform_position1", "platform_position2", "scale", "expected_value"]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.fixture(name='platform_position1')
@@ -123,7 +123,7 @@ def fixture_call_results(
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_reward_function(call_results, agent_name, expected_value):
     """
     A parameterized test to ensure that the DockingDistanceChangeReward behaves as intended.

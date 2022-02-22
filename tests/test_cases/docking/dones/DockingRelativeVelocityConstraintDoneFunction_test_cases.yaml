@@ -1,5 +1,5 @@
 # Simple boundary testing
-- case: below velocity constraint
+- ID: below velocity constraint
   platform_velocity: np.array([19, 0, 0])
   velocity_threshold: 20.0
   threshold_distance: 0.5
@@ -8,7 +8,7 @@
   lower_bound: False
   expected_value: False
   expected_status: None
-- case: at velocity constraint
+- ID: at velocity constraint
   platform_velocity: np.array([20, 0, 0])
   velocity_threshold: 20.0
   threshold_distance: 0.5
@@ -17,7 +17,7 @@
   lower_bound: False
   expected_value: False
   expected_status: None
-- case: above velocity constraint
+- ID: above velocity constraint
   platform_velocity: np.array([21, 0, 0])
   velocity_threshold: 20.0
   threshold_distance: 0.5
