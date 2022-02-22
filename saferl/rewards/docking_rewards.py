@@ -1,6 +1,7 @@
 """
 This module implements the Reward Functions and Reward Validators specific to the docking task.
 """
+import math
 from collections import OrderedDict
 
 import numpy as np
@@ -11,7 +12,74 @@ from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
 
-class CWHDistanceChangeRewardValidator(RewardFuncBaseValidator):
+class DockingTimeRewardValidator(RewardFuncBaseValidator):
+    """
+    scale: Scalar value to adjust magnitude of the reward
+    step_size: The size of one simulation step (sec)
+    """
+    scale: float
+    step_size: float
+
+
+class DockingTimeReward(RewardFuncBase):
+    """
+    This reward function allocates reward based on the time passed since the last reward was received.
+    """
+
+    def __init__(self, **kwargs):
+        self.config: DockingTimeRewardValidator
+        super().__init__(**kwargs)
+
+    @property
+    def get_validator(cls):
+        """
+        Method to return class's Validator.
+        """
+        return DockingTimeRewardValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        """
+        This method allocates reward based on the step size of the simulation.
+
+        Parameters
+        ----------
+        observation : OrderedDict
+            The observations available to the agent from the previous state.
+        action :
+            The last action performed by the agent.
+        next_observation : OrderedDict
+            The observations available to the agent from the current state.
+        state : StateDict
+            The previous state of the simulation.
+        next_state : StateDict
+            The current state of the simulation.
+        observation_space : StateDict
+            The agent's observation space.
+        observation_units : StateDict
+            The units corresponding to values in the observation_space?
+
+        Returns
+        -------
+        reward : RewardDict
+            The agent's reward for the change in time.
+        """
+
+        reward = RewardDict()
+        reward[self.config.agent_name] = self.config.scale * self.config.step_size
+
+        return reward
+
+
+class DockingDistanceChangeRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward
     """
@@ -19,13 +87,13 @@ class CWHDistanceChangeRewardValidator(RewardFuncBaseValidator):
     scale: float
 
 
-class CWHDistanceChangeReward(RewardFuncBase):
+class DockingDistanceChangeReward(RewardFuncBase):
     """
     This RewardFuncBase extension is responsible for calculating the reward associated with a change in agent position.
     """
 
     def __init__(self, **kwargs):
-        self.config: CWHDistanceChangeRewardValidator
+        self.config: DockingDistanceChangeRewardValidator
         super().__init__(**kwargs)
         self._dist_buffer = RingBuffer(capacity=2, dtype=float)
 
@@ -34,7 +102,7 @@ class CWHDistanceChangeReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return CWHDistanceChangeRewardValidator
+        return DockingDistanceChangeRewardValidator
 
     def __call__(
         self,
@@ -91,6 +159,281 @@ class CWHDistanceChangeReward(RewardFuncBase):
         return reward
 
 
+class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
+    """
+    TODO: Get the descriptions of these values
+    """
+    c: float = 2.0
+    a: float = math.inf
+    pivot: float = math.inf
+    pivot_ratio: float = 2.0
+    scale: float = 1.0
+
+
+class DockingDistanceExponentialChangeReward(RewardFuncBase):
+    """
+    Calculates an exponential reward based on the change in distance of the agent.
+    """
+
+    def __init__(self, **kwargs):
+        self.config: DockingDistanceExponentialChangeRewardValidator
+        super().__init__(**kwargs)
+        self._dist_buffer = RingBuffer(capacity=2, dtype=float)
+
+        assert not (self.config.a == math.inf and self.config.pivot == math.inf), "Both 'a' and 'pivot' cannot be specified."
+        assert self.config.a != math.inf or self.config.pivot != math.inf, "Either 'a' or 'pivot' must be specified."
+
+        if self.config.a != math.inf:
+            self.a = self.config.a
+        else:
+            self.a = math.log(self.config.pivot_ratio) / self.config.pivot
+
+        self.c = self.config.c
+        self.scale = self.config.scale
+
+    @property
+    def get_validator(cls):
+        """
+        Method to return class's Validator.
+        """
+        return DockingDistanceExponentialChangeRewardValidator
+
+    @property
+    def prev_dist(self):
+        """
+        The previous distance of the agent from the target.
+
+        Returns
+        -------
+        float
+            The previous distance of the agent from the target.
+        """
+        return self._dist_buffer[0]
+
+    @property
+    def curr_dist(self):
+        """
+        The current distance of the agent from the target.
+
+        Returns
+        -------
+        float
+            The current distance of the agent from the target.
+        """
+        return self._dist_buffer[1]
+
+    def update_dist(self, dist):
+        """
+        Store the current distance from the agent to the target.
+
+        Parameters
+        ----------
+        dist: float
+            The current distance of the agent from the target.
+
+        Returns
+        -------
+        None
+        """
+        self._dist_buffer.append(dist)
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        reward = RewardDict()
+        val = 0
+
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+        position = deputy.position
+
+        distance = np.linalg.norm(position)
+        self.update_dist(distance)
+
+        # TODO initialize distance buffer from initial state
+        if len(self._dist_buffer) == 2:
+            val = self.c * (math.exp(-self.a * self.curr_dist) - math.exp(-self.a * self.prev_dist))
+            val = self.scale * val
+
+        reward[self.config.agent_name] = val
+        return reward
+
+
+class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
+    """
+    TODO: Get the descriptions of these values
+    """
+    scale: float
+    bias: float = 0.0
+    step_size: float = 1.0
+    mass: float
+
+
+class DockingDeltaVReward(RewardFuncBase):
+    """
+    Calculates reward based on change in agent velocity.
+    """
+
+    def __init__(self, **kwargs):
+        self.config: DockingDeltaVRewardValidator
+        super().__init__(**kwargs)
+        self.bias = self.config.bias
+        self.scale = self.config.scale
+        self.mass = self.config.mass
+        self.step_size = self.config.step_size
+
+    def delta_v(self, state):
+        """
+        Get change in agent's velocity from the current state.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        d_v: float
+            The agent's change in velocity
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        control_vec = deputy.get_applied_action()
+        d_v = np.sum(np.abs(control_vec)) / self.mass * self.step_size
+        return d_v
+
+    @property
+    def get_validator(cls):
+        """
+        Method to return class's Validator.
+        """
+        return DockingDeltaVRewardValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        reward = RewardDict()
+        val = self.scale * self.delta_v(next_state) + self.bias
+        reward[self.config.agent_name] = val
+        return reward
+
+
+class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
+    """
+    TODO: get descriptions of these values
+    """
+    scale: float
+    bias: float = 0.0
+    step_size: float = 1.0
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float
+    lower_bound: bool = False
+
+
+class DockingVelocityConstraintReward(RewardFuncBase):
+    """
+    Calculates reward based on agent's violation of the velocity constraint.
+    """
+
+    def __init__(self, **kwargs):
+        self.config: DockingVelocityConstraintRewardValidator
+        super().__init__(**kwargs)
+        self.bias = self.config.bias
+        self.scale = self.config.scale
+        self.step_size = self.config.step_size
+
+    @property
+    def get_validator(cls):
+        """
+        Method to return class's Validator.
+        """
+        return DockingVelocityConstraintRewardValidator
+
+    def velocity_limit(self, state):
+        """
+        Get the velocity limit from the agent's current position.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        float
+            The velocity limit given the agent's position.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        dist = np.linalg.norm(deputy.position)
+        vel_limit = self.config.velocity_threshold
+        if dist > self.config.threshold_distance:
+            vel_limit += self.config.slope * self.config.mean_motion * (dist - self.config.threshold_distance)
+        return vel_limit
+
+    def max_vel_violation(self, state):
+        """
+        Get the magnitude of a velocity limit violation if one has occurred.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        violated: bool
+            Boolean value indicating if the velocity limit has been violated
+        violation: float
+            The magnitude of the velocity limit violation.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        rel_vel = deputy.velocity
+        rel_vel_mag = np.linalg.norm(rel_vel)
+
+        vel_limit = self.velocity_limit(state)
+
+        violation = rel_vel_mag - vel_limit
+        violated = rel_vel_mag > vel_limit
+        if self.config.lower_bound:
+            violation *= -1
+            violated = rel_vel_mag < vel_limit
+
+        return violated, violation
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+        reward = RewardDict()
+        violated, violation = self.max_vel_violation(next_state)
+        if violated:
+            val = self.scale * violation + self.bias
+        else:
+            val = 0
+        reward[self.config.agent_name] = val
+        return reward
+
+
 class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward
@@ -100,7 +443,11 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     scale: float
     timeout: float
     docking_region_radius: float
-    max_vel_constraint: float
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float
+    lower_bound: bool = False
 
 
 class DockingSuccessReward(RewardFuncBase):
@@ -118,6 +465,57 @@ class DockingSuccessReward(RewardFuncBase):
         Method to return class's Validator.
         """
         return DockingSuccessRewardValidator
+
+    def velocity_limit(self, state):
+        """
+        Get the velocity limit from the agent's current position.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        float
+            The velocity limit given the agent's position.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        dist = np.linalg.norm(deputy.position)
+        vel_limit = self.config.velocity_threshold
+        if dist > self.config.threshold_distance:
+            vel_limit += self.config.slope * self.config.mean_motion * (dist - self.config.threshold_distance)
+        return vel_limit
+
+    def max_vel_violation(self, state):
+        """
+        Get the magnitude of a velocity limit violation if one has occurred.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        violated: bool
+            Boolean value indicating if the velocity limit has been violated
+        violation: float
+            The magnitude of the velocity limit violation.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        rel_vel = deputy.velocity
+        rel_vel_mag = np.linalg.norm(rel_vel)
+
+        vel_limit = self.velocity_limit(state)
+
+        violation = rel_vel_mag - vel_limit
+        violated = rel_vel_mag > vel_limit
+        if self.config.lower_bound:
+            violation *= -1
+            violated = rel_vel_mag < vel_limit
+
+        return violated, violation
 
     def __call__(
         self,
@@ -162,16 +560,16 @@ class DockingSuccessReward(RewardFuncBase):
 
         position = deputy.position
         sim_time = deputy.sim_time
-        velocity_vector = deputy.velocity
 
         origin = np.array([0, 0, 0])
         docking_region_radius = self.config.docking_region_radius
-        velocity = np.linalg.norm(velocity_vector)
 
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        if in_docking and velocity < self.config.max_vel_constraint:
+        violated, _ = self.max_vel_violation(next_state)
+
+        if in_docking and not violated:
             value = self.config.scale
             if self.config.timeout:
                 # Add time reward component, if timeout specified
@@ -197,7 +595,11 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     timeout: float
     max_goal_distance: float
     docking_region_radius: float
-    max_vel_constraint: float
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float
+    lower_bound: bool = False
 
 
 class DockingFailureReward(RewardFuncBase):
@@ -215,6 +617,57 @@ class DockingFailureReward(RewardFuncBase):
         Method to return class's Validator.
         """
         return DockingFailureRewardValidator
+
+    def velocity_limit(self, state):
+        """
+        Get the velocity limit from the agent's current position.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        float
+            The velocity limit given the agent's position.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        dist = np.linalg.norm(deputy.position)
+        vel_limit = self.config.velocity_threshold
+        if dist > self.config.threshold_distance:
+            vel_limit += self.config.slope * self.config.mean_motion * (dist - self.config.threshold_distance)
+        return vel_limit
+
+    def max_vel_violation(self, state):
+        """
+        Get the magnitude of a velocity limit violation if one has occurred.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        violated: bool
+            Boolean value indicating if the velocity limit has been violated
+        violation: float
+            The magnitude of the velocity limit violation.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        rel_vel = deputy.velocity
+        rel_vel_mag = np.linalg.norm(rel_vel)
+
+        vel_limit = self.velocity_limit(state)
+
+        violation = rel_vel_mag - vel_limit
+        violated = rel_vel_mag > vel_limit
+        if self.config.lower_bound:
+            violation *= -1
+            violated = rel_vel_mag < vel_limit
+
+        return violated, violation
 
     def __call__(
         self,
@@ -259,23 +712,21 @@ class DockingFailureReward(RewardFuncBase):
 
         position = deputy.position
         sim_time = deputy.sim_time
-        velocity_vector = deputy.velocity
-
-        distance = np.linalg.norm(position)
-        velocity = np.linalg.norm(velocity_vector)
 
         # TODO: update to chief location when multiple platforms enabled
         origin = np.array([0, 0, 0])
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= self.config.docking_region_radius
 
+        violated, _ = self.max_vel_violation(next_state)
+
         if sim_time > self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
-        elif distance >= self.config.max_goal_distance:
+        elif radial_distance >= self.config.max_goal_distance:
             # agent exceeded max distance from goal
             value = self.config.distance_reward
-        elif in_docking and velocity >= self.config.max_vel_constraint:
+        elif in_docking and violated:
             # agent exceeded velocity constraint within docking region
             value = self.config.crash_reward
 

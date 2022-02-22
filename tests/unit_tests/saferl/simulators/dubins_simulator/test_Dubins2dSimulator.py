@@ -13,7 +13,7 @@ from tests.conftest import delimiter, read_test_cases
 from tests.factories.dubins.dubins_platform import Dubins2dPlatformFactory
 
 # Define test assay
-test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/Dubins2dSimulator_test_cases/")
+test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/rejoin/simulator/Dubins2dSimulator_test_cases/")
 
 
 @pytest.fixture(name='step_size')

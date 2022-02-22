@@ -80,11 +80,61 @@
     ],
     "rewards": [
         {
-            "name": "CWHDistanceChangeReward",
-            "functor": "saferl.rewards.docking_rewards.CWHDistanceChangeReward",
+            "name": "DockingDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
             "config": {
-                "scale": 1.0e-2
+                "pivot": 100
             }
         },
+      {
+        "name": "DockingDeltaVReward",
+        "functor": "saferl.rewards.docking_rewards.DockingDeltaVReward",
+        "config": {
+          "scale": -0.01,
+          "bias": 0.0,
+          "mass": 12.0
+        }
+      },
+      {
+        "name": "DockingVelocityConstraintReward",
+        "functor": "saferl.rewards.docking_rewards.DockingVelocityConstraintReward",
+        "config": {
+          "scale": -0.01,
+          "bias": -0.01,
+          "velocity_threshold": 0.2,
+          "threshold_distance": 0.5,
+          "mean_motion": 0.001027,
+          "lower_bound": True,
+        }
+      },
+        {
+          "name": "DockingSuccessReward",
+          "functor": "saferl.rewards.docking_rewards.DockingSuccessReward",
+          "config": {
+            "scale": 1.0,
+            "timeout": 2000,
+            "docking_region_radius": 0.5,
+            "velocity_threshold": 0.2,
+            "threshold_distance": 0.5,
+            "mean_motion": 0.001027,
+            "lower_bound": True,
+          }
+        },
+      {
+        "name": "DockingFailureReward",
+        "functor": "saferl.rewards.docking_rewards.DockingFailureReward",
+        "config": {
+          "timeout_reward": -1.0,
+          "distance_reward": -1.0,
+          "crash_reward": -1.0,
+          "timeout": 2000,
+          "max_goal_distance": 40000,
+          "docking_region_radius": 0.5,
+          "velocity_threshold": 0.2,
+          "threshold_distance": 0.5,
+          "mean_motion": 0.001027,
+          "lower_bound": True,
+        }
+      },
     ],
 }

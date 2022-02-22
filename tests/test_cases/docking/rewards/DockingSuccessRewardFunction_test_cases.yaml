@@ -6,7 +6,11 @@
   sim_time: 200
   timeout: 2000
   docking_region_radius: 0.5
-  max_vel_constraint: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
   expected_value: 1.9
 - ID: successful docking test 2
   platform_position: np.array([0.2, 0.2, 0.2])
@@ -15,7 +19,11 @@
   sim_time: 200
   timeout: 2000
   docking_region_radius: 0.5
-  max_vel_constraint: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
   expected_value: 1.9
 - ID: unsuccessful docking test 1
   platform_position: np.array([1, 1, 1])
@@ -24,7 +32,11 @@
   sim_time: 400
   timeout: 2000
   docking_region_radius: 0.5
-  max_vel_constraint: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
   expected_value: 0
 - ID: unsuccessful docking test 2
   platform_position: np.array([0.2, 0.2, 0.2])
@@ -33,7 +45,11 @@
   sim_time: 200
   timeout: 2000
   docking_region_radius: 0.5
-  max_vel_constraint: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
   expected_value: 0
 - ID: unsuccessful docking test 3
   platform_position: np.array([0.5, 0.5, 0.5])
@@ -42,5 +58,9 @@
   sim_time: 200
   timeout: 2000
   docking_region_radius: 0.5
-  max_vel_constraint: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
   expected_value: 0
