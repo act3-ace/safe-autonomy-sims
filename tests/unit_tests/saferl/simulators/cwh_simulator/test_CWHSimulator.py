@@ -13,7 +13,7 @@ from tests.conftest import delimiter, read_test_cases
 from tests.factories.cwh.cwh_platform import CWHPlatformFactory
 
 # Define test assay
-test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/docking/simulator/CWHSimulator_test_cases/")
+test_cases_dir = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/simulators/docking/CWHSimulator_test_cases/")
 
 
 @pytest.fixture(name='step_size')

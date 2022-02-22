@@ -12,7 +12,7 @@ from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/docking/rewards/DockingDistanceExponentialChangeReward_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/rewards/docking/DockingDistanceExponentialChangeReward_test_cases.yaml"
 )
 parameterized_fixture_keywords = ["platform_position1", "platform_position2", "scale", "c", "a", "pivot", "pivot_ratio", "expected_value"]
 test_configs, ids = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)

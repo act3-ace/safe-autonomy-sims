@@ -1,0 +1,67 @@
+# Simple Boundary Testing
+- ID: inside docking boundary region and below velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([0, 0, 0])
+  docking_region_radius: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
+  expected_value: False
+  expected_status: None
+- ID: on docking region boundary and below velocity constraint
+  platform_position: np.array([10, 0, 0])
+  platform_velocity: np.array([0, 0, 0])
+  docking_region_radius: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
+  expected_value: False
+  expected_status: None
+- ID: outside docking region boundary and below velocity constraint
+  platform_position: np.array([11, 0, 0])
+  platform_velocity: np.array([0, 0, 0])
+  docking_region_radius: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
+  expected_value: False
+  expected_status: None
+- ID: inside docking region boundary and below velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([9, 0, 0])
+  docking_region_radius: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
+  expected_value: False
+  expected_status: None
+- ID: inside docking region boundary and at velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([10, 0, 0])
+  docking_region_radius: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
+  expected_value: False
+  expected_status: None
+- ID: inside docking region boundary and above velocity constraint
+  platform_position: np.array([9, 0, 0])
+  platform_velocity: np.array([11, 0, 0])
+  docking_region_radius: 10
+  velocity_threshold: 10.0
+  threshold_distance: 0.5
+  slope: 2.0
+  mean_motion: 0.001027
+  lower_bound: False
+  expected_value: True
+  expected_status: DoneStatusCodes.LOSE

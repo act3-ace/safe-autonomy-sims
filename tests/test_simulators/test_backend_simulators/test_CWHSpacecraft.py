@@ -13,7 +13,7 @@ from tests.conftest import read_test_cases, delimiter
 
 
 # Define test assay
-test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../test_cases/CWHSpacecraft_test_cases.yaml")
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../test_cases/backend/CWHSpacecraft_test_cases.yaml")
 parameterized_fixture_keywords = ["attr_init",
                                   "control",
                                   "num_steps",
