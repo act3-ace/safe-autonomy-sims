@@ -37,7 +37,7 @@ class Test_get_applied_action:
     """
     # Define test assay
     test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_get_applied_action_test_cases.yaml"
+        os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/platform_get_applied_action_test_cases.yaml"
     )
     parameterized_fixture_keywords = ["applied_action"]
     test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
@@ -61,7 +61,7 @@ class Test_save_action_to_platform:
     """
     # Define test assay
     test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_save_action_to_platform_test_cases.yaml"
+        os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/platform_save_action_to_platform_test_cases.yaml"
     )
     parameterized_fixture_keywords = ["applied_action"]
     test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
@@ -89,7 +89,7 @@ class Test_position_attribute:
     """
     # Define test assay
     test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_position_attribute_test_cases.yaml"
+        os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/platform_position_attribute_test_cases.yaml"
     )
     parameterized_fixture_keywords = ["pos_input", "pos_expected"]
     test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
@@ -108,7 +108,7 @@ class Test_velocity_attribute:
     Tests for velocity attribute
     """
     test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/platform_velocity_attribute_test_cases.yaml"
+        os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/platform_velocity_attribute_test_cases.yaml"
     )
     parameterized_fixture_keywords = ["vel_input", "vel_expected"]
     test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)

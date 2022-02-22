@@ -41,9 +41,7 @@ class TestPositionSensor:
     """
     The class defines unit tests for the PositionSensor
     """
-    test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/position_sensor_test_cases.yaml"
-    )
+    test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/position_sensor_test_cases.yaml")
     parameterized_fixture_keywords = ["pos_input", "pos_expected"]
     test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
@@ -74,9 +72,7 @@ class TestVelocitySensor:
     """
     The class defines unit tests for the VelocitySensor
     """
-    test_cases_file_path = os.path.join(
-        os.path.split(__file__)[0], "../../../../test_cases/cwh_platform_test_cases/velocity_sensor_test_cases.yaml"
-    )
+    test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/velocity_sensor_test_cases.yaml")
     parameterized_fixture_keywords = ["vel_input", "vel_expected"]
     test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 

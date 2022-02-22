@@ -14,9 +14,7 @@ from saferl.platforms.dubins.dubins_sensors import PositionSensor
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
-test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../../test_cases/dubins_platform_test_cases/PositionSensor_test_cases.yaml"
-)
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../../test_cases/platforms/dubins/PositionSensor_test_cases.yaml")
 parameterized_fixture_keywords = ["position", "expected_position"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
