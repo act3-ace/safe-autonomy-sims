@@ -1,31 +1,31 @@
 """
-Unit tests for the DockingSuccessReward function from the docking_rewards module
+This module holds unit tests and fixtures for the SuccessfulDockingDoneFunction.
+
+Author: John McCarroll
 """
 
 import os
 
 import pytest
 
-from saferl.rewards.docking_rewards import DockingSuccessReward
+from saferl.dones.docking_dones import CrashDockingDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/rewards/docking/DockingSuccessRewardFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/CrashDockingDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
     "platform_position",
     "platform_velocity",
-    "scale",
-    "sim_time",
-    "timeout",
     "docking_region_radius",
     "velocity_threshold",
     "threshold_distance",
     "slope",
     "mean_motion",
     "lower_bound",
-    "expected_value"
+    "expected_value",
+    "expected_status"
 ]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
@@ -43,18 +43,15 @@ def fixture_platform_position(request):
     return request.param
 
 
-@pytest.fixture(name='scale')
-def fixture_scale(request):
+@pytest.fixture(name='platform_velocity')
+def fixture_platform_velocity(request):
     """
-    Get 'scale' parameter from the test config input
-    """
-    return request.param
+    Parameterized fixture for returning platform velocity defined in test_configs.
 
-
-@pytest.fixture(name='timeout')
-def fixture_timeout(request):
-    """
-    Get the 'timeout' parameter from the test config input
+    Returns
+    -------
+    numpy.ndarray
+        Three element array describing platform's 3D velocity
     """
     return request.param
 
@@ -62,7 +59,13 @@ def fixture_timeout(request):
 @pytest.fixture(name='docking_region_radius')
 def fixture_docking_region_radius(request):
     """
-    Get the 'docking_region_radius' parameter from the test config input
+    Parameterized fixture for returning the docking_region_radius passed to the SuccessfulDockingDoneFunction's constructor, as defined
+    in test_configs.
+
+    Returns
+    -------
+    int
+        The max allowed distance in a docking episode
     """
     return request.param
 
@@ -107,28 +110,10 @@ def fixture_lower_bound(request):
     return request.param
 
 
-@pytest.fixture(name='sim_time')
-def fixture_sim_time(request):
-    """request.param
-    Get the 'sim_time' parameter from the test config input
-    """
-    return request.param
-
-
-@pytest.fixture(name='platform_velocity')
-def fixture_platform_velocity(request):
-    """
-    Get the 'velocity' parameter from the test config input
-    """
-    return request.param
-
-
 @pytest.fixture(name='cut')
 def fixture_cut(
     cut_name,
-    scale,
     agent_name,
-    timeout,
     docking_region_radius,
     velocity_threshold,
     threshold_distance,
@@ -137,7 +122,7 @@ def fixture_cut(
     lower_bound,
 ):
     """
-    A fixture that instantiates a DockingSuccessRewardFunction and returns it.
+    A fixture that instantiates a SuccessfulDockingDoneFunction and returns it.
 
     Parameters
     ----------
@@ -145,17 +130,19 @@ def fixture_cut(
         The name of the component under test
     agent_name : str
         The name of the agent
+    docking_region_radius : int
+        The radius of the docking region passed to the SuccessfulDockingDoneFunction constructor
+    velocity_limit : int
+        The velocity limit passed to the SuccessfulDockingDoneFunction constructor
 
     Returns
     -------
-    DockingSuccessRewardFunction
+    SuccessfulDockingDoneFunction
         An instantiated component under test
     """
-    return DockingSuccessReward(
+    return CrashDockingDoneFunction(
         name=cut_name,
         agent_name=agent_name,
-        scale=scale,
-        timeout=timeout,
         docking_region_radius=docking_region_radius,
         velocity_threshold=velocity_threshold,
         threshold_distance=threshold_distance,
@@ -167,17 +154,24 @@ def fixture_cut(
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
-def test_reward_function(call_results, agent_name, expected_value):
+def test_call(call_results, next_state, agent_name, cut_name, expected_value, expected_status):
     """
-    A parameterized test to ensure that the DockingSuccessRewardFunction behaves as intended.
+    A parameterized test to ensure that the SuccessfulDockingDoneFunction behaves as intended.
 
     Parameters
     ----------
     call_results : DoneDict
-        The resulting DoneDict from calling the DockingSuccessRewardFunction
+        The resulting DoneDict from calling the SuccessfulDockingDoneFunction
+    next_state : StateDict
+        The StateDict that may have been mutated by the SuccessfulDockingDoneFunction
     agent_name : str
         The name of the agent
-    expected_value : float
-        The expected value from the reward function
+    cut_name : str
+        The name of the component under test
+    expected_value : bool
+        The expected bool corresponding to whether the agent's episode is done or not
+    expected_status : None or DoneStatusCodes
+        The expected status corresponding to the status of the agent's episode
     """
     assert call_results[agent_name] == expected_value
+    assert next_state.episode_state[agent_name][cut_name] is expected_status

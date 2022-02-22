@@ -4,7 +4,6 @@ Author: John McCarroll
 """
 
 import os
-from unittest import mock
 
 import pytest
 
@@ -13,9 +12,18 @@ from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
 )
-parameterized_fixture_keywords = ["platform_velocity", "target_velocity", "constraint_velocity", "expected_value", "expected_status"]
+parameterized_fixture_keywords = [
+    "platform_velocity",
+    "velocity_threshold",
+    "threshold_distance",
+    "slope",
+    "mean_motion",
+    "lower_bound",
+    "expected_value",
+    "expected_status"
+]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
@@ -32,36 +40,56 @@ def fixture_platform_velocity(request):
     return request.param
 
 
-@pytest.fixture(name='target_velocity')
-def fixture_target_velocity(request):
+@pytest.fixture(name='velocity_threshold')
+def fixture_velocity_threshold(request):
     """
-    Parameterized fixture for returning target velocity defined in test_configs.
-
-    Returns
-    -------
-    numpy.ndarray
-        Three element array describing target's 3D velocity vector
+    Return 'velocity_threshold' value from the test config input
     """
     return request.param
 
 
-@pytest.fixture(name='constraint_velocity')
-def fixture_constraint_velocity(request):
+@pytest.fixture(name='threshold_distance')
+def fixture_threshold_distance(request):
     """
-    Parameterized fixture for returning the constraint_velocity (the maximum acceptable relative velocity between
-    the deputy and the target) passed to the DockingRelativeVelocityConstraintDoneFunction's constructor, as
-    defined in test_configs.
+    Return 'threshold_distance' value from the test config input
+    """
+    return request.param
 
-    Returns
-    -------
-    int
-        The max allowed relative velocity in a docking episode
+
+@pytest.fixture(name='slope')
+def fixture_slope(request):
+    """
+    Return 'slope' value from the test config input
+    """
+    return request.param
+
+
+@pytest.fixture(name='mean_motion')
+def fixture_mean_motion(request):
+    """
+    Return 'mean_motion' value from the test config input
+    """
+    return request.param
+
+
+@pytest.fixture(name='lower_bound')
+def fixture_lower_bound(request):
+    """
+    Return 'lower_bound' value from the test config input
     """
     return request.param
 
 
 @pytest.fixture(name='cut')
-def fixture_cut(cut_name, agent_name, constraint_velocity, target_name):
+def fixture_cut(
+    cut_name,
+    agent_name,
+    velocity_threshold,
+    threshold_distance,
+    slope,
+    mean_motion,
+    lower_bound,
+):
     """
     A fixture that instantiates a DockingRelativeVelocityConstraintDoneFunction and returns it.
 
@@ -82,47 +110,14 @@ def fixture_cut(cut_name, agent_name, constraint_velocity, target_name):
         An instantiated component under test
     """
     return DockingRelativeVelocityConstraintDoneFunction(
-        name=cut_name, agent_name=agent_name, constraint_velocity=constraint_velocity, target=target_name
+        name=cut_name,
+        agent_name=agent_name,
+        velocity_threshold=velocity_threshold,
+        threshold_distance=threshold_distance,
+        slope=slope,
+        mean_motion=mean_motion,
+        lower_bound=lower_bound,
     )
-
-
-@pytest.fixture(name='call_results')
-def fixture_call_results(cut, observation, action, next_observation, next_state, platform, target):
-    """
-    A fixture responsible for calling the DockingVelocityLimitDoneFunction and returning the results.
-
-    Parameters
-    ----------
-    cut : DockingVelocityLimitDoneFunction
-        The component under test
-    observation : numpy.ndarray
-        The observation array
-    action : numpy.ndarray
-        The action array
-    next_observation : numpy.ndarray
-        The next_observation array
-    next_state : StateDict
-        The StateDict that the DockingVelocityLimitDoneFunction mutates
-    platform : MagicMock
-        The mock platform to be returned to the DockingVelocityLimitDoneFunction when it uses get_platform_by_name()
-    target : MagicMock
-        The mock target to be returned to the DockingVelocityLimitDoneFunction when it uses get_platform_by_name()
-
-    Returns
-    -------
-    results : DoneDict
-        The resulting DoneDict from calling the DockingVelocityLimitDoneFunction
-    """
-    with mock.patch("saferl.dones.docking_dones.get_platform_by_name") as func:
-        # construct iterable of return values (platforms)
-        platforms = []
-        for _ in test_configs:
-            platforms.append(platform)
-            platforms.append(target)
-        func.side_effect = platforms
-
-        results = cut(observation, action, next_observation, next_state)
-        return results
 
 
 @pytest.mark.unit_test

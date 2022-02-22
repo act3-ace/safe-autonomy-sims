@@ -7,13 +7,12 @@ Author: John McCarroll
 import os
 
 import pytest
-from act3_rl_core.libraries.state_dict import StateDict
 
 from saferl.dones.common_dones import TimeoutDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
-test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/TimeoutDoneFunction_test_cases.yaml")
+test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/dones/common/TimeoutDoneFunction_test_cases.yaml")
 parameterized_fixture_keywords = ["sim_time", "max_sim_time", "expected_value", "expected_status"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
@@ -44,29 +43,6 @@ def fixture_sim_time(request):
         The max allowed time in simulation in a docking episode
     """
     return request.param
-
-
-@pytest.fixture(name='next_state')
-def fixture_next_state(mocker, agent_name, cut_name, sim_time):
-    """
-    A fixture for creating a StateDict populated with the structure expected by the DoneFunction.
-
-    Parameters
-    ----------
-    agent_name : str
-        The name of the agent
-    cut_name : str
-        The name of the component under test
-
-    Returns
-    -------
-    state : StateDict
-        The populated StateDict
-    """
-    mock_platform = mocker.MagicMock()
-    mock_platform.sim_time = sim_time
-    state = StateDict({"episode_state": {agent_name: {cut_name: None}}, "sim_platforms": [mock_platform]})
-    return state
 
 
 @pytest.fixture(name='cut')
