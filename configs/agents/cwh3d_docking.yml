@@ -64,9 +64,9 @@
     ],
     "dones": [
         {
-            "functor": "saferl.dones.docking_dones.TimeoutDoneFunction",
+            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{
-                "timeout": 2000,
+                "max_sim_time": 2000,
             },
         },
         {

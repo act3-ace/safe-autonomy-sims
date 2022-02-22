@@ -184,8 +184,21 @@ def fixture_platform_velocity():
     return np.array([0, 0, 0])
 
 
+@pytest.fixture(name='sim_time')
+def fixture_sim_time():
+    """
+    placeholder fixture to be overridden by testing modules for returning platform sim time.
+
+    Returns
+    -------
+    float
+        Current simulation time
+    """
+    return 0.0
+
+
 @pytest.fixture(name='platform')
-def fixture_platform(mocker, platform_position, platform_velocity, agent_name):
+def fixture_platform(mocker, platform_position, platform_velocity, sim_time, agent_name):
     """
     A fixture to create a mock platform with a position property and velocity property
 
@@ -197,6 +210,8 @@ def fixture_platform(mocker, platform_position, platform_velocity, agent_name):
         The platform's 3D positional vector
     platform_velocity : numpy.ndarray
         The platform's 3D velocity vector
+    sim_time : float
+        The platform's simulation time
     agent_name : str
         The name of the agent
 
@@ -208,4 +223,5 @@ def fixture_platform(mocker, platform_position, platform_velocity, agent_name):
     test_platform = mocker.MagicMock(name=agent_name)
     test_platform.position = platform_position
     test_platform.velocity = platform_velocity
+    test_platform.sim_time = sim_time
     return test_platform
