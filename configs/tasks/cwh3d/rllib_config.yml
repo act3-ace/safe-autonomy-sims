@@ -13,7 +13,7 @@
 # ---------------------------------------------------------------------------
 
 # === Environment ===
-horizon: 2000
+horizon: 3000
 
 # === Execution ===
 rollout_fragment_length: 2000

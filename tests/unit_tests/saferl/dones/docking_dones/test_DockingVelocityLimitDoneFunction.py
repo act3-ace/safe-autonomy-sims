@@ -12,8 +12,19 @@ from saferl.dones.docking_dones import DockingVelocityLimitDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
-test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/DockingVelocityLimitDoneFunction_test_cases.yaml")
-parameterized_fixture_keywords = ["platform_velocity", "velocity_limit", "expected_value", "expected_status"]
+test_cases_file_path = os.path.join(
+    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/DockingVelocityLimitDoneFunction_test_cases.yaml"
+)
+parameterized_fixture_keywords = [
+    "platform_velocity",
+    "velocity_threshold",
+    "threshold_distance",
+    "slope",
+    "mean_motion",
+    "lower_bound",
+    "expected_value",
+    "expected_status"
+]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
@@ -30,22 +41,56 @@ def fixture_platform_velocity(request):
     return request.param
 
 
-@pytest.fixture(name='velocity_limit')
-def fixture_velocity_limit(request):
+@pytest.fixture(name='velocity_threshold')
+def fixture_velocity_threshold(request):
     """
-    Parameterized fixture for returning the velocity_limit passed to the
-    DockingVelocityLimitDoneFunction's constructor, as defined in test_configs.
+    Return 'velocity_threshold' value from the test config input
+    """
+    return request.param
 
-    Returns
-    -------
-    int
-        The max allowed velocity in a docking episode
+
+@pytest.fixture(name='threshold_distance')
+def fixture_threshold_distance(request):
+    """
+    Return 'threshold_distance' value from the test config input
+    """
+    return request.param
+
+
+@pytest.fixture(name='slope')
+def fixture_slope(request):
+    """
+    Return 'slope' value from the test config input
+    """
+    return request.param
+
+
+@pytest.fixture(name='mean_motion')
+def fixture_mean_motion(request):
+    """
+    Return 'mean_motion' value from the test config input
+    """
+    return request.param
+
+
+@pytest.fixture(name='lower_bound')
+def fixture_lower_bound(request):
+    """
+    Return 'lower_bound' value from the test config input
     """
     return request.param
 
 
 @pytest.fixture(name='cut')
-def cut(cut_name, agent_name, velocity_limit):
+def cut(
+    cut_name,
+    agent_name,
+    velocity_threshold,
+    threshold_distance,
+    slope,
+    mean_motion,
+    lower_bound,
+):
     """
     A fixture that instantiates a DockingVelocityLimitDoneFunction and returns it.
 
@@ -63,7 +108,15 @@ def cut(cut_name, agent_name, velocity_limit):
     DockingVelocityLimitDoneFunction
         An instantiated component under test
     """
-    return DockingVelocityLimitDoneFunction(name=cut_name, agent_name=agent_name, velocity_limit=velocity_limit)
+    return DockingVelocityLimitDoneFunction(
+        name=cut_name,
+        agent_name=agent_name,
+        velocity_threshold=velocity_threshold,
+        threshold_distance=threshold_distance,
+        slope=slope,
+        mean_motion=mean_motion,
+        lower_bound=lower_bound,
+    )
 
 
 @pytest.mark.unit_test
