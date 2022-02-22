@@ -1,24 +1,24 @@
-- case: case 1
+- ID: case 1
   platform_position1: np.array([0, 0, 0])
   platform_position2: np.array([1, 0, 0])
   scale: 2
   expected_value: 2
-- case: case 2
+- ID: case 2
   platform_position1: np.array([1, 1, 1])
   platform_position2: np.array([4, 4, 4])
   scale: 0.5
   expected_value: 0.5 * np.sqrt(27)
-- case: case 3 - large numbers
+- ID: case 3 - large numbers
   platform_position1: np.array([100, 100, 100])
   platform_position2: np.array([1000, 1000, 1000])
   scale: 0.4
   expected_value: 0.4 * np.sqrt(3 * (900 * 900))
-- case: edge case 1
+- ID: edge case 1
   platform_position1: np.array([0, 0, 0])
   platform_position2: np.array([0, 0, 0])
   scale: 2
   expected_value: 0
-- case: edge case 2
+- ID: edge case 2
   platform_position1: np.array([1, 1, 1])
   platform_position2: np.array([1, 1, 1])
   scale: 1.5

@@ -1,5 +1,5 @@
 # Test each failure path
-- case: crash
+- ID: crash
   platform_position: np.array([0, 0, 0])
   platform_velocity: 15.0
   sim_time: 200
@@ -15,7 +15,7 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: -1
-- case: max distance exceeded
+- ID: max distance exceedance
   platform_position: np.array([50000, 50000, 50000])
   platform_velocity: 5.0
   sim_time: 200
@@ -31,7 +31,7 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: -1
-- case: max velocity exceeded
+- ID: max velocity exceedance
   platform_position: np.array([0.01, 0.01, 0.01])
   platform_velocity: 20.0
   sim_time: 200
@@ -47,14 +47,14 @@
   mean_motion: 0.001027
   lower_bound: False
   expected_value: -1
-- case: no failure
+- ID: no failure
   platform_position: np.array([500, 500, 500])
   platform_velocity: 8.0
   sim_time: 200
   timeout: 2000
   timeout_reward: -1
-  distance_reward: -2
-  crash_reward: -3
+  distance_reward: -1
+  crash_reward: -1
   max_goal_distance: 40000
   docking_region_radius: 0.5
   velocity_threshold: 10.0

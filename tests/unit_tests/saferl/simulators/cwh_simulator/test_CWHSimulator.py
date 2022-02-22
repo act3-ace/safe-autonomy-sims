@@ -78,11 +78,11 @@ def fixture_cut(step_size, agent_configs):
 
 test_cases_file_path = os.path.join(test_cases_dir, "reset_test_cases.yaml")
 parameterized_fixture_keywords = ["reset_config", "expected_platform_configs", "step_size"]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_reset(cut, reset_config, expected_state):
     """Tests the reset method of the CWHSimulator"""
     state = cut.reset(reset_config)
@@ -91,11 +91,11 @@ def test_reset(cut, reset_config, expected_state):
 
 test_cases_file_path = os.path.join(test_cases_dir, "construct_sim_entities_test_cases.yaml")
 parameterized_fixture_keywords = ["expected_platform_configs", "step_size"]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_construct_sim_entities(cut, expected_sim_entities):
     """Tests the construct_sim_entities method of the CWHSimulator"""
     sim_entities = cut.construct_sim_entities()
@@ -104,11 +104,11 @@ def test_construct_sim_entities(cut, expected_sim_entities):
 
 test_cases_file_path = os.path.join(test_cases_dir, "construct_platforms_test_cases.yaml")
 parameterized_fixture_keywords = ["expected_platform_configs", "step_size"]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_construct_platforms(cut, expected_sim_platforms):
     """Tests the construct_platforms method of the CWHSimulator"""
     sim_platforms = cut.construct_platforms()
@@ -117,11 +117,11 @@ def test_construct_platforms(cut, expected_sim_platforms):
 
 test_cases_file_path = os.path.join(test_cases_dir, "step_test_cases.yaml")
 parameterized_fixture_keywords = ["reset_config", "expected_platform_configs", "step_size"]
-test_configs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
+test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
 @pytest.mark.unit_test
-@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True)
+@pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_step(cut, reset_config, expected_state):
     """Tests the step method of the CWHSimulator"""
     cut.reset(reset_config)
