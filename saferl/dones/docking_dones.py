@@ -229,8 +229,11 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
     """
     This class validates that the config contains essential peices of data for the done function
     """
-    constraint_velocity: float
-    target: str
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float
+    lower_bound: bool = False
 
 
 # needs a reference object
@@ -257,6 +260,57 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
         return DockingRelativeVelocityConstraintDoneFunctionValidator
 
+    def velocity_limit(self, state):
+        """
+        Get the velocity limit from the agent's current position.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        float
+            The velocity limit given the agent's position.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        dist = np.linalg.norm(deputy.position)
+        vel_limit = self.config.velocity_threshold
+        if dist > self.config.threshold_distance:
+            vel_limit += self.config.slope * self.config.mean_motion * (dist - self.config.threshold_distance)
+        return vel_limit
+
+    def max_vel_violation(self, state):
+        """
+        Get the magnitude of a velocity limit violation if one has occurred.
+
+        Parameters
+        ----------
+        state: StateDict
+            The current state of the system.
+
+        Returns
+        -------
+        violated: bool
+            Boolean value indicating if the velocity limit has been violated
+        violation: float
+            The magnitude of the velocity limit violation.
+        """
+        deputy = get_platform_by_name(state, self.config.agent_name)
+        rel_vel = deputy.velocity
+        rel_vel_mag = np.linalg.norm(rel_vel)
+
+        vel_limit = self.velocity_limit(state)
+
+        violation = rel_vel_mag - vel_limit
+        violated = rel_vel_mag > vel_limit
+        if self.config.lower_bound:
+            violation *= -1
+            violated = rel_vel_mag < vel_limit
+
+        return violated, violation
+
     def __call__(self, observation, action, next_observation, next_state):
         """
         Params
@@ -277,14 +331,10 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         """
         # eventually will include velocity constraint
         done = DoneDict()
-        # platform = get_platform_name(next_state,self.agent)
-        deputy = get_platform_by_name(next_state, self.agent)
-        target = get_platform_by_name(next_state, self.config.target)
-        # pos = platform.position
 
-        curr_vel_mag = np.linalg.norm(np.array(deputy.velocity) - np.array(target.velocity))
+        violated, _ = self.max_vel_violation(next_state)
 
-        done[self.agent] = curr_vel_mag > self.config.constraint_velocity
+        done[self.agent] = violated
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE

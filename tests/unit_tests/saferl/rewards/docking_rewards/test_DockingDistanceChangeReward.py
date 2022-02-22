@@ -1,5 +1,5 @@
 """
-Unit tests for the CWHDistanceChangeReward function from the docking_rewards module
+Unit tests for the DockingDistanceChangeReward function from the docking_rewards module
 """
 
 import os
@@ -7,11 +7,13 @@ from unittest import mock
 
 import pytest
 
-from saferl.rewards.docking_rewards import CWHDistanceChangeReward
+from saferl.rewards.docking_rewards import DockingDistanceChangeReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
-test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../../../test_cases/CWHDistanceChangeReward_test_cases.yaml")
+test_cases_file_path = os.path.join(
+    os.path.split(__file__)[0], "../../../../test_cases/docking/rewards/DockingDistanceChangeReward_test_cases.yaml"
+)
 parameterized_fixture_keywords = ["platform_position1", "platform_position2", "scale", "expected_value"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
@@ -53,7 +55,7 @@ def fixture_scale(request):
 @pytest.fixture(name='cut')
 def fixture_cut(cut_name, agent_name, scale):
     """
-    A fixture that instantiates a CWHDistanceChangeReward Function and returns it.
+    A fixture that instantiates a DockingDistanceChangeReward Function and returns it.
 
     Parameters
     ----------
@@ -66,10 +68,10 @@ def fixture_cut(cut_name, agent_name, scale):
 
     Returns
     -------
-    CWHDistanceChangeReward
+    DockingDistanceChangeReward
         An instantiated component under test
     """
-    return CWHDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name)
+    return DockingDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name)
 
 
 @pytest.fixture(name='call_results')
@@ -87,11 +89,11 @@ def fixture_call_results(
     platform
 ):
     """
-    A fixture responsible for calling the CWHDistanceChangeReward and returning the results.
+    A fixture responsible for calling the DockingDistanceChangeReward and returning the results.
 
     Parameters
     ----------
-    cut : CWHDistanceChangeReward
+    cut : DockingDistanceChangeReward
         The component under test
     observation : numpy.ndarray
         The observation array
@@ -124,12 +126,12 @@ def fixture_call_results(
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_reward_function(call_results, agent_name, expected_value):
     """
-    A parameterized test to ensure that the CWHDistanceChangeReward behaves as intended.
+    A parameterized test to ensure that the DockingDistanceChangeReward behaves as intended.
 
     Parameters
     ----------
     call_results : DoneDict
-        The resulting DoneDict from calling the CWHDistanceChangeReward
+        The resulting DoneDict from calling the DockingDistanceChangeReward
     agent_name : str
         The name of the agent
     expected_value : bool
