@@ -64,17 +64,35 @@
     ],
     "dones": [
         {
+            "functor": "saferl.dones.docking_dones.TimeoutDoneFunction",
+            "config":{
+                "timeout": 2000,
+            },
+        },
+        {
             "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
-
+            },
+        },
+        {
+            "functor": "saferl.dones.docking_dones.CrashDockingDoneFunction",
+            "config":{
+              "docking_region_radius": 0.5,
+              "velocity_threshold": 0.2,
+              "threshold_distance": 0.5,
+              "mean_motion": 0.001027,
+              "lower_bound": False,
             },
         },
         {
             "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
-              "velocity_limit": 10,
+              "velocity_threshold": 0.2,
+              "threshold_distance": 0.5,
+              "mean_motion": 0.001027,
+              "lower_bound": False,
             },
         },
     ],
@@ -104,7 +122,7 @@
           "velocity_threshold": 0.2,
           "threshold_distance": 0.5,
           "mean_motion": 0.001027,
-          "lower_bound": True,
+          "lower_bound": False,
         }
       },
         {
@@ -117,7 +135,7 @@
             "velocity_threshold": 0.2,
             "threshold_distance": 0.5,
             "mean_motion": 0.001027,
-            "lower_bound": True,
+            "lower_bound": False,
           }
         },
       {
@@ -133,7 +151,7 @@
           "velocity_threshold": 0.2,
           "threshold_distance": 0.5,
           "mean_motion": 0.001027,
-          "lower_bound": True,
+          "lower_bound": False,
         }
       },
     ],
