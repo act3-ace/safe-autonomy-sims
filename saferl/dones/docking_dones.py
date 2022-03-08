@@ -8,7 +8,7 @@ from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidato
 from act3_rl_core.libraries.environment_dict import DoneDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
-from saferl.utils import VelocityHandler, VelocityHandlerValidator
+from saferl.utils import max_vel_violation
 
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
@@ -82,7 +82,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         return done
 
 
-class SuccessfulDockingDoneValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+# VelHandler fixes...
+class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
     computations in the SuccessfulDockingDoneFunction.
@@ -91,7 +92,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator, VelocityHandlerValid
     docking_region_radius: float
 
 
-class SuccessfulDockingDoneFunction(DoneFuncBase, VelocityHandler):
+class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if deputy has successfully docked with the cheif or not.
     """
@@ -155,14 +156,14 @@ class SuccessfulDockingDoneFunction(DoneFuncBase, VelocityHandler):
         return done
 
 
-class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     """
     Validator for the DockingVelocityLimitDoneFunction
     """
     ...
 
 
-class DockingVelocityLimitDoneFunction(DoneFuncBase, VelocityHandler):
+class DockingVelocityLimitDoneFunction(DoneFuncBase):
     """
     This done fucntion determines whether the velocity limit has been exceeded or not.
     """
@@ -213,7 +214,7 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase, VelocityHandler):
         return done
 
 
-class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains essential peices of data for the done function
     """
@@ -221,7 +222,7 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
 
 
 # needs a reference object
-class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase, VelocityHandler):
+class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     """
     A done function that checks if the docking velocity relative to a target object has exceeded a certain specified threshold velocity.
     """
@@ -275,7 +276,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase, VelocityHandle
         return done
 
 
-class CrashDockingDoneValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class CrashDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
     computations in the SuccessfulDockingDoneFunction.
@@ -284,7 +285,7 @@ class CrashDockingDoneValidator(DoneFuncBaseValidator, VelocityHandlerValidator)
     docking_region_radius: float
 
 
-class CrashDockingDoneFunction(DoneFuncBase, VelocityHandler):
+class CrashDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if deputy has successfully docked with the cheif or not.
     """
@@ -346,7 +347,7 @@ class CrashDockingDoneFunction(DoneFuncBase, VelocityHandler):
         self._set_all_done(done)
         return done
 
-
+# no mas fixes****
 class TimeoutDoneValidator(DoneFuncBaseValidator):
     """
     Validator for the TimeoutDoneFunction.
