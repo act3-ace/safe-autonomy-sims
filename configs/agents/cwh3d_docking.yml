@@ -119,6 +119,7 @@
         "config": {
           "scale": -0.01,
           "bias": -0.01,
+#          "agent_name": blue0,
           "velocity_threshold": 0.2,
           "threshold_distance": 0.5,
           "mean_motion": 0.001027,

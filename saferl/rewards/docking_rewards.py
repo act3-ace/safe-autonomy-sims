@@ -11,7 +11,7 @@ from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBase
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
-from saferl.utils import VelocityHandler, VelocityHandlerValidator
+from saferl.utils import max_vel_violation
 
 
 class DockingTimeRewardValidator(RewardFuncBaseValidator):
@@ -332,16 +332,22 @@ class DockingDeltaVReward(RewardFuncBase):
         return reward
 
 
-class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator, VelocityHandlerValidator):
+# VelHandler fixes...
+class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     """
     TODO: get descriptions of these values
     """
     scale: float
     bias: float = 0.0
     step_size: float = 1.0
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float
+    lower_bound: bool = False
 
 
-class DockingVelocityConstraintReward(RewardFuncBase, VelocityHandler):
+class DockingVelocityConstraintReward(RewardFuncBase):
     """
     Calculates reward based on agent's violation of the velocity constraint.
     """
@@ -352,6 +358,14 @@ class DockingVelocityConstraintReward(RewardFuncBase, VelocityHandler):
         self.bias = self.config.bias
         self.scale = self.config.scale
         self.step_size = self.config.step_size
+        self.velocity_threshold = self.config.velocity_threshold
+        self.threshold_distance = self.config.threshold_distance
+        self.slope = self.config.slope
+        self.mean_motion = self.config.mean_motion
+        self.lower_bound = self.config.lower_bound
+
+        self.agent_name = self.config.agent_name
+        print(self.agent_name)
 
     @property
     def get_validator(self):
@@ -371,7 +385,7 @@ class DockingVelocityConstraintReward(RewardFuncBase, VelocityHandler):
         observation_units: StateDict,
     ) -> RewardDict:
         reward = RewardDict()
-        violated, violation = self.max_vel_violation(next_state)
+        violated, violation = max_vel_violation(next_state, self.config.agent_name)
         if violated:
             val = self.scale * violation + self.bias
         else:
@@ -380,7 +394,7 @@ class DockingVelocityConstraintReward(RewardFuncBase, VelocityHandler):
         return reward
 
 
-class DockingSuccessRewardValidator(RewardFuncBaseValidator, VelocityHandlerValidator):
+class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     """
     scale: Scalar value to adjust magnitude of the reward
     timeout: The max time for an episode         TODO: [optional]
@@ -391,7 +405,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator, VelocityHandlerVali
     docking_region_radius: float
 
 
-class DockingSuccessReward(RewardFuncBase, VelocityHandler):
+class DockingSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
     """
@@ -469,7 +483,7 @@ class DockingSuccessReward(RewardFuncBase, VelocityHandler):
         return reward
 
 
-class DockingFailureRewardValidator(RewardFuncBaseValidator, VelocityHandlerValidator):
+class DockingFailureRewardValidator(RewardFuncBaseValidator):
     """
     timeout_reward: Reward (penalty) associated with a failure by exceeding max episode time
     distance_reward: Reward (penalty) associated with a failure by exceeding max distance
@@ -487,7 +501,7 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator, VelocityHandlerVali
     docking_region_radius: float
 
 
-class DockingFailureReward(RewardFuncBase, VelocityHandler):
+class DockingFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
     """
