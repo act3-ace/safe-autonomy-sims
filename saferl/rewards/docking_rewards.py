@@ -332,7 +332,6 @@ class DockingDeltaVReward(RewardFuncBase):
         return reward
 
 
-# VelHandler fixes...
 class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     """
     TODO: get descriptions of these values
@@ -343,7 +342,7 @@ class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     velocity_threshold: float
     threshold_distance: float
     slope: float = 2.0
-    mean_motion: float
+    mean_motion: float = 0.001027
     lower_bound: bool = False
 
 
@@ -385,7 +384,17 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         observation_units: StateDict,
     ) -> RewardDict:
         reward = RewardDict()
-        violated, violation = max_vel_violation(next_state, self.config.agent_name)
+
+        violated, violation = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
+
         if violated:
             val = self.scale * violation + self.bias
         else:
@@ -403,6 +412,11 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     scale: float
     timeout: float
     docking_region_radius: float
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
 
 
 class DockingSuccessReward(RewardFuncBase):
@@ -471,7 +485,15 @@ class DockingSuccessReward(RewardFuncBase):
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         if in_docking and not violated:
             value = self.config.scale
@@ -499,6 +521,11 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     timeout: float
     max_goal_distance: float
     docking_region_radius: float
+    velocity_threshold: float
+    threshold_distance: float
+    slope: float = 2.0
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
 
 
 class DockingFailureReward(RewardFuncBase):
@@ -566,7 +593,15 @@ class DockingFailureReward(RewardFuncBase):
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= self.config.docking_region_radius
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         if sim_time > self.config.timeout:
             # episode reached max time

@@ -18,8 +18,8 @@
         {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
         {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
         {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2, properties: {name: "z_thrust"}}},
-        {"part": "Sensor_Position"},
-        {"part": "Sensor_Velocity"}
+        {"part": "Sensor_Position", "config": {"name": "Position Sensor"}},
+        {"part": "Sensor_Velocity", "config": {"name": "Velocity Sensor"}}
     ],
     "episode_parameter_provider": {
         "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -36,30 +36,34 @@
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config": {
-                "controller": "Controller_Thrust",
+                "controller": "X Thrust",
             },
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_Thrust",
+                "controller": "Y Thrust",
                 "index": 1
             }
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
-              "controller": "Controller_Thrust",
+              "controller": "Z Thrust",
               "index": 2
             }
         },
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Position"},
+            "config": {
+              "sensor": "Position Sensor"
+            },
         },
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Velocity"},
+            "config": {
+              "sensor": "Velocity Sensor"
+            },
         },
     ],
     "dones": [
