@@ -16,15 +16,15 @@ class CWHController(BaseController):
     A controller created to interface with the CWH platform.
     """
 
-    @property
-    def name(self):
-        """
-        Returns
-        -------
-        String
-            name of the controller
-        """
-        return self.config.name + self.__class__.__name__
+    # @property
+    # def name(self):
+    #     """
+    #     Returns
+    #     -------
+    #     String
+    #         name of the controller
+    #     """
+    #     return self.config.name #+ self.__class__.__name__
 
     def apply_control(self, control: np.ndarray) -> None:
         """
@@ -70,10 +70,10 @@ class ThrustController(CWHController):
         self,
         parent_platform,
         config,
-        control_properties=cwh_props.ThrustProp,
+        control_property_class=cwh_props.ThrustProp,
     ):  # pylint: disable=W0102
         self.config: ThrustControllerValidator
-        super().__init__(control_properties=control_properties, parent_platform=parent_platform, config=config)
+        super().__init__(control_property_class=control_property_class, parent_platform=parent_platform, config=config)
 
     @property
     def get_validator(self):

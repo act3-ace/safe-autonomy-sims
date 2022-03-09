@@ -32,8 +32,8 @@ class PositionSensor(DubinsSensor):
     Implementation of a sensor designed to give the position at any time
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=dubins_props.PositionProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.PositionProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -69,8 +69,8 @@ class VelocitySensor(DubinsSensor):
     Implementation of a sensor to give velocity at any time
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=dubins_props.VelocityProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.VelocityProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -107,8 +107,8 @@ class HeadingSensor(DubinsSensor):
     Implementation of a sensor to give heading at any point in time.
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=dubins_props.HeadingProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.HeadingProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -145,8 +145,8 @@ class FlightPathSensor(DubinsSensor):
     Implementation of a sensor to give flight path angle at any time.
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=dubins_props.FlightPathProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.FlightPathProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -177,7 +177,7 @@ PluginLibrary.AddClassToGroup(
 #     """
 #
 #     @property
-#     def measurement_properties(self):
+#     def measurement_property_class(self):
 #         """
 #         Retreive the measurement properies.
 #         Specifically here return the bounds and units of the flight path angle.

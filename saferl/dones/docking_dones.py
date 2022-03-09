@@ -82,7 +82,6 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         return done
 
 
-# VelHandler fixes...
 class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
@@ -90,6 +89,11 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
 
     docking_region_radius: float
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
@@ -147,7 +151,15 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         done[self.agent] = in_docking and not violated
         if done[self.agent]:
@@ -160,7 +172,11 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     """
     Validator for the DockingVelocityLimitDoneFunction
     """
-    ...
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
 class DockingVelocityLimitDoneFunction(DoneFuncBase):
@@ -206,7 +222,17 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         """
 
         done = DoneDict()
-        violated, _ = self.max_vel_violation(next_state)
+
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
+
         done[self.agent] = violated
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
@@ -218,7 +244,11 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
     """
     This class validates that the config contains essential peices of data for the done function
     """
-    ...
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
 # needs a reference object
@@ -266,7 +296,15 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         # eventually will include velocity constraint
         done = DoneDict()
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         done[self.agent] = violated
 
@@ -283,6 +321,11 @@ class CrashDockingDoneValidator(DoneFuncBaseValidator):
     """
 
     docking_region_radius: float
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
 class CrashDockingDoneFunction(DoneFuncBase):
@@ -339,7 +382,15 @@ class CrashDockingDoneFunction(DoneFuncBase):
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         done[self.agent] = in_docking and violated
         if done[self.agent]:
@@ -348,7 +399,6 @@ class CrashDockingDoneFunction(DoneFuncBase):
         return done
 
 
-# no mas fixes****
 class TimeoutDoneValidator(DoneFuncBaseValidator):
     """
     Validator for the TimeoutDoneFunction.
