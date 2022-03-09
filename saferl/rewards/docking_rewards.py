@@ -554,7 +554,7 @@ class DockingFailureReward(RewardFuncBase, VelocityHandler):
 
         violated, _ = self.max_vel_violation(next_state)
 
-        if sim_time > self.config.timeout:
+        if sim_time >= self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
         elif radial_distance >= self.config.max_goal_distance:
