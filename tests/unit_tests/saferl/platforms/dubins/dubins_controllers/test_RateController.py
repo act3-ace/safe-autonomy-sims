@@ -27,7 +27,7 @@ def setup_rate_controller(dubins_platform, control_properties, config):
     Set up RateController with default values
     """
 
-    return RateController(control_properties=control_properties, parent_platform=dubins_platform, config=config)
+    return RateController(control_property_class=control_properties, parent_platform=dubins_platform, config=config)
 
 
 # Unit Tests
@@ -38,7 +38,7 @@ def test_constructor(control_properties, config):
     """
     parent_platform = mock.MagicMock()
 
-    cut = RateController(control_properties=control_properties, parent_platform=parent_platform, config=config)
+    cut = RateController(control_property_class=control_properties, parent_platform=parent_platform, config=config)
 
     assert cut.config.axis == config.get("axis")
     assert isinstance(cut._properties, control_properties)  # pylint: disable=W0212
