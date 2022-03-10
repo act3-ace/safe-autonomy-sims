@@ -38,6 +38,7 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
                 -or-
                 if the "name" and "model" keys do not match a known model
         """
+        print('AvailablePlatforms config=', config)
 
         if "name" not in config:
             raise RuntimeError("Attempting to parse a PlatformType from name/model config, but both are not given!")
@@ -45,7 +46,7 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
         if config["name"] == "CWH":
             return CWHAvailablePlatformTypes.CWH
 
-        raise RuntimeError(f'name: {config["name"]} and model: {config["model"]} did not match a known platform type')
+        raise RuntimeError(f'name: {config["name"]} did not match a known platform type')
 
 
 PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": CWHSimulator})
