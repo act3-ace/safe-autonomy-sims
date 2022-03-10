@@ -18,8 +18,8 @@
         {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
         {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
         {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2, properties: {name: "z_thrust"}}},
-        {"part": "Sensor_Position", "config": {"name": "Position Sensor"}},
-        {"part": "Sensor_Velocity", "config": {"name": "Velocity Sensor"}}
+        {"part": "Sensor_Position"},
+        {"part": "Sensor_Velocity"}
     ],
     "episode_parameter_provider": {
         "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -56,13 +56,13 @@
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
             "config": {
-              "sensor": "Position Sensor"
+              "sensor": "Sensor_Position"
             },
         },
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
             "config": {
-              "sensor": "Velocity Sensor"
+              "sensor": "Sensor_Velocity"
             },
         },
     ],
@@ -123,7 +123,6 @@
         "config": {
           "scale": -0.01,
           "bias": -0.01,
-#          "agent_name": blue0,
           "velocity_threshold": 0.2,
           "threshold_distance": 0.5,
           "mean_motion": 0.001027,
