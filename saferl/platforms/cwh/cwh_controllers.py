@@ -24,7 +24,7 @@ class CWHController(BaseController):
     #     String
     #         name of the controller
     #     """
-    #     return self.config.name #+ self.__class__.__name__
+    #     return self.config.name + self.__class__.__name__
 
     def apply_control(self, control: np.ndarray) -> None:
         """
