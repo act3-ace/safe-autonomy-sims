@@ -4,11 +4,11 @@ This module contains implementations of sensors that reside on the Dubins platfo
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 from act3_rl_core.simulators.base_parts import BaseSensor
+from act3_rl_core.simulators.base_parts import BaseTimeSensor
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
 from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
-from act3_rl_core.simulators.base_parts import BaseTimeSensor
 
 
 class DubinsSensor(BaseSensor):
