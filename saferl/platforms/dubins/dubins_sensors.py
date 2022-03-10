@@ -8,6 +8,7 @@ from act3_rl_core.simulators.base_parts import BaseSensor
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
 from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
+from act3_rl_core.simulators.base_parts import BaseTimeSensor
 
 
 class DubinsSensor(BaseSensor):
@@ -246,6 +247,26 @@ PluginLibrary.AddClassToGroup(
 )
 PluginLibrary.AddClassToGroup(
     FlightPathSensor, "Sensor_Orientation", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
+
+
+class DubinsTimeSensor(BaseTimeSensor):
+    """
+    Implementation of a sensor to give the time since episode start
+    """
+    def _calculate_measurement(self, state):
+        return self.parent_platform.sim_time
+
+
+PluginLibrary.AddClassToGroup(
+    HeadingSensor, "Sensor_Time", {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    FlightPathSensor, "Sensor_Time", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
