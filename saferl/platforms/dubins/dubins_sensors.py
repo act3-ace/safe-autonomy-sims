@@ -179,7 +179,7 @@ PluginLibrary.AddClassToGroup(
 
 class RollSensor(DubinsSensor):
     """
-    Implementation of a sensor to give roll angle at any time.
+    Implementation of a sensor to give roll angle in radians at any time.
     """
 
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.RollProp):
@@ -270,40 +270,3 @@ PluginLibrary.AddClassToGroup(
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
-
-# class TimeSensor(DubinsSensor):
-#     """
-#     Implementation of a sensor to give flight path angle at any time.
-#     """
-#
-#     @property
-#     def measurement_property_class(self):
-#         """
-#         Retreive the measurement properies.
-#         Specifically here return the bounds and units of the flight path angle.
-#
-#         Returns
-#         -------
-#         fp_properties : MultiBoxProp
-#             bounds and units of the flight path angle
-#         """
-#         velocity_properties = MultiBoxProp(
-#             name="time", low=[-math.inf], high=[math.inf], unit=["sec"], description="time since beginning of simulation"
-#         )
-#         return velocity_properties
-#
-#     def _calculate_measurement(self, state):
-#         """
-#         Calculate the measurement - current time
-#
-#         Params
-#         ------
-#         state: np.ndarray
-#             current state
-#
-#         Returns
-#         -------
-#         float
-#             current time of the simulation
-#         """
-#         return self.parent_platform.sim_time
