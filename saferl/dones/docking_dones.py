@@ -8,7 +8,7 @@ from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidato
 from act3_rl_core.libraries.environment_dict import DoneDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
-from saferl.utils import VelocityHandler, VelocityHandlerValidator
+from saferl.utils import max_vel_violation
 
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
@@ -82,16 +82,21 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         return done
 
 
-class SuccessfulDockingDoneValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
     computations in the SuccessfulDockingDoneFunction.
     """
 
     docking_region_radius: float
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
-class SuccessfulDockingDoneFunction(DoneFuncBase, VelocityHandler):
+class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if deputy has successfully docked with the cheif or not.
     """
@@ -146,7 +151,15 @@ class SuccessfulDockingDoneFunction(DoneFuncBase, VelocityHandler):
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         done[self.agent] = in_docking and not violated
         if done[self.agent]:
@@ -155,14 +168,18 @@ class SuccessfulDockingDoneFunction(DoneFuncBase, VelocityHandler):
         return done
 
 
-class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     """
     Validator for the DockingVelocityLimitDoneFunction
     """
-    ...
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
-class DockingVelocityLimitDoneFunction(DoneFuncBase, VelocityHandler):
+class DockingVelocityLimitDoneFunction(DoneFuncBase):
     """
     This done fucntion determines whether the velocity limit has been exceeded or not.
     """
@@ -205,7 +222,17 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase, VelocityHandler):
         """
 
         done = DoneDict()
-        violated, _ = self.max_vel_violation(next_state)
+
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
+
         done[self.agent] = violated
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
@@ -213,15 +240,19 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase, VelocityHandler):
         return done
 
 
-class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains essential peices of data for the done function
     """
-    ...
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
 # needs a reference object
-class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase, VelocityHandler):
+class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     """
     A done function that checks if the docking velocity relative to a target object has exceeded a certain specified threshold velocity.
     """
@@ -265,7 +296,15 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase, VelocityHandle
         # eventually will include velocity constraint
         done = DoneDict()
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         done[self.agent] = violated
 
@@ -275,16 +314,21 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase, VelocityHandle
         return done
 
 
-class CrashDockingDoneValidator(DoneFuncBaseValidator, VelocityHandlerValidator):
+class CrashDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
     computations in the SuccessfulDockingDoneFunction.
     """
 
     docking_region_radius: float
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
 
 
-class CrashDockingDoneFunction(DoneFuncBase, VelocityHandler):
+class CrashDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if deputy has successfully docked with the cheif or not.
     """
@@ -338,7 +382,15 @@ class CrashDockingDoneFunction(DoneFuncBase, VelocityHandler):
         radial_distance = np.linalg.norm(np.array(position) - origin)
         in_docking = radial_distance <= docking_region_radius
 
-        violated, _ = self.max_vel_violation(next_state)
+        violated, _ = max_vel_violation(
+            next_state,
+            self.config.agent_name,
+            self.config.velocity_threshold,
+            self.config.threshold_distance,
+            self.config.mean_motion,
+            self.config.lower_bound,
+            slope=self.config.slope
+        )
 
         done[self.agent] = in_docking and violated
         if done[self.agent]:
