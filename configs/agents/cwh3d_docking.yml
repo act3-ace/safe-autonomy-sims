@@ -36,30 +36,34 @@
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config": {
-                "controller": "Controller_Thrust",
+                "controller": "X Thrust",
             },
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_Thrust",
+                "controller": "Y Thrust",
                 "index": 1
             }
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
-              "controller": "Controller_Thrust",
+              "controller": "Z Thrust",
               "index": 2
             }
         },
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Position"},
+            "config": {
+              "sensor": "Sensor_Position"
+            },
         },
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Velocity"},
+            "config": {
+              "sensor": "Sensor_Velocity"
+            },
         },
     ],
     "dones": [
