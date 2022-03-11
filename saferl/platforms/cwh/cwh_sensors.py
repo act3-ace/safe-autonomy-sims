@@ -27,6 +27,9 @@ class CWHSensor(BaseSensor):
         raise NotImplementedError
 
 
+PluginLibrary.AddClassToGroup(CWHSensor, "Sensor_Generic", {"simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH})
+
+
 class PositionSensor(CWHSensor):
     """
     Implementation of a sensor designed to give the position at any time
