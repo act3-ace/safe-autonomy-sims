@@ -166,7 +166,7 @@ class FlightPathSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Flight_Path_Angle", {
+    FlightPathSensor, "Sensor_Flight_Path_Angle", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
@@ -203,12 +203,12 @@ class RollSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Roll", {
+    RollSensor, "Sensor_Roll", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
 PluginLibrary.AddClassToGroup(
-    FlightPathSensor, "Sensor_Roll", {
+    RollSensor, "Sensor_Roll", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
@@ -240,12 +240,12 @@ class QuaternionSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Orientation", {
+    QuaternionSensor, "Sensor_Orientation", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
 PluginLibrary.AddClassToGroup(
-    FlightPathSensor, "Sensor_Orientation", {
+    QuaternionSensor, "Sensor_Orientation", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
@@ -261,12 +261,12 @@ class DubinsTimeSensor(BaseTimeSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Time", {
+    DubinsTimeSensor, "Sensor_Time", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
 PluginLibrary.AddClassToGroup(
-    FlightPathSensor, "Sensor_Time", {
+    DubinsTimeSensor, "Sensor_Time", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
