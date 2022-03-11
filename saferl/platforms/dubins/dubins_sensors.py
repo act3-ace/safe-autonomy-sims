@@ -3,7 +3,7 @@ This module contains implementations of sensors that reside on the Dubins platfo
 """
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseSensor
+from act3_rl_core.simulators.base_parts import BaseSensor, BaseTimeSensor
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
@@ -166,7 +166,107 @@ class FlightPathSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
+    HeadingSensor, "Sensor_Flight_Path_Angle", {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
     FlightPathSensor, "Sensor_Flight_Path_Angle", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
+
+
+class RollSensor(DubinsSensor):
+    """
+    Implementation of a sensor to give roll angle at any time.
+    """
+
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.RollProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - roll angle
+
+        Params
+        ------
+        state: np.ndarray
+            current state
+
+        Returns
+        -------
+        float
+            roll angle
+        """
+        return np.array([np.deg2rad(self.parent_platform.roll)], dtype=np.float32)
+
+
+PluginLibrary.AddClassToGroup(
+    HeadingSensor, "Sensor_Roll", {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    FlightPathSensor, "Sensor_Roll", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
+
+
+class QuaternionSensor(DubinsSensor):
+    """
+    Implementation of a sensor to give a quaternion view of the orientation at any time.
+    """
+
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.QuaternionProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - quaternion
+
+        Params
+        ------
+        state: np.ndarray
+            current state
+
+        Returns
+        -------
+        np.ndarray
+            quaternion
+        """
+        return self.parent_platform.orientation.as_quat()
+
+
+PluginLibrary.AddClassToGroup(
+    HeadingSensor, "Sensor_Orientation", {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    FlightPathSensor, "Sensor_Orientation", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
+
+
+class DubinsTimeSensor(BaseTimeSensor):
+    """
+    Implementation of a sensor to give the time since episode start
+    """
+
+    def _calculate_measurement(self, state):
+        return self.parent_platform.sim_time
+
+
+PluginLibrary.AddClassToGroup(
+    HeadingSensor, "Sensor_Time", {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    FlightPathSensor, "Sensor_Time", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
