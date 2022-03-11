@@ -50,6 +50,22 @@ class RateController(DubinsController):
         return np.array([self.parent_platform.get_applied_action()[self.config.axis]], dtype=np.float32)
 
 
+PluginLibrary.AddClassToGroup(
+    RateController,
+    "Controller_GenericRate",
+    {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    },
+)
+PluginLibrary.AddClassToGroup(
+    RateController,
+    "Controller_GenericRate",
+    {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    },
+)
+
+
 class AccelerationController(RateController):
     """Applies acceleration control to dubins platform"""
 
