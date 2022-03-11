@@ -3,8 +3,7 @@ This module contains implementations of sensors that reside on the Dubins platfo
 """
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseSensor
-from act3_rl_core.simulators.base_parts import BaseTimeSensor
+from act3_rl_core.simulators.base_parts import BaseSensor, BaseTimeSensor
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
@@ -183,8 +182,8 @@ class RollSensor(DubinsSensor):
     Implementation of a sensor to give roll angle at any time.
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=dubins_props.RollProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.RollProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -220,8 +219,8 @@ class QuaternionSensor(DubinsSensor):
     Implementation of a sensor to give a quaternion view of the orientation at any time.
     """
 
-    def __init__(self, parent_platform, config, measurement_properties=dubins_props.QuaternionProp):
-        super().__init__(measurement_properties=measurement_properties, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.QuaternionProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -256,6 +255,7 @@ class DubinsTimeSensor(BaseTimeSensor):
     """
     Implementation of a sensor to give the time since episode start
     """
+
     def _calculate_measurement(self, state):
         return self.parent_platform.sim_time
 
