@@ -257,7 +257,7 @@ class DubinsTimeSensor(BaseTimeSensor):
     """
 
     def _calculate_measurement(self, state):
-        return self.parent_platform.sim_time
+        return np.array([self.parent_platform.sim_time], dtype=np.float32)
 
 
 PluginLibrary.AddClassToGroup(
