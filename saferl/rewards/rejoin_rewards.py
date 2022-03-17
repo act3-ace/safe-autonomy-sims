@@ -447,7 +447,7 @@ class RejoinFirstTimeReward(RewardFuncBase):
 
 class RejoinSuccessRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the SuccessfulRejoinDoneFunction
+    Validator for the SuccessfulRejoinReward function
     Attributes
     ----------
     radius : float
