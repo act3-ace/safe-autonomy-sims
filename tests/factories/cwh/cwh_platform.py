@@ -18,9 +18,9 @@ class CWHPlatformFactory(BasePlatformFactory):
     )
 
     platform_config = [
-        (c.ThrustController, {'axis': 0}),
-        (c.ThrustController, {'axis': 1}),
-        (c.ThrustController, {'axis': 2}),
+        (c.ThrustController, {'name': 'x_thrust', 'axis': 0}),
+        (c.ThrustController, {'name': 'y_thrust', 'axis': 1}),
+        (c.ThrustController, {'name': 'z_thrust', 'axis': 2}),
         (s.PositionSensor, {}),
         (s.VelocitySensor, {}),
     ]

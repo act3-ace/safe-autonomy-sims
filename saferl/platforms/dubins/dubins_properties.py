@@ -238,3 +238,49 @@ class FlightPathProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.pi]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
     description: str = "Flight Path Sensor Properties"
+
+
+class RollProp(BoxProp):
+    """
+    Roll sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
+    name: str = "roll"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-np.pi]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [np.pi]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
+    description: str = "Roll Sensor Properties"
+
+
+class QuaternionProp(BoxProp):
+    """
+    Quaternion sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
+    name: str = "quaternion"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-1.] * 4
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.] * 4
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
+    description: str = "Quaternion Sensor Properties"

@@ -30,9 +30,9 @@ class DubinsPlatform(BasePlatform):
 
     def __eq__(self, other):
         if isinstance(other, DubinsPlatform):
-            eq = (self.velocity == other.velocity).all()
-            eq = eq and (self.position == other.position).all()
-            eq = eq and (self.orientation.as_euler("zyx") == other.orientation.as_euler("zyx")).all()
+            eq = np.allclose(self.velocity, other.velocity)
+            eq = eq and np.allclose(self.position, other.position)
+            eq = eq and np.allclose(self.orientation.as_euler("zyx"), other.orientation.as_euler("zyx"))
             eq = eq and self.heading == other.heading
             eq = eq and self.sim_time == other.sim_time
             return eq
