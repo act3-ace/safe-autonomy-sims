@@ -32,7 +32,7 @@ def test_CWHController_name():
     dummy_np_arr = np.array([0., 0., 0.])
 
     name = obj.name
-    expected_name = 'blue0CWHController'
+    expected_name = 'blue0'
     assert name == expected_name
 
 

@@ -44,8 +44,10 @@ def test_constructor(platform_name, platform):
         the mock platform passed to the DubinsPlatform constructor
     """
     with mock.patch("saferl.platforms.dubins.dubins_platform.BasePlatform._get_part_list") as func:
-        sensors = "sensors"
-        controllers = "controllers"
+        sensors = mock.MagicMock()
+        sensors.name = "sensors"
+        controllers = mock.MagicMock()
+        controllers.name = "controllers"
         func.side_effect = [sensors, controllers]
 
         config = {}
