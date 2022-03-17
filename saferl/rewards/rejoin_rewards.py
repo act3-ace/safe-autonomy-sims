@@ -150,12 +150,12 @@ class RejoinDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     TODO: Get the descriptions of these values
     """
     lead: str
-    offset = typing.List[float]
+    offset: typing.List[float]
     c: float = 2.0
     a: float = math.inf
-    pivot: float = math.inf
-    pivot_ratio: float = 2.0
-    scale: float = 1.0
+    pivot: typing.Union[float, int] = math.inf
+    pivot_ratio: typing.Union[float, int] = 2.0
+    scale: typing.Union[float, int] = 1.0
 
 
 class RejoinDistanceExponentialChangeReward(RewardFuncBase):
@@ -262,7 +262,7 @@ class RejoinRewardValidator(RewardFuncBaseValidator):
 
     Attributes
     ----------
-    reward : float
+    reward : typing.Union[float, int]
         reward for accomplishing the task
     radius : float
         size of the radius of the region region
@@ -273,9 +273,9 @@ class RejoinRewardValidator(RewardFuncBaseValidator):
     refund : bool, optional
         Flag which if true refunds reward if the rejoin region is exited. Default: False.
     """
-    reward: float
-    radius: float
-    offset: typing.List[float]
+    reward: typing.Union[float, int]
+    radius: typing.Union[float, int]
+    offset: typing.List[typing.Union[float, int]]
     lead: str
     refund: bool = False
 
@@ -365,9 +365,9 @@ class RejoinFirstTimeRewardValidator(RewardFuncBaseValidator):
     reward : float
         reward for accomplishing the task
     """
-    reward: float
-    radius: float
-    offset: typing.List[float]
+    reward: typing.Union[float, int]
+    radius: typing.Union[float, int]
+    offset: typing.List[typing.Union[float, int]]
     lead: str
 
 
@@ -463,12 +463,12 @@ class RejoinSuccessRewardValidator(RewardFuncBaseValidator):
     success_time : float
         time wingman must remain in rejoin region to obtain reward
     """
-    radius: float
-    offset: typing.List[float]
+    radius: typing.Union[float, int]
+    offset: typing.List[typing.Union[float, int]]
     lead: str
-    reward: float
-    step_size: float
-    success_time: float
+    reward: typing.Union[float, int]
+    step_size: typing.Union[float, int]
+    success_time: typing.Union[float, int]
 
 
 class RejoinSuccessReward(RewardFuncBase):
@@ -576,16 +576,16 @@ class RejoinFailureRewardValidator(RewardFuncBaseValidator):
     safety_margin : float
         minimum allowable distance to lead
     """
-    radius: float
-    offset: typing.List[float]
+    radius: typing.Union[float, int]
+    offset: typing.List[typing.Union[float, int]]
     lead: str
-    crash_reward: float
-    distance_reward: float
-    timeout_reward: float
-    leave_rejoin_reward: float
-    max_time: float
-    max_distance: float
-    safety_margin: float
+    crash_reward: typing.Union[float, int]
+    distance_reward: typing.Union[float, int]
+    timeout_reward: typing.Union[float, int]
+    leave_rejoin_reward: typing.Union[float, int]
+    max_time: typing.Union[float, int]
+    max_distance: typing.Union[float, int]
+    safety_margin: typing.Union[float, int]
 
 
 class RejoinFailureReward(RewardFuncBase):
@@ -595,7 +595,7 @@ class RejoinFailureReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.config: RejoinSuccessRewardValidator
+        self.config: RejoinFailureRewardValidator
         self._rejoin_prev = False
         super().__init__(**kwargs)
 
@@ -604,7 +604,7 @@ class RejoinFailureReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return RejoinSuccessRewardValidator
+        return RejoinFailureRewardValidator
 
     def crash(self, state):
         """
