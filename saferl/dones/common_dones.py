@@ -67,4 +67,5 @@ class TimeoutDoneFunction(DoneFuncBase):
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
+        self._set_all_done(done)
         return done
