@@ -1,5 +1,5 @@
 """
-This module contains various utility functions for calculating velocity constraints.
+This module contains various utility functions.
 
 Author: Jamie Cunningham
 """
@@ -81,3 +81,55 @@ def max_vel_violation(state, agent_name, velocity_threshold, threshold_distance,
         violated = rel_vel_mag < vel_limit
 
     return violated, violation
+
+
+def get_rejoin_region_center(ref, offset):
+    """
+    Get the position of the rejoin region's center
+
+    Parameters
+    ----------
+    ref: BasePlatform
+        The reference platform for the rejoin region
+    offset: np.ndarray (length <= 3)
+        The cartesian offset of the center of the rejoin region from the reference platform
+
+    Returns
+    -------
+    center: np.ndarray
+        The [x, y, z] position of the rejoin region's center
+    """
+    full_offset = np.zeros(3)
+    full_offset[:len(offset)] = offset
+    ref_orientation = ref.orientation
+    full_offset = ref_orientation.apply(full_offset)
+    center = ref.position + full_offset
+    return center
+
+
+def in_rejoin(wingman, lead, radius, offset):
+    """
+    Determines if the wingman platform is within the rejoin region relative to the lead platform.
+
+    Parameters
+    ----------
+    wingman: BasePlatform
+        The wingman platform
+    lead: BasePlatform
+        The lead platform
+    radius: float
+        The radius of the rejoin region
+    offset: np.ndarray (length <= 3)
+        The cartesian offset of the rejoin region's center from the lead platform
+
+    Returns
+    -------
+    in_rejoin: bool
+        Value is true if wingman platform is within the rejoin region
+    distance: float
+        Distance from center of rejoin region
+    """
+    rejoin_center = get_rejoin_region_center(lead, offset)
+    distance = np.linalg.norm(wingman.position - rejoin_center)
+    in_region = distance <= radius
+    return in_region, distance
