@@ -1,6 +1,6 @@
 """
 Contains implementations of the necessary done functions for the rejoin environment.
-Namely three done funcitons : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
+Namely three done functions : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
 """
 import typing
 from collections import OrderedDict
@@ -17,101 +17,100 @@ from act3_rl_core.libraries.environment_dict import DoneDict
 from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
+from saferl.utils import in_rejoin
 
-class SuccessfulRejoinDoneValidator(DoneFuncBaseValidator):
+
+class RejoinSuccessDoneValidator(DoneFuncBaseValidator):
     """
     Validator for the SuccessfulRejoinDoneFunction
     Attributes
     ----------
-        rejoin_region_radius : float
-            size of the radius of the region region
-        offset_values : [float,float,float]
-            vector detailing the location of the center of the rejoin region from the aircraft
-        lead : str
-            name of the lead platform, for later lookup
+    radius : float
+        size of the radius of the region region
+    offset : [float,float,float]
+        vector detailing the location of the center of the rejoin region from the aircraft
+    lead : str
+        name of the lead platform, for later lookup
+    step_size : float
+        size of one single simulation step
+    success_time : float
+        time wingman must remain in rejoin region to obtain reward
     """
-    rejoin_region_radius: float
-    offset_values: typing.List[float]
+    radius: typing.Union[float, int]
+    offset: typing.List[typing.Union[float, int]]
     lead: str
+    step_size: typing.Union[float, int]
+    success_time: typing.Union[float, int]
 
 
-class SuccessfulRejoinDoneFunction(DoneFuncBase):
+class RejoinSuccessDone(DoneFuncBase):
     """
-    Done function that details whether a successful rejoin has been made or not.
+    This function determines the reward for when the wingman successfully stays in the rejoin region for the given duration
     """
 
     def __init__(self, **kwargs) -> None:
-        self.config: SuccessfulRejoinDoneValidator
+        self.config: RejoinSuccessDoneValidator
+        self.rejoin_time = 0.0
         super().__init__(**kwargs)
 
     @property
-    def get_validator(self) -> typing.Type[DoneFuncBaseValidator]:
+    def get_validator(self):
         """
-        Returns the validator for this done function.
+        Method to return class's Validator.
+        """
+        return RejoinSuccessDoneValidator
 
-        Params
-        ------
-        cls : class constructor
+    def _update_rejoin_time(self, state):
+        wingman = get_platform_by_name(state, self.config.agent_name)
+        lead = get_platform_by_name(state, self.config.lead)
+
+        in_rejoin_region, _ = in_rejoin(wingman=wingman, lead=lead, radius=self.config.radius, offset=self.config.offset)
+
+        if in_rejoin_region:
+            self.rejoin_time += self.config.step_size
+        else:
+            self.rejoin_time = 0.0
+
+    def reset(self):
+        self.rejoin_time = 0.0
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        next_state: StateDict,
+    ) -> DoneDict:
+        """
+        This method calculates the agent's reward for succeeding in the rejoin task.
+
+        Parameters
+        ----------
+        observation : OrderedDict
+            The observations available to the agent from the previous state.
+        action :
+            The last action performed by the agent.
+        next_observation : OrderedDict
+            The observations available to the agent from the current state.
+        next_state : StateDict
+            The current state of the simulation.
 
         Returns
         -------
-        SuccessfulRejoinDoneValidator
-            done function validator
-
+        reward : RewardDict
+            The agent's reward for succeeding in the rejoin task.
         """
 
-        return SuccessfulRejoinDoneValidator
-
-    def __call__(self, observation, action, next_observation, next_state):
-        """
-        Logic that returns the done condition given the current environment conditions
-
-        Params
-        ------
-        observation : np.ndarray
-             current observation from environment
-        action : np.ndarray
-             current action to be applied
-        next_observation : np.ndarray
-             incoming observation from environment
-        next_state : np.ndarray
-             incoming state from environment
-
-        Returns
-        -------
-        done : DoneDict
-            dictionary containing the condition condition for the current agent
-
-        """
-
-        # eventually will include velocity constraint
         done = DoneDict()
 
-        lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
-        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+        self._update_rejoin_time(next_state)
 
-        # compute the rejoin region , using all three pieces of info
-
-        # all 3 pieces
-        rejoin_region_radius = self.config.rejoin_region_radius
-        lead_orientation = lead_aircraft_platform.orientation
-
-        # Match offset dims
-        if len(self.config.offset_values) < 3:
-            for _ in range(3 - len(self.config.offset_values)):
-                self.config.offset_values.append(0.0)
-        offset_vector = np.array(self.config.offset_values)
-
-        # rotate vector then add it to the lead center
-        rotated_vector = lead_orientation.apply(offset_vector)
-        rejoin_region_center = lead_aircraft_platform.position + rotated_vector
-
-        radial_distance = np.linalg.norm(np.array(wingman_agent_platform.position) - rejoin_region_center)
-        done[self.agent] = radial_distance <= rejoin_region_radius
+        done[self.agent] = self.rejoin_time > self.config.success_time
 
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
 
+        self._set_all_done(done)
         return done
 
 
@@ -173,7 +172,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
+            dictionary containing the condition for the current agent
 
         """
 
@@ -189,6 +188,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
+        self._set_all_done(done)
         return done
 
 
@@ -197,10 +197,10 @@ class CrashDoneValidator(DoneFuncBaseValidator):
     Validator for the CrashDoneFunction
     Attributes
     ----------
-        safety_margin : float
-            the distance between the lead and wingman that needs to be maintained
-        lead : str
-            name of the lead platform, for later lookup
+    safety_margin : float
+        the distance between the lead and wingman that needs to be maintained
+    lead : str
+        name of the lead platform
     """
     safety_margin: float
     lead: str
@@ -208,7 +208,7 @@ class CrashDoneValidator(DoneFuncBaseValidator):
 
 class CrashDoneFunction(DoneFuncBase):
     """
-    Done function that determines whether a crash occured or not.
+    Done function that determines whether a crash occurred or not.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -250,14 +250,13 @@ class CrashDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
+            dictionary containing the condition  for the current agent
 
         """
 
         done = DoneDict()
 
         wingman_agent_platform = get_platform_by_name(next_state, self.agent)
-
         lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
@@ -267,6 +266,7 @@ class CrashDoneFunction(DoneFuncBase):
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
 
+        self._set_all_done(done)
         return done
 
 
@@ -326,7 +326,7 @@ class RejoinDone(SharedDoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
+            dictionary containing the condition for the current agent
 
         """
 
