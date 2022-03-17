@@ -9,15 +9,23 @@ from unittest import mock
 
 import pytest
 
-from saferl.dones.rejoin_dones import SuccessfulRejoinDoneFunction
+from saferl.dones.rejoin_dones import RejoinSuccessDone
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/dones/rejoin/SuccessfulRejoinDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../test_cases/dones/rejoin/RejoinSuccessDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
-    "rejoin_region_radius", "offset_values", "lead_orientation", "lead_position", "platform_position", "expected_value", "expected_status"
+    "radius",
+    "offset",
+    "step_size",
+    "success_time",
+    "lead_orientation",
+    "lead_position",
+    "platform_position",
+    "expected_value",
+    "expected_status"
 ]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
@@ -48,10 +56,10 @@ def fixture_lead_position(request):
     return request.param
 
 
-@pytest.fixture(name="rejoin_region_radius")
-def fixture_rejoin_region_radius(request):
+@pytest.fixture(name="radius")
+def fixture_radius(request):
     """
-    Parameterized fixture for returning offset_values defined in test_SuccessfulRejoinDoneFunction.yaml
+    Parameterized fixture for returning radius defined in test_SuccessfulRejoinDoneFunction.yaml
 
     Returns
     -------
@@ -61,10 +69,10 @@ def fixture_rejoin_region_radius(request):
     return request.param
 
 
-@pytest.fixture(name="offset_values")
-def fixture_offset_values(request):
+@pytest.fixture(name="offset")
+def fixture_offset(request):
     """
-    Parameterized fixture for returning offset_values defined in test_SuccessfulRejoinDoneFunction.yaml
+    Parameterized fixture for returning offset defined in test_RejoinSuccessDoneFunction.yaml
 
     Returns
     -------
@@ -74,8 +82,34 @@ def fixture_offset_values(request):
     return request.param
 
 
+@pytest.fixture(name="step_size")
+def fixture_step_size(request):
+    """
+    Parameterized fixture for returning step_size defined in test_RejoinSuccessDoneFunction.yaml
+
+    Returns
+    -------
+    float
+        Simulation step size
+    """
+    return request.param
+
+
+@pytest.fixture(name="success_time")
+def fixture_success_time(request):
+    """
+    Parameterized fixture for returning success time defined in test_RejoinSuccessDoneFunction.yaml
+
+    Returns
+    -------
+    float
+        Time wingman is in rejoin to be determined successful
+    """
+    return request.param
+
+
 @pytest.fixture(name='cut')
-def fixture_cut(cut_name, agent_name, lead_name, rejoin_region_radius, offset_values):
+def fixture_cut(cut_name, agent_name, lead_name, radius, offset, step_size, success_time):
     """
     A fixture that instantiates a SuccessfulRejoinDoneFunction and returns it.
 
@@ -87,19 +121,23 @@ def fixture_cut(cut_name, agent_name, lead_name, rejoin_region_radius, offset_va
         The name of the agent
     lead_name : str
         The name of the lead
-    rejoin_region_radius : float
+    radius : float
         The radius of the rejoin region
-    offset_values : list
+    offset : list
         A list of floats describing xyz magnitudes of the offset to the center of the rejoin region
+    step_size : float
+        Size of one single simulation step
+    success_time : float
+        Time wingman must spend in rejoin region for success to be true
 
     Returns
     -------
-    SuccessfulRejoinDoneFunction
+    RejoinSuccessDone
         An instantiated component under test
     """
 
-    return SuccessfulRejoinDoneFunction(
-        name=cut_name, agent_name=agent_name, rejoin_region_radius=rejoin_region_radius, lead=lead_name, offset_values=offset_values
+    return RejoinSuccessDone(
+        name=cut_name, agent_name=agent_name, radius=radius, lead=lead_name, offset=offset, step_size=step_size, success_time=success_time
     )
 
 
@@ -135,8 +173,8 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         # construct iterable of return values (platforms)
         platforms = []
         for _ in test_configs:
-            platforms.append(lead)
             platforms.append(platform)
+            platforms.append(lead)
         func.side_effect = platforms
 
         results = cut(observation, action, next_observation, next_state)
