@@ -66,9 +66,15 @@
     ],
     "dones": [
         {
+            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
+            "config":{
+                "max_sim_time": 1000,
+            },
+        },
+        {
             "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
             "config":{
-                "max_distance": 10000,
+                "max_distance": 40000,
                 "lead": "red0",
             },
         },
@@ -80,11 +86,13 @@
             },
         },
         {
-            "functor": "saferl.dones.rejoin_dones.SuccessfulRejoinDoneFunction",
+            "functor": "saferl.dones.rejoin_dones.RejoinSuccessDone",
             "config":{
-                "rejoin_region_radius": 100,
-                "offset_values": [500, 500, 0],
+                "radius": 150,
+                "offset": [500, 500, 0],
                 "lead": "red0",
+                "step_size": 1,
+                "success_time": 20,
             },
         },
     ],
