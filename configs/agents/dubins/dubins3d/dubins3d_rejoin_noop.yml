@@ -70,7 +70,10 @@
             "name": "RejoinNoReward",
             "functor": "saferl.rewards.rejoin_rewards.RejoinReward",
             "config": {
-                "reward": 0
+                "reward": 0,
+                "radius": 150,
+                "offset": [ 500, 500, 0 ],
+                "lead": "red0",
             }
         },
     ],
