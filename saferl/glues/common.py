@@ -9,6 +9,7 @@ from functools import lru_cache
 import gym
 import numpy as np
 from act3_rl_core.glues.base_glue import BaseAgentGlue, BaseAgentGlueNormalizationValidator, BaseAgentGlueValidator
+from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue
 from act3_rl_core.glues.base_wrapper import BaseWrapperGlue
 from act3_rl_core.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
 from act3_rl_core.libraries.env_space_util import EnvSpaceUtil
@@ -144,6 +145,26 @@ class CustomNormalizationWrapperGlue(CustomNormalizationGlue, BaseWrapperGlue):
     @property
     def get_validator(self) -> typing.Type[BaseAgentGlueValidator]:
         return CustomNormalizationWrapperGlueValidator
+
+
+class CustomNormalizationMultiWrapperGlueValidator(CustomNormalizationGlueValidator):
+    """
+    wrapped - the wrapped glue instance
+    """
+    wrapped: typing.List[BaseAgentGlue]
+
+    class Config:  # pylint: disable=C0115, R0903
+        arbitrary_types_allowed = True
+
+
+class CustomNormalizationMultiWrapperGlue(CustomNormalizationGlue, BaseMultiWrapperGlue):
+    """
+    Wrapper glue which allows normalization of wrapped glue actions and observations using custom mu and sigma.
+    """
+
+    @property
+    def get_validator(self) -> typing.Type[BaseAgentGlueValidator]:
+        return CustomNormalizationMultiWrapperGlueValidator
 
 
 class CustomNormalizationObserveSensorGlueValidator(ObserveSensorValidator):
