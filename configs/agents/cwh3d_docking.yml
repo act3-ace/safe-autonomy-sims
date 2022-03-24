@@ -37,33 +37,71 @@
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config": {
                 "controller": "X Thrust",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
             },
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Y Thrust",
-                "index": 1
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
             }
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
               "controller": "Z Thrust",
-              "index": 2
+              "training_export_behavior": "EXCLUDE",
+              "normalization": {
+                "enabled": False,
+              }
             }
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "saferl.glues.common.CustomNormalizationObserveSensorGlue",
             "config": {
-              "sensor": "Sensor_Position"
+              "sensor": "Sensor_Position",
+              "normalization": {
+                "enabled": True,
+                "mu": 0,
+                "sigma": [100, 100, 100],
+              }
             },
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "saferl.glues.common.CustomNormalizationObserveSensorGlue",
             "config": {
-              "sensor": "Sensor_Velocity"
+              "sensor": "Sensor_Velocity",
+              "normalization": {
+                "enabled": True,
+                "mu": 0,
+                "sigma": [0.5, 0.5, 0.5],
+              }
             },
+        },
+        {
+            "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+            "wrapped":
+              {
+                "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+                "config": {
+                  "sensor": "Sensor_Velocity"
+                },
+              },
+            "config":
+              {
+                "normalization": {
+                      "enabled": True,
+                      "mu": 0,
+                      "sigma": 1,
+                }
+              }
         },
     ],
     "dones": [
@@ -79,15 +117,15 @@
                 "max_distance": 40000,
             },
         },
-        {
-            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
-            "config":{
-              "velocity_threshold": 0.2,
-              "threshold_distance": 0.5,
-              "mean_motion": 0.001027,
-              "lower_bound": False,
-            },
-        },
+#        {
+#            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
+#            "config":{
+#              "velocity_threshold": 0.2,
+#              "threshold_distance": 0.5,
+#              "mean_motion": 0.001027,
+#              "lower_bound": False,
+#            },
+#        },
         {
             "functor": "saferl.dones.docking_dones.CrashDockingDoneFunction",
             "config":{
