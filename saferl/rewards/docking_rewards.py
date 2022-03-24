@@ -364,7 +364,6 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         self.lower_bound = self.config.lower_bound
 
         self.agent_name = self.config.agent_name
-        print(self.agent_name)
 
     @property
     def get_validator(self):
