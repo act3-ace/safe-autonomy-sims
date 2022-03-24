@@ -103,6 +103,28 @@
                 }
               }
         },
+        {
+            "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
+            "wrapped":
+              {
+                "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+                "config": {
+                  "sensor": "Sensor_Position"
+                },
+              },
+            "config":
+              {
+                "normalization": {
+                      "enabled": True,
+                      "mu": 0,
+                      "sigma": 1,
+                },
+                "velocity_threshold": 0.2,
+                "threshold_distance": 0.5,
+                "mean_motion": 0.001027,
+                "slope": 2.0,
+              }
+        },
     ],
     "dones": [
         {
