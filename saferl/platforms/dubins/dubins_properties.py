@@ -280,7 +280,7 @@ class QuaternionProp(BoxProp):
     """
 
     name: str = "quaternion"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-1.] * 4
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.] * 4
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [-1.] * 4
+    high: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [1.] * 4
+    unit: Annotated[typing.List[StrictStr], Field(min_items=4, max_items=4)] = ["None"] * 4
     description: str = "Quaternion Sensor Properties"

@@ -166,7 +166,7 @@ class FlightPathSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Flight_Path_Angle", {
+    FlightPathSensor, "Sensor_Flight_Path_Angle", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
@@ -179,7 +179,7 @@ PluginLibrary.AddClassToGroup(
 
 class RollSensor(DubinsSensor):
     """
-    Implementation of a sensor to give roll angle at any time.
+    Implementation of a sensor to give roll angle in radians at any time.
     """
 
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.RollProp):
@@ -203,12 +203,12 @@ class RollSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Roll", {
+    RollSensor, "Sensor_Roll", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
 PluginLibrary.AddClassToGroup(
-    FlightPathSensor, "Sensor_Roll", {
+    RollSensor, "Sensor_Roll", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
@@ -240,12 +240,12 @@ class QuaternionSensor(DubinsSensor):
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Orientation", {
+    QuaternionSensor, "Sensor_Orientation", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
 PluginLibrary.AddClassToGroup(
-    FlightPathSensor, "Sensor_Orientation", {
+    QuaternionSensor, "Sensor_Orientation", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
@@ -257,53 +257,16 @@ class DubinsTimeSensor(BaseTimeSensor):
     """
 
     def _calculate_measurement(self, state):
-        return self.parent_platform.sim_time
+        return np.array([self.parent_platform.sim_time], dtype=np.float32)
 
 
 PluginLibrary.AddClassToGroup(
-    HeadingSensor, "Sensor_Time", {
+    DubinsTimeSensor, "Sensor_Time", {
         "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
     }
 )
 PluginLibrary.AddClassToGroup(
-    FlightPathSensor, "Sensor_Time", {
+    DubinsTimeSensor, "Sensor_Time", {
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
-
-# class TimeSensor(DubinsSensor):
-#     """
-#     Implementation of a sensor to give flight path angle at any time.
-#     """
-#
-#     @property
-#     def measurement_property_class(self):
-#         """
-#         Retreive the measurement properies.
-#         Specifically here return the bounds and units of the flight path angle.
-#
-#         Returns
-#         -------
-#         fp_properties : MultiBoxProp
-#             bounds and units of the flight path angle
-#         """
-#         velocity_properties = MultiBoxProp(
-#             name="time", low=[-math.inf], high=[math.inf], unit=["sec"], description="time since beginning of simulation"
-#         )
-#         return velocity_properties
-#
-#     def _calculate_measurement(self, state):
-#         """
-#         Calculate the measurement - current time
-#
-#         Params
-#         ------
-#         state: np.ndarray
-#             current state
-#
-#         Returns
-#         -------
-#         float
-#             current time of the simulation
-#         """
-#         return self.parent_platform.sim_time
