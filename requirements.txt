@@ -1,1 +1,2 @@
-act3-rl-core==1.32.1
+act3-rl-core==1.36.0
+tensorflow==2.8.0
