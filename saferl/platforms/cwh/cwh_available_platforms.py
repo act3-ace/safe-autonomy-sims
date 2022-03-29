@@ -38,7 +38,6 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
                 -or-
                 if the "name" and "model" keys do not match a known model
         """
-        print('AvailablePlatforms config=', config)
 
         if "name" not in config:
             raise RuntimeError("Attempting to parse a PlatformType from name/model config, but both are not given!")
