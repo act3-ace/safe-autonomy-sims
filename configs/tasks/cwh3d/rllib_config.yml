@@ -16,8 +16,8 @@
 horizon: 3000
 
 # === Execution ===
-rollout_fragment_length: 2000
-train_batch_size: 12000  # set to num_workers * rollout_fragment_length
+rollout_fragment_length: 200
+train_batch_size: 1200  # set to num_workers * rollout_fragment_length
 sgd_minibatch_size: 1200
 batch_mode: complete_episodes
 
@@ -34,6 +34,8 @@ num_gpus: 0
 
 # === PPO ===
 num_sgd_iter: 30
+gamma: 0.968559
+lambda: 0.928544
 
 # === Other ===
 seed: 1

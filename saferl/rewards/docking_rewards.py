@@ -364,7 +364,6 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         self.lower_bound = self.config.lower_bound
 
         self.agent_name = self.config.agent_name
-        print(self.agent_name)
 
     @property
     def get_validator(self):
@@ -603,7 +602,7 @@ class DockingFailureReward(RewardFuncBase):
             slope=self.config.slope
         )
 
-        if sim_time > self.config.timeout:
+        if sim_time >= self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
         elif radial_distance >= self.config.max_goal_distance:
