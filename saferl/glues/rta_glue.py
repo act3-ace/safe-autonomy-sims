@@ -71,10 +71,10 @@ class RTAGlue(BaseMultiWrapperGlue):
         for controller_glue in self.controller_glues:
             controller_glue.apply_action(filtered_action, observation)
 
-    def observation_space(self) -> gym.spaces.Space:
+    def observation_space(self):
         return None
 
-    def get_observation(self) -> typing.Union[np.ndarray, typing.Tuple, typing.Dict]:
+    def get_observation(self):
         return None
 
     def _get_controller_glues(self, glue):
