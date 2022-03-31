@@ -187,7 +187,7 @@ class PitchRateController(RateController):
     """Applies pitch rate control to dubins platform"""
 
     def __init__(self, parent_platform, config, control_property_class=dubins_props.PitchRateProp):
-        super().__init__(control_property_class=control_property_class, parent_platform=parent_platform, config=config, exclusiveness=set())
+        super().__init__(control_property_class=control_property_class, parent_platform=parent_platform, config=config)
 
 
 PluginLibrary.AddClassToGroup(
