@@ -303,7 +303,7 @@ class SpeedProp(BoxProp):
     """
 
     name: str = "speed"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [200]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [400]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [200.]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [400.]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["ft/s"]
     description: str = "Speed Sensor Properties"

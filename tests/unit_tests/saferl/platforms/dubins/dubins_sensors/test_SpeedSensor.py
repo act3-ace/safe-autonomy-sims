@@ -41,7 +41,7 @@ def mock_dubins_platform(speed):
     Returns a mock of a DubinsPlatform with a 'velocity' attribute
     """
     mock_platform = mock.MagicMock()
-    mock_platform.v = np.array(speed)
+    mock_platform.v = speed
 
     return mock_platform
 
