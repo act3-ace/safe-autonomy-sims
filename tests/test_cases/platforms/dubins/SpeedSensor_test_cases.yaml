@@ -1,0 +1,10 @@
+# Simple accuracy tests
+- ID: case 1
+  speed: [0.]
+  expected_speed: np.array([0.])
+- ID: case 2
+  speed: [200.]
+  expected_speed: np.array([200.])
+- ID: case 3
+  speed: [400.]
+  expected_speed: np.array([400.])
