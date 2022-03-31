@@ -63,6 +63,6 @@ def test__calculate_measurement(speed_sensor, expected_speed):
     """
     parametrized test for the _calculate_measurement method of the SpeedSensor
     """
-    state = np.array([0.])
+    state = np.array([0., 0., 0.])
     result = speed_sensor._calculate_measurement(state)  #pylint: disable=W0212
     assert np.array_equiv(result, expected_speed)
