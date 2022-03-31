@@ -284,3 +284,26 @@ class QuaternionProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [1.] * 4
     unit: Annotated[typing.List[StrictStr], Field(min_items=4, max_items=4)] = ["None"] * 4
     description: str = "Quaternion Sensor Properties"
+
+
+class SpeedProp(BoxProp):
+    """
+    Speed sensor properties.
+
+    name : str
+        sensor property name
+    low : list[float]
+        minimum bounds of sensor output
+    high : list[float]
+        maximum bounds of sensor output
+    unit : str
+        unit of measurement for sensor output
+    description : str
+        description of sensor properties
+    """
+
+    name: str = "speed"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [200]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [400]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["ft/s"]
+    description: str = "Speed Sensor Properties"
