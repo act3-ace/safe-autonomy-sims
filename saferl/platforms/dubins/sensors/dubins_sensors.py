@@ -281,3 +281,40 @@ PluginLibrary.AddClassToGroup(
         "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
     }
 )
+
+
+class SpeedSensor(DubinsSensor):
+    """
+    Implementation of a sensor to give speed in ft/s at any time.
+    """
+
+    def __init__(self, parent_platform, config, measurement_property_class=dubins_props.SpeedProp):
+        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
+
+    def _raw_measurement(self, state):
+        """
+        Calculate the measurement - speed
+
+        Params
+        ------
+        state: np.ndarray
+            current state
+
+        Returns
+        -------
+        np.ndarray
+            speed
+        """
+        return np.array([self.parent_platform.v], dtype=np.float32)
+
+
+PluginLibrary.AddClassToGroup(
+    SpeedSensor, "Sensor_Speed", {
+        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
+    }
+)
+PluginLibrary.AddClassToGroup(
+    SpeedSensor, "Sensor_Speed", {
+        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
+    }
+)
