@@ -1,30 +1,42 @@
 """
 This module contains implementations of sensors that reside on the Dubins platform
 """
+import typing
+
 import numpy as np
 from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseSensor, BaseTimeSensor
+from act3_rl_core.simulators.base_parts import BasePlatformPartValidator, BaseTimeSensor
 
 import saferl.platforms.dubins.dubins_properties as dubins_props
+from saferl.platforms.common.sensors import TransformSensor
 from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
 from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 
 
-class DubinsSensor(BaseSensor):
+class DubinsSensorValidator(BasePlatformPartValidator):
     """
-    Interface for a basic sensor of the CWH platform
+    oriented: Flag to orient sensor value from platform's partner orientation. Default: False.
+    """
+    oriented: bool = False
+
+
+class DubinsSensor(TransformSensor):
+    """
+    Interface for a basic sensor of the Dubins platform
     """
 
-    def _calculate_measurement(self, state):
-        """
-        get measurements from the sensor
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        return DubinsSensorValidator
 
-        Raises
-        ------
-        NotImplementedError
-            If the method has not been implemented
-        """
+    def _raw_measurement(self, state):
         raise NotImplementedError
+
+    def _transform(self, measurement, state):
+        if self.config.oriented:
+            ref_rotation = self.parent_platform.partner_orientation.inv()
+            measurement = ref_rotation.apply(measurement)
+        return measurement
 
 
 class PositionSensor(DubinsSensor):
@@ -35,7 +47,7 @@ class PositionSensor(DubinsSensor):
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.PositionProp):
         super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
-    def _calculate_measurement(self, state):
+    def _raw_measurement(self, state):
         """
         Calculate the position
 
@@ -72,7 +84,7 @@ class VelocitySensor(DubinsSensor):
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.VelocityProp):
         super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
-    def _calculate_measurement(self, state):
+    def _raw_measurement(self, state):
         """
         Calculate the measurement - velocity
 
@@ -110,7 +122,7 @@ class HeadingSensor(DubinsSensor):
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.HeadingProp):
         super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
-    def _calculate_measurement(self, state):
+    def _raw_measurement(self, state):
         """
         Calculate the measurement - heading
 
@@ -124,7 +136,6 @@ class HeadingSensor(DubinsSensor):
         list of floats
             heading of aircraft
         """
-
         return np.array([self.parent_platform.heading], dtype=np.float32)
 
 
@@ -148,7 +159,7 @@ class FlightPathSensor(DubinsSensor):
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.FlightPathProp):
         super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
-    def _calculate_measurement(self, state):
+    def _raw_measurement(self, state):
         """
         Calculate the measurement - flight path angle
 
@@ -185,7 +196,7 @@ class RollSensor(DubinsSensor):
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.RollProp):
         super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
-    def _calculate_measurement(self, state):
+    def _raw_measurement(self, state):
         """
         Calculate the measurement - roll angle
 
@@ -222,7 +233,7 @@ class QuaternionSensor(DubinsSensor):
     def __init__(self, parent_platform, config, measurement_property_class=dubins_props.QuaternionProp):
         super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
 
-    def _calculate_measurement(self, state):
+    def _raw_measurement(self, state):
         """
         Calculate the measurement - quaternion
 

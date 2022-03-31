@@ -15,12 +15,15 @@
 "agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
-        {"part": "Controller_YawRate", "config": {"axis": 0}},
-        { "part": "Controller_Acceleration", "config": { "axis": 1 } },
-        {"part": "Sensor_Position"},
-        {"part": "Sensor_Velocity"},
-        {"part": "Sensor_Heading"},
+        {"part": "Controller_RollRate", "config": {"axis": 0}},
+        {"part": "Controller_PitchRate", "config": {"axis": 1}},
+        {"part": "Controller_Acceleration", "config": {"axis": 2}},
+        {"part": "Sensor_Relative_Position", "config": {"oriented": True}},
+        {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [500, 500, 0]}},
+        {"part": "Sensor_Velocity", "config": {"oriented": True}},
+        {"part": "Sensor_Partner_Velocity", "config": {"oriented": True}},
         {"part": "Sensor_Flight_Path_Angle"},
+        {"part": "Sensor_Roll"},
     ],
     "episode_parameter_provider": {
       "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -28,7 +31,7 @@
     "simulator_reset_parameters": {
       "x": 0,
       "y": 0,
-      "z": 0,
+      "z": 10000,
       "heading": 0,
       "v": 200,
       "gamma": 0,
@@ -44,44 +47,144 @@
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_YawRate",
+                "controller": "Controller_PitchRate",
             }
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Position"},
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config":{
+                "controller": "Controller_RollRate",
+            }
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Velocity"},
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 1000,
+            }
+          },
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Heading"},
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1, 1],
+            }
+          },
         },
         {
-          "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-          "config": { "sensor": "Sensor_Flight_Path_Angle" },
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Rejoin_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 1000,
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Rejoin_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1, 1],
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 400,
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1, 1],
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Partner_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 400,
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Partner_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1, 1],
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+          "config": {
+            "sensor": "Sensor_Roll",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 1.04719755,  # pi/3
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+          "config": {
+            "sensor": "Sensor_Flight_Path_Angle",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 0.34906585039,  # pi/9
+            }
+          },
         },
     ],
     "dones": [
         {
             "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{
-                "max_sim_time": 1000,
+                "max_sim_time": 2000,
             },
         },
         {
             "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
             "config":{
-                "max_distance": 40000,
+                "max_distance": 100000,
                 "lead": "red0",
             },
         },
         {
             "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
             "config":{
-                "safety_margin": 10,
+                "safety_margin": 100,
                 "lead": "red0",
             },
         },
