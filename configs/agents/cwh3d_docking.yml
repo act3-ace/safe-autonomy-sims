@@ -64,7 +64,7 @@
             }
         },
         {
-            "functor": "saferl.glues.common.CustomNormalizationObserveSensorGlue",
+            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
             "config": {
               "sensor": "Sensor_Position",
               "normalization": {
@@ -75,7 +75,7 @@
             },
         },
         {
-            "functor": "saferl.glues.common.CustomNormalizationObserveSensorGlue",
+            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
             "config": {
               "sensor": "Sensor_Velocity",
               "normalization": {
@@ -87,15 +87,9 @@
         },
         {
             "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
-            "wrapped":
-              {
-                "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-                "config": {
-                  "sensor": "Sensor_Velocity"
-                },
-              },
             "config":
               {
+                "sensor": "Sensor_Velocity",
                 "normalization": {
                       "enabled": True,
                       "mu": 0,
@@ -105,15 +99,9 @@
         },
         {
             "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
-            "wrapped":
-              {
-                "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-                "config": {
-                  "sensor": "Sensor_Position"
-                },
-              },
             "config":
               {
+                "sensor": "Sensor_Position",
                 "normalization": {
                       "enabled": True,
                       "mu": 0,
