@@ -16,6 +16,7 @@
   "simulator": {
     "type": "Dubins3dSimulator",
     "config": {
+      "lead": "red0",
       "step_size": 1
     },
   },

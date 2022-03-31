@@ -3,11 +3,7 @@ This module contains various utility functions.
 
 Author: Jamie Cunningham
 """
-import copy
-import typing
-from collections import OrderedDict
 
-import gym
 import numpy as np
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
@@ -137,96 +133,3 @@ def in_rejoin(wingman, lead, radius, offset):
     distance = np.linalg.norm(wingman.position - rejoin_center)
     in_region = distance <= radius
     return in_region, distance
-
-
-def normalize_space_from_mu_sigma(
-    space_likes: typing.Tuple[gym.spaces.Space],
-    mu: float = 0.0,
-    sigma: float = 1.0,
-) -> gym.spaces.Space:
-    """
-    Normalizes a given gym box using the provided mu and sigma
-
-    Parameters
-    ----------
-    space_likes: typing.Tuple[gym.spaces.Space]
-        the gym space to turn all boxes into the scaled space
-    mu: float = 0.0
-        mu for normalization
-    sigma: float = 1.0
-        sigma for normalization
-
-    Returns
-    -------
-    gym.spaces.Space:
-        the new gym spaces where all boxes have had their bounds changed
-    """
-    space_arg = space_likes[0]
-    if isinstance(space_arg, gym.spaces.Box):
-        low = np.divide(np.subtract(space_arg.low, mu), sigma)
-        high = np.divide(np.subtract(space_arg.high, mu), sigma)
-        return gym.spaces.Box(low=low, high=high, shape=space_arg.shape, dtype=np.float32)
-    return copy.deepcopy(space_arg)
-
-
-def normalize_sample_from_mu_sigma(
-    space_likes: typing.Tuple[gym.spaces.Space, typing.Union[OrderedDict, dict, tuple, np.ndarray, list]],
-    mu: float = 0.0,
-    sigma: float = 1,
-) -> typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
-    """
-    This normalizes a sample from a box space using the mu and sigma arguments
-
-    Parameters
-    ----------
-    space_likes: typing.Tuple[gym.spaces.Space, sample_type]
-        the first is the gym space
-        the second is the sample of this space to scale
-    mu: float
-        the mu used for normalizing the sample
-    sigma: float
-        the sigma used for normalizing the sample
-
-    Returns
-    -------
-    typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
-        the normalized sample
-    """
-    (space_arg, space_sample_arg) = space_likes
-    if isinstance(space_arg, gym.spaces.Box):
-        val = np.array(space_sample_arg)
-        norm_value = np.subtract(val, mu)
-        norm_value = np.divide(norm_value, sigma)
-        return norm_value.astype(np.float32)
-    return copy.deepcopy(space_sample_arg)
-
-
-def unnormalize_sample_from_mu_sigma(
-    space_likes: typing.Tuple[gym.spaces.Space, typing.Union[OrderedDict, dict, tuple, np.ndarray, list]],
-    mu: float = 0.0,
-    sigma: float = 1,
-) -> typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
-    """
-    This unnormalizes a sample from a box space using the mu and sigma arguments
-
-    Parameters
-    ----------
-    space_likes: typing.Tuple[gym.spaces.Space, sample_type]
-        the first is the gym space
-        the second is the sample of this space to scale
-    mu: float
-        the mu used for unnormalizing the sample
-    sigma: float
-        the sigma used for unnormalizing the sample
-
-    Returns
-    -------
-    typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
-        the unnormalized sample
-    """
-    (space_arg, space_sample_arg) = space_likes
-    if isinstance(space_arg, gym.spaces.Box):
-        val = np.array(space_sample_arg)
-        norm_value = np.add(np.multiply(val, sigma), mu)
-        return norm_value.astype(np.float32)
-    return copy.deepcopy(space_sample_arg)

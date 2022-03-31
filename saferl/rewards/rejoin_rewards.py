@@ -343,7 +343,7 @@ class RejoinReward(RewardFuncBase):
         wingman = get_platform_by_name(next_state, self.config.agent_name)
         lead = get_platform_by_name(next_state, self.config.lead)
 
-        in_rejoin_region = in_rejoin(wingman=wingman, lead=lead, radius=self.config.radius, offset=self.config.offset)
+        in_rejoin_region, _ = in_rejoin(wingman=wingman, lead=lead, radius=self.config.radius, offset=self.config.offset)
 
         if in_rejoin_region and self.rejoin_prev:
             value = self.config.reward
@@ -434,7 +434,7 @@ class RejoinFirstTimeReward(RewardFuncBase):
         wingman = get_platform_by_name(next_state, self.config.agent_name)
         lead = get_platform_by_name(next_state, self.config.lead)
 
-        in_rejoin_region = in_rejoin(wingman=wingman, lead=lead, radius=self.config.radius, offset=self.config.offset)
+        in_rejoin_region, _ = in_rejoin(wingman=wingman, lead=lead, radius=self.config.radius, offset=self.config.offset)
 
         if in_rejoin_region and self.rejoin_first_time:
             value = self.config.reward

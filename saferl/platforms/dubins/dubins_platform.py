@@ -108,6 +108,67 @@ class DubinsPlatform(BasePlatform):
         return self._platform.orientation
 
     @property
+    def partner(self):
+        """
+        The platform's partner entity
+        TODO: don't require this
+
+        Returns
+        -------
+        BaseEntity
+            The platform's partner or None if partner does not exist
+        """
+        return self._platform.partner
+
+    @property
+    def partner_position(self):
+        """
+        The position of the platform's partner
+
+        Returns
+        -------
+        np.ndarray
+            The position vector of the platform's partner or None if partner is not specified
+        """
+        return self._platform.partner.position if self._platform.partner is not None else None
+
+    @property
+    def partner_velocity(self):
+        """
+        The velocity of the platform's partner
+
+        Returns
+        -------
+        np.ndarray
+            The velocity vector of the platform's partner
+        """
+        return self._platform.partner.velocity if self._platform.partner is not None else None
+
+    @property
+    def partner_heading(self):
+        """
+        The heading of the platform's partner
+
+        Returns
+        -------
+        float
+            The heading angle of the platform's partner in radians
+        """
+        return self._platform.partner.heading if self._platform.partner is not None else None
+
+    @property
+    def partner_orientation(self):
+        """
+        The orientation of the platform's partner
+
+        Returns
+        -------
+        scipy.Rotation
+            The scipy rotation of the platform's partner
+        """
+        return self._platform.partner.orientation if self._platform.partner is not None else None
+
+    @property
     def sim_time(self):
         """
         The current simulation time in seconds.
@@ -193,64 +254,26 @@ class Dubins3dPlatform(DubinsPlatform):
         """
         return self._platform.roll
 
+    @property
+    def partner_flight_path_angle(self):
+        """
+        The flight path angle of the platform's partner
 
-# class Dubins6DOFPlatform(Base6DOFPlatform):
-#     """
-#     The __________________ as it's platform and
-#     allows for saving an action to the platform for when the platform needs
-#     to give an action to the environment during the environment step function
-#     """
-#
-#     def __init__(self, platform, platform_config, seed=None):  # pylint: disable=W0613
-#         self._platform = platform
-#         self._controllers: typing.Tuple[BaseController, ...] = ()
-#         self._sensors: typing.Tuple[BaseSensor, ...] = ()
-#         self.next_action = [0, 0, 0]
-#         self._controllers = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseController))
-#         self._sensors = tuple(part[0](self, part[1]) for part in platform_config if issubclass(part[0], BaseSensor))
-#
-#     @property
-#     def name(self) -> str:
-#         return self._platform.name
-#
-#     @property
-#     def position(self) -> np.ndarray:
-#         # TODO: find appropriate observer values (this is the Statue of Liberty)
-#         obs_lat, obs_lon, obs_a = 40.6892, 74.0445, 10000
-#         n, e, d = self._platform.position
-#         lla = np.array(pm.ned.ned2geodetic(n, e, d, lat0=obs_lat, lon0=obs_lon, h0=obs_a))
-#         return lla
-#
-#     @property
-#     def orientation(self) -> np.ndarray:
-#         yaw = self._platform.yaw
-#         pitch = self._platform.pitch
-#         roll = self._platform.roll
-#         return np.array([yaw, pitch, roll])
-#
-#     @property
-#     def velocity_ned(self) -> np.ndarray:
-#         return self._platform.velocity
-#
-#     @property
-#     def acceleration_ned(self) -> np.ndarray:
-#         return self._platform.acceleration
-#
-#     @property
-#     def speed(self) -> np.ndarray:
-#         return self._platform.v
-#
-#     @property
-#     def sensors(self) -> typing.Tuple[BaseSensor, ...]:
-#         return self._sensors
-#
-#     @property
-#     def controllers(self) -> typing.Tuple[BaseController, ...]:
-#         return self._controllers
-#
-#     def get_applied_action(self):
-#         return self.next_action
-#
-#     @property
-#     def operable(self):
-#         return True
+        Returns
+        -------
+        float
+            The flight path angle of the platform's partner in radians
+        """
+        return self._platform.partner.gamma if self._platform.partner is not None else None
+
+    @property
+    def partner_roll(self):
+        """
+        The roll of the platform's partner
+
+        Returns
+        -------
+        float
+            The roll angle of the platform's partner in radians
+        """
+        return self._platform.partner.roll if self._platform.partner is not None else None
