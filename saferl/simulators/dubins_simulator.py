@@ -1,15 +1,71 @@
 """
 Contains the implementations of classes that describe how the simulation is to proceed.
 """
+import abc
 
 from act3_rl_core.libraries.plugin_library import PluginLibrary
 
 import saferl_sim.dubins.entities as bp
 from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
-from saferl.simulators.saferl_simulator import SafeRLSimulator
+from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
 
 
-class Dubins2dSimulator(SafeRLSimulator):
+class DubinsSimulatorValidator(SafeRLSimulatorValidator):
+    """
+    lead: the name of the lead aircraft
+    """
+    lead: str = ""
+
+
+class DubinsSimulator(SafeRLSimulator):
+    """
+    Base simulator class for Dubins aircraft platforms.
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.register_lead()
+
+    @property
+    def get_simulator_validator(self):
+        return DubinsSimulatorValidator
+
+    def reset(self, config):
+        config = self.get_reset_validator(**config)
+        self._state.clear()
+        self.clock = 0.0
+        self.sim_entities = self.construct_sim_entities(config.platforms)
+        self.register_lead()
+        self._state.sim_platforms = self.construct_platforms()
+        self.update_sensor_measurements()
+        return self._state
+
+    def register_lead(self):
+        """
+        Register the lead platform with all wingman platforms.
+
+        Parameters
+        ----------
+        lead: str
+            The id of the lead aircraft platform
+
+        Returns
+        -------
+        None
+        """
+        lead = self.config.lead
+        if lead != "":
+            lead_entity = self.sim_entities[lead]
+            for agent_id, entity in self.sim_entities.items():
+                if agent_id != lead:
+                    entity.register_partner(lead_entity)
+
+    @abc.abstractmethod
+    def _construct_platform_map(self) -> dict:
+        raise NotImplementedError
+
+
+class Dubins2dSimulator(DubinsSimulator):
     """
     A class that contains all essential components of a Dubins2D simulation
     """
@@ -24,7 +80,7 @@ class Dubins2dSimulator(SafeRLSimulator):
 PluginLibrary.AddClassToGroup(Dubins2dSimulator, "Dubins2dSimulator", {})
 
 
-class Dubins3dSimulator(SafeRLSimulator):
+class Dubins3dSimulator(DubinsSimulator):
     """
     A class that contains all essential components of a Dubins 3D simulation
     """
@@ -37,83 +93,3 @@ class Dubins3dSimulator(SafeRLSimulator):
 
 
 PluginLibrary.AddClassToGroup(Dubins3dSimulator, "Dubins3dSimulator", {})
-
-if __name__ == "__main__":
-    tmp_config_2d = {
-        "step_size": 1,
-        "agent_configs": {
-            "blue0": {
-                "sim_config": {
-                    "platform": "dubins2d"
-                },
-                "platform_config": [
-                    # ("saferl.platforms.dubins.dubins_controllers.CombinedTurnRateAccelerationController", {
-                    #     "name": "YawAccControl"
-                    # }),
-                    ("saferl.platforms.dubins.dubins_controllers.YawRateController", {
-                        "name": "YawRateControl", "axis": 0
-                    }),
-                    ("saferl.platforms.dubins.dubins_controllers.AccelerationController", {
-                        "name": "AccelerationControl", "axis": 1
-                    }),
-                    ("saferl.platforms.dubins.dubins_sensors.PositionSensor", {}),
-                    ("saferl.platforms.dubins.dubins_sensors.VelocitySensor", {}),
-                    ("saferl.platforms.dubins.dubins_sensors.HeadingSensor", {}),
-                ],
-            }
-        },
-    }
-
-    tmp_config_3d = {
-        "step_size": 1,
-        "agent_configs": {
-            "blue0": {
-                "sim_config": {
-                    "platform": "dubins3d"
-                },
-                "platform_config": [
-                    ("saferl.platforms.dubins.dubins_controllers.CombinedPitchRollAccelerationController", {
-                        "name": "PitchRollAccControl"
-                    }),
-                    # ("saferl.platforms.dubins.dubins_controllers.PitchRateController", {
-                    #     "name": "PitchRateControl", "axis": 0
-                    # }),
-                    # ("saferl.platforms.dubins.dubins_controllers.RollRateController", {
-                    #     "name": "RollRateControl", "axis": 1
-                    # }),
-                    # ("saferl.platforms.dubins.dubins_controllers.AccelerationController", {
-                    #     "name": "AccelerationControl", "axis": 2
-                    # }),
-                    ("saferl.platforms.dubins.dubins_sensors.PositionSensor", {}),
-                    ("saferl.platforms.dubins.dubins_sensors.VelocitySensor", {}),
-                    ("saferl.platforms.dubins.dubins_sensors.HeadingSensor", {}),
-                    # ("saferl.platforms.dubins.dubins_sensors.FlightPathSensor", {}),
-                ],
-            }
-        },
-    }
-
-    reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 0], "heading": 0, "speed": 50}}}
-    # reset_config = {"agent_initialization": {"blue0": {"position": [0, 1, 2], "heading": 0, "speed": 50, "gamma": 0, "roll": 0}}}
-
-    tmp = Dubins2dSimulator(**tmp_config_2d)
-    # tmp = Dubins3dSimulator(**tmp_config_3d)
-
-    state = tmp.reset(reset_config)
-    print(
-        f"Position: {state.sim_platforms[0].position}\t"
-        f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
-    )
-    for i in range(5):
-        control = [1, 0]
-        # control = [1, 0, 0]
-        # state.sim_platforms[0]._controllers[0].apply_control(control)
-        # state.sim_platforms[0]._controllers[0].apply_control(control[0])
-        # state.sim_platforms[0]._controllers[1].apply_control(control[1])
-        # state.sim_platforms[0]._controllers[2].apply_control(control[2])
-        # print(state.sim_platforms[0]._sensors[1].get_measurement())
-        state = tmp.step()
-        print(
-            f"Position: {state.sim_platforms[0].position}\t "
-            f"Velocity: {state.sim_platforms[0].velocity}\tHeading: {state.sim_platforms[0].heading}"
-        )

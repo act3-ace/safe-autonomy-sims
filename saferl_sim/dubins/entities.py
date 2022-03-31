@@ -44,6 +44,17 @@ class BaseDubinsAircraft(BaseEntity):
     """Base interface for Dubins Entities
     """
 
+    def __init__(self, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None, **kwargs):
+        super().__init__(
+            dynamics=dynamics,
+            control_default=control_default,
+            control_min=control_min,
+            control_max=control_max,
+            control_map=control_map,
+            **kwargs
+        )
+        self.partner = None
+
     @classmethod
     def _get_config_validator(cls):
         return BaseDubinsAircraftValidator
@@ -56,6 +67,21 @@ class BaseDubinsAircraft(BaseEntity):
             eq = eq and self.heading == other.heading
             return eq
         return False
+
+    def register_partner(self, partner: BaseEntity):
+        """
+        Register another entity as this aircraft's partner. Defines line of communication between entities.
+
+        Parameters
+        ----------
+        partner: BaseEntity
+            Entity with line of communication to this aircraft.
+
+        Returns
+        -------
+        None
+        """
+        self.partner = partner
 
     @property
     @abc.abstractmethod
