@@ -16,10 +16,11 @@
 "config": {
     "parts": [
         {"part": "Controller_YawRate", "config": {"axis": 0}},
-        { "part": "Controller_Acceleration", "config": { "axis": 1 } },
-        {"part": "Sensor_Position"},
-        {"part": "Sensor_Velocity"},
-        {"part": "Sensor_Heading"},
+        {"part": "Controller_Acceleration", "config": { "axis": 1 }},
+        {"part": "Sensor_Relative_Position", "config": {"oriented": True}},
+        {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [500, 500]}},
+        {"part": "Sensor_Velocity", "config": {"oriented": True}},
+        {"part": "Sensor_Partner_Velocity", "config": {"oriented": True}},
     ],
     "episode_parameter_provider": {
       "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -36,25 +37,103 @@
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config": {
                 "controller": "Controller_Acceleration",
+                "training_export_behavior": "EXCLUDE",
             },
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_YawRate",
+                "training_export_behavior": "EXCLUDE",
             }
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Position"},
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 1000,
+            }
+          },
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Velocity"},
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1],
+            }
+          },
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
-            "config": {"sensor": "Sensor_Heading"},
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Rejoin_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 1000,
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Relative_Rejoin_Position",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1],
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 400,
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1],
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "config": {
+            "sensor": "Sensor_Partner_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": 400,
+            }
+          },
+        },
+        {
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "sensor": "Sensor_Partner_Velocity",
+            "normalization": {
+              "enabled": True,
+              "mu": 0,
+              "sigma": [1, 1],
+            }
+          },
         },
     ],
     "dones": [

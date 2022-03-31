@@ -15,8 +15,9 @@
 "agent": "act3_rl_core.agents.noop_agent.NoOpAgent"
 "config": {
     "parts": [
-        {"part": "Controller_YawRate", "config": {"axis": 0}},
-        { "part": "Controller_Acceleration", "config": { "axis": 1 } },
+        {"part": "Controller_RollRate", "config": {"axis": 0}},
+        {"part": "Controller_PitchRate", "config": {"axis": 1}},
+        {"part": "Controller_Acceleration", "config": {"axis": 2}},
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
         {"part": "Sensor_Heading"},
@@ -26,9 +27,9 @@
       "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": 1000,
+      "x": 5000,
       "y": 0,
-      "z": 0,
+      "z": 10000,
       "heading": 0,
       "v": 200,
       "gamma": 0,
@@ -44,7 +45,13 @@
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_YawRate",
+                "controller": "Controller_PitchRate",
+            }
+        },
+        {
+            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "config":{
+                "controller": "Controller_RollRate",
             }
         },
         {
