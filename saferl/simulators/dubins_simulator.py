@@ -24,10 +24,23 @@ class DubinsSimulator(SafeRLSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if self.config.lead != "":
-            self.register_lead(self.config.lead)
+        self.register_lead()
 
-    def register_lead(self, lead):
+    @property
+    def get_simulator_validator(self):
+        return DubinsSimulatorValidator
+
+    def reset(self, config):
+        config = self.get_reset_validator(**config)
+        self._state.clear()
+        self.clock = 0.0
+        self.sim_entities = self.construct_sim_entities(config.platforms)
+        self.register_lead()
+        self._state.sim_platforms = self.construct_platforms()
+        self.update_sensor_measurements()
+        return self._state
+
+    def register_lead(self):
         """
         Register the lead platform with all wingman platforms.
 
@@ -40,10 +53,12 @@ class DubinsSimulator(SafeRLSimulator):
         -------
         None
         """
-        lead_entity = self.sim_entities[lead]
-        for agent_id, entity in self.sim_entities:
-            if agent_id != lead:
-                entity.register_partner(lead_entity)
+        lead = self.config.lead
+        if lead != "":
+            lead_entity = self.sim_entities[lead]
+            for agent_id, entity in self.sim_entities.items():
+                if agent_id != lead:
+                    entity.register_partner(lead_entity)
 
     @abc.abstractmethod
     def _construct_platform_map(self) -> dict:
