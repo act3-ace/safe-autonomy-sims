@@ -108,6 +108,67 @@ class DubinsPlatform(BasePlatform):
         return self._platform.orientation
 
     @property
+    def partner(self):
+        """
+        The platform's partner entity
+        TODO: don't require this
+
+        Returns
+        -------
+        BaseEntity
+            The platform's partner or None if partner does not exist
+        """
+        return self._platform.partner
+
+    @property
+    def partner_position(self):
+        """
+        The position of the platform's partner
+
+        Returns
+        -------
+        np.ndarray
+            The position vector of the platform's partner or None if partner is not specified
+        """
+        return self._platform.partner.position if self._platform.partner is not None else None
+
+    @property
+    def partner_velocity(self):
+        """
+        The velocity of the platform's partner
+
+        Returns
+        -------
+        np.ndarray
+            The velocity vector of the platform's partner
+        """
+        return self._platform.partner.velocity if self._platform.partner is not None else None
+
+    @property
+    def partner_heading(self):
+        """
+        The heading of the platform's partner
+
+        Returns
+        -------
+        float
+            The heading angle of the platform's partner in radians
+        """
+        return self._platform.partner.heading if self._platform.partner is not None else None
+
+    @property
+    def partner_orientation(self):
+        """
+        The orientation of the platform's partner
+
+        Returns
+        -------
+        scipy.Rotation
+            The scipy rotation of the platform's partner
+        """
+        return self._platform.partner.orientation if self._platform.partner is not None else None
+
+    @property
     def sim_time(self):
         """
         The current simulation time in seconds.
@@ -192,3 +253,27 @@ class Dubins3dPlatform(DubinsPlatform):
             The roll angle of the platform in radians
         """
         return self._platform.roll
+
+    @property
+    def partner_flight_path_angle(self):
+        """
+        The flight path angle of the platform's partner
+
+        Returns
+        -------
+        float
+            The flight path angle of the platform's partner in radians
+        """
+        return self._platform.partner.gamma if self._platform.partner is not None else None
+
+    @property
+    def partner_roll(self):
+        """
+        The roll of the platform's partner
+
+        Returns
+        -------
+        float
+            The roll angle of the platform's partner in radians
+        """
+        return self._platform.partner.roll if self._platform.partner is not None else None
