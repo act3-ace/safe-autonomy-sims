@@ -34,7 +34,7 @@
     },
     "glues": [
         {
-          "functor": "saferl.glues.rta_glue.RTAGlue",
+          "functor": "saferl.core.glues.rta_glue.RTAGlue",
           "wrapped": [
             {
               "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
@@ -69,14 +69,14 @@
     ],
     "dones": [
         {
-            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
+            "functor": "saferl.core.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
 
             },
         },
         {
-            "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
+            "functor": "saferl.core.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
               "velocity_limit": 10,
@@ -86,7 +86,7 @@
     "rewards": [
         {
             "name": "CWHDistanceChangeReward",
-            "functor": "saferl.rewards.docking_rewards.CWHDistanceChangeReward",
+            "functor": "saferl.core.rewards.docking_rewards.CWHDistanceChangeReward",
             "config": {
                 "scale": 1.0e-2
             }

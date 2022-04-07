@@ -9,8 +9,8 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from saferl.platforms.dubins.dubins_controllers import CombinedTurnRateAccelerationController
-from saferl.platforms.dubins.dubins_properties import YawAndAccelerationProp
+from saferl.core.platforms.dubins.dubins_controllers import CombinedTurnRateAccelerationController
+from saferl.core.platforms.dubins.dubins_properties import YawAndAccelerationProp
 
 
 @pytest.fixture(name="control_properties")

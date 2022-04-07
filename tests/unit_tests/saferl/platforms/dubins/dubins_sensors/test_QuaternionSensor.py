@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 from scipy.spatial.transform import Rotation
 
-from saferl.platforms.dubins.sensors.dubins_sensors import QuaternionSensor
+from saferl.core.platforms.dubins.sensors.dubins_sensors import QuaternionSensor
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

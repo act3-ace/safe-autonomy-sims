@@ -6,7 +6,7 @@ import os
 import pytest
 from act3_rl_core.libraries.state_dict import StateDict
 
-from saferl.rewards.docking_rewards import DockingFailureReward
+from saferl.core.rewards.docking_rewards import DockingFailureReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

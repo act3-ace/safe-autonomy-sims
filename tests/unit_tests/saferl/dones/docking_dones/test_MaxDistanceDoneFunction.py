@@ -8,7 +8,7 @@ import os
 
 import pytest
 
-from saferl.dones.docking_dones import MaxDistanceDoneFunction
+from saferl.core.dones.docking_dones import MaxDistanceDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
