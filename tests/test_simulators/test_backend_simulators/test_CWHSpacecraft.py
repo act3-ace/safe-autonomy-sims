@@ -7,7 +7,7 @@ Author: John McCarroll
 import pytest
 import os
 
-from saferl_sim.cwh.cwh import CWHSpacecraft
+from saferl.backend.cwh.cwh import CWHSpacecraft
 from tests.test_simulators.test_backend_simulators.conftest import evaluate
 from tests.conftest import read_test_cases, delimiter
 

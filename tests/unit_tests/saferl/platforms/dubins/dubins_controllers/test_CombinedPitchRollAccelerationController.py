@@ -9,8 +9,8 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from saferl.platforms.dubins.dubins_controllers import CombinedPitchRollAccelerationController
-from saferl.platforms.dubins.dubins_properties import PitchRollAndAccelerationProp
+from saferl.core.platforms.dubins.dubins_controllers import CombinedPitchRollAccelerationController
+from saferl.core.platforms.dubins.dubins_properties import PitchRollAndAccelerationProp
 
 
 @pytest.fixture(name="control_properties")
