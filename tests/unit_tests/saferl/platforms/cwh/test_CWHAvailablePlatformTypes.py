@@ -3,7 +3,7 @@ Tests for the CWHAvailablePlatformTypes module
 """
 import pytest
 
-from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
+from saferl.core.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 
 
 @pytest.mark.unit_test

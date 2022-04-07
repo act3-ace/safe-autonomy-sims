@@ -6,7 +6,7 @@ import os
 
 import pytest
 
-from saferl.rewards.docking_rewards import DockingSuccessReward
+from saferl.core.rewards.docking_rewards import DockingSuccessReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

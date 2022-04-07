@@ -8,7 +8,7 @@ import os
 import pytest
 from act3_rl_core.libraries.state_dict import StateDict
 
-from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.core.simulators.cwh_simulator import CWHSimulator
 from tests.conftest import delimiter, read_test_cases
 from tests.factories.cwh.cwh_platform import CWHPlatformFactory
 
