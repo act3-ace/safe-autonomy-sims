@@ -1,6 +1,6 @@
 import factory
 
-import saferl_sim.cwh.cwh as e
+from saferl.backend.cwh import cwh as e
 
 
 class CWHSpacecraftFactory(factory.Factory):

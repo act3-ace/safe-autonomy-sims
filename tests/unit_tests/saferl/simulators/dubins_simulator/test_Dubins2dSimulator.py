@@ -8,7 +8,7 @@ import os
 import pytest
 from act3_rl_core.libraries.state_dict import StateDict
 
-from saferl.simulators.dubins_simulator import Dubins2dSimulator
+from saferl.core.simulators.dubins_simulator import Dubins2dSimulator
 from tests.conftest import delimiter, read_test_cases
 from tests.factories.dubins.dubins_platform import Dubins2dPlatformFactory
 

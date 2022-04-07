@@ -1,6 +1,6 @@
 import factory
 
-import saferl_sim.dubins.entities as e
+from saferl.backend.dubins import entities as e
 
 
 class Dubins2dAircraftFactory(factory.Factory):

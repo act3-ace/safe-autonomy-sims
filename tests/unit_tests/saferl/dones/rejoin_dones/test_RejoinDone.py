@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 from act3_rl_core.libraries.environment_dict import DoneDict
 
-from saferl.dones.rejoin_dones import RejoinDone
+from saferl.core.dones.rejoin_dones import RejoinDone
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

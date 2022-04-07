@@ -9,7 +9,7 @@ from unittest import mock
 
 import pytest
 
-from saferl.dones.rejoin_dones import CrashDoneFunction
+from saferl.core.dones.rejoin_dones import CrashDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
@@ -111,7 +111,7 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
     results : DoneDict
         The resulting DoneDict from calling the CrashDoneFunction
     """
-    with mock.patch("saferl.dones.rejoin_dones.get_platform_by_name") as func:
+    with mock.patch("saferl.core.dones.rejoin_dones.get_platform_by_name") as func:
         # construct iterable of return values (platforms)
         platforms = []
         for _ in test_configs:

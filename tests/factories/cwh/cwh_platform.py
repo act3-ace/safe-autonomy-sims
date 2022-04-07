@@ -1,10 +1,10 @@
 import factory
 
-import saferl.platforms.cwh.cwh_platform as p
+import saferl.core.platforms.cwh.cwh_platform as p
 from tests.factories.cwh.cwh_entity import CWHSpacecraftFactory
 from tests.factories.base_factories.platform import BasePlatformFactory
-import saferl.platforms.cwh.cwh_sensors as s
-import saferl.platforms.cwh.cwh_controllers as c
+import saferl.core.platforms.cwh.cwh_sensors as s
+import saferl.core.platforms.cwh.cwh_controllers as c
 
 
 class CWHPlatformFactory(BasePlatformFactory):
