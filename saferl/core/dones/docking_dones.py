@@ -3,9 +3,19 @@ Functions that define the terminal conditions for the Docking Environment.
 This in turn defines whether the end is episode is reached or not.
 """
 
+import typing
+from collections import OrderedDict
+
 import numpy as np
-from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
+from act3_rl_core.dones.done_func_base import (
+    DoneFuncBase,
+    DoneFuncBaseValidator,
+    DoneStatusCodes,
+    SharedDoneFuncBase,
+    SharedDoneFuncBaseValidator,
+)
 from act3_rl_core.libraries.environment_dict import DoneDict
+from act3_rl_core.libraries.state_dict import StateDict
 from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
 
 from saferl.core.utils import max_vel_violation
@@ -396,4 +406,178 @@ class CrashDockingDoneFunction(DoneFuncBase):
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
+        return done
+
+
+class CollisionDoneFunctionValidator(SharedDoneFuncBaseValidator):
+    """
+    name : str
+        The name of this done condition
+    """
+    spacecraft_safety_constraint: float = 0.5  # meters
+
+
+class CollisionDoneFunction(SharedDoneFuncBase):
+    """
+    Done function that determines whether the other agent is done.
+    """
+
+    @property
+    def get_validator(self) -> typing.Type[SharedDoneFuncBaseValidator]:
+        """
+        Returns the validator for this done function.
+
+        Params
+        ------
+        cls : class constructor
+
+        Returns
+        -------
+        RejoinDoneValidator
+            done function validator
+
+        """
+        return CollisionDoneFunctionValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action: OrderedDict,
+        next_observation: OrderedDict,
+        next_state: StateDict,
+        local_dones: DoneDict,
+        local_done_info: OrderedDict
+    ) -> DoneDict:
+        """
+        Logic that returns the done condition given the current environment conditions
+
+        Params
+        ------
+        observation : np.ndarray
+             current observation from environment
+        action : np.ndarray
+             current action to be applied
+        next_observation : np.ndarray
+             incoming observation from environment
+        next_state : np.ndarray
+             incoming state from environment
+
+        Returns
+        -------
+        done : DoneDict
+            dictionary containing the condition for the current agent
+
+        """
+
+        # get list of spacecrafts
+        agent_names = list(local_done_info.keys())
+
+        # populate DoneDict
+        done = DoneDict()
+        for name in local_dones.keys():
+            done[name] = False
+
+        # check if any spacecraft violates boundaries of other spacecrafts
+        while len(agent_names) > 1:
+            agent_name = agent_names.pop()
+            agent_platform = get_platform_by_name(next_state, agent_name)  # TODO: better way to do this?
+            agent_position = agent_platform.position  # TODO: def better way
+
+            for other_agent_name in agent_names:
+
+                if local_dones[other_agent_name]:
+                    # skip if other_agent has docked
+                    continue
+
+                # check location against location of other agents for boundary violation
+                other_agent_platform = get_platform_by_name(next_state, other_agent_name)  # TODO: better way to do this?
+                other_agent_position = other_agent_platform.position  # TODO: def better way
+                radial_distance = np.linalg.norm(np.array(agent_position) - np.array(other_agent_position))
+
+                # check if in docking region (flag on platform or check pos?)
+
+                if radial_distance < self.config.spacecraft_safety_constraint:
+                    # collision detected. stop loop and end episode
+                    for k in local_dones.keys():
+                        done[k] = True
+                    break
+        return done
+
+
+class MultiagentSuccessfulDockingDoneFunctionValidator(SharedDoneFuncBaseValidator):
+    """
+    name : str
+        The name of this done condition
+    """
+    success_function_name: str = "SuccessfulDockingDoneFunction"
+
+
+class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
+    """
+    Done function that determines whether the other agent is done.
+    """
+
+    @property
+    def get_validator(self) -> typing.Type[SharedDoneFuncBaseValidator]:
+        """
+        Returns the validator for this done function.
+
+        Params
+        ------
+        cls : class constructor
+
+        Returns
+        -------
+        RejoinDoneValidator
+            done function validator
+
+        """
+        return MultiagentSuccessfulDockingDoneFunctionValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action: OrderedDict,
+        next_observation: OrderedDict,
+        next_state: StateDict,
+        local_dones: DoneDict,
+        local_done_info: OrderedDict
+    ) -> DoneDict:
+        """
+        Logic that returns the done condition given the current environment conditions
+
+        Params
+        ------
+        observation : np.ndarray
+             current observation from environment
+        action : np.ndarray
+             current action to be applied
+        next_observation : np.ndarray
+             incoming observation from environment
+        next_state : np.ndarray
+             incoming state from environment
+
+        Returns
+        -------
+        done : DoneDict
+            dictionary containing the condition for the current agent
+
+        """
+
+        # get list of spacecrafts
+        done = DoneDict()
+
+        for agent_name in local_done_info.keys():
+            if self.config.success_function_name in next_state.episode_state[agent_name]:
+                # docking kvp exists
+                if next_state.episode_state[agent_name][self.config.success_function_name] != DoneStatusCodes.WIN:
+                    # agent failed to dock
+                    return done
+            else:
+                # agent has not reached done condition
+                return done
+
+        # all agents have docked, set all dones to True
+        for k in local_dones.keys():
+            done[k] = True
         return done
