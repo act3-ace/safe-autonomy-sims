@@ -470,6 +470,9 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         """
 
         # get list of spacecrafts
+        # all_string = "__all__"
+        # agent_names = list(local_dones.keys())
+        # agent_names.remove(all_string)
         agent_names = list(local_done_info.keys())
 
         # populate DoneDict
