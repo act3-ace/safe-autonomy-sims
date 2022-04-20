@@ -174,6 +174,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         done[self.agent] = in_docking and not violated
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+            deputy.operable = False
         self._set_all_done(done)
         return done
 
