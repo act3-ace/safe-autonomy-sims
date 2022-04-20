@@ -1,0 +1,12 @@
+# This yaml defines the launch config for cwh 3d multiagent in CoRL
+
+config: ../safe-autonomy-sims/configs/tasks/cwh3d_multiagent/cwh3d_multiagent_task.yml
+platform_config:
+  - [blue0, ../safe-autonomy-sims/configs/platforms/cwh_platform.yml]
+  - [blue1, ../safe-autonomy-sims/configs/platforms/cwh_platform.yml]
+  - [blue2, ../safe-autonomy-sims/configs/platforms/cwh_platform.yml]
+agent_config:
+  - [blue0, blue0, ../safe-autonomy-sims/configs/agents/cwh3d_docking_multiagent.yml, config/policy/ppo/default_config.yml]
+  - [blue1, blue1, ../safe-autonomy-sims/configs/agents/cwh3d_docking_multiagent.yml, config/policy/ppo/default_config.yml]
+  - [blue2, blue2, ../safe-autonomy-sims/configs/agents/cwh3d_docking_multiagent.yml, config/policy/ppo/default_config.yml]
+compute_platform: local

@@ -15,14 +15,15 @@
 ####################################################################
 # Override values used by the setup
 ####################################################################
+auto_system_detect_class: act3_rl_core.experiments.base_experiment.BaseAutoDetect
 experiment_class: act3_rl_core.experiments.rllib_experiment.RllibExperiment
+
 config:
   rllib_config_updates: &rllib_config_updates
-    #num_workers: 0
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
-    local_mode: True
+    local_mode: False
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
@@ -44,4 +45,3 @@ config:
   ray_config: [!include ray_config.yml, *ray_config_updates]
   env_config: [!include ../../environments/cwh3d_multiagent.yml, *env_config_updates]
   tune_config: [!include tune_config.yml, *tune_config_updates]
-
