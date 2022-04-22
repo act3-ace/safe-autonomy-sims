@@ -56,6 +56,9 @@ class RTAGlue(BaseMultiWrapperGlue):
     def get_validator(cls):
         return RTAGlueValidator
 
+    def get_unique_name(self) -> str:
+        return "RTAFilter"
+
     def action_space(self) -> gym.spaces.Space:
         action_space_dict = {}
         action_spaces = [glue.action_space() for glue in self.glues()]

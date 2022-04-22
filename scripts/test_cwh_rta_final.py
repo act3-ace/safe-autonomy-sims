@@ -3,6 +3,7 @@ import socket
 import typing
 from datetime import datetime
 import jsonargparse
+import scipy
 
 import ray
 from pydantic import PyObject, validator
@@ -10,8 +11,10 @@ from ray import tune
 
 from act3_rl_core.agents.base_agent import BaseAgentParser
 from act3_rl_core.environment.default_env_rllib_callbacks import EnvironmentDefaultCallbacks
-from act3_rl_core.environment.multi_agent_env import ACT3MultiAgentEnv
+from act3_rl_core.environment.multi_agent_env import ACT3MultiAgentEnv, ACT3MultiAgentEnvValidator
+from act3_rl_core.episode_parameter_providers.remote import RemoteEpisodeParameterProvider
 from act3_rl_core.experiments.base_experiment import BaseExperiment, BaseExperimentValidator
+from act3_rl_core.libraries.factory import Factory
 from act3_rl_core.parsers.yaml_loader import apply_patches
 from act3_rl_core.policies.base_policy import BasePolicyValidator
 
@@ -129,14 +132,15 @@ class RTAExperiment(BaseExperiment):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.config = typing.cast(RTAExperimentValidator, self.config)
+        self.config: RTAExperimentValidator = typing.cast(RTAExperimentValidator, self.config)
 
-    @classmethod
-    def get_validator(cls):
+    @property
+    def get_validator(self) -> typing.Type[RTAExperimentValidator]:
         return RTAExperimentValidator
 
-    @classmethod
-    def get_policy_validator(cls):
+    @property
+    def get_policy_validator(self) -> typing.Type[RTAPolicyValidator]:
+        """Return validator"""
         return RTAPolicyValidator
 
     def run_experiment(self, args: argparse.Namespace) -> None:
@@ -151,13 +155,26 @@ class RTAExperiment(BaseExperiment):
             self.config.env_config["other_platforms"] = self.create_other_platforms(args.other_platform)
 
         # Create episode parameter providers
-        ACT3MultiAgentEnv.create_episode_parameter_provider(self.config.env_config, remote=(not self.config.ray_config['local_mode']))
-        for agent_name, agent_configs in self.config.env_config['agents'].items():
-            agent_configs.class_config.agent.create_episode_parameter_provider(
-                BaseAgentParser(
-                    **agent_configs.class_config.config, agent_name=agent_name, multiple_workers=(not self.config.ray_config['local_mode'])
-                )
+        # ACT3MultiAgentEnv.create_episode_parameter_provider(self.config.env_config, remote=(not self.config.ray_config['local_mode']))
+        # for agent_name, agent_configs in self.config.env_config['agents'].items():
+        #     agent_configs.class_config.agent.create_episode_parameter_provider(
+        #         BaseAgentParser(
+        #             **agent_configs.class_config.config, agent_name=agent_name, multiple_workers=(not self.config.ray_config['local_mode'])
+        #         )
+        #     )
+
+        if not self.config.ray_config['local_mode']:
+            self.config.env_config['episode_parameter_provider'] = RemoteEpisodeParameterProvider.wrap_epp_factory(
+                Factory(**self.config.env_config['episode_parameter_provider']),
+                actor_name=ACT3MultiAgentEnv.episode_parameter_provider_name
             )
+
+            for agent_name, agent_configs in self.config.env_config['agents'].items():
+                agent_configs.class_config.config['episode_parameter_provider'] = RemoteEpisodeParameterProvider.wrap_epp_factory(
+                    Factory(**agent_configs.class_config.config['episode_parameter_provider']), agent_name
+                )
+
+        self.config.env_config['epp_registry'] = ACT3MultiAgentEnvValidator(**self.config.env_config).epp_registry
 
         tmp = ACT3MultiAgentEnv(self.config.env_config)
         tmp_as = tmp.action_space
@@ -165,8 +182,12 @@ class RTAExperiment(BaseExperiment):
         tmp_ac = self.config.env_config['agents']
 
         policies = {
-            policy_name:
-            (tmp_ac[policy_name].policy_config["policy_class"], policy_obs, tmp_as[policy_name], tmp_ac[policy_name].policy_config)
+            policy_name:(
+                tmp_ac[policy_name].policy_config["policy_class"],
+                policy_obs,
+                tmp_as[policy_name],
+                tmp_ac[policy_name].policy_config
+            )
             for policy_name,
             policy_obs in tmp_os.spaces.items()
         }
@@ -182,7 +203,6 @@ class RTAExperiment(BaseExperiment):
         rllib_config["env_config"] = self.config.env_config
         now = datetime.now()
         rllib_config["env_config"]["output_date_string"] = f"{now.strftime('%Y%m%d_%H%M%S')}_{socket.gethostname()}"
-        rllib_config["horizon"] = self.config.env_config["horizon"]
         rllib_config["create_env_on_driver"] = True
 
         # .add_default_plugin_paths()
@@ -269,7 +289,8 @@ class RTAExperiment(BaseExperiment):
         pos_vel_ax.set_ylabel("velocity")
 
 
-        plt.show()
+        # plt.show()
+        plt.savefig('rta_test.png')
 
     def plot_constraint_line(self, ax, x, y, border_linewidth=10, color='r', border_alpha=0.25):
         ax.plot(x, y, color, linewidth=border_linewidth, alpha=border_alpha)
