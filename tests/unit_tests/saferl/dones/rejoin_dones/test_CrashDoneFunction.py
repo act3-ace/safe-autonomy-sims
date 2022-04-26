@@ -80,7 +80,7 @@ def fixture_cut(cut_name, agent_name, lead_name, safety_margin):
         An instantiated component under test
     """
 
-    return CrashDoneFunction(name=cut_name, agent_name=agent_name, safety_margin=safety_margin, lead=lead_name)
+    return CrashDoneFunction(name=cut_name, agent_name=agent_name, platform_name=agent_name, safety_margin=safety_margin, lead=lead_name)
 
 
 @pytest.fixture(name='call_results')

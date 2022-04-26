@@ -137,7 +137,14 @@ def fixture_cut(cut_name, agent_name, lead_name, radius, offset, step_size, succ
     """
 
     return RejoinSuccessDone(
-        name=cut_name, agent_name=agent_name, radius=radius, lead=lead_name, offset=offset, step_size=step_size, success_time=success_time
+        name=cut_name,
+        agent_name=agent_name,
+        platform_name=agent_name,
+        radius=radius,
+        lead=lead_name,
+        offset=offset,
+        step_size=step_size,
+        success_time=success_time
     )
 
 
