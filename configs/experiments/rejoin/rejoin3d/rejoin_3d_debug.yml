@@ -1,0 +1,23 @@
+"config": "configs/tasks/dubins3d_debug/dubins3d_task.yml"
+"platform_config":
+  - [
+      "blue0",
+      "configs/platforms/dubins3d_platform.yml",
+    ]
+  - [
+      "red0",
+      "configs/platforms/dubins3d_platform.yml",
+    ]
+"agent_config":
+  - [
+      "blue0",
+      "blue0",
+      "configs/agents/dubins/dubins3d/dubins3d_rejoin.yml",
+      "configs/policy/ppo/default_config.yml",
+    ]
+  - [
+      "red0",
+      "red0",
+      "configs/agents/dubins/dubins3d/dubins3d_rejoin_noop.yml",
+      "configs/policy/ppo/default_config.yml",
+    ]
