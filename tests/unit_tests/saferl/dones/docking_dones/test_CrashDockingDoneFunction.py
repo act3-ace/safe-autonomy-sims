@@ -143,6 +143,7 @@ def fixture_cut(
     return CrashDockingDoneFunction(
         name=cut_name,
         agent_name=agent_name,
+        platform_name=agent_name,
         docking_region_radius=docking_region_radius,
         velocity_threshold=velocity_threshold,
         threshold_distance=threshold_distance,
