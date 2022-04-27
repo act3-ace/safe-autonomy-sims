@@ -1,0 +1,22 @@
+{
+    "policy_class": act3_rl_core.policies.scripted_action.ScriptedActionPolicy,
+    "train": False,
+
+    "config": {
+        "controllers": [
+            ['Controller_Acceleration_Acceleration', 'control'],
+            ['Controller_PitchRate_Pitch_rate', 'control'],
+            ['Controller_RollRate_Roll_rate', 'control'],
+        ],
+
+        "time_extractor": {
+            "fields": ["ObserveSensor_Sensor_Time", "direct_observation"],
+            'indices': [0]
+        },
+
+        "control_times": [],
+        "control_values" : [],
+        "default_action": [0, 0, 0],
+        "missing_action_policy": "default_action"
+    }
+}
