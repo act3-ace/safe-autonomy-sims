@@ -32,7 +32,7 @@
       },
       {
         "functor": "saferl.core.dones.docking_dones.MultiagentSuccessfulDockingDoneFunction",
-        "config": { "success_function_name": "SuccessfulRejoinDoneFunction" },
+        "config": { success_function_name: "SuccessfulRejoinDoneFunction" },
       }
     ]
   }
