@@ -487,15 +487,13 @@ class CollisionDoneFunction(SharedDoneFuncBase):
             for other_agent_name in agent_names:
 
                 if local_dones[other_agent_name]:
-                    # skip if other_agent has docked
+                    # skip if other_agent is done
                     continue
 
                 # check location against location of other agents for boundary violation
                 other_agent_platform = get_platform_by_name(next_state, other_agent_name)  # TODO: better way to do this?
-                other_agent_position = other_agent_platform.position  # TODO: def better way
+                other_agent_position = other_agent_platform.position
                 radial_distance = np.linalg.norm(np.array(agent_position) - np.array(other_agent_position))
-
-                # check if in docking region (flag on platform or check pos?)
 
                 if radial_distance < self.config.spacecraft_safety_constraint:
                     # collision detected. stop loop and end episode
