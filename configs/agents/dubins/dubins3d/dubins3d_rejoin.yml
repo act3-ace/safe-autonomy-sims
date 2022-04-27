@@ -42,18 +42,30 @@
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config": {
                 "controller": "Controller_Acceleration",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
             },
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_PitchRate",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
             }
         },
         {
             "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_RollRate",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
             }
         },
         {
