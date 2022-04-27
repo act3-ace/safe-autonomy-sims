@@ -73,7 +73,7 @@ class ThrustController(CWHController):
         control_property_class=cwh_props.ThrustProp,
     ):  # pylint: disable=W0102
         self.config: ThrustControllerValidator
-        super().__init__(control_property_class=control_property_class, parent_platform=parent_platform, config=config)
+        super().__init__(property_class=control_property_class, parent_platform=parent_platform, config=config)
 
     @property
     def get_validator(self):
