@@ -63,7 +63,7 @@ def fixture_cut(cut_name, agent_name, max_sim_time):
     TimeoutDoneFunction
         An instantiated component under test
     """
-    return TimeoutDoneFunction(name=cut_name, agent_name=agent_name, max_sim_time=max_sim_time)
+    return TimeoutDoneFunction(name=cut_name, agent_name=agent_name, platform_name=agent_name, max_sim_time=max_sim_time)
 
 
 @pytest.mark.unit_test
