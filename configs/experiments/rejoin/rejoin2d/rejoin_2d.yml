@@ -19,5 +19,5 @@
       "red0",
       "red0",
       "configs/agents/dubins/dubins2d/dubins2d_rejoin_noop.yml",
-      "configs/policy/rejoin/scripted_lead.yml",
+      "configs/policy/rejoin/scripted_lead_2d.yml",
     ]
