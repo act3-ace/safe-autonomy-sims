@@ -12,7 +12,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # ---------------------------------------------------------------------------
 
-"agent": "act3_rl_core.agents.noop_agent.NoOpAgent"
+"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
         {"part": "Controller_YawRate", "config": {"axis": 0}},
@@ -20,6 +20,7 @@
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
         {"part": "Sensor_Heading"},
+        { "part": "Sensor_Time" },
     ],
     "episode_parameter_provider": {
       "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -55,6 +56,15 @@
         {
             "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
             "config": {"sensor": "Sensor_Heading"},
+        },
+        {
+          "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+          "config": {
+            "sensor": "Sensor_Time",
+            "normalization": {
+              "enabled": False,
+            }
+          },
         },
     ],
     "dones": [],
