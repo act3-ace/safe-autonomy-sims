@@ -4,9 +4,9 @@
 
     "config": {
         "controllers": [
-            ['Controller_Acceleration_Acceleration', 'control'],
-            ['Controller_PitchRate_Pitch_rate', 'control'],
-            ['Controller_RollRate_Roll_rate', 'control'],
+            ['Controller_Acceleration_Acceleration', 'acceleration'],
+            ['Controller_PitchRate_Pitch_rate', 'pitch_rate'],
+            ['Controller_RollRate_Roll_rate', 'roll_rate'],
         ],
 
         "time_extractor": {
