@@ -1,0 +1,14 @@
+# This yaml defines the launch config for dubins 3d multiagent in CoRL
+
+config: ../safe-autonomy-sims/configs/tasks/dubins3d_multiagent/dubins3d_multiagent_task.yml
+platform_config:
+  - [red0, ../safe-autonomy-sims/configs/platforms/dubins3d_platform.yml]
+  - [blue0, ../safe-autonomy-sims/configs/platforms/dubins3d_platform.yml]
+  - [blue1, ../safe-autonomy-sims/configs/platforms/dubins3d_platform.yml]
+  - [blue2, ../safe-autonomy-sims/configs/platforms/dubins3d_platform.yml]
+agent_config:
+  - [red0, red0, ../safe-autonomy-sims/configs/agents/dubins/dubins3d/dubins3d_rejoin_noop.yml, ../act3-rl-core/config/policy/ppo/default_config.yml]
+  - [blue0, blue0, ../safe-autonomy-sims/configs/agents/dubins/dubins3d_multiagent/dubins3d_multiagent_0.yml, ../act3-rl-core/config/policy/ppo/default_config.yml]
+  - [blue1, blue1, ../safe-autonomy-sims/configs/agents/dubins/dubins3d_multiagent/dubins3d_multiagent_1.yml, ../act3-rl-core/config/policy/ppo/default_config.yml]
+  - [blue2, blue2, ../safe-autonomy-sims/configs/agents/dubins/dubins3d_multiagent/dubins3d_multiagent_2.yml, ../act3-rl-core/config/policy/ppo/default_config.yml]
+compute_platform: local
