@@ -1,6 +1,6 @@
 # This yaml defines the launch config for dubins 3d multiagent in CoRL
 
-config: ../../safe-autonomy-sims/configs/tasks/dubins3d_multiagent/dubins3d_multiagent_task.yml
+config: ../safe-autonomy-sims/configs/tasks/dubins3d_multiagent/dubins3d_multiagent_task.yml
 platform_config:
   - [red0, ../safe-autonomy-sims/configs/platforms/dubins3d_platform.yml]
   - [blue0, ../safe-autonomy-sims/configs/platforms/dubins3d_platform.yml]
