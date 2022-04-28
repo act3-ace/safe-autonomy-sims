@@ -38,6 +38,9 @@
             "config": {
                 "controller": "Controller_Acceleration",
                 "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                    "enabled": False,
+                }
             },
         },
         {
@@ -45,6 +48,9 @@
             "config":{
                 "controller": "Controller_YawRate",
                 "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
             }
         },
         {
