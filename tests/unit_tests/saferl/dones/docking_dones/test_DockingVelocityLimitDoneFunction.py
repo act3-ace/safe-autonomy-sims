@@ -111,6 +111,7 @@ def cut(
     return DockingVelocityLimitDoneFunction(
         name=cut_name,
         agent_name=agent_name,
+        platform_name=agent_name,
         velocity_threshold=velocity_threshold,
         threshold_distance=threshold_distance,
         slope=slope,

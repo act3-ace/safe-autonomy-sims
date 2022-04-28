@@ -82,7 +82,9 @@ def fixture_cut(cut_name, agent_name, lead_name, max_distance):
         An instantiated component under test
     """
 
-    return MaxDistanceDoneFunction(name=cut_name, agent_name=agent_name, max_distance=max_distance, lead=lead_name)
+    return MaxDistanceDoneFunction(
+        name=cut_name, agent_name=agent_name, platform_name=agent_name, max_distance=max_distance, lead=lead_name
+    )
 
 
 @pytest.fixture(name='call_results')
