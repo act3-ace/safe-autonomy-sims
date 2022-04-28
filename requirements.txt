@@ -1,3 +1,3 @@
-act3-rl-core==1.40.0
+act3-rl-core==1.40.2
 tensorflow==2.8.0
 numpy==1.22.2
