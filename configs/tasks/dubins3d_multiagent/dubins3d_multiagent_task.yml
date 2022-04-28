@@ -27,7 +27,7 @@ config:
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
-    TrialName: CWH-3D-DOCKING-MULTIAGENT
+    TrialName: DUBINS-3D-REJOIN-MULTIAGENT
     output_path: /tmp/safe_autonomy/
 
   # Change the default path for saving out the data
@@ -43,5 +43,5 @@ config:
     local: [!include rllib_config.yml,  *rllib_config_updates]
 
   ray_config: [!include ray_config.yml, *ray_config_updates]
-  env_config: [!include ../../environments/cwh3d_multiagent.yml, *env_config_updates]
+  env_config: [!include ../../environments/dubins3d_multiagent.yml, *env_config_updates]
   tune_config: [!include tune_config.yml, *tune_config_updates]
