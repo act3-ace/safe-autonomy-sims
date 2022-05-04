@@ -4,9 +4,9 @@ This in turn defines whether the end is episode is reached or not.
 """
 
 import numpy as np
-from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
-from act3_rl_core.libraries.environment_dict import DoneDict
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
+from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
+from corl.libraries.environment_dict import DoneDict
+from corl.simulators.common_platform_utils import get_platform_by_name
 
 from saferl.core.utils import max_vel_violation
 

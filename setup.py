@@ -40,13 +40,7 @@ if __name__ == '__main__':
         'factory',
     ]
 
-    docs_require = [
-        'mkdocs',
-        'mkdocs-macros-plugin',
-        'mkdocs-mermaid-plugin',
-        'inari[mkdocs]',
-        'pymdown-extensions',
-    ]
+    docs_require = parse_requirements("mkdocs-requirements.txt")
 
     setup(
         name="safe-autonomy-sims",

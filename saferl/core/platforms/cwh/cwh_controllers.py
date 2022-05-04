@@ -3,8 +3,8 @@ This module contains controllers for the CWH platform.
 """
 
 import numpy as np
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseController, BasePlatformPartValidator
+from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_parts import BaseController, BasePlatformPartValidator
 
 import saferl.core.platforms.cwh.cwh_properties as cwh_props
 from saferl.core.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes

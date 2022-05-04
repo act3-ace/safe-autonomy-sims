@@ -6,9 +6,9 @@ import abc
 import typing
 
 import numpy as np
-from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.libraries.units import ValueWithUnits
-from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+from corl.libraries.state_dict import StateDict
+from corl.libraries.units import ValueWithUnits
+from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
 
 class SafeRLSimulatorValidator(BaseSimulatorValidator):

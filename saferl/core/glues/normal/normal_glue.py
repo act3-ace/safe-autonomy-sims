@@ -11,8 +11,8 @@ from functools import lru_cache
 
 import gym
 import numpy as np
-from act3_rl_core.glues.base_glue import BaseAgentGlue, BaseAgentGlueNormalizationValidator, BaseAgentGlueValidator
-from act3_rl_core.libraries.env_space_util import EnvSpaceUtil
+from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueNormalizationValidator, BaseAgentGlueValidator
+from corl.libraries.env_space_util import EnvSpaceUtil
 from pydantic import validator
 
 

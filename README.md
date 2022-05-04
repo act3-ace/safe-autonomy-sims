@@ -2,30 +2,39 @@
 
 
 ## Intro
-The Safe-Autonomy-Sims library provides the components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA). This repo is designed to work hand-in-glove with the CoRL (ACT3-RL-Core) library.
+The Safe-Autonomy-Sims library provides the components and
+tools to build modular, integration-focused Reinforcement 
+Learning environments with Run Time Assurance (RTA). 
+This repo is designed to work hand-in-glove with the CoRL 
+library.
 
 ## Installation
-The following instructions detail how to install the safe-autonomy-sims library on your local system.
-It is recommended to install the python modules within a [virtualenv](https://virtualenv.pypa.io/en/stable/#)
+The following instructions detail how to install 
+the safe-autonomy-sims library on your local system.
+It is recommended to install the python modules within 
+a [virtualenv](https://virtualenv.pypa.io/en/stable/#)
 or [conda](https://docs.conda.io/projects/conda/en/latest/index.html) environment.
 
 ### Installing CoRL
-Clone a copy of the CoRL (act3-rl-core) source code onto your local machine:
+Clone a copy of the CoRL source code onto
+your local machine:
 ```shell
 # via SSH
-git clone git@github.com/act3-ace:act3-rl/act3-rl-core.git
+git clone git@github.com/act3-ace:act3-rl/corl.git
 
 # via HTTPS
-git clone https://github.com/act3-ace/act3-rl/act3-rl-core.git
+git clone https://github.com/act3-ace/act3-rl/corl.git
 ```
 
-Install the CoRL (act3-rl-core) module into your environment using `pip`:
+Install the CoRL (act3-rl-core) module into your 
+environment using `pip`:
 ```shell
-pip install path/to/act3-rl-core/
+pip install path/to/corl/
 ```
 
 ### Installing safe-autonomy-sims
-Clone a copy of the safe-autonomy-sims source code onto your local machine:
+Clone a copy of the safe-autonomy-sims source code 
+onto your local machine:
 ```shell
 # via SSH
 git clone git@github.com/act3-ace:rta/safe-autonomy-sims.git
@@ -34,12 +43,14 @@ git clone git@github.com/act3-ace:rta/safe-autonomy-sims.git
 git clone https://github.com/act3-ace/safe-autonomy-sims.git
 ```
 
-Install the safe-autonomy-sims module into your environment using `pip`:
+Install the safe-autonomy-sims module into your 
+environment using `pip`:
 ```shell
 pip install path/to/safe-autonomy-sims/
 ```
 
-For a local development version, please install using the `-e, --editable` option:
+For a local development version, please install 
+using the `-e, --editable` option:
 ```shell
 pip install -e path/to/safe-autonomy-sims/
 ```
@@ -61,7 +72,7 @@ in an environment.
 As an example, you can launch a training loop for the
 provided Docking 3D environment using the following command:
 ```shell
-python path/to/act3-rl-core/act3_rl_core train.py --cfg /path/to/safe-autonomy-sims/configs/experiments/docking/docking_3d.yml --compute_platform local
+python path/to/corl/corl train.py --cfg /path/to/safe-autonomy-sims/configs/experiments/docking/docking_3d.yml --compute_platform local
 ```
 
 ### Evaluation

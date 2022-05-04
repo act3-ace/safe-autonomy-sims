@@ -6,9 +6,9 @@ Author: Jamie Cunningham
 
 import typing
 
-from act3_rl_core.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
-from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue
-from act3_rl_core.glues.base_wrapper import BaseWrapperGlue
+from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
+from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue
+from corl.glues.base_wrapper import BaseWrapperGlue
 
 from saferl.core.glues.normal.normal_glue import NormalGlue, NormalGlueValidator
 
