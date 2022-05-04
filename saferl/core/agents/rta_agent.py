@@ -4,7 +4,7 @@ A trainable RTA agent class.
 
 import typing
 
-from act3_rl_core.agents.base_agent import BaseAgentParser, Functor, FunctorWrapper, TrainableBaseAgent
+from corl.agents.base_agent import BaseAgentParser, Functor, FunctorWrapper, TrainableBaseAgent
 
 
 class FunctorMultiWrapper(Functor):
