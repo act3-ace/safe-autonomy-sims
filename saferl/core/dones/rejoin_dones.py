@@ -82,7 +82,7 @@ class RejoinSuccessDone(DoneFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -136,8 +136,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         """
         Returns the validator for this done function.
 
-        Params
-        ------
+        Parameters
+        ----------
         cls : class constructor
 
         Returns
@@ -152,16 +152,16 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         """
         Logic that returns the done condition given the current environment conditions
 
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
-             current observation from environment
+            current observation from environment
         action : np.ndarray
-             current action to be applied
+            current action to be applied
         next_observation : np.ndarray
-             incoming observation from environment
+            incoming observation from environment
         next_state : np.ndarray
-             incoming state from environment
+            incoming state from environment
 
         Returns
         -------
@@ -214,8 +214,8 @@ class CrashDoneFunction(DoneFuncBase):
         """
         Returns the validator for this done function.
 
-        Params
-        ------
+        Parameters
+        ----------
         cls : class constructor
 
         Returns
@@ -230,16 +230,16 @@ class CrashDoneFunction(DoneFuncBase):
         """
         Logic that returns the done condition given the current environment conditions
 
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
-             current observation from environment
+            current observation from environment
         action : np.ndarray
-             current action to be applied
+            current action to be applied
         next_observation : np.ndarray
-             incoming observation from environment
+            incoming observation from environment
         next_state : np.ndarray
-             incoming state from environment
+            incoming state from environment
 
         Returns
         -------
@@ -282,8 +282,8 @@ class RejoinDone(SharedDoneFuncBase):
         """
         Returns the validator for this done function.
 
-        Params
-        ------
+        Parameters
+        ----------
         cls : class constructor
 
         Returns
@@ -306,7 +306,7 @@ class RejoinDone(SharedDoneFuncBase):
         """
         Logic that returns the done condition given the current environment conditions
 
-        Params
+        Parameters
         ------
         observation : np.ndarray
              current observation from environment

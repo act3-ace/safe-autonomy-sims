@@ -234,6 +234,7 @@ class Test__eq__:
         Returns
         -------
 
+
         """
 
         dubins_platform._platform.velocity = velocity1  # pylint: disable=W0212
