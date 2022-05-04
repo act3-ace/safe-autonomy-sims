@@ -26,8 +26,8 @@ class TimeoutDoneFunction(DoneFuncBase):
     @property
     def get_validator(cls):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -39,8 +39,8 @@ class TimeoutDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -52,8 +52,8 @@ class TimeoutDoneFunction(DoneFuncBase):
 
         Returns
         -------
-            done : DoneDict
-                dictionary containing the done condition for the current agent.
+        done : DoneDict
+            dictionary containing the done condition for the current agent.
         """
 
         done = DoneDict()

@@ -53,8 +53,8 @@ class BaseRTA:
 
         Returns
         -------
-            Union[np.ndarray, tuple, dict]
-                The filtered action
+        Union[np.ndarray, tuple, dict]
+            The filtered action
         """
 
         if self.enable:

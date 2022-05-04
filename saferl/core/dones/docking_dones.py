@@ -32,8 +32,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -46,8 +46,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -59,8 +59,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         Returns
         -------
-            done : DoneDict
-                dictionary containing the condition condition for the current agent
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
 
         """
 
@@ -108,8 +108,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -122,8 +122,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -191,8 +191,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -204,8 +204,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -264,8 +264,8 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -277,8 +277,8 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -340,8 +340,8 @@ class CrashDockingDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -354,8 +354,8 @@ class CrashDockingDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray

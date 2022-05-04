@@ -33,10 +33,10 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
         Raises
         ------
-            RuntimeError
-                if the given config doesn't have both "name" and "model" keys
-                -or-
-                if the "name" and "model" keys do not match a known model
+        RuntimeError
+            if the given config doesn't have both "name" and "model" keys
+            -or-
+            if the "name" and "model" keys do not match a known model
         """
 
         if "name" not in config:

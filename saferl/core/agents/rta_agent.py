@@ -30,7 +30,7 @@ class FunctorMultiWrapper(Functor):
         Returns
         -------
         MultiWrapperGlue:
-                An instance of a glue functor wrapper initialized with the given config.
+            An instance of a glue functor wrapper initialized with the given config.
         """
         wrapped_glues = [
             glue.create_functor_glue_object(platform, agent_name, local_param_storage, world_param_storage) for glue in self.wrapped_glues

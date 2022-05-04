@@ -23,8 +23,8 @@ def flip_rta(control):
 
     Returns
     -------
-        dict
-            The filtered control dictionary
+    dict
+        The filtered control dictionary
     """
     filtered_control = OrderedDict()
     for k, v in control.items():
@@ -101,6 +101,6 @@ class RTAGlue(BaseMultiWrapperGlue):
 
         Returns
         -------
-            RTA function attached to glue.
+        RTA function attached to glue.
         """
         return self.config.rta
