@@ -1,20 +1,81 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core  Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
 site_name: Safe-Autonomy-Sims
 site_author: Safe-Autonomy Team
 repo_url: https://github.com/act3-ace/safe-autonomy-sims
 docs_dir: "docs"
+site_url: https://github.com/act3-ace/
+edit_uri: blob/main/docs/
+site_dir: site
+site_description: "The following python project creates a python interface for training Deep RL - provides the base RL functionality and APIs to enable rapid ablation testing and setup"
 
 plugins:
   - search
   - macros
+  - mkdocstrings
+  - autorefs
+  - gen-files:
+      scripts:
+        - docs/gen_ref_nav.py  # or any other name or path
+  # - literate-nav:
+  #   nav_file: reference/SUMMARY.md
+  - section-index
   - pdf-export:
       verbose: true
       media_type: print
       enabled_if_env: ENABLE_PDF_EXPORT
-  - inari:
-      module: saferl
-      out-name: saferl
+      combined: true
+
+
+theme:
+  name: material
+  icon:
+    logo: material/currency-sign
+  features:
+  - navigation.tabs
+  - navigation.top
+  palette:
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: teal
+    accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+
+
+extra_css:
+  - css/style.css
+  - css/material.css
+  - css/mkdocstrings.css
+
 
 markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
+  - toc:
+      permalink: "¤"
   - codehilite
   - pymdownx.superfences:
       custom_fences:
@@ -25,81 +86,77 @@ markdown_extensions:
 extra_javascript:
   - https://unpkg.com/mermaid@8.4.2/dist/mermaid.min.js
 
+handlers:
+  python:
+    setup_commands:
+    - import sys
+    - sys.path.append("docs")
+    selection:
+      new_path_syntax: yes
+    import:  # demonstration purpose in the docs
+      - https://docs.python-requests.org/en/master/objects.inv
+
 nav:
   - "Introduction": index.md
   - "About": about.md
+  - change_log.md
+  - license.md
+  - reference/SUMMARY.md
   - "API":
     - saferl/index.md
-    - backend:
-        - saferl/backend/index.md
-        - base_models:
-          - saferl/backend/base_models/index.md
-          - saferl/backend/base_models/entities-py.md
-        - cwh:
-          - saferl/backend/cwh/index.md
-          - saferl/backend/cwh/cwh-py.md
-        - dubins:
-          - saferl/backend/dubins/index.md
-          - saferl/backend/dubins/entities-py.md
-    - core:
-        - saferl/core/index.md
-        - saferl/core/utils-py.md
-        - agents:
-          - saferl/core/agents/index.md
-          - saferl/core/agents/rta_agent-py.md
-        - dones:
-          - saferl/core/dones/index.md
-          - saferl/core/dones/common_dones-py.md
-          - saferl/core/dones/docking_dones-py.md
-          - saferl/core/dones/rejoin_dones-py.md
-        - glues:
-          - saferl/core/glues/index.md
-          - saferl/core/glues/magnitude_glue-py.md
-          - saferl/core/glues/rejoin_region_glue-py.md
-          - saferl/core/glues/rta_glue-py.md
-          - saferl/core/glues/unit_vector_glue-py.md
-          - saferl/core/glues/vel_limit_glue-py.md
-          - normal:
-            - saferl/core/glues/normal/index.md
-            - saferl/core/glues/normal/normal_glue-py.md
-            - saferl/core/glues/normal/normal_observe_glue-py.md
-            - saferl/core/glues/normal/normal_wrapper_glue-py.md
-        - platforms:
-          - saferl/core/platforms/index.md
-          - common:
-            - saferl/core/platforms/common/index.md
-            - saferl/core/platforms/common/sensors-py.md
-          - cwh:
-            - saferl/core/platforms/cwh/index.md
-            - saferl/core/platforms/cwh/cwh_available_platforms-py.md
-            - saferl/core/platforms/cwh/cwh_controllers-py.md
-            - saferl/core/platforms/cwh/cwh_platform-py.md
-            - saferl/core/platforms/cwh/cwh_properties-py.md
-            - saferl/core/platforms/cwh/cwh_sensors-py.md
-          - dubins:
-            - saferl/core/platforms/dubins/index.md
-            - saferl/core/platforms/dubins/dubins_available_platforms-py.md
-            - saferl/core/platforms/dubins/dubins_controllers-py.md
-            - saferl/core/platforms/dubins/dubins_platform-py.md
-            - saferl/core/platforms/dubins/dubins_properties-py.md
-            - sensors:
-              - saferl/core/platforms/dubins/sensors/index.md
-              - saferl/core/platforms/dubins/sensors/dubins_sensors-py.md
-              - saferl/core/platforms/dubins/sensors/partner_sensors-py.md
-              - saferl/core/platforms/dubins/sensors/relative_sensors-py.md
-        - rewards:
-          - saferl/core/rewards/index.md
-          - saferl/core/rewards/docking_rewards-py.md
-          - saferl/core/rewards/rejoin_rewards-py.md
-        - rta:
-          - saferl/core/rta/index.md
-          - saferl/core/rta/base_rta-py.md
-          - cwh:
-            - saferl/core/rta/cwh/index.md
-            - saferl/core/rta/cwh/cwh_rta-py.md
-        - simulators:
-          - saferl/core/simulators/index.md
-          - saferl/core/simulators/cwh_simulator-py.md
-          - saferl/core/simulators/dubins_simulator-py.md
-          - saferl/core/simulators/saferl_simulator-py.md
-theme: material
+    - reference/__init__.md
+    - reference/backend/__init__.md
+    - reference/backend/base_models/__init__.md
+    - reference/backend/base_models/entities.md
+    - reference/backend/cwh/__init__.md
+    - reference/backend/cwh/cwh.md
+    - reference/backend/dubins/__init__.md
+    - reference/backend/dubins/entities.md
+    - reference/core/__init__.md
+    - reference/core/utils.md
+    - reference/core/agents/__init__.md
+    - reference/core/agents/rta_agent.md
+    - reference/core/dones/__init__.md
+    - reference/core/dones/common_dones.md
+    - reference/core/dones/docking_dones.md
+    - reference/core/dones/rejoin_dones.md
+    - reference/core/glues/__init__.md
+    - reference/core/glues/magnitude_glue.md
+    - reference/core/glues/rejoin_region_glue.md
+    - reference/core/glues/rta_glue.md
+    - reference/core/glues/unit_vector_glue.md
+    - reference/core/glues/vel_limit_glue.md
+    - reference/core/glues/normal/__init__.md
+    - reference/core/glues/normal/normal_glue.md
+    - reference/core/glues/normal/normal_observe_glue.md
+    - reference/core/glues/normal/normal_wrapper_glue.md
+    - reference/core/platforms/__init__.md
+    - reference/core/platforms/common/__init__.md
+    - reference/core/platforms/common/sensors.md
+    - reference/core/platforms/cwh/__init__.md
+    - reference/core/platforms/cwh/cwh_available_platforms.md
+    - reference/core/platforms/cwh/cwh_controllers.md
+    - reference/core/platforms/cwh/cwh_platform.md
+    - reference/core/platforms/cwh/cwh_properties.md
+    - reference/core/platforms/cwh/cwh_sensors.md
+    - reference/core/platforms/dubins/__init__.md
+    - reference/core/platforms/dubins/dubins_available_platforms.md
+    - reference/core/platforms/dubins/dubins_controllers.md
+    - reference/core/platforms/dubins/dubins_platform.md
+    - reference/core/platforms/dubins/dubins_properties.md
+    - reference/core/platforms/dubins/sensors/__init__.md
+    - reference/core/platforms/dubins/sensors/dubins_sensors.md
+    - reference/core/platforms/dubins/sensors/partner_sensors.md
+    - reference/core/platforms/dubins/sensors/relative_sensors.md
+    - reference/core/rewards/__init__.md
+    - reference/core/rewards/docking_rewards.md
+    - reference/core/rewards/rejoin_rewards.md
+    - reference/core/rta/__init__.md
+    - reference/core/rta/base_rta.md
+    - reference/core/rta/cwh/__init__.md
+    - reference/core/rta/cwh/cwh_rta.md
+    - reference/core/simulators/__init__.md
+    - reference/core/simulators/cwh_simulator.md
+    - reference/core/simulators/dubins_simulator.md
+    - reference/core/simulators/saferl_simulator.md
+
