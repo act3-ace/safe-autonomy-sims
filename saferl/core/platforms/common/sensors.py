@@ -7,7 +7,7 @@ import abc
 import typing
 
 import numpy as np
-from act3_rl_core.simulators.base_parts import BaseSensor
+from corl.simulators.base_parts import BaseSensor
 
 
 class TransformSensor(BaseSensor):

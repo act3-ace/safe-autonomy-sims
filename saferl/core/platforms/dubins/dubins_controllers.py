@@ -2,8 +2,8 @@
 This module contains controllers for the Dubins platform.
 """
 import numpy as np
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseController, BasePlatformPartValidator
+from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_parts import BaseController, BasePlatformPartValidator
 
 import saferl.core.platforms.dubins.dubins_properties as dubins_props
 from saferl.core.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
