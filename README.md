@@ -63,6 +63,9 @@ project documentation. Documentation source files are
 written in Markdown, and configured with a single YAML 
 configuration file.
 
+**NOTE**: In order to properly build the documentation locally, you must first 
+have CoRL and safe-autonomy-sims installed in your container/environment!
+
 Install the Mkdocs modules in a container/virtual environment via pip:
 ```shell
 pip install -U -r mkdocs-requirements.txt
