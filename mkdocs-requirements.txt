@@ -1,7 +1,21 @@
-# mkdocs plugins
+# docs requirements
+inari[mkdocs]
+mkdocs
 mkdocs-git-revision-date-localized-plugin
-pymdown-extensions
 mkdocs-macros-plugin
 mkdocs-material
+mkdocs-material-extensions
+mkdocs-mermaid-plugin
 mkdocs-pdf-export-plugin
-inari[mkdocs]
+mktheapidocs[plugin]
+mkdocstrings
+mkdocs-autorefs
+mkdocs-coverage
+mkdocs-gen-files
+mkdocs-literate-nav
+mkdocs-section-index
+mkdocs-with-pdf
+
+papermill
+Pillow
+pymdown-extensions
