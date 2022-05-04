@@ -3,7 +3,7 @@ This module defines the measurement and control properties for CWH spacecraft se
 """
 import typing
 
-from act3_rl_core.libraries.property import BoxProp
+from corl.libraries.property import BoxProp
 from pydantic import Field, StrictFloat, StrictStr
 from typing_extensions import Annotated
 

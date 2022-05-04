@@ -12,7 +12,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # ---------------------------------------------------------------------------
 
-"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
         {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
@@ -22,7 +22,7 @@
         {"part": "Sensor_Velocity"}
     ],
     "episode_parameter_provider": {
-      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
       "x": 10,
@@ -37,20 +37,20 @@
           "functor": "saferl.core.glues.rta_glue.RTAGlue",
           "wrapped": [
             {
-              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "functor": "corl.glues.common.controller_glue.ControllerGlue",
               "config": {
                 "controller": "Controller_Thrust",
               },
             },
             {
-              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "functor": "corl.glues.common.controller_glue.ControllerGlue",
               "config": {
                 "controller": "Controller_Thrust",
                 "index": 1
               }
             },
             {
-              "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+              "functor": "corl.glues.common.controller_glue.ControllerGlue",
               "config": {
                 "controller": "Controller_Thrust",
                 "index": 2
@@ -59,11 +59,11 @@
           ]
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {"sensor": "Sensor_Position", "normalization": {"enabled": False}},
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {"sensor": "Sensor_Velocity", "normalization": {"enabled": False}},
         },
     ],
