@@ -17,12 +17,12 @@ or [conda](https://docs.conda.io/projects/conda/en/latest/index.html) environmen
 
 ### Installing CoRL
 Clone a copy of the CoRL source code onto
-your local machine:
+your local machine via SSH:
 ```shell
-# via SSH
 git clone git@github.com/act3-ace:act3-rl/corl.git
-
-# via HTTPS
+```
+or HTTPS:
+```shell
 git clone https://github.com/act3-ace/act3-rl/corl.git
 ```
 
@@ -34,12 +34,12 @@ pip install path/to/corl/
 
 ### Installing safe-autonomy-sims
 Clone a copy of the safe-autonomy-sims source code 
-onto your local machine:
+onto your local machine via SSH:
 ```shell
-# via SSH
 git clone git@github.com/act3-ace:rta/safe-autonomy-sims.git
-
-# via HTTPS
+```
+or HTTPS:
+```shell
 git clone https://github.com/act3-ace/safe-autonomy-sims.git
 ```
 
@@ -55,6 +55,29 @@ using the `-e, --editable` option:
 pip install -e path/to/safe-autonomy-sims/
 ```
 
+## Local Documentation
+
+This repository is setup to use [MKDOCS](https://www.mkdocs.org/)
+which is a static site generator geared towards building 
+project documentation. Documentation source files are 
+written in Markdown, and configured with a single YAML 
+configuration file.
+
+Install the Mkdocs modules in a container/virtual environment via pip:
+```shell
+pip install -U -r mkdocs-requirements.txt
+```
+To build the documentation locally without serving it, use
+the following command from within your container/virtual environment:
+```shell
+python -m  mkdocs build
+```
+To serve the documentation on a local port, use the following
+command from within your container/virtual environment: 
+```shell
+python -m mkdocs serve 
+```
+    
 
 ## Usage
 
