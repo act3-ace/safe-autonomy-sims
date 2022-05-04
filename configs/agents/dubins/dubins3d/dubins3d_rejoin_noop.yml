@@ -12,7 +12,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # ---------------------------------------------------------------------------
 
-"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
         {"part": "Controller_RollRate", "config": {"axis": 0}},
@@ -25,7 +25,7 @@
         {"part": "Sensor_Time"},
     ],
     "episode_parameter_provider": {
-      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
       "x": 5000,
@@ -38,44 +38,44 @@
     },
     "glues": [
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config": {
                 "controller": "Controller_Acceleration",
                 "training_export_behavior": "EXCLUDE",
             },
         },
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_PitchRate",
                 "training_export_behavior": "EXCLUDE",
             }
         },
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_RollRate",
                 "training_export_behavior": "EXCLUDE",
             }
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {"sensor": "Sensor_Position"},
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {"sensor": "Sensor_Velocity"},
         },
         {
-            "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {"sensor": "Sensor_Heading"},
         },
         {
-          "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
           "config": { "sensor": "Sensor_Flight_Path_Angle" },
         },
         {
-          "functor": "act3_rl_core.glues.common.observe_sensor.ObserveSensor",
+          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
           "config": {
             "sensor": "Sensor_Time",
             "normalization": {

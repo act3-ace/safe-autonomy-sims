@@ -1,5 +1,5 @@
 {
-    "policy_class": act3_rl_core.policies.scripted_action.ScriptedActionPolicy,
+    "policy_class": corl.policies.scripted_action.ScriptedActionPolicy,
     "train": False,
 
     "config": {
