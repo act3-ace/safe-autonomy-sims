@@ -2,8 +2,8 @@
 Contains implementations of sensors that can be used in injuction with the CWH platform
 """
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseSensor
+from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_parts import BaseSensor
 
 import saferl.core.platforms.cwh.cwh_properties as cwh_props
 from saferl.core.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes

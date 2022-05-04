@@ -4,7 +4,7 @@ aircraft operating under the Dubins dynamics model.
 """
 
 import numpy as np
-from act3_rl_core.simulators.base_platform import BasePlatform
+from corl.simulators.base_platform import BasePlatform
 
 
 class DubinsPlatform(BasePlatform):

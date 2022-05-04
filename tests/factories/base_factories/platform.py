@@ -1,7 +1,7 @@
 import typing
 
 import factory
-from act3_rl_core.simulators.base_platform import BasePlatform
+from corl.simulators.base_platform import BasePlatform
 
 
 class BasePlatformFactory(factory.Factory):

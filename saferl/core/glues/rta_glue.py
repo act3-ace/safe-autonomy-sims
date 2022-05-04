@@ -6,8 +6,8 @@ from collections import OrderedDict
 
 import gym
 import numpy as np
-from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
-from act3_rl_core.glues.common.controller_glue import ControllerGlue
+from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
+from corl.glues.common.controller_glue import ControllerGlue
 from pydantic import PyObject
 
 from saferl.core.rta.cwh.cwh_rta import DockingRTA

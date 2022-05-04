@@ -4,7 +4,7 @@ Unit tests for the DockingFailureReward function from the docking_rewards module
 import os
 
 import pytest
-from act3_rl_core.libraries.state_dict import StateDict
+from corl.libraries.state_dict import StateDict
 
 from saferl.core.rewards.docking_rewards import DockingFailureReward
 from tests.conftest import delimiter, read_test_cases

@@ -3,7 +3,7 @@ Contains the implementations of classes that describe how the simulation is to p
 """
 import abc
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
+from corl.libraries.plugin_library import PluginLibrary
 
 from saferl.backend.dubins import entities as bp
 from saferl.core.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
