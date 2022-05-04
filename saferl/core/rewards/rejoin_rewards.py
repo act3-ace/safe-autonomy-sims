@@ -109,7 +109,7 @@ class RejoinDistanceChangeReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -293,8 +293,8 @@ class RejoinReward(RewardFuncBase):
     @property
     def get_validator(self):
         """
-            Method to return class's Validator.
-            """
+        Method to return class's Validator.
+        """
         return RejoinRewardValidator
 
     def reset(self):
@@ -318,7 +318,7 @@ class RejoinReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -409,7 +409,7 @@ class RejoinFirstTimeReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -519,7 +519,7 @@ class RejoinSuccessReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -681,7 +681,7 @@ class RejoinFailureReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.

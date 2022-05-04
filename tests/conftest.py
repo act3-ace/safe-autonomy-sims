@@ -30,7 +30,7 @@ def wrap_angle(angle, max=np.pi):
 
     Returns
     -------
-        The wrapped angle.
+    The wrapped angle.
     """
     if abs(angle) > max:
         shifted_angle = angle + max

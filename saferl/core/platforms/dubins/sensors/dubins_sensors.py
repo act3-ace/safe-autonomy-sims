@@ -51,8 +51,8 @@ class PositionSensor(DubinsSensor):
         """
         Calculate the position
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -88,11 +88,10 @@ class VelocitySensor(DubinsSensor):
         """
         Calculate the measurement - velocity
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
-
 
         Returns
         -------
@@ -126,8 +125,8 @@ class HeadingSensor(DubinsSensor):
         """
         Calculate the measurement - heading
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -163,8 +162,8 @@ class FlightPathSensor(DubinsSensor):
         """
         Calculate the measurement - flight path angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -200,8 +199,8 @@ class RollSensor(DubinsSensor):
         """
         Calculate the measurement - roll angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -237,8 +236,8 @@ class QuaternionSensor(DubinsSensor):
         """
         Calculate the measurement - quaternion
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -295,7 +294,7 @@ class SpeedSensor(DubinsSensor):
         """
         Calculate the measurement - speed
 
-        Params
+        Parameters
         ------
         state: np.ndarray
             current state
