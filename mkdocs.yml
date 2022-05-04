@@ -19,7 +19,11 @@ site_description: "The following python project creates a python interface for t
 plugins:
   - search
   - macros
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            docstring_style: numpy
   - autorefs
   - gen-files:
       scripts:
