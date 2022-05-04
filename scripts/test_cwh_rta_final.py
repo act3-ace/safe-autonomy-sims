@@ -321,7 +321,6 @@ class MainUtilACT3Core:
         """
         Processes the arguments as main entry point for ACT3/ deep reinforcement training code
 
-
         Parameters
         ----------
         alternate_argv : Sequence[str], optional

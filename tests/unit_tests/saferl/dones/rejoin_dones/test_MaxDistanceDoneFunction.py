@@ -109,7 +109,6 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
     lead : MagicMock
         The mock lead to be returned to the MaxDistanceDoneFunction when it uses get_platform_by_name()
 
-
     Returns
     -------
     results : DoneDict

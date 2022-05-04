@@ -23,6 +23,7 @@ class TransformSensor(BaseSensor):
     def _raw_measurement(self, state):
         """
         Calculate the raw sensor measurement value.
+
         Parameters
         ----------
         state: typing.Tuple

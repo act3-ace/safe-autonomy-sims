@@ -20,8 +20,8 @@ class PartnerPositionSensor(d.PositionSensor):
         """
         Calculate the position of the platform's partner
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -56,11 +56,10 @@ class PartnerVelocitySensor(d.VelocitySensor):
         """
         Calculate the measurement - partner velocity
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
-
 
         Returns
         -------
@@ -93,8 +92,8 @@ class PartnerHeadingSensor(d.HeadingSensor):
         """
         Calculate the measurement - partner heading
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -129,8 +128,8 @@ class PartnerFlightPathSensor(d.FlightPathSensor):
         """
         Calculate the measurement - partner flight path angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -165,8 +164,8 @@ class PartnerRollSensor(d.RollSensor):
         """
         Calculate the measurement - partner roll angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -199,8 +198,8 @@ class PartnerQuaternionSensor(d.QuaternionSensor):
         """
         Calculate the measurement - partner quaternion orientation
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 

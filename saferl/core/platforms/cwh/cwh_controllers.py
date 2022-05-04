@@ -57,8 +57,8 @@ class ThrustController(CWHController):
     """
     A controller to control thrust on the CWH platrorm.
 
-    Params
-    -------
+    Parameters
+    ----------
     parent_platform : cwh_platform
         the platform to which the controller belongs
     config : dict
@@ -78,8 +78,8 @@ class ThrustController(CWHController):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -95,8 +95,8 @@ class ThrustController(CWHController):
         """
         Applies control to the parent platform
 
-        Params
-        ------
+        Parameters
+        ----------
         control
             ndarray describing the control to the platform
         """
@@ -104,7 +104,7 @@ class ThrustController(CWHController):
 
     def get_applied_control(self) -> np.ndarray:
         """
-        Retreive the applied control to the parent platform
+        Retrieve the applied control to the parent platform
 
         Returns
         -------

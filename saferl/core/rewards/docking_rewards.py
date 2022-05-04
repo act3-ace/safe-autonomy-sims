@@ -56,7 +56,7 @@ class DockingTimeReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -124,7 +124,7 @@ class DockingDistanceChangeReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -451,7 +451,7 @@ class DockingSuccessReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -560,7 +560,7 @@ class DockingFailureReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
