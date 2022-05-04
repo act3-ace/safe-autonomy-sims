@@ -8,7 +8,7 @@ import os
 
 import numpy as np
 import pytest
-from act3_rl_core.libraries.environment_dict import DoneDict
+from corl.libraries.environment_dict import DoneDict
 
 from saferl.core.dones.rejoin_dones import RejoinDone
 from tests.conftest import delimiter, read_test_cases
@@ -39,7 +39,7 @@ def fixture_done_status(request):
 
     Returns
     -------
-    act3_rl_core.dones.done_func_base.DoneStatusCodes
+    corl.dones.done_func_base.DoneStatusCodes
     """
     return request.param
 
@@ -65,7 +65,7 @@ def fixture_local_dones(agent_name, done_status):
 
     Returns
     -------
-    act3_rl_core.libraries.environment_dict.DoneDict
+    corl.libraries.environment_dict.DoneDict
         The DoneDict of agent's DoneStatuses
     """
 

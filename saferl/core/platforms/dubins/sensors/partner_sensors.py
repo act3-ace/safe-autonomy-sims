@@ -4,7 +4,7 @@ This module contains Dubins platform sensors which read values sent from the pla
 Author: Jamie Cunningham
 """
 import numpy as np
-from act3_rl_core.libraries.plugin_library import PluginLibrary
+from corl.libraries.plugin_library import PluginLibrary
 
 import saferl.core.platforms.dubins.sensors.dubins_sensors as d
 from saferl.core.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes

@@ -5,7 +5,7 @@ Author: Jamie Cunningham
 """
 
 import numpy as np
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
+from corl.simulators.common_platform_utils import get_platform_by_name
 
 
 def velocity_limit(state, agent_name, velocity_threshold, threshold_distance, mean_motion, slope=2.0):

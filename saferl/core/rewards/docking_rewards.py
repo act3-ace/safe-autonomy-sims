@@ -5,10 +5,10 @@ import math
 from collections import OrderedDict
 
 import numpy as np
-from act3_rl_core.libraries.environment_dict import RewardDict
-from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
+from corl.libraries.environment_dict import RewardDict
+from corl.libraries.state_dict import StateDict
+from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
+from corl.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
 from saferl.core.utils import max_vel_violation
