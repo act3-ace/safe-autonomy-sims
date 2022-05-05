@@ -29,7 +29,7 @@ plugins:
         - docs/gen_ref_nav.py  # or any other name or path
   - section-index
   - pdf-export:
-      verbose: true
+      verbose: false
       media_type: print
       enabled_if_env: ENABLE_PDF_EXPORT
       combined: true
@@ -100,8 +100,9 @@ handlers:
 nav:
   - "Introduction": index.md
   - "About": about.md
-  - change_log.md
-  - license.md
+  - "Install": install.md
+#  - "Changelog": change_log.md
+  - "License": license.md
   - "API":
 #      - reference/SUMMARY.md  # API "Table of Contents"
       - api/index.md
@@ -123,7 +124,7 @@ nav:
           - "agents":
               - api/core/agents/index.md
               - "rta agent":
-                  - api/core/agents/rta_agent.md
+                  - api/core/agents/rta_agent/index.md
                   - reference/core/agents/rta_agent.md
           - "dones":
               - api/core/dones/index.md
