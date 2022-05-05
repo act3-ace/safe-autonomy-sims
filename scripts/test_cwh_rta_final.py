@@ -8,18 +8,19 @@ import scipy
 import ray
 from pydantic import PyObject, validator
 from ray import tune
+from ray.tune.utils.log import Verbosity
 
-from act3_rl_core.agents.base_agent import BaseAgentParser
-from act3_rl_core.environment.default_env_rllib_callbacks import EnvironmentDefaultCallbacks
-from act3_rl_core.environment.multi_agent_env import ACT3MultiAgentEnv, ACT3MultiAgentEnvValidator
-from act3_rl_core.episode_parameter_providers.remote import RemoteEpisodeParameterProvider
-from act3_rl_core.experiments.base_experiment import BaseExperiment, BaseExperimentValidator
-from act3_rl_core.libraries.factory import Factory
-from act3_rl_core.parsers.yaml_loader import apply_patches
-from act3_rl_core.policies.base_policy import BasePolicyValidator
+from corl.agents.base_agent import BaseAgentParser
+from corl.environment.default_env_rllib_callbacks import EnvironmentDefaultCallbacks
+from corl.environment.multi_agent_env import ACT3MultiAgentEnv, ACT3MultiAgentEnvValidator
+from corl.episode_parameter_providers.remote import RemoteEpisodeParameterProvider
+from corl.experiments.base_experiment import BaseExperiment, BaseExperimentValidator
+from corl.libraries.factory import Factory
+from corl.parsers.yaml_loader import apply_patches
+from corl.policies.base_policy import BasePolicyValidator
 
-from act3_rl_core.experiments.base_experiment import ExperimentParse
-from act3_rl_core.parsers.yaml_loader import load_file
+from corl.experiments.base_experiment import ExperimentParse
+from corl.parsers.yaml_loader import load_file
 
 import pathlib
 import numpy as np
@@ -147,7 +148,11 @@ class RTAExperiment(BaseExperiment):
         if args.compute_platform in ['ray']:
             self._update_ray_config_for_ray_platform()
 
-        self.config.env_config["agents"] = self.create_agents(args.agent_config)
+        self.config.env_config["agents"], self.config.env_config["agent_platforms"] = self.create_agents(
+            args.platform_config, args.agent_config
+        )
+
+        self.config.env_config["horizon"] = rllib_config["horizon"]
 
         if args.other_platform:
             self.config.env_config["other_platforms"] = self.create_other_platforms(args.other_platform)
@@ -410,7 +415,7 @@ class RTAExperiment(BaseExperiment):
         self.config.ray_config['log_to_driver'] = False
 
 
-class MainUtilACT3Core:
+class MainUtilRTAExpr:
     """
     Contains all the procedures that allow for argument parsing to setup an experiment
     """
@@ -421,7 +426,6 @@ class MainUtilACT3Core:
     def parse_args(alternate_argv: typing.Optional[typing.Sequence[str]] = None):
         """
         Processes the arguments as main entry point for ACT3/ deep reinforcement training code
-
 
         Parameters
         ----------
@@ -444,26 +448,46 @@ class MainUtilACT3Core:
         parser.add_argument(
             "--config",
             type=str,
-            default=MainUtilACT3Core.DEFAULT_CONFIG_PATH,
-            help=f"Path to config.yml file used to setup the training environment Default={MainUtilACT3Core.DEFAULT_CONFIG_PATH}",
+            default=MainUtilRTAExpr.DEFAULT_CONFIG_PATH,
+            help=f"Path to config.yml file used to setup the training environment Default={MainUtilRTAExpr.DEFAULT_CONFIG_PATH}",
         )
 
         parser.add_argument(
             "--compute-platform",
             type=str,
-            help="Compute platform [ace, hpc, local] of experiment. Used to select rllib_config",
+            default="auto",
+            help="Compute platform [ace, hpc, local, auto] of experiment. Used to select rllib_config",
+        )
+        parser.add_argument(
+            "-pc",
+            "--platform-config",
+            action="append",
+            nargs=2,
+            metavar=("platform-name", "platform-file"),
+            help="the specification for a platform in the environment"
         )
         parser.add_argument(
             "-ac",
             "--agent-config",
             action="append",
             nargs=4,
-            metavar=("agent-name", "configuration-file", "platform-file", "policy-file"),
+            metavar=("agent-name", "platform-name", "configuration-file", "policy-file"),
             help="the specification for an agent in the environment"
         )
         parser.add_argument("-op", "--other-platform", action="append", nargs=2, metavar=("agent-name", "platform-file"), help="help:")
-        parser.add_argument('--verbose', type=int, default=1)
-
+        parser.add_argument(
+            '--verbose',
+            type=Verbosity,
+            choices=[Verbosity.V0_MINIMAL, Verbosity.V1_EXPERIMENT, Verbosity.V2_TRIAL_NORM, Verbosity.V3_TRIAL_DETAILS],
+            default=Verbosity.V3_TRIAL_DETAILS
+        )
+        parser.add_argument(
+            '--debug',
+            action='store_true',
+            help="Tells your specified experiment to switch configurations to debug mode, experiments may ignore this flag"
+        )
+        parser.add_argument('--profile', action='store_true', help="Tells experiment to switch configuration to profile mode")
+        parser.add_argument('--profile-iterations', type=int, default=10)
         return parser.parse_args(args=alternate_argv)
 
 
@@ -503,7 +527,7 @@ def main():
     """
     Main method of the module that allows for arguments parsing  for experiment setup.
     """
-    args = MainUtilACT3Core.parse_args()
+    args = MainUtilRTAExpr.parse_args()
     config = load_file(config_filename=args.config)
 
     # print(config)

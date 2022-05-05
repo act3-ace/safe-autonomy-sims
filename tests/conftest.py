@@ -9,7 +9,7 @@ import yaml
 import math
 import numpy as np
 from scipy.spatial.transform import Rotation
-from act3_rl_core.dones.done_func_base import DoneStatusCodes
+from corl.dones.done_func_base import DoneStatusCodes
 
 
 # Define constants
@@ -30,7 +30,7 @@ def wrap_angle(angle, max=np.pi):
 
     Returns
     -------
-        The wrapped angle.
+    The wrapped angle.
     """
     if abs(angle) > max:
         shifted_angle = angle + max

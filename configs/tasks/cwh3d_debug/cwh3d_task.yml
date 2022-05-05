@@ -15,7 +15,7 @@
 ####################################################################
 # Override values used by the setup
 ####################################################################
-experiment_class: act3_rl_core.experiments.rllib_experiment.RllibExperiment
+experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
     #num_workers: 0

@@ -2,8 +2,8 @@
 Contains implementations of sensors that can be used in injuction with the CWH platform
 """
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseSensor
+from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_parts import BaseSensor
 
 import saferl.core.platforms.cwh.cwh_properties as cwh_props
 from saferl.core.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
@@ -35,8 +35,8 @@ class PositionSensor(CWHSensor):
     Implementation of a sensor designed to give the position at any time
     """
 
-    def __init__(self, parent_platform, config, measurement_property_class=cwh_props.PositionProp):
-        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, property_class=cwh_props.PositionProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
         """
@@ -62,8 +62,8 @@ class VelocitySensor(CWHSensor):
     Implementation of a sensor to give velocity at any time
     """
 
-    def __init__(self, parent_platform, config, measurement_property_class=cwh_props.VelocityProp):
-        super().__init__(measurement_property_class=measurement_property_class, parent_platform=parent_platform, config=config)
+    def __init__(self, parent_platform, config, property_class=cwh_props.VelocityProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
     # state - tuple
     def _calculate_measurement(self, state):

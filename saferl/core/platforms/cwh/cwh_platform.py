@@ -4,7 +4,7 @@ operating under the Clohessy-Wiltshire dynamics model.
 """
 
 import numpy as np
-from act3_rl_core.simulators.base_platform import BasePlatform
+from corl.simulators.base_platform import BasePlatform
 
 
 class CWHPlatform(BasePlatform):
@@ -31,8 +31,9 @@ class CWHPlatform(BasePlatform):
     def get_applied_action(self):
         """returns the action stored in this platform
 
-        Returns:
-            typing.Any -- any sort of stored action
+        Returns
+        -------
+        typing.Any -- any sort of stored action
         """
         return self._last_applied_action
 
@@ -49,8 +50,10 @@ class CWHPlatform(BasePlatform):
         saves an action to the platform if it matches
         the action space
 
-        Arguments:
-            action typing.Any -- The action to store in the platform
+        Parameters
+        ----------
+        action: typing.Any
+            The action to store in the platform
         """
         self._last_applied_action[axis] = action
 

@@ -6,7 +6,7 @@ Author: Jamie Cunningham
 import os
 
 import pytest
-from act3_rl_core.libraries.state_dict import StateDict
+from corl.libraries.state_dict import StateDict
 
 from saferl.core.simulators.cwh_simulator import CWHSimulator
 from tests.conftest import delimiter, read_test_cases

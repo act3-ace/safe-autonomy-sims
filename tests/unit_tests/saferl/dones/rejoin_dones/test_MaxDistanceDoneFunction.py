@@ -82,7 +82,9 @@ def fixture_cut(cut_name, agent_name, lead_name, max_distance):
         An instantiated component under test
     """
 
-    return MaxDistanceDoneFunction(name=cut_name, agent_name=agent_name, max_distance=max_distance, lead=lead_name)
+    return MaxDistanceDoneFunction(
+        name=cut_name, agent_name=agent_name, platform_name=agent_name, max_distance=max_distance, lead=lead_name
+    )
 
 
 @pytest.fixture(name='call_results')
@@ -106,7 +108,6 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         The mock wingman to be returned to the MaxDistanceDoneFunction when it uses get_platform_by_name()
     lead : MagicMock
         The mock lead to be returned to the MaxDistanceDoneFunction when it uses get_platform_by_name()
-
 
     Returns
     -------

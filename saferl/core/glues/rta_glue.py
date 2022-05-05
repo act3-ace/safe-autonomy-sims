@@ -7,10 +7,9 @@ from collections import OrderedDict
 
 import gym
 import numpy as np
-from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
-from act3_rl_core.glues.common.controller_glue import ControllerGlue
+from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
+from corl.glues.common.controller_glue import ControllerGlue
 from pydantic import PyObject
-
 from run_time_assurance.rta import RTAModule
 
 # from saferl.core.rta.cwh.cwh_rta import DockingRTA
@@ -26,8 +25,8 @@ def flip_rta(control):
 
     Returns
     -------
-        dict
-            The filtered control dictionary
+    dict
+        The filtered control dictionary
     """
     filtered_control = OrderedDict()
     for k, v in control.items():
@@ -97,7 +96,7 @@ class RTAGlue(BaseMultiWrapperGlue):
     def _filter_action(self, desired_action: OrderedDict, observation: typing.Dict) -> OrderedDict:
         rta_state_vector = self._get_rta_state_vector(observation)
         rta_action_vector = self._get_action_vector_from_action(desired_action)
-        filtered_action_vector =  self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
+        filtered_action_vector = self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
         return self._get_action_from_action_vector(filtered_action_vector)
 
     @abc.abstractmethod

@@ -5,7 +5,7 @@ Author: Jamie Cunningham
 """
 
 import numpy as np
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
+from corl.simulators.common_platform_utils import get_platform_by_name
 
 
 def velocity_limit(state, agent_name, velocity_threshold, threshold_distance, mean_motion, slope=2.0):
@@ -23,7 +23,6 @@ def velocity_limit(state, agent_name, velocity_threshold, threshold_distance, me
     threshold_distance: float
         The radius of the docking region
     mean_motion: float
-
     slope: float
         The slope of the linear velocity limit as a function of distance from docking region
 
@@ -55,7 +54,6 @@ def max_vel_violation(state, agent_name, velocity_threshold, threshold_distance,
     threshold_distance: float
         The radius of the docking region
     mean_motion: float
-
     lower_bound: bool
         If True, the function enforces a minimum velocity constraint on the agent's platform
     slope: float
