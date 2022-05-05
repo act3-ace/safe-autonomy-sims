@@ -25,16 +25,20 @@
         "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": 100,
-      "y": 100,
-      "z": 100,
+      "x": -5000,
+      "y": 6000,
+      "z": 6000,
       "xdot": 0,
       "ydot": 0,
       "zdot": 0,
     },
     "glues": [
         {
-            "functor": "saferl.core.glues.rta_glue.RTAGlue",
+            # "functor": "saferl.core.glues.rta_glue.RTAGlue",
+            "functor": "saferl.core.rta.cwh.cwh_rta.RTAGlueCWHDocking3d",
+            "config": {
+                "step_size": 1,
+            },
             "wrapped": [
                 {
                     "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
@@ -73,7 +77,7 @@
             "config": {
               "sensor": "Sensor_Position",
               "normalization": {
-                "enabled": True,
+                "enabled": False,
                 "mu": 0,
                 "sigma": [100, 100, 100],
               }
@@ -84,7 +88,7 @@
             "config": {
               "sensor": "Sensor_Velocity",
               "normalization": {
-                "enabled": True,
+                "enabled": False,
                 "mu": 0,
                 "sigma": [0.5, 0.5, 0.5],
               }
