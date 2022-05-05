@@ -18,7 +18,6 @@ site_description: "The following python project creates a python interface for t
 
 plugins:
   - search
-  - macros
   - mkdocstrings:
       handlers:
         python:
@@ -28,8 +27,6 @@ plugins:
   - gen-files:
       scripts:
         - docs/gen_ref_nav.py  # or any other name or path
-  # - literate-nav:
-  #   nav_file: reference/SUMMARY.md
   - section-index
   - pdf-export:
       verbose: true
