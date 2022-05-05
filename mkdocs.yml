@@ -101,6 +101,7 @@ nav:
   - "Introduction": index.md
   - "About": about.md
   - "Install": install.md
+  - "Tasks": tasks.md
 #  - "Changelog": change_log.md
   - "License": license.md
   - "API":
