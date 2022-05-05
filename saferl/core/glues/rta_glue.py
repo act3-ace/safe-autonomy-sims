@@ -1,6 +1,7 @@
 """
 Glue containing RTA module for filtering actions.
 """
+import abc
 import typing
 from collections import OrderedDict
 
@@ -10,7 +11,9 @@ from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMult
 from act3_rl_core.glues.common.controller_glue import ControllerGlue
 from pydantic import PyObject
 
-from saferl.core.rta.cwh.cwh_rta import DockingRTA
+from run_time_assurance.rta import RTAModule
+
+# from saferl.core.rta.cwh.cwh_rta import DockingRTA
 
 
 def flip_rta(control):
@@ -36,9 +39,11 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
     """
     Validator for RTAGlue class.
 
+    step_size: duration in seconds that agent's action will be applied
     rta: RTA module which filters actions based on a safety function
     """
-    rta: PyObject = DockingRTA
+    step_size: float
+    rta: PyObject = None
 
 
 class RTAGlue(BaseMultiWrapperGlue):
@@ -50,35 +55,78 @@ class RTAGlue(BaseMultiWrapperGlue):
         self.config: RTAGlueValidator
         super().__init__(**kwargs)
         self.controller_glues = self._get_controller_glues(self)
-        self.config.rta = self.config.rta()
+        self.rta = self._instantiate_rta_module()
+        self.filtered_action = None
 
     @property
     def get_validator(cls):
         return RTAGlueValidator
 
     def get_unique_name(self) -> str:
-        return "RTAFilter"
+        return "RTAModule"
 
     def action_space(self) -> gym.spaces.Space:
-        action_space_dict = {}
         action_spaces = [glue.action_space() for glue in self.glues()]
-        action_space_dict[self.config.name] = gym.spaces.tuple.Tuple(tuple(action_spaces))
-        return gym.spaces.Dict(action_space_dict)
+        return gym.spaces.tuple.Tuple(tuple(action_spaces))
+
+    def controller_glue_action_space(self) -> gym.spaces.tuple.Tuple:
+        """
+        Compiles the action spaces for the terminal control glues for each wrapped chain of glues
+        i.e. compiles the action spaces that directly interface with the platform actuators
+
+        Returns
+        -------
+        gym.spaces.Space
+            The gym Space that defines the actions given to the apply_action function for the wrapped terminal controller glues
+        """
+        action_spaces = [controller_glue.action_space() for controller_glue in self.controller_glues]
+        return action_spaces
 
     def apply_action(self, action: typing.Union[np.ndarray, typing.Tuple, typing.Dict], observation: typing.Dict) -> None:
-        assert isinstance(action, dict)  # TODO: Support all action types
-        action = next(iter(action.values()))
-        for i in range(len(self.glues())):  # TODO: Don't assume glue/action ordering
+        assert isinstance(action, tuple)
+
+        for i in range(len(self.glues())):
             self.glues()[i].apply_action(action[i], observation)
-        filtered_action = self.rta.filter_action(self._get_stored_action(), observation)
-        for controller_glue in self.controller_glues:
-            controller_glue.apply_action(filtered_action, observation)
+
+        desired_action = self._get_stored_action()
+        filtered_action = self._filter_action(desired_action, observation)
+
+        for controller_glue, controller_filtered_action in zip(self.controller_glues, filtered_action):
+            controller_glue.apply_action(controller_filtered_action, observation)
+
+    def _filter_action(self, desired_action: OrderedDict, observation: typing.Dict) -> OrderedDict:
+        rta_state_vector = self._get_rta_state_vector(observation)
+        rta_action_vector = self._get_action_vector_from_action(desired_action)
+        filtered_action_vector =  self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
+        return self._get_action_from_action_vector(filtered_action_vector)
+
+    @abc.abstractmethod
+    def _get_rta_state_vector(self, observation: typing.Dict) -> np.ndarray:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _get_action_vector_from_action(self, action: OrderedDict) -> np.ndarray:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _get_action_from_action_vector(self, action_vector: np.ndarray) -> OrderedDict:
+        raise NotImplementedError
+
+    def _instantiate_rta_module(self) -> RTAModule:
+        return self.config.rta()
 
     def observation_space(self):
         return None
 
     def get_observation(self):
         return None
+
+    def get_info_dict(self):
+        return {
+            "actual control": self.rta.control_actual,
+            "desired control": self.rta.control_desired,
+            "intervening": self.rta.intervening,
+        }
 
     def _get_controller_glues(self, glue):
         controller_glues = []
@@ -91,19 +139,8 @@ class RTAGlue(BaseMultiWrapperGlue):
         return controller_glues
 
     def _get_stored_action(self):
-        stored_action = OrderedDict()
+        stored_action = []
         for controller_glue in self.controller_glues:
             applied_action = controller_glue.get_applied_control()
-            stored_action.update(applied_action)
-        return stored_action
-
-    @property
-    def rta(self):
-        """
-        RTA function attached to glue
-
-        Returns
-        -------
-            RTA function attached to glue.
-        """
-        return self.config.rta
+            stored_action.append(applied_action)
+        return tuple(stored_action)

@@ -110,14 +110,12 @@ class RTAPolicyValidator(BasePolicyValidator):
 def make_action(agent_name, x_thrust, y_thrust, z_thrust):
     action = {
         agent_name: {
-            "RTAGlue": {
-                "RTAGlue":
-                    (
-                        {'x_thrust': np.array([x_thrust], dtype=np.float32)},
-                        {'y_thrust': np.array([y_thrust], dtype=np.float32)},
-                        {'z_thrust': np.array([z_thrust], dtype=np.float32)},
-                    )
-            }
+            "RTAModule":
+                (
+                    {'x_thrust': np.array([x_thrust], dtype=np.float32)},
+                    {'y_thrust': np.array([y_thrust], dtype=np.float32)},
+                    {'z_thrust': np.array([z_thrust], dtype=np.float32)},
+                )
         }
     }
     return action
@@ -222,72 +220,154 @@ class RTAExperiment(BaseExperiment):
         #actions = [make_action('blue0',-1.0,1.0,2.0),make_action('blue0',-3.0,2.0,2.0),make_action('blue0',-1.0,1.0,4.0)]
         # make sure you have a list of actions i.e. ordered dicts
 
-        actions = []
-        for i in range(num_steps):
-            actions.append(make_action("blue0", 0.05, .1, 0))
+        agent = args.agent_config[0][0]
+        data = []
+        controller = TestController()
+        done = False
+        i = 0
 
+        intervening_list = []
 
-        all_data = []
-
-        for i in range(num_steps):
-            if i == 500:
+        while not done:
+            
+            if i == 999:
                 print(1)
-            data = env.step(actions[i])
-            print(data)
+            
+            position = obs[agent]["ObserveSensor_Sensor_Position"]["direct_observation"]
+            velocity = obs[agent]["ObserveSensor_Sensor_Velocity"]["direct_observation"]
+            state = np.concatenate((position, velocity))
+
+            u_des = controller.compute_feedback_control(state)
+
+            action = make_action(agent, *u_des)
+            obs, rewards, dones, info = env.step(action)
+
+            intervening = info['blue0']['RTAModule']['intervening']
+            control_actual = info['blue0']['RTAModule']['actual control']
+            control_desired = info['blue0']['RTAModule']['desired control']
+
+            done = dones['__all__']
+
+            step_data = {
+                'state': state,
+                'intervening': intervening,
+                'control': control_actual,
+            }
             print('completed step=', i)
-            all_data.append(data)
+            data.append(step_data)
+            i += 1
 
         # loop thru list and call step
         # test with normal docking config
 
-        self.plot_pos_vel(all_data)
+        self.plot_pos_vel(data)
 
     def plot_pos_vel(self, data):
         from matplotlib import pyplot as plt
 
-        fig, ((pos_ax, pos_vel_ax), (vel_x_ax, vel_y_ax)) = plt.subplots(2,2)
+        states = np.empty([len(data), 6])
+        control = np.empty([len(data), 3])
+        intervening = np.empty([len(data)])
+        for i in range(len(data)):
+            states[i, :] = data[i]['state']
+            control[i, :] = data[i]['control']
+            intervening[i] = data[i]['intervening']
 
-        pos_x = [d[0]["blue0"]["ObserveSensor_Sensor_Position"]["direct_observation"][0] for d in data]
-        pos_y = [d[0]["blue0"]["ObserveSensor_Sensor_Position"]["direct_observation"][1] for d in data]
-        pos_ax.plot(pos_x, pos_y)
-        pos_ax.set_title("Position")
-        pos_ax.set_xlabel("x")
-        pos_ax.set_ylabel("y")
+        fig = plt.figure()
+        fig.set_figwidth(15)
+        fig.set_figheight(10)
+        ax1 = fig.add_subplot(231, projection='3d')
+        ax2 = fig.add_subplot(232)
+        ax3 = fig.add_subplot(233)
+        ax4 = fig.add_subplot(234)
+        ax5 = fig.add_subplot(235)
+        ax6 = fig.add_subplot(236)
 
-        vel_x = [i for i in range(len(data))]
-        vel_x_y = [d[0]["blue0"]["ObserveSensor_Sensor_Velocity"]["direct_observation"][0] for d in data]
-        self.plot_constraint_line(vel_x_ax, vel_x, [10 for _ in range(len(vel_x))])
-        self.plot_constraint_line(vel_x_ax, vel_x, [-10 for _ in range(len(vel_x))])
-        vel_x_ax.plot(vel_x, vel_x_y)
-        vel_span = max(vel_x_y) - min(vel_x_y)
-        vel_x_ax.set_ylim(min(vel_x_y)-.1*vel_span, max(vel_x_y)+.1*vel_span)
-        vel_x_ax.set_title("X Velocity")
-        vel_x_ax.set_xlabel("time")
-        vel_x_ax.set_ylabel("x velocity")
+        max = np.max(np.abs(states[:, 0:3]))*1.1
+        RTAon = np.ma.masked_where(intervening != 1, states[:, 1])
+        ax1.plot(0, 0, 'kx')
+        ax1.plot(states[0, 0], states[0, 1], states[0, 2], 'r+')
+        ax1.plot(states[:, 0], states[:, 1], states[:, 2], 'b')
+        ax1.plot(states[:, 0], RTAon, states[:, 2], 'c')
+        ax1.set_xlim([-max, max])
+        ax1.set_ylim([-max, max])
+        ax1.set_zlim([-max, max])
+        ax1.set_xlabel('x')
+        ax1.set_ylabel('y')
+        ax1.set_zlabel('y')
+        ax1.set_title('Trajectory')
+        ax1.grid(True)
 
-        vel_y_y = [d[0]["blue0"]["ObserveSensor_Sensor_Velocity"]["direct_observation"][1] for d in data]
-        self.plot_constraint_line(vel_y_ax, vel_x, [10 for _ in range(len(vel_x))])
-        self.plot_constraint_line(vel_y_ax, vel_x, [-10 for _ in range(len(vel_x))])
-        vel_y_ax.plot(vel_x, vel_y_y)
-        vel_span = max(vel_y_y) - min(vel_y_y)
-        vel_y_ax.set_ylim(min(vel_y_y)-.1*vel_span, max(vel_y_y)+.1*vel_span)
-        vel_y_ax.set_title("Y Velocity")
-        vel_y_ax.set_xlabel("time")
-        vel_y_ax.set_ylabel("y velocity")
+        v = np.empty([len(states), 2])
+        for i in range(len(states)):
+            v[i, :] = [np.linalg.norm(states[i, 0:3]), np.linalg.norm(states[i, 3:6])]
+        RTAon = np.ma.masked_where(intervening != 1, v[:, 1])
+        ax2.plot([0, 15000], [0.2, 0.2+4*0.001027*15000], 'g--')
+        ax2.plot(v[:, 0], v[:, 1], 'b')
+        ax2.plot(v[:, 0], RTAon, 'c')
+        ax2.set_xlim([0, np.max(v[:, 0])*1.1])
+        ax2.set_ylim([0, np.max(v[:, 1])*1.1])
+        ax2.set_xlabel('Relative Position')
+        ax2.set_ylabel('Relative Velocity')
+        ax2.set_title('Distance Dependent Speed Limit')
+        ax2.grid(True)
 
-        vel_t = np.sqrt(np.array(vel_x_y, dtype=float)**2 + np.array(vel_y_y, dtype=float)**2)
-        r_t = np.sqrt(np.array(pos_x, dtype=float)**2 + np.array(pos_y, dtype=float)**2)
-        vel_limit_nmt = 0.2 + r_t * 2 * 0.001027
-        self.plot_constraint_line(pos_vel_ax, r_t, vel_limit_nmt)
-        self.plot_constraint_line(pos_vel_ax, r_t, [10 for _ in range(len(r_t))])
-        self.plot_constraint_line(pos_vel_ax, r_t, [-10 for _ in range(len(r_t))])
-        pos_vel_ax.plot(r_t, vel_t)
-        vel_span = max(vel_t) - min(vel_t)
-        pos_vel_ax.set_ylim(min(vel_t)-.1*vel_span, max(vel_t)+.1*vel_span)
-        pos_vel_ax.set_title("Velocity vs Distance to Chief")
-        pos_vel_ax.set_xlabel("distance")
-        pos_vel_ax.set_ylabel("velocity")
+        ax3.plot(0, 0, 'kx')
+        ax3.plot(0, 0, 'r+')
+        ax3.plot(0, 0, 'g')
+        ax3.plot(0, 0, 'b')
+        ax3.plot(0, 0, 'c')
+        ax3.legend(['Chief', 'Deputy Initial Position', 'Constraint', 'RTA Not Intervening', 'RTA Intervening'])
+        ax3.axis('off')
+        ax3.set_xlim([1, 2])
+        ax3.set_ylim([1, 2])
 
+        RTAonx = np.ma.masked_where(intervening != 1, states[:, 3])
+        RTAony = np.ma.masked_where(intervening != 1, states[:, 4])
+        RTAonz = np.ma.masked_where(intervening != 1, states[:, 5])
+        ax4.plot([0, len(states)*1.1], [10, 10], 'g--')
+        ax4.plot([0, len(states)*1.1], [-10, -10], 'g--')
+        ax4.plot(range(len(states)), states[:, 3], 'b')
+        ax4.plot(range(len(states)), RTAonx, 'c')
+        ax4.plot(range(len(states)), states[:, 4], 'r')
+        ax4.plot(range(len(states)), RTAony, 'tab:orange')
+        ax4.plot(range(len(states)), states[:, 5], 'tab:brown')
+        ax4.plot(range(len(states)), RTAonz, 'tab:green')
+        ax4.set_xlim([0, len(states)*1.1])
+        ax4.set_xlabel('Time Steps')
+        ax4.set_ylabel('Velocity')
+        ax4.set_title('Max Velocity Constraint')
+        ax4.grid(True)
+
+        RTAonx = np.ma.masked_where(intervening != 1, control[:, 0])
+        RTAony = np.ma.masked_where(intervening != 1, control[:, 1])
+        RTAonz = np.ma.masked_where(intervening != 1, control[:, 2])
+        ax5.plot([0, len(control)*1.1], [1, 1], 'g--')
+        ax5.plot([0, len(control)*1.1], [-1, -1], 'g--')
+        ax5.plot(range(len(control)), control[:, 0], 'b')
+        ax5.plot(range(len(control)), RTAonx, 'c')
+        ax5.plot(range(len(control)), control[:, 1], 'r')
+        ax5.plot(range(len(control)), RTAony, 'tab:orange')
+        ax5.plot(range(len(control)), control[:, 2], 'tab:brown')
+        ax5.plot(range(len(control)), RTAonz, 'tab:green')
+        ax5.set_xlim([0, len(control)*1.1])
+        ax5.set_xlabel('Time Steps')
+        ax5.set_ylabel('Force')
+        ax5.set_title('Actions')
+        ax5.grid(True)
+
+        ax6.plot(0, 0, 'g--')
+        ax6.plot(0, 0, 'b')
+        ax6.plot(0, 0, 'c')
+        ax6.plot(0, 0, 'r')
+        ax6.plot(0, 0, 'tab:orange')
+        ax6.plot(0, 0, 'tab:brown')
+        ax6.plot(0, 0, 'tab:green')
+        ax6.legend(['Constraint', 'vx/Fx: RTA Not Intervening', 'vx/Fx: RTA Intervening', 'vy/Fy: RTA Not Intervening',
+                    'vy/Fy: RTA Intervening', 'vz/Fz: RTA Not Intervening', 'vz/Fz: RTA Intervening'])
+        ax6.axis('off')
+        ax6.set_xlim([1, 2])
+        ax6.set_ylim([1, 2])
 
         # plt.show()
         plt.savefig('rta_test.png')
@@ -385,6 +465,38 @@ class MainUtilACT3Core:
         parser.add_argument('--verbose', type=int, default=1)
 
         return parser.parse_args(args=alternate_argv)
+
+
+class TestController():
+    def __init__(self, m = 12, n = 0.001027):
+        # Define in-plane CWH Dynamics
+        A = np.array([[0, 0, 0, 1, 0, 0],
+                      [0, 0, 0, 0, 1, 0],
+                      [0, 0, 0, 0, 0, 1],
+                      [3*n**2, 0, 0, 0, 2*n, 0],
+                      [0, 0, 0, -2*n, 0, 0],
+                      [0, 0, -n**2, 0, 0, 0]])
+        B = np.array([[0, 0, 0],
+                      [0, 0, 0],
+                      [0, 0, 0],
+                      [1/m, 0, 0],
+                      [0, 1/m, 0],
+                      [0, 0, 1/m]])
+
+        # Specify LQR gains
+        Q = np.multiply(.050, np.eye(6))   # State cost
+        R = np.multiply(1000, np.eye(3))   # Control cost
+
+        # Solve ARE
+        Xare = np.matrix(scipy.linalg.solve_continuous_are(A, B, Q, R))
+        # Compute the LQR gain
+        K = np.matrix(scipy.linalg.inv(R)*(B.T*Xare))
+        # Change to Array
+        self.Klqr = -np.squeeze(np.asarray(K))
+
+    def compute_feedback_control(self, x0):
+        u = np.matmul(self.Klqr, x0)
+        return np.clip(u, -1, 1)
 
 
 def main():
