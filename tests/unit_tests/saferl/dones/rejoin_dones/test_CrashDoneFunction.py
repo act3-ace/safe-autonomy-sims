@@ -80,7 +80,7 @@ def fixture_cut(cut_name, agent_name, lead_name, safety_margin):
         An instantiated component under test
     """
 
-    return CrashDoneFunction(name=cut_name, agent_name=agent_name, safety_margin=safety_margin, lead=lead_name)
+    return CrashDoneFunction(name=cut_name, agent_name=agent_name, platform_name=agent_name, safety_margin=safety_margin, lead=lead_name)
 
 
 @pytest.fixture(name='call_results')
@@ -104,7 +104,6 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         The mock wingman to be returned to the CrashDoneFunction when it uses get_platform_by_name()
     lead : MagicMock
         The mock lead to be returned to the CrashDoneFunction when it uses get_platform_by_name()
-
 
     Returns
     -------

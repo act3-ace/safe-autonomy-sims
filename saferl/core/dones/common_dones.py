@@ -2,9 +2,9 @@
 This module contains functions that define common terminal conditions across environments.
 """
 
-from act3_rl_core.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
-from act3_rl_core.libraries.environment_dict import DoneDict
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
+from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
+from corl.libraries.environment_dict import DoneDict
+from corl.simulators.common_platform_utils import get_platform_by_name
 
 
 class TimeoutDoneValidator(DoneFuncBaseValidator):
@@ -26,8 +26,8 @@ class TimeoutDoneFunction(DoneFuncBase):
     @property
     def get_validator(cls):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -39,8 +39,8 @@ class TimeoutDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -52,8 +52,8 @@ class TimeoutDoneFunction(DoneFuncBase):
 
         Returns
         -------
-            done : DoneDict
-                dictionary containing the done condition for the current agent.
+        done : DoneDict
+            dictionary containing the done condition for the current agent.
         """
 
         done = DoneDict()

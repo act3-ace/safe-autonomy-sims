@@ -137,7 +137,14 @@ def fixture_cut(cut_name, agent_name, lead_name, radius, offset, step_size, succ
     """
 
     return RejoinSuccessDone(
-        name=cut_name, agent_name=agent_name, radius=radius, lead=lead_name, offset=offset, step_size=step_size, success_time=success_time
+        name=cut_name,
+        agent_name=agent_name,
+        platform_name=agent_name,
+        radius=radius,
+        lead=lead_name,
+        offset=offset,
+        step_size=step_size,
+        success_time=success_time
     )
 
 
@@ -162,7 +169,6 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         The mock wingman to be returned to the SuccessfulRejoinDoneFunction when it uses get_platform_by_name()
     lead : MagicMock
         The mock lead to be returned to the SuccessfulRejoinDoneFunction when it uses get_platform_by_name()
-
 
     Returns
     -------

@@ -6,8 +6,8 @@ Author: Jamie Cunningham
 
 import typing
 
-from act3_rl_core.glues.base_glue import BaseAgentGlueValidator
-from act3_rl_core.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
+from corl.glues.base_glue import BaseAgentGlueValidator
+from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
 
 from saferl.core.glues.normal.normal_glue import NormalGlue, NormalGlueNormalizationValidator
 

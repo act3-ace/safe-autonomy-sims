@@ -27,7 +27,6 @@ def fixture_lead(mocker, lead_position, lead_orientation, lead_name):
     lead_name : str
         The name of the agent
 
-
     Returns
     -------
     test_lead_platform : MagicMock

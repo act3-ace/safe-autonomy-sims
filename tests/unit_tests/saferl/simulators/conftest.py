@@ -19,5 +19,6 @@ def entity_config(request):
     Returns
     -------
 
+
     """
     return request.param
