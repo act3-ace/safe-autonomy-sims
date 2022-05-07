@@ -101,6 +101,7 @@ nav:
   - "Introduction": index.md
   - "About": about.md
   - "Install": install.md
+  - "Concepts": concepts.md
   - "Tasks":
       - tasks/index.md
       - "2D Dubins Rejoin": tasks/2d_rejoin_task.md
