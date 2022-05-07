@@ -103,6 +103,8 @@ nav:
   - "Install": install.md
 #  - "Changelog": change_log.md
   - "License": license.md
+  - "Concepts":
+      - concepts.md
   - "API":
 #      - reference/SUMMARY.md  # API "Table of Contents"
       - api/index.md
