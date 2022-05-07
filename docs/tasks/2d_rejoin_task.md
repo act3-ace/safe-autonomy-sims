@@ -1,8 +1,6 @@
-#Tasks
+# 2D Dubins Rejoin
 
-## 2D Dubins Rejoin
-
-### Description
+## Description
 
 This task challenges an ML agent to learn to perform a basic maneuver
 used in aircraft formation flight: the rejoin. Default rejoin environments
@@ -16,7 +14,7 @@ include throttle and heading turn rate. The agent wingman must remain in formati
 for a specified amount of time in order to succeed.
 
 
-### Training
+## Training
 
 To launch a training loop, the module `corl/train_rl.py` in the `corl/` repository 
 is used. This module must be passed the necessary experiment config file at launch. 

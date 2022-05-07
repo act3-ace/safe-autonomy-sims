@@ -101,7 +101,9 @@ nav:
   - "Introduction": index.md
   - "About": about.md
   - "Install": install.md
-  - "Tasks": tasks.md
+  - "Tasks":
+      - tasks/index.md
+      - "2D Dubins Rejoin": tasks/2d_rejoin_task.md
 #  - "Changelog": change_log.md
   - "License": license.md
   - "Concepts":
