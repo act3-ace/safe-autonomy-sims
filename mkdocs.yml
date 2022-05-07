@@ -105,9 +105,7 @@ nav:
   - "License": license.md
   - "Concepts":
       - concepts.md
-  - change_log.md
   - license.md
-  - reference/SUMMARY.md
   - "API":
 #      - reference/SUMMARY.md  # API "Table of Contents"
       - api/index.md
