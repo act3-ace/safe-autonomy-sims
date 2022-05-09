@@ -106,6 +106,7 @@ nav:
       - tasks/index.md
       - "2D Dubins Rejoin": tasks/2d_rejoin_task.md
       - "3D Dubins Rejoin": tasks/3d_rejoin_task.md
+      - "3D CWH Docking": tasks/3d_docking_task.md
 #  - "Changelog": change_log.md
   - "License": license.md
   - "API":
