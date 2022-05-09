@@ -1,5 +1,5 @@
 """
-This module provides base implentations for entities in the saferl simulator
+This module provides base implentations for entities in the saferl simulator.
 """
 
 import abc
@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 
 class BaseEntityValidator(BaseModel):
-    """Validator for BaseEntity's config member
+    """Validator for BaseEntity's config member.
 
     Parameters
     ----------
@@ -23,7 +23,7 @@ class BaseEntityValidator(BaseModel):
 
 
 class BaseEntity(abc.ABC):
-    """Base implementation of a dynamics controlled entity within the saferl sim
+    """Base implementation of a dynamics controlled entity within the saferl sim.
 
     Parameters
     ----------
@@ -62,7 +62,7 @@ class BaseEntity(abc.ABC):
         raise NotImplementedError
 
     def step(self, step_size, action=None):
-        """Executes a state transition simulation step for the entity
+        """Executes a state transition simulation step for the entity.
 
         Parameters
         ----------
@@ -109,7 +109,8 @@ class BaseEntity(abc.ABC):
 
     @property
     def state(self) -> np.ndarray:
-        """Returns copy of entity's state vector
+        """
+        Returns copy of entity's state vector.
 
         Returns
         -------
@@ -149,7 +150,7 @@ class BaseEntity(abc.ABC):
     @property
     @abc.abstractmethod
     def orientation(self) -> scipy.spatial.transform.Rotation:
-        """get orientation of entity
+        """get orientation of entity.
 
         Returns
         -------
