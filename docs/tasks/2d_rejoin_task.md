@@ -21,6 +21,5 @@ is used. This module must be passed the necessary experiment config file at laun
 From the root of the repository, execute the following command:
 
 ```commandline
-python -m corl.train_rl --cfg /path/to/safe-autonomy-sims/configs/experiments/dubins2d.yml
+python -m corl.train_rl --cfg /path/to/safe-autonomy-sims/configs/experiments/rejoin/rejoin2d/rejoin_2d.yml
 ```
-
