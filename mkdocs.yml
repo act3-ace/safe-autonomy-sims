@@ -113,14 +113,9 @@ nav:
       - api/index.md
       - "backend":
           - api/backend/index.md
-          - "base_models":
-              - api/backend/base_models/index.md
-              - "entities":
-                  - reference/backend/base_models/entities.md
-              - "cwh entities":
-                  - reference/backend/cwh/cwh.md
-              - "dubins entities":
-                  - reference/backend/dubins/entities.md
+          - "entities": reference/backend/base_models/entities.md
+          - "cwh entities": reference/backend/cwh/cwh.md
+          - "dubins entities": reference/backend/dubins/entities.md
       - "core":
           - api/core/index.md
           - "agents":
