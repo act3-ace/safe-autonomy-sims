@@ -1,5 +1,5 @@
 """
-This module provides base implentations for entities in the saferl simulator.
+This module provides base implementations for entities in the saferl simulator.
 """
 
 import abc
@@ -12,29 +12,31 @@ from pydantic import BaseModel
 
 
 class BaseEntityValidator(BaseModel):
-    """Validator for BaseEntity's config member.
+    """
+    Validator for BaseEntity's config member.
 
     Parameters
     ----------
     name : str
-        name of entity
+        Name of entity
     """
     name: str
 
 
 class BaseEntity(abc.ABC):
-    """Base implementation of a dynamics controlled entity within the saferl sim.
+    """
+    Base implementation of a dynamics controlled entity within the saferl sim.
 
     Parameters
     ----------
     dynamics : BaseDynamics
-        dynamics object for computing state transitions
+        Dynamics object for computing state transitions
     control_default: np.ndarray
-        default control vector used when no action is passed to step(). Typically 0 or neutral for each actuator.
+        Default control vector used when no action is passed to step(). Typically 0 or neutral for each actuator.
     control_min: np.ndarray
-        minimum allowable control vector values. Control vectors that exceed this limit are clipped.
+        Optional minimum allowable control vector values. Control vectors that exceed this limit are clipped.
     control_max: np.ndarray
-        maximum allowable control vector values. Control vectors that exceed this limit are clipped.
+        Optional maximum allowable control vector values. Control vectors that exceed this limit are clipped.
     control_map: dict
         Optional mapping for actuator names to their indices in the state vector.
         Allows dictionary action inputs in step().
@@ -62,12 +64,13 @@ class BaseEntity(abc.ABC):
         raise NotImplementedError
 
     def step(self, step_size, action=None):
-        """Executes a state transition simulation step for the entity.
+        """
+        Executes a state transition simulation step for the entity.
 
         Parameters
         ----------
         step_size : float
-            duration of simulation step in seconds
+            Duration of simulation step in seconds
         action : Union(dict, list, np.ndarray), optional
             Control action taken by entity, by default None resulting in a control of control_default
             When list or ndarray, directly used and control vector for dynamics model
@@ -150,12 +153,13 @@ class BaseEntity(abc.ABC):
     @property
     @abc.abstractmethod
     def orientation(self) -> scipy.spatial.transform.Rotation:
-        """get orientation of entity.
+        """
+        Get orientation of entity.
 
         Returns
         -------
         scipy.spatial.transform.Rotation
-            Rotation tranformation of the entity's local reference frame basis vectors in the global reference frame.
+            Rotation transformation of the entity's local reference frame basis vectors in the global reference frame.
             i.e. applying this rotation to [1, 0, 0] yields the entity's local x-axis in the global frame.
         """
         raise NotImplementedError
@@ -163,13 +167,14 @@ class BaseEntity(abc.ABC):
     @property
     @abc.abstractmethod
     def velocity(self):
-        """get 3d velocity vector"""
+        """Get 3d velocity vector"""
         raise NotImplementedError
 
 
 class BaseDynamics(abc.ABC):
     """
-    State transition implementation for a physics dynamics model. Used by entities to compute their next state while stepping.
+    State transition implementation for a physics dynamics model. Used by entities to compute their next state when
+    their step() method is called.
 
     Parameters
     ----------
@@ -199,12 +204,13 @@ class BaseDynamics(abc.ABC):
         self.angle_wrap_centers = angle_wrap_centers
 
     def step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Computes the dynamics state transition from the current state and control input
+        """
+        Computes the dynamics state transition from the current state and control input.
 
         Parameters
         ----------
         step_size : float
-            Duration of the simation step in seconds.
+            Duration of the simulation step in seconds.
         state : np.ndarray
             Current state of the system at the beginning of the simulation step.
         control : np.ndarray
@@ -213,7 +219,7 @@ class BaseDynamics(abc.ABC):
         Returns
         -------
         Tuple[np.ndarray, np.ndarray]
-            tuple of the systems's next state and the state's instantaneous time derivative at the end of the step
+            Tuple of the system's next state and the state's instantaneous time derivative at the end of the step
         """
         next_state, state_dot = self._step(step_size, state, control)
         next_state = np.clip(next_state, self.state_min, self.state_max)
@@ -243,7 +249,7 @@ class BaseODESolverDynamics(BaseDynamics):
     Parameters
     ----------
     integration_method : string
-        Numerical integration method used by dyanmics solver. One of ['RK45', 'Euler'].
+        Numerical integration method used by dynamics solver. One of ['RK45', 'Euler'].
         'RK45' is slow but very accurate.
         'Euler' is fast but very inaccurate.
     kwargs
@@ -255,7 +261,8 @@ class BaseODESolverDynamics(BaseDynamics):
         super().__init__(**kwargs)
 
     def compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
-        """Computes the instataneous time derivative of the state vector
+        """
+        Computes the instantaneous time derivative of the state vector
 
         Parameters
         ----------
@@ -322,12 +329,13 @@ class BaseLinearODESolverDynamics(BaseODESolverDynamics):
 
     @abc.abstractmethod
     def _gen_dynamics_matrices(self) -> Tuple[np.ndarray, np.ndarray]:
-        """Initializes the linear ODE matrices A, B.
+        """
+        Initializes the linear ODE matrices A, B.
 
         Returns
         -------
         Tuple[np.ndarray, np.ndarray]
-            tuple of the systems's dynamics matrices A, B.
+            Tuple of the system's dynamics matrices A, B.
         """
         raise NotImplementedError
 
