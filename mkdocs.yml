@@ -99,7 +99,6 @@ handlers:
 
 nav:
   - "Introduction": index.md
-  - "About": about.md
   - "Install": install.md
   - "Concepts": concepts.md
   - "Tasks":
