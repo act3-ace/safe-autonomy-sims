@@ -1,5 +1,6 @@
 """
-This module implements 3D a point mass spacecraft with Clohessy-Wilshire phyiscs dynamics in non-intertial orbital Hill's reference frame
+This module implements a 3D point mass spacecraft with Clohessy-Wilshire physics dynamics in non-inertial orbital
+Hill's reference frame.
 """
 
 import numpy as np
@@ -9,14 +10,15 @@ from saferl.backend.base_models.entities import BaseEntity, BaseEntityValidator,
 
 
 class CWHSpacecraftValidator(BaseEntityValidator):
-    """Validator for CWHSpacecraft kwargs
+    """
+    Validator for CWHSpacecraft kwargs.
 
     Parameters
     ----------
     position : list[float]
-        length 3 list of x, y, z position values.
+        Length 3 list of x, y, z position values.
     velocity : list[float]
-        length 3 list of x, y, z velocity values.
+        Length 3 list of x, y, z velocity values.
 
     Raises
     ------
@@ -32,7 +34,8 @@ class CWHSpacecraftValidator(BaseEntityValidator):
 
 
 class CWHSpacecraft(BaseEntity):
-    """3D point mass spacecraft with +/- xyz thrusters and Clohessy-Wiltshire dynamics in Hill's reference frame
+    """
+    3D point mass spacecraft with +/- xyz thrusters and Clohessy-Wiltshire dynamics in Hill's reference frame.
 
     States
         x
@@ -130,7 +133,8 @@ class CWHSpacecraft(BaseEntity):
 
     @property
     def orientation(self):
-        """get orientation of CWHSpacecraft. Always identity as point mass model doesn't rotate.
+        """
+        Get orientation of CWHSpacecraft, which is always an identity rotation as a point mass model doesn't rotate.
 
         Returns
         -------
@@ -143,12 +147,13 @@ class CWHSpacecraft(BaseEntity):
 
     @property
     def velocity(self):
-        """get 3d velocity vector"""
+        """Get 3d velocity vector"""
         return self._state[3:6].copy()
 
 
 class CWHDynamics(BaseLinearODESolverDynamics):
-    """State transition implementation of 3D Clohessy-Wiltshire dynamics model.
+    """
+    State transition implementation of 3D Clohessy-Wiltshire dynamics model.
 
     Parameters
     ----------
