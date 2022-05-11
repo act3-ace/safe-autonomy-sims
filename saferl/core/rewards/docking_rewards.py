@@ -16,16 +16,18 @@ from saferl.core.utils import max_vel_violation
 
 class DockingTimeRewardValidator(RewardFuncBaseValidator):
     """
-    scale: Scalar value to adjust magnitude of the reward
-    step_size: The size of one simulation step (sec)
+    scale: Scalar value to adjust magnitude of the reward.
+    step_size: The size of one simulation step (sec).
     """
     scale: float
     step_size: float
 
 
+# Change name to TimeReward?
 class DockingTimeReward(RewardFuncBase):
     """
-    This reward function allocates reward based on the time passed since the last reward was received.
+    This reward function allocates reward based on the number of time steps (BaseSimulator.step() method calls) that 
+    have passed in a single episode.
     """
 
     def __init__(self, **kwargs):
@@ -83,7 +85,7 @@ class DockingTimeReward(RewardFuncBase):
 
 class DockingDistanceChangeRewardValidator(RewardFuncBaseValidator):
     """
-    scale: Scalar value to adjust magnitude of the reward
+    scale: Scalar value to adjust magnitude of the reward.
     """
 
     scale: float
@@ -135,7 +137,7 @@ class DockingDistanceChangeReward(RewardFuncBase):
         observation_space : StateDict
             The agent's observation space.
         observation_units : StateDict
-            The units corresponding to values in the observation_space?
+            The units corresponding to keys in the observation_space.
 
         Returns
         -------

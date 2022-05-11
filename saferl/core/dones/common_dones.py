@@ -14,6 +14,7 @@ class TimeoutDoneValidator(DoneFuncBaseValidator):
     max_sim_time: float
 
 
+# TODO: remove redundant done func
 class TimeoutDoneFunction(DoneFuncBase):
     """
     A done function that determines if the max episode time has been reached.

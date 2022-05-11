@@ -1,6 +1,6 @@
 """
 Functions that define the terminal conditions for the Docking Environment.
-This in turn defines whether the end is episode is reached or not.
+This in turn defines whether the end of an episode has been reached.
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ from saferl.core.utils import max_vel_violation
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the max_distance data needed for
-    computations in the MaxDistanceDoneFucntion.
+    computations in the MaxDistanceDoneFunction.
     """
 
     max_distance: float
@@ -39,7 +39,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         Returns
         -------
         MaxDistanceDoneValidator
-            config validator for the MaxDistanceDoneFucntion
+            Config validator for the MaxDistanceDoneFucntion.
 
         """
         return MaxDistanceDoneValidator
@@ -60,8 +60,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
-
+            Dictionary containing the done condition for the current agent.
         """
 
         done = DoneDict()
@@ -98,7 +97,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
-    A done function that determines if deputy has successfully docked with the cheif or not.
+    A done function that determines if the deputy has successfully docked with the chief.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -115,7 +114,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         Returns
         -------
         SuccessfulDockingDoneValidator
-            config validator for the SuccessfulDockingDoneFunction
+            Config validator for the SuccessfulDockingDoneFunction.
 
         """
         return SuccessfulDockingDoneValidator
@@ -136,8 +135,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
-
+            Dictionary containing the done condition for the current agent.
         """
         # eventually will include velocity constraint
         done = DoneDict()
@@ -181,7 +179,7 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
 
 class DockingVelocityLimitDoneFunction(DoneFuncBase):
     """
-    This done fucntion determines whether the velocity limit has been exceeded or not.
+    This done function determines whether the velocity limit has been exceeded or not.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -197,8 +195,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        DockingVelocityLimitDoneFunctionValidator : Done Function
-            done function for the DockingVelocityLimitDoneFunction
+        DockingVelocityLimitDoneFunctionValidator : done function
+            Done function for the DockingVelocityLimitDoneFunction.
         """
         return DockingVelocityLimitDoneFunctionValidator
 
@@ -218,7 +216,7 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
+            Dictionary containing the done condition for the current agent.
         """
 
         done = DoneDict()
@@ -242,7 +240,7 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
 class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
     """
-    This class validates that the config contains essential peices of data for the done function
+    This class validates that the config contains essential data for the done function.
     """
     velocity_threshold: float
     threshold_distance: float
@@ -254,7 +252,8 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
 # needs a reference object
 class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     """
-    A done function that checks if the docking velocity relative to a target object has exceeded a certain specified threshold velocity.
+    A done function that checks if the docking velocity relative to a target object has exceeded a certain specified 
+    threshold velocity.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -291,7 +290,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
+            Dictionary containing the done condition for the current agent.
         """
         # eventually will include velocity constraint
         done = DoneDict()
@@ -317,7 +316,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 class CrashDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
-    computations in the SuccessfulDockingDoneFunction.
+    computations in the CrashDockingDoneValidator.
     """
 
     docking_region_radius: float
@@ -330,7 +329,7 @@ class CrashDockingDoneValidator(DoneFuncBaseValidator):
 
 class CrashDockingDoneFunction(DoneFuncBase):
     """
-    A done function that determines if deputy has successfully docked with the cheif or not.
+    A done function that determines if deputy has crashed with the chief (at origin).
     """
 
     def __init__(self, **kwargs) -> None:
@@ -346,8 +345,8 @@ class CrashDockingDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        SuccessfulDockingDoneValidator
-            config validator for the SuccessfulDockingDoneFunction
+        CrashDockingDoneValidator
+            Config validator for the CrashDockingDoneFunction.
 
         """
         return CrashDockingDoneValidator
@@ -368,7 +367,7 @@ class CrashDockingDoneFunction(DoneFuncBase):
         Returns
         -------
         done : DoneDict
-            dictionary containing the condition condition for the current agent
+            Dictionary containing the done condition for the current agent.
 
         """
         done = DoneDict()
