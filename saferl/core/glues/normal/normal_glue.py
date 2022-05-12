@@ -22,21 +22,21 @@ def normalize_space_from_mu_sigma(
     sigma: float = 1.0,
 ) -> gym.spaces.Space:
     """
-    Normalizes a given gym box using the provided mu and sigma
+    Normalizes a given gym box using the provided mu and sigma.
 
     Parameters
     ----------
     space_likes: typing.Tuple[gym.spaces.Space]
-        the gym space to turn all boxes into the scaled space
+        The gym space to turn all boxes into the scaled space.
     mu: float = 0.0
-        mu for normalization
+        Mu for normalization.
     sigma: float = 1.0
-        sigma for normalization
+        Sigma for normalization.
 
     Returns
     -------
     gym.spaces.Space:
-        the new gym spaces where all boxes have had their bounds changed
+        The new gym spaces where all boxes have had their bounds changed.
     """
     space_arg = space_likes[0]
     if isinstance(space_arg, gym.spaces.Box):
@@ -52,22 +52,22 @@ def normalize_sample_from_mu_sigma(
     sigma: float = 1,
 ) -> typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
     """
-    This normalizes a sample from a box space using the mu and sigma arguments
+    This normalizes a sample from a box space using the mu and sigma arguments.
 
     Parameters
     ----------
     space_likes: typing.Tuple[gym.spaces.Space, sample_type]
-        the first is the gym space
-        the second is the sample of this space to scale
+        The first element is the gym space.
+        The second element is the sample of this space to scale.
     mu: float
-        the mu used for normalizing the sample
+        The mu used for normalizing the sample.
     sigma: float
-        the sigma used for normalizing the sample
+        The sigma used for normalizing the sample.
 
     Returns
     -------
     typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
-        the normalized sample
+        The normalized sample.
     """
     (space_arg, space_sample_arg) = space_likes
     if isinstance(space_arg, gym.spaces.Box):
@@ -84,22 +84,22 @@ def unnormalize_sample_from_mu_sigma(
     sigma: float = 1,
 ) -> typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
     """
-    This unnormalizes a sample from a box space using the mu and sigma arguments
+    This unnormalizes a sample from a box space using the mu and sigma arguments.
 
     Parameters
     ----------
     space_likes: typing.Tuple[gym.spaces.Space, sample_type]
-        the first is the gym space
-        the second is the sample of this space to scale
+        The first element is the gym space.
+        The second element is the sample of this space to scale.
     mu: float
-        the mu used for unnormalizing the sample
+        The mu used for unnormalizing the sample.
     sigma: float
-        the sigma used for unnormalizing the sample
+        The sigma used for unnormalizing the sample.
 
     Returns
     -------
     typing.Union[OrderedDict, dict, tuple, np.ndarray, list]:
-        the unnormalized sample
+        The unnormalized sample.
     """
     (space_arg, space_sample_arg) = space_likes
     if isinstance(space_arg, gym.spaces.Box):
@@ -112,15 +112,17 @@ def unnormalize_sample_from_mu_sigma(
 class NormalGlueNormalizationValidator(BaseAgentGlueNormalizationValidator):
     """
     Allows custom definition of mu and sigma for normalization. Both or neither mu and sigma must be defined.
-    mu: custom mu value to normalize by
-    sigma: custom sigma value to normalize by
+    mu: custom mu value to normalize by.
+    sigma: custom sigma value to normalize by.
     """
     mu: typing.Union[float, typing.List[float], None] = None
     sigma: typing.Union[float, typing.List[float], None] = None
 
     @validator('mu', 'sigma', always=True)
     def check_iterable(cls, v):
-        """Check if mu is iterable"""
+        """
+        Check if mu is iterable.
+        """
         if isinstance(v, float):
             v = [v]
         return v
@@ -128,8 +130,10 @@ class NormalGlueNormalizationValidator(BaseAgentGlueNormalizationValidator):
 
 class NormalGlueValidator(BaseAgentGlueValidator):
     """
-    Validate NormalGlue
-    normalization: enable normalization and set mu and sigma or max and min
+    Validates NormalGlue config.
+
+    normalization: NormalGlueNormalizationValidator
+        Enable normalization and set mu and sigma or max and min.
     """
     normalization: NormalGlueNormalizationValidator = NormalGlueNormalizationValidator()
 

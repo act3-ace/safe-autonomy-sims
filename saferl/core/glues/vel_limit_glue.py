@@ -13,7 +13,8 @@ from saferl.core.glues.normal.normal_observe_glue import NormalObserveSensorGlue
 
 class VelocityLimitGlueValidator(NormalObserveSensorGlueValidator):
     """
-    Validator for the VelocityLimitGlue
+    Validator for the VelocityLimitGlue.
+
     velocity_threshold: float
         The maximum tolerated velocity within docking region without crashing
     threshold_distance: float
