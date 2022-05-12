@@ -1,6 +1,7 @@
 # sensors
 
-This page contains Sensors used in Rejoin tasks with Dubins dynamics.
+This page contains Sensor Platform Parts used in Rejoin
+tasks with Dubins dynamics.
 
 - [dubins sensors](../../../../../reference/core/platforms/dubins/sensors/dubins_sensors.md)
 - [partner sensors](../../../../../reference/core/platforms/dubins/sensors/partner_sensors.md)

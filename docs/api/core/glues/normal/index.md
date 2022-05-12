@@ -1,6 +1,7 @@
 # normal
 
-This directory encapsulates glue functions which implement normalization.
+This package contains glue functions which implement
+normalization using custom mu and sigma values.
 
 - [Normal glue](../../../../reference/core/glues/normal/normal_glue.md)
 - [Normal observe glues](../../../../reference/core/glues/normal/normal_observe_glue.md)
