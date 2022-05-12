@@ -61,6 +61,7 @@ class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
 
 
 class RTAGlueCWHDocking3d(RTAGlue):
+    """General RTA Glue to wrap CWH Docking 3d RTA from the run-time-assurance package"""
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dRTAGlueValidator
@@ -113,6 +114,7 @@ class CWHDocking3dExplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator
 
 
 class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dExplicitSwitchingRTAGlueValidator
@@ -149,6 +151,7 @@ class CWHDocking3dImplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator
 
 
 class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dImplicitSwitchingRTAGlueValidator
@@ -171,6 +174,7 @@ class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
 
 
 class RTAGlueCHWDocking3dExplicitOptimization(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
 
     def _instantiate_rta_module(self, **kwargs) -> RTAModule:
         return Docking3dExplicitOptimizationRTA(**kwargs)
@@ -203,6 +207,7 @@ class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValida
 
 
 class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dImplicitOptimizationRTAGlueValidator
