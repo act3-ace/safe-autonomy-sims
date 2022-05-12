@@ -12,8 +12,10 @@ from saferl.core.glues.normal.normal_observe_glue import NormalObserveSensorGlue
 
 class InRejoinGlueValidator(NormalObserveSensorGlueValidator):
     """
+    Validator for InRejoinGlue.
+
     radius: float
-        The radius of the rejoin region
+        The radius of the rejoin region.
     """
     radius: float
 

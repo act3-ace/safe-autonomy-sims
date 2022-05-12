@@ -19,12 +19,13 @@ def flip_rta(control):
 
     Parameters
     ----------
-    control: dictionary of input controls
+    control: dict
+        Dictionary of input controls.
 
     Returns
     -------
     dict
-        The filtered control dictionary
+        The filtered control dictionary.
     """
     filtered_control = OrderedDict()
     for k, v in control.items():
@@ -36,7 +37,8 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
     """
     Validator for RTAGlue class.
 
-    rta: RTA module which filters actions based on a safety function
+    rta: PyObject
+        RTA module which filters actions based on a safety function.
     """
     rta: PyObject = DockingRTA
 
@@ -97,10 +99,11 @@ class RTAGlue(BaseMultiWrapperGlue):
     @property
     def rta(self):
         """
-        RTA function attached to glue
+        RTA function attached to glue.
 
         Returns
         -------
-        RTA function attached to glue.
+        PyObject
+            RTA function attached to glue.
         """
         return self.config.rta
