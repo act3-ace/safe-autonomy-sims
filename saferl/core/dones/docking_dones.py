@@ -15,6 +15,9 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the max_distance data needed for
     computations in the MaxDistanceDoneFunction.
+
+    max_distance: float
+        The maximum tolerated relative distance between deputy and chief before episode termination.
     """
 
     max_distance: float
@@ -23,6 +26,25 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
 class MaxDistanceDoneFunction(DoneFuncBase):
     """
     A done function that determines if the max distance has been traveled or not.
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -39,29 +61,11 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         Returns
         -------
         MaxDistanceDoneValidator
-            Config validator for the MaxDistanceDoneFucntion.
-
+            Config validator for the MaxDistanceDoneFunction.
         """
         return MaxDistanceDoneValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Parameters
-        ----------
-        observation : np.ndarray
-            np.ndarray describing the current observation
-        action : np.ndarray
-            np.ndarray describing the current action
-        next_observation : np.ndarray
-            np.ndarray describing the incoming observation
-        next_state : np.ndarray
-            np.ndarray describing the incoming state
-
-        Returns
-        -------
-        done : DoneDict
-            Dictionary containing the done condition for the current agent.
-        """
 
         done = DoneDict()
 
@@ -85,6 +89,19 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
     computations in the SuccessfulDockingDoneFunction.
+
+    docking_region_radius : float
+        The radius of the docking region in meters.
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        TODO
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
 
     docking_region_radius: float
@@ -98,6 +115,25 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
 class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if the deputy has successfully docked with the chief.
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -115,28 +151,10 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         -------
         SuccessfulDockingDoneValidator
             Config validator for the SuccessfulDockingDoneFunction.
-
         """
         return SuccessfulDockingDoneValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Parameters
-        ----------
-        observation : np.ndarray
-            np.ndarray describing the current observation
-        action : np.ndarray
-            np.ndarray describing the current action
-        next_observation : np.ndarray
-            np.ndarray describing the incoming observation
-        next_state : np.ndarray
-            np.ndarray describing the incoming state
-
-        Returns
-        -------
-        done : DoneDict
-            Dictionary containing the done condition for the current agent.
-        """
         # eventually will include velocity constraint
         done = DoneDict()
         deputy = get_platform_by_name(next_state, self.config.agent_name)
@@ -168,7 +186,20 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
 class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     """
-    Validator for the DockingVelocityLimitDoneFunction
+    Validator for the DockingVelocityLimitDoneFunction.
+
+    docking_region_radius : float
+        The radius of the docking region in meters.
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        TODO
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
     velocity_threshold: float
     threshold_distance: float
@@ -180,6 +211,25 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
 class DockingVelocityLimitDoneFunction(DoneFuncBase):
     """
     This done function determines whether the velocity limit has been exceeded or not.
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -201,23 +251,6 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         return DockingVelocityLimitDoneFunctionValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Parameters
-        ----------
-        observation : np.ndarray
-            np.ndarray describing the current observation
-        action : np.ndarray
-            np.ndarray describing the current action
-        next_observation : np.ndarray
-            np.ndarray describing the incoming observation
-        next_state : np.ndarray
-            np.ndarray describing the incoming state
-
-        Returns
-        -------
-        done : DoneDict
-            Dictionary containing the done condition for the current agent.
-        """
 
         done = DoneDict()
 
@@ -241,6 +274,17 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains essential data for the done function.
+
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        TODO
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
     velocity_threshold: float
     threshold_distance: float
@@ -252,8 +296,27 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
 # needs a reference object
 class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     """
-    A done function that checks if the docking velocity relative to a target object has exceeded a certain specified 
+    A done function that checks if the docking velocity relative to a target object has exceeded a certain specified
     threshold velocity.
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -275,23 +338,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         return DockingRelativeVelocityConstraintDoneFunctionValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Parameters
-        ----------
-        observation : np.ndarray
-            np.ndarray describing the current observation
-        action : np.ndarray
-            np.ndarray describing the current action
-        next_observation : np.ndarray
-            np.ndarray describing the incoming observation
-        next_state : np.ndarray
-            np.ndarray describing the incoming state
 
-        Returns
-        -------
-        done : DoneDict
-            Dictionary containing the done condition for the current agent.
-        """
         # eventually will include velocity constraint
         done = DoneDict()
 
@@ -317,8 +364,20 @@ class CrashDockingDoneValidator(DoneFuncBaseValidator):
     """
     This class validates that the config contains the docking_region_radius data needed for
     computations in the CrashDockingDoneValidator.
-    """
 
+    docking_region_radius : float
+        The radius of the docking region in meters.
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        TODO
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
+    """
     docking_region_radius: float
     velocity_threshold: float
     threshold_distance: float
@@ -330,6 +389,25 @@ class CrashDockingDoneValidator(DoneFuncBaseValidator):
 class CrashDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if deputy has crashed with the chief (at origin).
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -352,24 +430,7 @@ class CrashDockingDoneFunction(DoneFuncBase):
         return CrashDockingDoneValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Parameters
-        ----------
-        observation : np.ndarray
-            np.ndarray describing the current observation
-        action : np.ndarray
-            np.ndarray describing the current action
-        next_observation : np.ndarray
-            np.ndarray describing the incoming observation
-        next_state : np.ndarray
-            np.ndarray describing the incoming state
 
-        Returns
-        -------
-        done : DoneDict
-            Dictionary containing the done condition for the current agent.
-
-        """
         done = DoneDict()
         deputy = get_platform_by_name(next_state, self.config.agent_name)
 
