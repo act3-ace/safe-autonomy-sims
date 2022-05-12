@@ -1,5 +1,5 @@
 """
-This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft
+This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 """
 from collections import OrderedDict
 
@@ -9,7 +9,8 @@ from saferl.core.rta.base_rta import ConstraintModule, ExplicitSimplexModule
 
 
 class DockingRTA(ExplicitSimplexModule):
-    """Explicit Simplex RTA for CWH Docking problem
+    """
+    Explicit Simplex RTA for CWH Docking problem.
 
     Parameters
     ----------
@@ -137,7 +138,8 @@ class DockingRTA(ExplicitSimplexModule):
 
 
 class Constraint_rel_vel(ConstraintModule):
-    """CWH NMT velocity constraint
+    """
+    CWH NMT velocity constraint.
 
     Parameters
     ----------
@@ -167,14 +169,15 @@ class Constraint_rel_vel(ConstraintModule):
 
 
 class ConstraintStateLimit(ConstraintModule):
-    """Generic state vector element limit constraint
+    """
+    Generic state vector element limit constraint.
 
     Parameters
     ----------
     limit_val : float
-        state vector element limit constraint value
+        State vector element limit constraint value.
     state_index: int
-        index/indices of state vector element to apply limit constraint to
+        Index/indices of state vector element to apply limit constraint to.
     """
 
     def __init__(self, limit_val, state_index):

@@ -14,7 +14,7 @@ class BaseRTAValidator(BaseModel):
     A validator for the BaseRTA class.
 
     name : str
-        name of RTA class
+        Name of RTA class.
     """
     name: typing.Optional[str]
     step_size: float = 1
@@ -22,7 +22,7 @@ class BaseRTAValidator(BaseModel):
 
 class BaseRTA:
     """
-    Base class for a RTA filter
+    Base class for a RTA filter.
     """
 
     def __init__(self, **kwargs):
@@ -32,7 +32,8 @@ class BaseRTA:
 
     @classmethod
     def get_validator(cls):
-        """returns the validator for this class
+        """
+        Returns the validator for this class.
 
         Returns:
             BaseRTAValidator -- A pydantic validator to be used to validate kwargs
@@ -47,14 +48,14 @@ class BaseRTA:
         Parameters
         ----------
         action : Union[np.ndarray, tuple, dict]
-            The action to be monitored and filtered by the RTA algorithm
+            The action to be monitored and filtered by the RTA algorithm.
         observation : dict
-            Observation buffer containing the current observation of the environment
+            Observation buffer containing the current observation of the environment.
 
         Returns
         -------
         Union[np.ndarray, tuple, dict]
-            The filtered action
+            The filtered action.
         """
 
         if self.enable:
@@ -68,7 +69,9 @@ class BaseRTA:
 
 
 class ConstraintBasedRTA(BaseRTA):
-    """TODO"""
+    """
+    TODO
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -120,7 +123,7 @@ class SimplexModule(ConstraintBasedRTA):
         Returns
         -------
         bool
-            True if unsafe
+            True if unsafe.
         '''
         raise NotImplementedError()
 
@@ -130,9 +133,9 @@ class SimplexModule(ConstraintBasedRTA):
 
 
 class ExplicitSimplexModule(SimplexModule):
-    '''
-    Assumes one moving entity
-    '''
+    """
+    Assumes one moving entity.
+    """
 
     def _monitor(self, action, observation, intervening):
         state_vec = self._get_state_vector(observation)
