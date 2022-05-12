@@ -91,7 +91,7 @@ class RTAGlue(BaseMultiWrapperGlue):
         for controller_glue, controller_filtered_action in zip(self.controller_glues, filtered_action):
             controller_glue.apply_action(controller_filtered_action, observation)
 
-    def _filter_action(self, desired_action: OrderedDict, observation: typing.Dict) -> OrderedDict:
+    def _filter_action(self, desired_action: tuple, observation: typing.Dict) -> tuple:
         rta_state_vector = self._get_rta_state_vector(observation)
         rta_action_vector = self._get_action_vector_from_action(desired_action)
         filtered_action_vector = self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
@@ -150,7 +150,7 @@ class RTAGlue(BaseMultiWrapperGlue):
                 controller_glues.extend(self._get_controller_glues(glue=wrapped_glue))
         return controller_glues
 
-    def _get_stored_action(self):
+    def _get_stored_action(self) -> tuple:
         stored_action = []
         for controller_glue in self.controller_glues:
             applied_action = controller_glue.get_applied_control()
