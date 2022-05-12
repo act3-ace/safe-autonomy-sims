@@ -32,7 +32,7 @@ class TransformSensor(BaseSensor):
         Returns
         -------
         typing.Union[np.ndarray, typing.Tuple, typing.Dict]
-            The raw measurements from this sensor
+            The raw measurements from this sensor.
         """
         raise NotImplementedError
 
@@ -44,13 +44,13 @@ class TransformSensor(BaseSensor):
         Parameters
         ----------
         measurement: typing.Union[np.ndarray, typing.Tuple, typing.Dict]
-            The measurement to be transformed
+            The measurement to be transformed.
         state: typing.Tuple
-            The current state of the environment used to obtain the measurement
+            The current state of the environment used to obtain the measurement.
 
         Returns
         -------
         typing.Union[np.ndarray, typing.Tuple, typing.Dict]
-            The transformed measurements from this sensor
+            The transformed measurements from this sensor.
         """
         raise NotImplementedError

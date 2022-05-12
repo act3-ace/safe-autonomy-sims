@@ -11,16 +11,16 @@ class CWHPlatform(BasePlatform):
     """
     A platform representing a spacecraft operating under CWH dynamics.
     Allows for saving an action to the platform for when the platform needs
-    to give an action to the environment during the environment step function
+    to give an action to the environment during the environment step function.
 
     Parameters
     ----------
     platform_name : str
-        Name of the platform
+        Name of the platform.
     platform : sim_entity
-        Backend simulation entity associated with the platform
+        Backend simulation entity associated with the platform.
     platform_config : dict
-        Platform-specific configuration dictionary
+        Platform-specific configuration dictionary.
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -29,11 +29,12 @@ class CWHPlatform(BasePlatform):
         self._sim_time = 0.0
 
     def get_applied_action(self):
-        """returns the action stored in this platform
+        """
+        Returns the action stored in this platform.
 
         Returns
         -------
-        typing.Any -- any sort of stored action
+        typing.Any -- Any sort of stored action.
         """
         return self._last_applied_action
 
@@ -47,37 +48,38 @@ class CWHPlatform(BasePlatform):
 
     def save_action_to_platform(self, action, axis):
         """
-        saves an action to the platform if it matches
-        the action space
+        Saves an action to the platform if it matches the action space.
 
         Parameters
         ----------
         action: typing.Any
             The action to store in the platform
+        axis: int
+            The index of the action space where the action shall be saved.
         """
         self._last_applied_action[axis] = action
 
     @property
     def position(self) -> np.ndarray:
         """
-        The position of the platform
+        The position of the platform.
 
         Returns
         -------
         np.ndarray
-            The position vector of the platform
+            The position vector of the platform.
         """
         return self._platform.position
 
     @property
     def velocity(self):
         """
-        The velocity of the platform
+        The velocity of the platform.
 
         Returns
         -------
         np.ndarray
-            The velocity vector of the platform
+            The velocity vector of the platform.
         """
         return self._platform.velocity
 
@@ -89,7 +91,7 @@ class CWHPlatform(BasePlatform):
         Returns
         -------
         float
-            Current simulation time
+            Current simulation time.
         """
         return self._sim_time
 

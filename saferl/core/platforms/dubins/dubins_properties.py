@@ -15,15 +15,15 @@ class AccelerationProp(BoxProp):
     Acceleration control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for sensor output.
     description : str
-        description of control properties
+        Description of sensor properties.
     """
 
     name: str = "acceleration"
@@ -38,15 +38,15 @@ class YawRateProp(BoxProp):
     Yaw rate control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for sensor output.
     description : str
-        description of control properties
+        Description of sensor properties.
     """
 
     name: str = "yaw_rate"
@@ -61,15 +61,15 @@ class PitchRateProp(BoxProp):
     Pitch rate control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for sensor output.
     description : str
-        description of control properties
+        Description of sensor properties.
     """
 
     name: str = "pitch_rate"
@@ -84,15 +84,15 @@ class RollRateProp(BoxProp):
     Roll rate control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for sensor output.
     description : str
-        description of control properties
+        Description of sensor properties.
     """
 
     name: str = "roll_rate"
@@ -107,15 +107,15 @@ class YawAndAccelerationProp(BoxProp):
     Combined Yaw Rate and Acceleration control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for sensor output.
     description : str
-        description of control properties
+        Description of sensor properties.
     """
 
     name: str = "yaw_acceleration"
@@ -130,15 +130,15 @@ class PitchRollAndAccelerationProp(BoxProp):
     Combined Pitch Rate, Roll Rate, and Acceleration control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for sensor output.
     description : str
-        description of control properties
+        Description of sensor properties.
     """
 
     name: str = "pitch_roll_acceleration"
@@ -153,15 +153,15 @@ class PositionProp(BoxProp):
     Position sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "position"
@@ -176,15 +176,15 @@ class VelocityProp(BoxProp):
     Velocity sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "velocity"
@@ -199,15 +199,15 @@ class HeadingProp(BoxProp):
     Heading sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "heading"
@@ -222,15 +222,15 @@ class FlightPathProp(BoxProp):
     Flight path sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "flight_path"
@@ -245,15 +245,15 @@ class RollProp(BoxProp):
     Roll sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "roll"
@@ -268,15 +268,15 @@ class QuaternionProp(BoxProp):
     Quaternion sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "quaternion"
@@ -291,15 +291,15 @@ class SpeedProp(BoxProp):
     Speed sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "speed"
