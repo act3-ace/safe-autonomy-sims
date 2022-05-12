@@ -83,9 +83,16 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.arithmatex:  # MathJax (latex)
+      generic: true
 
 extra_javascript:
+  # Mermaid
   - https://unpkg.com/mermaid@8.4.2/dist/mermaid.min.js
+  # MathJax (latex)
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 handlers:
   python:
@@ -101,6 +108,13 @@ nav:
   - "Introduction": index.md
   - "About": about.md
   - "Install": install.md
+  - "Concepts": concepts.md
+  - "Configuration": configuration.md
+  - "Tasks":
+      - tasks/index.md
+      - "2D Dubins Rejoin": tasks/2d_rejoin_task.md
+      - "3D Dubins Rejoin": tasks/3d_rejoin_task.md
+      - "3D CWH Docking": tasks/3d_docking_task.md
 #  - "Changelog": change_log.md
   - "License": license.md
   - "API":
