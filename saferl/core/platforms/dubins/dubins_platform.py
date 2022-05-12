@@ -1,5 +1,5 @@
 """
-This module defines the platforms used with saferl Dubins2dSimulator and Subins3dSimulator classes. It represents an
+This module defines the platforms used with saferl Dubins2dSimulator and Dubins3dSimulator classes. It represents an
 aircraft operating under the Dubins dynamics model.
 """
 
@@ -11,16 +11,16 @@ class DubinsPlatform(BasePlatform):
     """
     A platform representing an aircraft operating under Dubins dynamics.
     Allows for saving an action to the platform for when the platform needs
-    to give an action to the environment during the environment step function
+    to give an action to the environment during the environment step function.
 
     Parameters
     ----------
     platform_name : str
-        Name of the platform
+        Name of the platform.
     platform : sim_entity
-        Backend simulation entity associated with the platform
+        Backend simulation entity associated with the platform.
     platform_config : dict
-        Platform-specific configuration dictionary
+        Platform-specific configuration dictionary.
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -39,20 +39,20 @@ class DubinsPlatform(BasePlatform):
         return False
 
     def get_applied_action(self):
-        """returns the action stored in this platform
+        """
+        Returns the action stored in this platform.
 
         Returns:
-            typing.Any -- any sort of stored action
+            typing.Any -- Any sort of stored action.
         """
         return self._last_applied_action
 
     def save_action_to_platform(self, action, axis=None):
         """
-        saves an action to the platform if it matches
-        the action space
+        Saves an action to the platform if it matches the action space.
 
         Arguments:
-            action typing.Any -- The action to store in the platform
+            action typing.Any -- The action to store in the platform.
         """
         if axis is not None:
             self._last_applied_action[axis] = action
@@ -62,56 +62,56 @@ class DubinsPlatform(BasePlatform):
     @property
     def position(self):
         """
-        The position of the platform
+        The position of the platform.
 
         Returns
         -------
         np.ndarray
-            The position vector of the platform
+            The position vector of the platform.
         """
         return self._platform.position
 
     @property
     def velocity(self):
         """
-        The velocity of the platform
+        The velocity of the platform.
 
         Returns
         -------
         np.ndarray
-            The velocity vector of the platform
+            The velocity vector of the platform.
         """
         return self._platform.velocity
 
     @property
     def heading(self):
         """
-        The heading of the platform
+        The heading of the platform.
 
         Returns
         -------
         float
-            The heading angle of the platform in radians
+            The heading angle of the platform in radians.
         """
         return self._platform.heading
 
     @property
     def orientation(self):
         """
-        The orientation of the platform
+        The orientation of the platform.
 
         Returns
         -------
         scipy.Rotation
-            The scipy rotation of the platform
+            The scipy rotation of the platform.
         """
         return self._platform.orientation
 
+    # TODO: don't require this property
     @property
     def partner(self):
         """
-        The platform's partner entity
-        TODO: don't require this
+        The platform's partner entity.
 
         Returns
         -------
@@ -123,48 +123,48 @@ class DubinsPlatform(BasePlatform):
     @property
     def partner_position(self):
         """
-        The position of the platform's partner
+        The position of the platform's partner.
 
         Returns
         -------
         np.ndarray
-            The position vector of the platform's partner or None if partner is not specified
+            The position vector of the platform's partner or None if partner is not specified.
         """
         return self._platform.partner.position if self._platform.partner is not None else None
 
     @property
     def partner_velocity(self):
         """
-        The velocity of the platform's partner
+        The velocity of the platform's partner.
 
         Returns
         -------
         np.ndarray
-            The velocity vector of the platform's partner
+            The velocity vector of the platform's partner.
         """
         return self._platform.partner.velocity if self._platform.partner is not None else None
 
     @property
     def partner_heading(self):
         """
-        The heading of the platform's partner
+        The heading of the platform's partner.
 
         Returns
         -------
         float
-            The heading angle of the platform's partner in radians
+            The heading angle of the platform's partner in radians.
         """
         return self._platform.partner.heading if self._platform.partner is not None else None
 
     @property
     def partner_orientation(self):
         """
-        The orientation of the platform's partner
+        The orientation of the platform's partner.
 
         Returns
         -------
         scipy.Rotation
-            The scipy rotation of the platform's partner
+            The scipy rotation of the platform's partner.
         """
         return self._platform.partner.orientation if self._platform.partner is not None else None
 
@@ -176,7 +176,7 @@ class DubinsPlatform(BasePlatform):
         Returns
         -------
         float
-            Current simulation time
+            Current simulation time.
         """
         return self._sim_time
 
@@ -193,16 +193,16 @@ class Dubins2dPlatform(DubinsPlatform):
     """
     A platform representing an aircraft operating under 2D Dubins dynamics.
     Allows for saving an action to the platform for when the platform needs
-    to give an action to the environment during the environment step function
+    to give an action to the environment during the environment step function.
 
     Parameters
     ----------
     platform_name : str
-        Name of the platform
+        Name of the platform.
     platform : sim_entity
-        Backend simulation entity associated with the platform
+        Backend simulation entity associated with the platform.
     platform_config : dict
-        Platform-specific configuration dictionary
+        Platform-specific configuration dictionary.
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -219,11 +219,11 @@ class Dubins3dPlatform(DubinsPlatform):
     Parameters
     ----------
     platform_name : str
-        Name of the platform
+        Name of the platform.
     platform : sim_entity
-        Backend simulation entity associated with the platform
+        Backend simulation entity associated with the platform.
     platform_config : dict
-        Platform-specific configuration dictionary
+        Platform-specific configuration dictionary.
     """
 
     def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
@@ -233,47 +233,47 @@ class Dubins3dPlatform(DubinsPlatform):
     @property
     def flight_path_angle(self):
         """
-        The flight path angle of the platform
+        The flight path angle of the platform.
 
         Returns
         -------
         float
-            The flight path angle of the platform in radians
+            The flight path angle of the platform in radians.
         """
         return self._platform.gamma
 
     @property
     def roll(self):
         """
-        The roll of the platform
+        The roll of the platform.
 
         Returns
         -------
         float
-            The roll angle of the platform in radians
+            The roll angle of the platform in radians.
         """
         return self._platform.roll
 
     @property
     def partner_flight_path_angle(self):
         """
-        The flight path angle of the platform's partner
+        The flight path angle of the platform's partner.
 
         Returns
         -------
         float
-            The flight path angle of the platform's partner in radians
+            The flight path angle of the platform's partner in radians.
         """
         return self._platform.partner.gamma if self._platform.partner is not None else None
 
     @property
     def partner_roll(self):
         """
-        The roll of the platform's partner
+        The roll of the platform's partner.
 
         Returns
         -------
         float
-            The roll angle of the platform's partner in radians
+            The roll angle of the platform's partner in radians.
         """
         return self._platform.partner.roll if self._platform.partner is not None else None

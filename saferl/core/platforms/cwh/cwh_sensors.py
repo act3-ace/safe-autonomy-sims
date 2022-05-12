@@ -1,5 +1,5 @@
 """
-Contains implementations of sensors that can be used in injuction with the CWH platform
+Contains implementations of sensors that can be used in junction with the CWH platform.
 """
 
 from corl.libraries.plugin_library import PluginLibrary
@@ -12,17 +12,17 @@ from saferl.core.simulators.cwh_simulator import CWHSimulator
 
 class CWHSensor(BaseSensor):
     """
-    Interface for a basic sensor of the CWH platform
+    Interface for a basic sensor of the CWH platform.
     """
 
     def _calculate_measurement(self, state):
         """
-        get measurements from the sensor
+        Get measurements from the sensor.
 
         Raises
         ------
         NotImplementedError
-            If the method has not been implemented
+            If the method has not been implemented.
         """
         raise NotImplementedError
 
@@ -32,7 +32,7 @@ PluginLibrary.AddClassToGroup(CWHSensor, "Sensor_Generic", {"simulator": CWHSimu
 
 class PositionSensor(CWHSensor):
     """
-    Implementation of a sensor designed to give the position at any time
+    Implementation of a sensor designed to give the position at any time.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.PositionProp):
@@ -40,12 +40,12 @@ class PositionSensor(CWHSensor):
 
     def _calculate_measurement(self, state):
         """
-        Calculate the measurement - position
+        Calculate the measurement - position.
 
         Returns
         -------
         list of floats
-            position of spacecraft
+            Position of spacecraft.
         """
         return self.parent_platform.position
 
@@ -59,7 +59,7 @@ PluginLibrary.AddClassToGroup(
 
 class VelocitySensor(CWHSensor):
     """
-    Implementation of a sensor to give velocity at any time
+    Implementation of a sensor to give velocity at any time.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.VelocityProp):
@@ -68,12 +68,12 @@ class VelocitySensor(CWHSensor):
     # state - tuple
     def _calculate_measurement(self, state):
         """
-        Calculate the measurement - velocity
+        Calculate the measurement - velocity.
 
         Returns
         -------
         list of floats
-            velocity of spacecraft
+            Velocity of spacecraft.
         """
         return self.parent_platform.velocity
 

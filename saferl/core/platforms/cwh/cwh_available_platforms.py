@@ -11,7 +11,8 @@ from saferl.core.simulators.cwh_simulator import CWHSimulator
 
 
 class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
-    """Enumeration that outlines the platform types that have been implimented
+    """
+    Enumeration that outlines the platform types that have been implemented.
     """
     CWH = (1, )
 
@@ -19,24 +20,25 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
     @classmethod
     def ParseFromNameModel(cls, config: dict):
-        """Given a config with the keys "model" and "name" determine the PlatformType
+        """
+        Given a config with the keys "model" and "name" determine the PlatformType.
 
         Parameters
         ----------
         config : dict
-            Platform configuration dictionary
+            Platform configuration dictionary.
 
         Returns
         -------
         CWHAvailablePlatformTypes
-            The platform type associated with the given configuration
+            The platform type associated with the given configuration.
 
         Raises
         ------
         RuntimeError
-            if the given config doesn't have both "name" and "model" keys
+            If the given config doesn't have both "name" and "model" keys
             -or-
-            if the "name" and "model" keys do not match a known model
+            If the "name" and "model" keys do not match a known model.
         """
 
         if "name" not in config:
