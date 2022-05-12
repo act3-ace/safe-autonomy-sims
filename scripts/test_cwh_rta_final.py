@@ -184,22 +184,6 @@ class RTAExperiment(BaseExperiment):
         tmp_os = tmp.observation_space
         tmp_ac = self.config.env_config['agents']
 
-        policies = {
-            policy_name:(
-                tmp_ac[policy_name].policy_config["policy_class"],
-                policy_obs,
-                tmp_as[policy_name],
-                tmp_ac[policy_name].policy_config
-            )
-            for policy_name,
-            policy_obs in tmp_os.spaces.items()
-        }
-
-        train_policies = [policy_name for policy_name in policies.keys() if tmp_ac[policy_name].policy_config["train"]]
-
-        rllib_config["multiagent"] = {
-            "policies": policies, "policy_mapping_fn": lambda agent_id: agent_id, "policies_to_train": train_policies
-        }
 
         rllib_config["env"] = ACT3MultiAgentEnv
         rllib_config["callbacks"] = EnvironmentDefaultCallbacks
@@ -217,9 +201,6 @@ class RTAExperiment(BaseExperiment):
         # call reset on env
         obs = env.reset()
         # setup action
-
-        # setup for loop for specified number of steps
-        num_steps = 100
 
         # setup a list of actions
         #actions = [make_action('blue0',-1.0,1.0,2.0),make_action('blue0',-3.0,2.0,2.0),make_action('blue0',-1.0,1.0,4.0)]
