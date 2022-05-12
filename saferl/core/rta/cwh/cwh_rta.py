@@ -2,9 +2,7 @@
 This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft
 """
 import abc
-import typing
 
-import numpy as np
 from run_time_assurance.rta import RTABackupController, RTAModule
 from run_time_assurance.zoo.cwh.docking_3d import (
     M_DEFAULT,
@@ -70,12 +68,6 @@ class RTAGlueCWHDocking3d(RTAGlue):
     @property
     def get_validator(cls):
         return CWHDocking3dRTAGlueValidator
-
-    def _get_rta_state_vector(self, observation: typing.Dict) -> np.ndarray:
-        position = observation['ObserveSensor_Sensor_Position']['direct_observation']
-        velocity = observation['ObserveSensor_Sensor_Velocity']['direct_observation']
-        state_vec = np.concatenate((position, velocity))
-        return state_vec
 
     def _create_rta_module(self) -> RTAModule:
         rta_args = self._get_rta_args()

@@ -39,8 +39,11 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
 
     step_size: duration in seconds that agent's action will be applied
     rta: RTA module which filters actions based on a safety function
+    state_observation_names: list of keys from observation dict whose direct observation values will be concatenated to form the RTA state
+        vector
     """
     step_size: float
+    state_observation_names: typing.List[str]
 
 
 class RTAGlue(BaseMultiWrapperGlue):
@@ -97,9 +100,16 @@ class RTAGlue(BaseMultiWrapperGlue):
         filtered_action_vector = self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
         return self._get_action_from_action_vector(filtered_action_vector)
 
-    @abc.abstractmethod
     def _get_rta_state_vector(self, observation: typing.Dict) -> np.ndarray:
-        raise NotImplementedError
+        state_obs = []
+        for obs_name in self.config.state_observation_names:
+            try:
+                state_obs.append(observation[obs_name]['direct_observation'])
+            except KeyError as e:
+                raise KeyError(f"state observation {obs_name} not found. Must be one of {list(observation.keys())}") from e
+
+        state_vec = np.concatenate(state_obs)
+        return state_vec
 
     def _get_action_vector_from_action(self, action: tuple) -> np.ndarray:
         actions_ordered = []
