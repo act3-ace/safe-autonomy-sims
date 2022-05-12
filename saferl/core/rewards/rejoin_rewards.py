@@ -155,7 +155,22 @@ class RejoinDistanceChangeReward(RewardFuncBase):
 
 class RejoinDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: Get the descriptions of these values
+    Validator for the RejoinDistanceExponentialChangeReward Reward Function.
+
+    lead : str
+        Name of the lead platform, for later lookup.
+    offset : [float,float,float]
+        Vector detailing the location of the center of the rejoin region from the aircraft.
+    c : float
+        Scale factor of exponential distance function
+    a : float
+        Exponential coefficient of exponential distance function. Do not specify if `pivot` is defined.
+    pivot : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    pivot_ratio : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    scale : float
+        Reward scaling value.
     """
     lead: str
     offset: typing.List[float]
