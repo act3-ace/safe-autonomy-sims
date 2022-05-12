@@ -194,7 +194,18 @@ class DockingDistanceChangeReward(RewardFuncBase):
 
 class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: Get the descriptions of these values
+    Validator for the DockingDistanceExponentialChangeReward Reward Function.
+
+    c : float
+        Scale factor of exponential distance function
+    a : float
+        Exponential coefficient of exponential distance function. Do not specify if `pivot` is defined.
+    pivot : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    pivot_ratio : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    scale : float
+        Reward scaling value.
     """
     c: float = 2.0
     a: float = math.inf
@@ -337,7 +348,16 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
 class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: Get the descriptions of these values
+    Validator for the DockingDeltaVReward Reward Function.
+
+    scale : float
+        Reward scaling value.
+    bias : float
+        Fixed reward bias.
+    step_size : float
+        Size of a single simulation step.
+    mass : float
+        Mass of spacecraft in kilograms.
     """
     scale: float
     bias: float = 0.0
@@ -439,7 +459,25 @@ class DockingDeltaVReward(RewardFuncBase):
 
 class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: get descriptions of these values
+    Validator for the DockingVelocityConstraintReward Reward function.
+    scale : float
+        Scalar value to adjust magnitude of the reward.
+    bias : float
+        Y intercept of the linear region of the velocity constraint function.
+    step_size : float
+        The size of one simulation step (sec).
+    docking_region_radius : float
+        The radius of the docking region in meters.
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
     scale: float
     bias: float = 0.0
@@ -552,7 +590,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     scale : float
         Scalar value to adjust magnitude of the reward.
     timeout : float
-        The max time for an episode.         TODO: [optional]
+        The max time for an episode.
     docking_region_radius : float
         The radius of the docking region in meters.
     velocity_threshold : float
@@ -562,7 +600,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     slope : float
         The slope of the linear region of the velocity constraint function.
     mean_motion : float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
