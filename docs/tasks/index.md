@@ -10,4 +10,4 @@ will be added in time. The following list contains all currently available tasks
 
 - [2D Dubins Rejoin](2d_rejoin_task.md)
 - [3D Dubins Rejoin](3d_rejoin_task.md)
-- [3D CWH Docking](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+- [3D CWH Docking](3d_docking_task.md)
