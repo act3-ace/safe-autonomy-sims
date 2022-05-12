@@ -183,9 +183,7 @@ nav:
                   - reference/core/rewards/rejoin_rewards.md
           - "rta":
               - api/core/rta/index.md
-              - "base rta":
-                  - reference/core/rta/base_rta.md
-              - "cwh":
+              - "cwh_rta":
                   - reference/core/rta/cwh/cwh_rta.md
           - "simulators":
               - api/core/simulators/index.md
