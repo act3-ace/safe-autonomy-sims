@@ -42,6 +42,7 @@ The control for the system is defined by
 ```
 
 ![Hill's Reference Frame](docs/images/HillsFrame3.png)
+
 *Hill's reference frame centered on a chief spacecraft and used to describe the relative motion of a deputy spacecraft conducting proximity operations (not to scale).*
 
 ## Dynamics
