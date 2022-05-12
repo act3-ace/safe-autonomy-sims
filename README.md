@@ -127,7 +127,7 @@ Throttle, heading, flight angle, roll control.
 Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors: 
 
 -  **Docking 3D**
-Static 1N thrusters in $`\pm x, \pm y, \pm z`$.
+Static 1N thrusters in $\pm x, \pm y, \pm z$.
 
 
 ## Team
