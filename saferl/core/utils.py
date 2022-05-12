@@ -17,14 +17,15 @@ def velocity_limit(state, agent_name, velocity_threshold, threshold_distance, me
     state: StateDict
         The current state of the system.
     agent_name: str
-        The name of the agent platform
+        The name of the agent platform.
     velocity_threshold: float
-        The maximum tolerated velocity within docking region without crashing
+        The maximum tolerated velocity within docking region without crashing.
     threshold_distance: float
-        The radius of the docking region
+        The radius of the docking region.
     mean_motion: float
+        TODO
     slope: float
-        The slope of the linear velocity limit as a function of distance from docking region
+        The slope of the linear velocity limit as a function of distance from docking region.
 
     Returns
     -------
@@ -48,21 +49,22 @@ def max_vel_violation(state, agent_name, velocity_threshold, threshold_distance,
     state: StateDict
         The current state of the system.
     agent_name: str
-        The name of the agent platform
+        The name of the agent platform.
     velocity_threshold: float
-        The maximum tolerated velocity within docking region without crashing
+        The maximum tolerated velocity within docking region without crashing.
     threshold_distance: float
-        The radius of the docking region
+        The radius of the docking region.
     mean_motion: float
+        TODO
     lower_bound: bool
-        If True, the function enforces a minimum velocity constraint on the agent's platform
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     slope: float
-        The slope of the linear velocity limit as a function of distance from docking region
+        The slope of the linear velocity limit as a function of distance from docking region.
 
     Returns
     -------
     violated: bool
-        Boolean value indicating if the velocity limit has been violated
+        Boolean value indicating if the velocity limit has been violated.
     violation: float
         The magnitude of the velocity limit violation.
     """
@@ -83,19 +85,19 @@ def max_vel_violation(state, agent_name, velocity_threshold, threshold_distance,
 
 def get_rejoin_region_center(ref, offset):
     """
-    Get the position of the rejoin region's center
+    Get the position of the rejoin region's center.
 
     Parameters
     ----------
     ref: BasePlatform
-        The reference platform for the rejoin region
+        The reference platform for the rejoin region.
     offset: np.ndarray (length <= 3)
-        The cartesian offset of the center of the rejoin region from the reference platform
+        The cartesian offset of the center of the rejoin region from the reference platform.
 
     Returns
     -------
     center: np.ndarray
-        The [x, y, z] position of the rejoin region's center
+        The [x, y, z] position of the rejoin region's center.
     """
     full_offset = np.zeros(3)
     full_offset[:len(offset)] = offset
@@ -112,20 +114,20 @@ def in_rejoin(wingman, lead, radius, offset):
     Parameters
     ----------
     wingman: BasePlatform
-        The wingman platform
+        The wingman platform.
     lead: BasePlatform
-        The lead platform
+        The lead platform.
     radius: float
-        The radius of the rejoin region
+        The radius of the rejoin region.
     offset: np.ndarray (length <= 3)
-        The cartesian offset of the rejoin region's center from the lead platform
+        The cartesian offset of the rejoin region's center from the lead platform.
 
     Returns
     -------
     in_rejoin: bool
-        Value is true if wingman platform is within the rejoin region
+        Value is true if wingman platform is within the rejoin region.
     distance: float
-        Distance from center of rejoin region
+        Distance from center of rejoin region.
     """
     rejoin_center = get_rejoin_region_center(lead, offset)
     distance = np.linalg.norm(wingman.position - rejoin_center)
