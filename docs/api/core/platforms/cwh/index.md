@@ -1,11 +1,15 @@
 # cwh
 
-This page contains the Platform used in Docking tasks with CWH dynamics,
-along with all the necessary Platform parts: Controllers, Sensors, Properties,
-and AvailablePlatformTypes. Controllers apply controls to thrusters and control
+This package contains the Platform used in Docking tasks with CWH dynamics,
+along with all the necessary Platform parts. Controllers apply controls to thrusters and control
 surfaces to interact with environment dynamics. Sensors measure various aspects
-of the environment. Properties define the range of values expected to be passed
-to a given Controller. 
+of the environment. All PlatformParts include a set of 
+properties which define the range of values the Platform Part
+can handle.
+
+These Platforms and Platform Parts can interact directly with
+entities in the environment simulation to read from or 
+update the simulation state.
 
 - [Cwh available platforms](../../../../reference/core/platforms/cwh/cwh_available_platforms.md)
 - [Cwh controllers](../../../../reference/core/platforms/cwh/cwh_controllers.md)
