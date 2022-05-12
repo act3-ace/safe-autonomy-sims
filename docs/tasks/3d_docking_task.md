@@ -41,7 +41,7 @@ The control for the system is defined by
 \boldsymbol{u} = [F_x,F_y, F_z]^T=[u_{1},u_{2},u_3]^T \in \mathcal{U} \subset \mathbb{R}^3
 ```
 
-![Hill's Reference Frame](docs/images/HillsFrame3.png)
+![Hill's Reference Frame](../images/HillsFrame3.png)
 
 *Hill's reference frame centered on a chief spacecraft and used to describe the relative motion of a deputy spacecraft conducting proximity operations (not to scale).*
 
