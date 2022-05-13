@@ -101,17 +101,14 @@ provided Docking 3D environment using the following command:
 python path/to/corl/corl train.py --cfg /path/to/safe-autonomy-sims/configs/experiments/docking/docking_3d.yml --compute_platform local
 ```
 
-### Evaluation
-
-TO BE DETERMINED
-
 ## Environments
 
 This library includes the following environments:
-  - Rejoin 2D
-  - Rejoin 3D
-  - Docking 3D
 
+- Rejoin 2D
+- Rejoin 3D
+- Docking 3D
+  
 
 ### Rejoin
 Aircraft formation flight rejoin where a wingman aircraft controlled by the agent must join a formation relative to a lead aircraft. The formation is defined by a rejoin region relative to the lead's position and orientation which the wingman must enter and remain within. Comes in the following flavors:
