@@ -99,7 +99,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     slope : float
         The slope of the linear region of the velocity constraint function.
     mean_motion : float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
@@ -197,7 +197,7 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     slope : float
         The slope of the linear region of the velocity constraint function.
     mean_motion : float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
@@ -282,7 +282,7 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
     slope : float
         The slope of the linear region of the velocity constraint function.
     mean_motion : float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
@@ -374,7 +374,7 @@ class CrashDockingDoneValidator(DoneFuncBaseValidator):
     slope : float
         The slope of the linear region of the velocity constraint function.
     mean_motion : float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """

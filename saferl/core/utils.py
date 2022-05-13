@@ -23,7 +23,7 @@ def velocity_limit(state, agent_name, velocity_threshold, threshold_distance, me
     threshold_distance: float
         The radius of the docking region.
     mean_motion: float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     slope: float
         The slope of the linear velocity limit as a function of distance from docking region.
 
@@ -55,7 +55,7 @@ def max_vel_violation(state, agent_name, velocity_threshold, threshold_distance,
     threshold_distance: float
         The radius of the docking region.
     mean_motion: float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound: bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     slope: float
