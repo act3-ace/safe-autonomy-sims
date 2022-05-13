@@ -20,7 +20,7 @@ class VelocityLimitGlueValidator(NormalObserveSensorGlueValidator):
     threshold_distance: float
         The radius of the docking region
     mean_motion: float
-        TODO: define
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     slope: float
         The slope of the linear velocity limit as a function of distance from docking region
     """

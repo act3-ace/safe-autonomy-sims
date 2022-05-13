@@ -193,22 +193,18 @@ class DockingDistanceChangeReward(RewardFuncBase):
 
 class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingDeltaVReward config.
+    Validator for the DockingDistanceExponentialChangeReward Reward Function.
 
-
-    c: float
-        Scalar constant to the exponential reward. This sets the total cumulative reward for the function, provided
-        x = distance goes from infinity to zero.
-    a: float
-        Scalar to the distance variable, where a = ln(pivot_ratio) / pivot.
-    pivot: float
-        The characteristic distance from which the cumulative reward (from x = pivot to x = 0) is equal to
-        c*(pivot_ratio-1/pivot_ratio).
-    pivot_ratio: float
-        This variable is used to define the ratio used as a scalar to x = distance.
-        When x = pivot, reward = c*(pivot_ratio - 1 / pivot_ratio).
-    scale: float
-        A scalar value applied to final reward.
+    c : float
+        Scale factor of exponential distance function
+    a : float
+        Exponential coefficient of exponential distance function. Do not specify if `pivot` is defined.
+    pivot : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    pivot_ratio : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    scale : float
+        Reward scaling value.
     """
     c: float = 2.0
     a: float = math.inf
@@ -354,14 +350,14 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
 class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingDeltaVReward config.
+    Validator for the DockingDeltaVReward Reward Function.
 
     scale : float
-        A scalar value applied to final reward.
+        A scalar value applied to reward.
     bias : float
-        A bias value added to the final reward.
+        A bias value added to the reward.
     step_size : float
-        The amount of time (sec) that passes in between simulation state transitions (steps).
+        Size of a single simulation step.
     mass : float
         The mass (kg) of the agent's spacecraft.
     """
@@ -465,14 +461,16 @@ class DockingDeltaVReward(RewardFuncBase):
 
 class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingVelocityConstraintReward config.
+    Validator for the DockingVelocityConstraintReward Reward function.
 
     scale : float
-        A scalar value applied to final reward.
+        Scalar value to adjust magnitude of the reward.
     bias : float
-        A bias value added to the final reward.
+        Y intercept of the linear region of the velocity constraint function.
     step_size : float
-        The amount of time (sec) that passes in between simulation state transitions (steps).
+        The size of one simulation step (sec).
+    docking_region_radius : float
+        The radius of the docking region in meters.
     velocity_threshold : float
         The maximum tolerated velocity within docking region without crashing.
     threshold_distance : float
@@ -510,7 +508,7 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         observation_units: StateDict,
     ) -> RewardDict:
 
-    This method calculates the current velocity contraint based on the relative distance from the chief.
+    This method calculates the current velocity constraint based on the relative distance from the chief.
     It compares the velocity constraint with the deputy's current velocity. If the velocity constraint is
     exceeded, the function returns a penalty for the agent.
 
@@ -595,7 +593,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     scale : float
         Scalar value to adjust magnitude of the reward.
     timeout : float
-        The max time for an episode.         TODO: [optional]
+        The max time for an episode.
     docking_region_radius : float
         The radius of the docking region in meters.
     velocity_threshold : float
@@ -652,7 +650,7 @@ class DockingSuccessReward(RewardFuncBase):
     observation_space : StateDict
         The agent's observation space.
     observation_units : StateDict
-        The units corresponding to values in the observation_space?
+        The units corresponding to keys in the observation_space?
 
     Returns
     -------
@@ -789,7 +787,7 @@ class DockingFailureReward(RewardFuncBase):
     observation_space : StateDict
         The agent's observation space.
     observation_units : StateDict
-        The units corresponding to values in the observation_space?
+        The units corresponding to keys in the observation_space?
 
     Returns
     -------
