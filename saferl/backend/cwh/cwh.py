@@ -56,13 +56,13 @@ class CWHSpacecraft(BaseEntity):
     Parameters
     ----------
     m: float
-        Mass of spacecraft in kilograms, by default 12
+        Mass of spacecraft in kilograms, by default 12.
     n: float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
     integration_method: str
-        Numerical integration method passed to dynamics model. See BaseODESolverDynamics
+        Numerical integration method passed to dynamics model. See BaseODESolverDynamics.
     kwargs:
-        Additional keyword arguments passed to CWHSpacecraftValidator
+        Additional keyword arguments passed to CWHSpacecraftValidator.
     """
 
     def __init__(self, m=12, n=0.001027, integration_method="RK45", **kwargs):

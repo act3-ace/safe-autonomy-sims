@@ -105,7 +105,6 @@ class DockingDistanceChangeRewardValidator(RewardFuncBaseValidator):
     scale : float
         Scalar value to adjust magnitude of the reward.
     """
-
     scale: float
 
 
@@ -194,7 +193,22 @@ class DockingDistanceChangeReward(RewardFuncBase):
 
 class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: Get the descriptions of these values
+    Validator for the DockingDeltaVReward config.
+
+
+    c: float
+        Scalar constant to the exponential reward. This sets the total cumulative reward for the function, provided
+        x = distance goes from infinity to zero.
+    a: float
+        Scalar to the distance variable, where a = ln(pivot_ratio) / pivot.
+    pivot: float
+        The characteristic distance from which the cumulative reward (from x = pivot to x = 0) is equal to
+        c*(pivot_ratio-1/pivot_ratio).
+    pivot_ratio: float
+        This variable is used to define the ratio used as a scalar to x = distance.
+        When x = pivot, reward = c*(pivot_ratio - 1 / pivot_ratio).
+    scale: float
+        A scalar value applied to final reward.
     """
     c: float = 2.0
     a: float = math.inf
@@ -206,6 +220,9 @@ class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
 class DockingDistanceExponentialChangeReward(RewardFuncBase):
     """
     Calculates an exponential reward based on the change in distance of the agent.
+    Reward is based on the multiplicative scale factor to the exponential potential function:
+        reward = ce^(ln(pivot_ratio)/pivot * x)
+
 
     def __call__(
         self,
@@ -337,7 +354,16 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
 class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: Get the descriptions of these values
+    Validator for the DockingDeltaVReward config.
+
+    scale : float
+        A scalar value applied to final reward.
+    bias : float
+        A bias value added to the final reward.
+    step_size : float
+        The amount of time (sec) that passes in between simulation state transitions (steps).
+    mass : float
+        The mass (kg) of the agent's spacecraft.
     """
     scale: float
     bias: float = 0.0
@@ -347,7 +373,7 @@ class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
 
 class DockingDeltaVReward(RewardFuncBase):
     """
-    Calculates reward based on change in agent velocity.
+    Calculates reward based on the agent's fuel consumption measured in delta-v.
 
 
     def __call__(
@@ -361,8 +387,8 @@ class DockingDeltaVReward(RewardFuncBase):
         observation_units: StateDict,
     ) -> RewardDict:
 
-    This method retrieves the current velocity of the agent and compares it to the previous velocity. The
-    difference is used to return a proportional reward.
+    This method retrieves the current thrust control applied by the agent (delta v), which is used to calculate and
+    return a proportional reward.
 
     Parameters
     ----------
@@ -439,7 +465,24 @@ class DockingDeltaVReward(RewardFuncBase):
 
 class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: get descriptions of these values
+    Validator for the DockingVelocityConstraintReward config.
+
+    scale : float
+        A scalar value applied to final reward.
+    bias : float
+        A bias value added to the final reward.
+    step_size : float
+        The amount of time (sec) that passes in between simulation state transitions (steps).
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
     scale: float
     bias: float = 0.0
@@ -562,7 +605,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     slope : float
         The slope of the linear region of the velocity constraint function.
     mean_motion : float
-        TODO
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
@@ -689,8 +732,16 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
         Max distance from the goal.
     docking_region_radius : float
         Radius of the docking region in meters.
-    max_vel_constraint : float
-        The max velocity allowed for a successful dock in the docking region in meters per second.
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
     timeout_reward: float
     distance_reward: float
