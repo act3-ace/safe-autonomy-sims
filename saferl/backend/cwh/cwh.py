@@ -1,4 +1,14 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module implements a 3D point mass spacecraft with Clohessy-Wilshire physics dynamics in non-inertial orbital
 Hill's reference frame.
 """
@@ -139,7 +149,7 @@ class CWHSpacecraft(BaseEntity):
         Returns
         -------
         scipy.spatial.transform.Rotation
-            Rotation tranformation of the entity's local reference frame basis vectors in the global reference frame.
+            Rotation transformation of the entity's local reference frame basis vectors in the global reference frame.
             i.e. applying this rotation to [1, 0, 0] yields the entity's local x-axis in the global frame.
         """
         # always return a no rotation quaternion as points do not have an orientation
