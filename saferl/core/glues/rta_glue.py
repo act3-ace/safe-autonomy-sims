@@ -48,10 +48,10 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
     """
     Validator for RTAGlue class.
 
-    step_size: duration in seconds that agent's action will be applied
-    rta: RTA module which filters actions based on a safety function
-    state_observation_names: list of keys from observation dict whose direct observation values will be concatenated to form the RTA state
-        vector
+    step_size: float
+        duration in seconds that agent's action will be applied
+    state_observation_names: list[str]
+    list of keys from observation dict whose direct observation values will be concatenated to form the RTA state vector
     """
     step_size: float
     state_observation_names: typing.List[str]
