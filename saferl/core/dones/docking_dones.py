@@ -187,7 +187,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        done[self.agent] = in_docking and not violated
+        done[self.agent] = bool(in_docking and not violated)
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
