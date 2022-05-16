@@ -1,11 +1,21 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module contains implementations of sensors that reside on the Dubins platform
 """
 import typing
 
 import numpy as np
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BasePlatformPartValidator, BaseTimeSensor
+from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_parts import BasePlatformPartValidator, BaseTimeSensor
 
 import saferl.core.platforms.dubins.dubins_properties as dubins_props
 from saferl.core.platforms.common.sensors import TransformSensor
@@ -51,8 +61,8 @@ class PositionSensor(DubinsSensor):
         """
         Calculate the position
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -88,11 +98,10 @@ class VelocitySensor(DubinsSensor):
         """
         Calculate the measurement - velocity
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
-
 
         Returns
         -------
@@ -126,8 +135,8 @@ class HeadingSensor(DubinsSensor):
         """
         Calculate the measurement - heading
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -163,8 +172,8 @@ class FlightPathSensor(DubinsSensor):
         """
         Calculate the measurement - flight path angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -200,8 +209,8 @@ class RollSensor(DubinsSensor):
         """
         Calculate the measurement - roll angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -237,8 +246,8 @@ class QuaternionSensor(DubinsSensor):
         """
         Calculate the measurement - quaternion
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -295,7 +304,7 @@ class SpeedSensor(DubinsSensor):
         """
         Calculate the measurement - speed
 
-        Params
+        Parameters
         ------
         state: np.ndarray
             current state

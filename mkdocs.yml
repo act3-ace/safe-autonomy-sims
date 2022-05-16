@@ -1,51 +1,196 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core  Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
 site_name: Safe-Autonomy-Sims
 site_author: Safe-Autonomy Team
 repo_url: https://github.com/act3-ace/safe-autonomy-sims
 docs_dir: "docs"
+site_url: https://github.com/act3-ace/
+edit_uri: blob/main/docs/
+site_dir: site
+site_description: "The following python project creates a python interface for training Deep RL - provides the base RL functionality and APIs to enable rapid ablation testing and setup"
 
 plugins:
   - search
-  - macros
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            docstring_style: numpy
+  - autorefs
+  - gen-files:
+      scripts:
+        - docs/gen_ref_nav.py  # or any other name or path
+  - section-index
   - pdf-export:
-      verbose: true
+      verbose: false
       media_type: print
       enabled_if_env: ENABLE_PDF_EXPORT
-  - inari:
-      module: saferl
-      out-name: saferl
+      combined: true
+
+
+theme:
+  name: material
+  icon:
+    logo: material/currency-sign
+  features:
+  - navigation.tabs
+  - navigation.top
+  palette:
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: teal
+    accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+
+
+extra_css:
+  - css/style.css
+  - css/material.css
+  - css/mkdocstrings.css
+
 
 markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
+  - toc:
+      permalink: "¤"
   - codehilite
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.arithmatex:  # MathJax (latex)
+      generic: true
 
 extra_javascript:
+  # Mermaid
   - https://unpkg.com/mermaid@8.4.2/dist/mermaid.min.js
+  # MathJax (latex)
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+handlers:
+  python:
+    setup_commands:
+    - import sys
+    - sys.path.append("docs")
+    selection:
+      new_path_syntax: yes
+    import:  # demonstration purpose in the docs
+      - https://docs.python-requests.org/en/master/objects.inv
 
 nav:
   - "Introduction": index.md
-  - "About": about.md
+  - "Install": install.md
+  - "Concepts": concepts.md
+  - "Configuration": configuration.md
+  - "Tasks":
+      - tasks/index.md
+      - "2D Dubins Rejoin": tasks/2d_rejoin_task.md
+      - "3D Dubins Rejoin": tasks/3d_rejoin_task.md
+      - "3D CWH Docking": tasks/3d_docking_task.md
+#  - "Changelog": change_log.md
+#  - "License": license.md
   - "API":
-    - saferl/index.md
-    - Dones:
-      - saferl/dones/index.md
-      - saferl/dones/docking_dones-py.md
-    - Glues:
-      - saferl/glues/index.md
-      - saferl/glues/combined_controller_glue-py.md
-      - saferl/glues/rta_glue-py.md
-    - Platforms:
-      - saferl/platforms/index.md
-      - CWH:
-        - saferl/platforms/cwh/index.md
-      - Dubins:
-        - saferl/platforms/dubins/index.md
-    - Rewards:
-      - saferl/rewards/index.md
-      - saferl/rewards/docking_rewards-py.md
-    - Simulators:
-      - saferl/simulators/index.md
-theme: material
+#      - reference/SUMMARY.md  # API "Table of Contents"
+      - api/index.md
+      - "backend":
+          - api/backend/index.md
+          - "entities": reference/backend/base_models/entities.md
+          - "cwh entities": reference/backend/cwh/cwh.md
+          - "dubins entities": reference/backend/dubins/entities.md
+      - "core":
+          - api/core/index.md
+          - "agents":
+              - api/core/agents/index.md
+              - "rta agent":
+                  - reference/core/agents/rta_agent.md
+          - "dones":
+              - api/core/dones/index.md
+              - "common dones":
+                  - reference/core/dones/common_dones.md
+              - "docking dones":
+                  - reference/core/dones/docking_dones.md
+              - "rejoin dones":
+                  - reference/core/dones/rejoin_dones.md
+          - "glues":
+              - api/core/glues/index.md
+              - "normal":
+                  - api/core/glues/normal/index.md
+                  - reference/core/glues/normal/normal_glue.md
+                  - reference/core/glues/normal/normal_observe_glue.md
+                  - reference/core/glues/normal/normal_wrapper_glue.md
+              - reference/core/glues/magnitude_glue.md
+              - reference/core/glues/rejoin_region_glue.md
+              - reference/core/glues/rta_glue.md
+              - reference/core/glues/unit_vector_glue.md
+              - reference/core/glues/vel_limit_glue.md
+          - "platforms":
+              - api/core/platforms/index.md
+              - "common":
+                  - reference/core/platforms/common/sensors.md
+              - "cwh":
+                  - api/core/platforms/cwh/index.md
+                  - reference/core/platforms/cwh/cwh_available_platforms.md
+                  - reference/core/platforms/cwh/cwh_controllers.md
+                  - reference/core/platforms/cwh/cwh_platform.md
+                  - reference/core/platforms/cwh/cwh_properties.md
+                  - reference/core/platforms/cwh/cwh_sensors.md
+              - "dubins":
+                  - api/core/platforms/dubins/index.md
+                  - "sensors":
+                      - api/core/platforms/dubins/sensors/index.md
+                      - "dubins sensors":
+                          - reference/core/platforms/dubins/sensors/dubins_sensors.md
+                      - "partner sensors":
+                          - reference/core/platforms/dubins/sensors/partner_sensors.md
+                      - "relative sensors":
+                          - reference/core/platforms/dubins/sensors/relative_sensors.md
+                  - reference/core/platforms/dubins/dubins_available_platforms.md
+                  - reference/core/platforms/dubins/dubins_controllers.md
+                  - reference/core/platforms/dubins/dubins_platform.md
+                  - reference/core/platforms/dubins/dubins_properties.md
+          - "rewards":
+              - api/core/rewards/index.md
+              - "docking rewards":
+                  - reference/core/rewards/docking_rewards.md
+              - "rejoin rewards":
+                  - reference/core/rewards/rejoin_rewards.md
+          - "rta":
+              - api/core/rta/index.md
+              - "cwh_rta":
+                  - reference/core/rta/cwh/cwh_rta.md
+          - "simulators":
+              - api/core/simulators/index.md
+              - "cwh simulator":
+                  - reference/core/simulators/cwh_simulator.md
+              - "dubins simulator":
+                  - reference/core/simulators/dubins_simulator.md
+              - "saferl simulator":
+                  - reference/core/simulators/saferl_simulator.md
+          - reference/core/utils.md

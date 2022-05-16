@@ -1,4 +1,14 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 Functions that define the terminal conditions for the Docking Environment.
 This in turn defines whether the end is episode is reached or not.
 """
@@ -42,8 +52,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -56,8 +66,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -69,8 +79,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         Returns
         -------
-            done : DoneDict
-                dictionary containing the condition condition for the current agent
+        done : DoneDict
+            dictionary containing the condition condition for the current agent
 
         """
 
@@ -118,8 +128,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -132,8 +142,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -171,8 +181,10 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        done[self.agent] = in_docking and not violated
-
+        # main:
+        # done[self.agent] = in_docking and not violated
+        # multi
+        done[self.agent] = bool(in_docking and not violated)
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
@@ -202,8 +214,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -215,8 +227,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -275,8 +287,8 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -288,8 +300,8 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -351,8 +363,8 @@ class CrashDockingDoneFunction(DoneFuncBase):
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -365,8 +377,8 @@ class CrashDockingDoneFunction(DoneFuncBase):
 
     def __call__(self, observation, action, next_observation, next_state):
         """
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
             np.ndarray describing the current observation
         action : np.ndarray
@@ -429,15 +441,10 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         """
         Returns the validator for this done function.
 
-        Params
-        ------
-        cls : class constructor
-
         Returns
         -------
         RejoinDoneValidator
             done function validator
-
         """
         return CollisionDoneFunctionValidator
 
@@ -453,8 +460,6 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         """
         Logic that returns the done condition given the current environment conditions
 
-        Params
-        ------
         observation : np.ndarray
              current observation from environment
         action : np.ndarray
@@ -463,6 +468,10 @@ class CollisionDoneFunction(SharedDoneFuncBase):
              incoming observation from environment
         next_state : np.ndarray
              incoming state from environment
+        local_dones: DoneDict
+            TODO
+        local_done_info: OrderedDict
+            TODO
 
         Returns
         -------
@@ -525,10 +534,6 @@ class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
         """
         Returns the validator for this done function.
 
-        Params
-        ------
-        cls : class constructor
-
         Returns
         -------
         RejoinDoneValidator
@@ -558,7 +563,11 @@ class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
         next_observation : np.ndarray
              incoming observation from environment
         next_state : np.ndarray
-             incoming state from environment
+            incoming state from environment
+        local_dones: DoneDict
+            TODO ****
+        local_done_info: OrderedDict
+            TODO****
 
         Returns
         -------

@@ -1,10 +1,20 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module contains Dubins platform sensors which read values sent from the platform's partner.
 
 Author: Jamie Cunningham
 """
 import numpy as np
-from act3_rl_core.libraries.plugin_library import PluginLibrary
+from corl.libraries.plugin_library import PluginLibrary
 
 import saferl.core.platforms.dubins.sensors.dubins_sensors as d
 from saferl.core.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
@@ -20,8 +30,8 @@ class PartnerPositionSensor(d.PositionSensor):
         """
         Calculate the position of the platform's partner
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -56,11 +66,10 @@ class PartnerVelocitySensor(d.VelocitySensor):
         """
         Calculate the measurement - partner velocity
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
-
 
         Returns
         -------
@@ -93,8 +102,8 @@ class PartnerHeadingSensor(d.HeadingSensor):
         """
         Calculate the measurement - partner heading
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -129,8 +138,8 @@ class PartnerFlightPathSensor(d.FlightPathSensor):
         """
         Calculate the measurement - partner flight path angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -165,8 +174,8 @@ class PartnerRollSensor(d.RollSensor):
         """
         Calculate the measurement - partner roll angle
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 
@@ -199,8 +208,8 @@ class PartnerQuaternionSensor(d.QuaternionSensor):
         """
         Calculate the measurement - partner quaternion orientation
 
-        Params
-        ------
+        Parameters
+        ----------
         state: np.ndarray
             current state
 

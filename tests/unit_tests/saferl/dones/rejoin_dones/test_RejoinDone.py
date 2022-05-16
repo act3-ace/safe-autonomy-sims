@@ -1,4 +1,14 @@
 """
+# -------------------------------------------------------------------------------
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning Core (CoRL) Runtime Assurance Extensions
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# -------------------------------------------------------------------------------
+
 This module holds unit tests and fixtures for the CrashDoneFunction.
 
 Author: John McCarroll
@@ -8,7 +18,7 @@ import os
 
 import numpy as np
 import pytest
-from act3_rl_core.libraries.environment_dict import DoneDict
+from corl.libraries.environment_dict import DoneDict
 
 from saferl.core.dones.rejoin_dones import RejoinDone
 from tests.conftest import delimiter, read_test_cases
@@ -39,7 +49,7 @@ def fixture_done_status(request):
 
     Returns
     -------
-    act3_rl_core.dones.done_func_base.DoneStatusCodes
+    corl.dones.done_func_base.DoneStatusCodes
     """
     return request.param
 
@@ -65,7 +75,7 @@ def fixture_local_dones(agent_name, done_status):
 
     Returns
     -------
-    act3_rl_core.libraries.environment_dict.DoneDict
+    corl.libraries.environment_dict.DoneDict
         The DoneDict of agent's DoneStatuses
     """
 

@@ -1,8 +1,18 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module contains the CWH Simulator for interacting with the CWH Docking task simulator
 """
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
+from corl.libraries.plugin_library import PluginLibrary
 
 from saferl.backend.cwh.cwh import CWHSpacecraft
 from saferl.core.platforms.cwh.cwh_platform import CWHPlatform

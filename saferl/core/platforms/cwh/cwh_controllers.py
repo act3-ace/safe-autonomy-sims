@@ -1,10 +1,20 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module contains controllers for the CWH platform.
 """
 
 import numpy as np
-from act3_rl_core.libraries.plugin_library import PluginLibrary
-from act3_rl_core.simulators.base_parts import BaseController, BasePlatformPartValidator
+from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_parts import BaseController, BasePlatformPartValidator
 
 import saferl.core.platforms.cwh.cwh_properties as cwh_props
 from saferl.core.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
@@ -15,16 +25,6 @@ class CWHController(BaseController):
     """
     A controller created to interface with the CWH platform.
     """
-
-    # @property
-    # def name(self):
-    #     """
-    #     Returns
-    #     -------
-    #     String
-    #         name of the controller
-    #     """
-    #     return self.config.name + self.__class__.__name__
 
     def apply_control(self, control: np.ndarray) -> None:
         """
@@ -57,8 +57,8 @@ class ThrustController(CWHController):
     """
     A controller to control thrust on the CWH platrorm.
 
-    Params
-    -------
+    Parameters
+    ----------
     parent_platform : cwh_platform
         the platform to which the controller belongs
     config : dict
@@ -73,14 +73,13 @@ class ThrustController(CWHController):
         property_class=cwh_props.ThrustProp,
     ):  # pylint: disable=W0102
         self.config: ThrustControllerValidator
-
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
     @property
     def get_validator(self):
         """
-        Params
-        ------
+        Parameters
+        ----------
         cls : constructor function
 
         Returns
@@ -96,8 +95,8 @@ class ThrustController(CWHController):
         """
         Applies control to the parent platform
 
-        Params
-        ------
+        Parameters
+        ----------
         control
             ndarray describing the control to the platform
         """
@@ -105,7 +104,7 @@ class ThrustController(CWHController):
 
     def get_applied_control(self) -> np.ndarray:
         """
-        Retreive the applied control to the parent platform
+        Retrieve the applied control to the parent platform
 
         Returns
         -------
