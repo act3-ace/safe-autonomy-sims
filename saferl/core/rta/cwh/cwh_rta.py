@@ -9,199 +9,225 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
+This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft
 """
-from collections import OrderedDict
+import abc
 
-import numpy as np
+from run_time_assurance.rta import RTABackupController, RTAModule
+from run_time_assurance.zoo.cwh.docking_3d import (
+    M_DEFAULT,
+    N_DEFAULT,
+    V0_DEFAULT,
+    V1_COEF_DEFAULT,
+    X_VEL_LIMIT_DEFAULT,
+    Y_VEL_LIMIT_DEFAULT,
+    Z_VEL_LIMIT_DEFAULT,
+    Docking3dExplicitOptimizationRTA,
+    Docking3dExplicitSwitchingRTA,
+    Docking3dImplicitOptimizationRTA,
+    Docking3dImplicitSwitchingRTA,
+)
 
-from saferl.core.rta.base_rta import ConstraintModule, ExplicitSimplexModule
+from saferl.core.glues.rta_glue import RTAGlue, RTAGlueValidator
 
 
-class DockingRTA(ExplicitSimplexModule):
-    """
-    Explicit Simplex RTA for CWH Docking problem.
+class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
+    """Base validator for cwh docking 3d rta glues
 
     Parameters
     ----------
-    x_vel_limit : float
-        x velocity component magnitude safety constraint upper bound. m/s
-    y_vel_limit : float
-        y velocity component magnitude safety constraint upper bound. m/s
-    v0: float
-        NMT safety constraint velocity upper bound constatnt component where ||v|| <= v0 + v1_coeff*n*distance. m/s
-    v1_coeff: float
-        NMT safety constraint velocity upper bound distance*mean_motion proportinality coefficient
-        where ||v|| <= v0 + v1_coeff*n*distance. m/s
-    n: float
-        Mean motion of Hill reference frame circular orbit. rad/s
-    m: float
-        Mass of spacecraft. kg
+    m : float, optional
+        mass in kg of spacecraft, by default M_DEFAULT
+    n : float, optional
+        orbital mean motion in rad/s of current Hill's reference frame, by default N_DEFAULT
+    v0 : float, optional
+        Maximum safe docking velocity in m/s, by default V0_DEFAULT
+        v0 of v_limit = v0 + v1*n*||r||
+    v1_coef : float, optional
+        coefficient of linear component of the distance depending speed limit in 1/seconds, by default V1_COEF_DEFAULT
+        v1_coef of v_limit = v0 + v1_coef*n*||r||
+    x_vel_limit : float, optional
+        max velocity magnitude in the x direction, by default X_VEL_LIMIT_DEFAULT
+    y_vel_limit : float, optional
+        max velocity magnitude in the y direction, by default Y_VEL_LIMIT_DEFAULT
+    z_vel_limit : float, optional
+        max velocity magnitude in the z direction, by default Z_VEL_LIMIT_DEFAULT
+    control_bounds_high : Union[float, np.ndarray], optional
+        upper bound of allowable control. Pass a list for element specific limit. By default 1
+    control_bounds_low : Union[float, np.ndarray], optional
+        lower bound of allowable control. Pass a list for element specific limit. By default -1
     """
+    m: float = M_DEFAULT
+    n: float = N_DEFAULT
+    v0: float = V0_DEFAULT
+    v1_coef: float = V1_COEF_DEFAULT
+    x_vel_limit: float = X_VEL_LIMIT_DEFAULT
+    y_vel_limit: float = Y_VEL_LIMIT_DEFAULT
+    z_vel_limit: float = Z_VEL_LIMIT_DEFAULT
+    control_bounds_high: float = 1
+    control_bounds_low: float = -1
 
-    def __init__(self, x_vel_limit=10, y_vel_limit=10, v0=0.2, v1_coeff=2, n=0.001027, m=12, **kwargs):
 
-        self.v0 = v0
-        self.v1_coeff = v1_coeff
+class RTAGlueCWHDocking3d(RTAGlue):
+    """General RTA Glue to wrap CWH Docking 3d RTA from the run-time-assurance package"""
 
-        self.x_vel_limit = x_vel_limit
-        self.y_vel_limit = y_vel_limit
-
-        self.n = n
-        self.v1 = self.v1_coeff * self.n
-
-        self.m = m
-
-        self.A, self.B = self._gen_dynamics_matrices()
-
+    def __init__(self, **kwargs):
+        self.config: CWHDocking3dRTAGlueValidator
         super().__init__(**kwargs)
 
-    def _setup_constraints(self):
-        # TODO: Automate this?
-        self.constraint_rel_vel = Constraint_rel_vel(v0=self.v0, v1=self.v1)
-        self.constraint_x_vel = ConstraintStateLimit(limit_val=self.x_vel_limit, state_index=2)
-        self.constraint_y_vel = ConstraintStateLimit(limit_val=self.y_vel_limit, state_index=3)
-        return ['constraint_rel_vel', 'constraint_x_vel', 'constraint_y_vel']
+    @property
+    def get_validator(cls):
+        return CWHDocking3dRTAGlueValidator
 
-    def _backup_control(self, action, observation):
-        state_vec = self._get_state_vector(observation)
+    def _create_rta_module(self) -> RTAModule:
+        rta_args = self._get_rta_args()
+        rta_module = self._instantiate_rta_module(**rta_args)
+        return rta_module
 
-        pred_state = self._pred_state_vector(action, state_vec, self.config.step_size)
+    @abc.abstractmethod
+    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
+        raise NotImplementedError
 
-        desired_state = pred_state.copy()
-        if self.constraint_x_vel.h_x(desired_state) < 0:
-            desired_state[2] = self.x_vel_limit * np.sign(desired_state[2])
-        if self.constraint_y_vel.h_x(desired_state) < 0:
-            desired_state[3] = self.y_vel_limit * np.sign(desired_state[3])
-        if self.constraint_rel_vel.h_x(desired_state) < 0:
-            rH = np.linalg.norm(desired_state[0:2])
-            vH = np.linalg.norm(desired_state[2:4])
-            vH_max = self.v1 * rH + self.v0
-            desired_state[2:4] = desired_state[2:4] / vH * vH_max
-        accel = (desired_state[2:4] - state_vec[2:4]) / self.config.step_size
-
-        backup_action = (accel[0:2] - self.A[2:4] @ pred_state) * self.m
-
-        backup_action = np.clip(backup_action, -1, 1)
-
-        backup_action_dict = self._get_action_dict(backup_action, ["x_thrust", "y_thrust"])
-
-        # TODO: Remove this 2D hack
-        backup_action_dict["z_thrust"] = 0
-
-        return backup_action_dict
-
-    def _gen_dynamics_matrices(self):
-        m = self.m
-        n = self.n
-
-        A = np.array(
-            [
-                [0, 0, 1, 0],
-                [0, 0, 0, 1],
-                [3 * n**2, 0, 0, 2 * n],
-                [0, 0, -2 * n, 0],
-            ],
-            dtype=np.float32,
-        )
-
-        B = np.array(
-            [
-                [0, 0],
-                [0, 0],
-                [1 / m, 0],
-                [0, 1 / m],
-            ],
-            dtype=np.float32,
-        )
-
-        return A, B
-
-    def _pred_state_vector(self, action, state_vec, step_size):
-        action_vec = self._get_action_vector(action)
-
-        state_dot = self.A @ state_vec + self.B @ action_vec
-        next_state = state_vec + state_dot * step_size
-
-        # sol = scipy.integrate.solve_ivp(self.compute_state_dot, (0, step_size), state, args=(control, ))
-
-        # next_state = sol.y[:, -1]  # save last timestep of integration solution
-        return next_state
-
-    def _get_action_vector(self, action):
-        action_vec = []  # TODO: Make more general
-        for _, v in action.items():
-            action_vec.extend(list(v))
-        return np.array(action_vec)[0:2]
-
-    def _get_action_dict(self, action, keys):
-        action_dict = OrderedDict()  # TODO: Find a better way to construct dict
-        for i, action_val in enumerate(action):
-            action_dict[keys[i]] = action_val
-        return action_dict
-
-    def _get_state_vector(self, observation):
-        state_vector = []
-        for _, v in observation.items():
-            state_vector.extend(list(next(iter(v.values()))))
-        return np.array(state_vector)[[0, 1, 3, 4]]
+    def _get_rta_args(self) -> dict:
+        return {
+            "m": self.config.m,
+            "n": self.config.n,
+            "v0": self.config.v0,
+            "v1_coef": self.config.v1_coef,
+            "x_vel_limit": self.config.x_vel_limit,
+            "y_vel_limit": self.config.y_vel_limit,
+            "z_vel_limit": self.config.z_vel_limit,
+            "control_bounds_high": self.config.control_bounds_high,
+            "control_bounds_low": self.config.control_bounds_low,
+        }
 
 
-class Constraint_rel_vel(ConstraintModule):
-    """
-    CWH NMT velocity constraint.
+class CWHDocking3dExplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
+    """Validator for CWH Docking 3d Explicit Switching RTA Glue
 
     Parameters
     ----------
-    v0: float
-        NMT safety constraint velocity upper bound constatnt component where ||v|| <= v0 + v1_coeff*n*distance. m/s
-    v1: float
-        NMT safety constraint velocity upper bound distance proportinality coefficient where ||v|| <= v0 + v1*distance. m/s
+    backup_controller : RTABackupController, optional
+        backup controller object utilized by rta module to generate backup control.
+        By default Docking2dStopLQRBackupController
     """
-
-    def __init__(self, v0, v1):
-        self.v0 = v0
-        self.v1 = v1
-
-    def h_x(self, state_vec):
-        return (self.v0 + self.v1 * np.linalg.norm(state_vec[0:2])) - np.linalg.norm(state_vec[2:4])
-
-    def grad(self, state_vec):
-        Hs = np.array([[2 * self.v1**2, 0, 0, 0], [0, 2 * self.v1**2, 0, 0], [0, 0, -2, 0], [0, 0, 0, -2]])
-
-        ghs = Hs @ state_vec
-        ghs[0] = ghs[0] + 2 * self.v1 * self.v0 * state_vec[0] / np.linalg.norm(state_vec[0:2])
-        ghs[1] = ghs[1] + 2 * self.v1 * self.v0 * state_vec[1] / np.linalg.norm(state_vec[0:2])
-        return ghs
-
-    def alpha(self, x):
-        return 0.05 * x + 0.1 * x**3
+    # backup_controller: RTABackupController = None
+    test: int = 1
 
 
-class ConstraintStateLimit(ConstraintModule):
-    """
-    Generic state vector element limit constraint.
+class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+
+    def __init__(self, **kwargs):
+        self.config: CWHDocking3dExplicitSwitchingRTAGlueValidator
+        super().__init__(**kwargs)
+
+    @property
+    def get_validator(cls):
+        return CWHDocking3dExplicitSwitchingRTAGlueValidator
+
+    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
+        return Docking3dExplicitSwitchingRTA(**kwargs)
+
+    def _get_rta_args(self) -> dict:
+        parent_args = super()._get_rta_args()
+        return {
+            **parent_args,
+            'backup_controller': self.config.backup_controller,
+        }
+
+
+class CWHDocking3dImplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
+    """Validator for CWH Docking 3d Implicit Switching RTA Glue
 
     Parameters
     ----------
-    limit_val : float
-        State vector element limit constraint value.
-    state_index: int
-        Index/indices of state vector element to apply limit constraint to.
+    backup_window : float
+        Duration of time in seconds to evaluate backup controller trajectory
+    backup_controller : RTABackupController, optional
+        backup controller object utilized by rta module to generate backup control.
+        By default Docking2dStopLQRBackupController
     """
+    backup_window: float = 5
+    backup_controller: RTABackupController = None
 
-    def __init__(self, limit_val, state_index):
-        self.limit_val = limit_val
-        self.state_index = state_index
 
-    def h_x(self, state_vec):
-        return self.limit_val**2 - state_vec[self.state_index]**2
+class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
 
-    def grad(self, state_vec):
-        gh = np.zeros((state_vec.size, state_vec.size), dtype=float)
-        gh[self.state_index, self.state_index] = -2
-        g = gh @ state_vec
-        return g
+    def __init__(self, **kwargs):
+        self.config: CWHDocking3dImplicitSwitchingRTAGlueValidator
+        super().__init__(**kwargs)
 
-    def alpha(self, x):
-        return 0.0005 * x + 0.001 * x**3
+    @property
+    def get_validator(cls):
+        return CWHDocking3dImplicitSwitchingRTAGlueValidator
+
+    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
+        return Docking3dImplicitSwitchingRTA(**kwargs)
+
+    def _get_rta_args(self) -> dict:
+        parent_args = super()._get_rta_args()
+        return {
+            **parent_args,
+            'backup_window': self.config.backup_window,
+            'backup_controller': self.config.backup_controller,
+        }
+
+
+class RTAGlueCHWDocking3dExplicitOptimization(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+
+    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
+        return Docking3dExplicitOptimizationRTA(**kwargs)
+
+
+class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValidator):
+    """Validator for CWH Docking 3d Implicit Optimization RTA Glue
+
+    Parameters
+    ----------
+    backup_window : float
+        Duration of time in seconds to evaluate backup controller trajectory
+    num_check_all : int
+        Number of points at beginning of backup trajectory to check at every sequential simulation timestep.
+        Should be <= backup_window.
+        Defaults to 0 as skip_length defaults to 1 resulting in all backup trajectory points being checked.
+    skip_length : int
+        After num_check_all points in the backup trajectory are checked, the remainder of the backup window is filled by
+        skipping every skip_length points to reduce the number of backup trajectory constraints. Will always check the
+        last point in the backup trajectory as well.
+        Defaults to 1, resulting in no skipping.
+    backup_controller : RTABackupController, optional
+        backup controller object utilized by rta module to generate backup control.
+        By default Docking2dStopLQRBackupController
+    """
+    backup_window: float = 5
+    num_check_all: int = 5
+    skip_length: int = 1
+    backup_controller: RTABackupController = None
+
+
+class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
+    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+
+    def __init__(self, **kwargs):
+        self.config: CWHDocking3dImplicitOptimizationRTAGlueValidator
+        super().__init__(**kwargs)
+
+    @property
+    def get_validator(cls):
+        return CWHDocking3dImplicitOptimizationRTAGlueValidator
+
+    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
+        return Docking3dImplicitOptimizationRTA(**kwargs)
+
+    def _get_rta_args(self) -> dict:
+        parent_args = super()._get_rta_args()
+        return {
+            **parent_args,
+            'backup_window': self.config.backup_window,
+            'num_check_all': self.config.num_check_all,
+            'skip_length': self.config.skip_length,
+            'backup_controller': self.config.backup_controller,
+        }
