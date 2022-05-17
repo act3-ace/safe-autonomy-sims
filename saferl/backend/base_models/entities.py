@@ -192,7 +192,7 @@ class BaseDynamics(abc.ABC):
         Minimum allowable value for the next state. State values that exceed this are clipped.
         When a float, represents single limit applied to entire state vector.
         When an ndarray, each element represents the limit to the corresponding state vector element.
-    state_min : float or np.ndarray
+    state_max : float or np.ndarray
         Maximum allowable value for the next state. State values that exceed this are clipped.
         When a float, represents single limit applied to entire state vector.
         When an ndarray, each element represents the limit to the corresponding state vector element.
