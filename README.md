@@ -6,11 +6,11 @@ The Safe-Autonomy-Sims library provides the components and
 tools to build modular, integration-focused Reinforcement 
 Learning environments with Run Time Assurance (RTA). 
 This repo is designed to work hand-in-glove with the CoRL 
-library.
+and Run Time Assurance libraries.
 
 ## Installation
 The following instructions detail how to install 
-the safe-autonomy-sims library on your local system.
+the safe-autonomy-sims library and its dependencies on your local system.
 It is recommended to install the python modules within 
 a [virtualenv](https://virtualenv.pypa.io/en/stable/#)
 or [conda](https://docs.conda.io/projects/conda/en/latest/index.html) environment.
@@ -26,10 +26,27 @@ or HTTPS:
 git clone https://github.com/act3-ace/act3-rl/corl.git
 ```
 
-Install the CoRL (act3-rl-core) module into your 
+Install the CoRL module into your 
 environment using `pip`:
 ```shell
 pip install path/to/corl/
+```
+
+### Installing Run Time Assurance
+Clone a copy of the Run Time Assurance source code onto
+your local machine via SSH:
+```shell
+git clone git@github.com/act3-ace:rta/run-time-assurance.git
+```
+or HTTPS:
+```shell
+git clone https://github.com/act3-ace/run-time-assurance.git
+```
+
+Install the Run Time Assurance module into your 
+environment using `pip`:
+```shell
+pip install path/to/run-time-assurance/
 ```
 
 ### Installing safe-autonomy-sims
