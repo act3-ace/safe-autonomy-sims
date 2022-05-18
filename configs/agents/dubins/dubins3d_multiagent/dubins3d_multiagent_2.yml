@@ -12,7 +12,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # ---------------------------------------------------------------------------
 
-"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
         {"part": "Controller_RollRate", "config": {"axis": 0}},
@@ -26,11 +26,11 @@
         {"part": "Sensor_Roll"},
     ],
     "episode_parameter_provider": {
-      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
       "x": {
-        "type": "act3_rl_core.libraries.parameters.UniformParameter",
+        "type": "corl.libraries.parameters.UniformParameter",
         "config": {
           "name": "x",
           "units": "meters",
@@ -39,7 +39,7 @@
         },
       },
       "y": {
-        "type": "act3_rl_core.libraries.parameters.UniformParameter",
+        "type": "corl.libraries.parameters.UniformParameter",
         "config": {
           "name": "y",
           "units": "meters",
@@ -48,7 +48,7 @@
         },
       },
       "z": {
-        "type": "act3_rl_core.libraries.parameters.UniformParameter",
+        "type": "corl.libraries.parameters.UniformParameter",
         "config": {
           "name": "z",
           "units": "meters",
@@ -63,19 +63,19 @@
     },
     "glues": [
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config": {
                 "controller": "Controller_Acceleration",
             },
         },
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_PitchRate",
             }
         },
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_RollRate",
             }

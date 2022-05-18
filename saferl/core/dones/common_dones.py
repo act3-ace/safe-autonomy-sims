@@ -112,7 +112,6 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         -------
         RejoinDoneValidator
             done function validator
-
         """
         return CollisionDoneFunctionValidator
 
@@ -145,36 +144,42 @@ class CollisionDoneFunction(SharedDoneFuncBase):
             dictionary containing the condition for the current agent
         """
 
-        # get list of agents
-        agent_names = list(local_done_info.keys())
+        # get list of spacecrafts
+        agent_names = list(local_dones.keys())
+        try:
+            agent_names.remove("__all__")
+        except ValueError as err:
+            print(err)
 
         # populate DoneDict
         done = DoneDict()
         for name in local_dones.keys():
             done[name] = False
 
-        # check if any agent violates safety_constraint of other agents
+        # check if any spacecraft violates boundaries of other spacecrafts
         while len(agent_names) > 1:
             agent_name = agent_names.pop()
-            agent_platform = get_platform_by_name(next_state, agent_name)  # TODO: better way to do this
+            agent_platform = get_platform_by_name(next_state, agent_name)
             agent_position = agent_platform.position
 
             for other_agent_name in agent_names:
 
-                if local_dones.get(other_agent_name, True):
-                    # skip if other_agent is done or inoperable
+                if local_dones[other_agent_name]:
+                    # skip if other_agent is done
                     continue
 
                 # check location against location of other agents for boundary violation
-                other_agent_platform = get_platform_by_name(next_state, other_agent_name)  # TODO: better way to do this
+                other_agent_platform = get_platform_by_name(next_state, other_agent_name)
                 other_agent_position = other_agent_platform.position
+
                 radial_distance = np.linalg.norm(np.array(agent_position) - np.array(other_agent_position))
 
                 if radial_distance < self.config.safety_constraint:
                     # collision detected. stop loop and end episode
                     for k in local_dones.keys():
                         done[k] = True
-                    break
+                    # break
+                    return done
         return done
 
 
@@ -250,7 +255,7 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
                 # agent has not reached done condition
                 return done
 
-        # all agents have suceeded, set all dones to True
+        # all agents have succeeded, set all dones to True
         for k in local_dones.keys():
             done[k] = True
         return done
