@@ -7,9 +7,9 @@ or [conda](https://docs.conda.io/projects/conda/en/latest/index.html)
 environment.
 
 The safe-autonomy-sims library is built on the [CoRL](https://github.com/act3-ace/act3-rl/corl)
-reinforcement learning framework. This framework is required
+reinforcement learning framework using the [Run Time Assurance](https://github.com/act3-ace/run-time-assurance) package. These dependencies are required
 in order to use safe-autonomy-sims. At the time of writing,
-CoRL is not available on any public package indices and
+neither dependency is available on any public package repos and
 must be installed from source.
 
 ## Installing CoRL
@@ -26,6 +26,22 @@ git clone https://github.com/act3-ace/act3-rl/corl.git
 Install the CoRL module into your environment using `pip`:
 ```shell
 pip install path/to/corl/
+```
+
+## Installing Run Time Assurance
+Clone a copy of the Run Time Assurance source code onto your local machine via SSH:
+```shell
+git clone git@github.com/act3-ace:rta/run-time-assurance.git
+```
+or HTTPS:
+```shell
+git clone https://github.com/act3-ace/run-time-assurance.git
+```
+
+Install the Run Time Assurance module into your 
+environment using `pip`:
+```shell
+pip install path/to/run-time-assurance/
 ```
 
 ## Installing safe-autonomy-sims
