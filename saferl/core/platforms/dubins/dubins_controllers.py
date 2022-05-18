@@ -21,7 +21,9 @@ from saferl.core.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dS
 
 
 class DubinsController(BaseController):
-    """Generic dubins controller"""
+    """
+    Generic dubins controller.
+    """
 
     def apply_control(self, control: np.ndarray) -> None:
         raise NotImplementedError
@@ -34,16 +36,20 @@ class DubinsController(BaseController):
 
 
 class RateControllerValidator(BasePlatformPartValidator):
-    """Generic rate controller validator.
+    """
+    Generic rate controller validator.
 
-    axis: index in combined control vector for this controller's output action
+    axis: int
+        Index in combined control vector for this controller's output action.
     """
 
     axis: int
 
 
 class RateController(DubinsController):
-    """Generic rate controller. Writes control action to platform's control vector and reads applied action from platform."""
+    """
+    Generic rate controller. Writes control action to platform's control vector and reads applied action from platform.
+    """
 
     def __init__(self, **kwargs) -> None:
         self.config: RateControllerValidator
@@ -77,7 +83,9 @@ PluginLibrary.AddClassToGroup(
 
 
 class AccelerationController(RateController):
-    """Applies acceleration control to dubins platform"""
+    """
+    Applies acceleration control to dubins platform.
+    """
 
     def __init__(self, parent_platform, config, property_class=dubins_props.AccelerationProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
@@ -100,7 +108,9 @@ PluginLibrary.AddClassToGroup(
 
 
 class YawRateController(RateController):
-    """Applies Yaw control to dubins platform"""
+    """
+    Applies Yaw control to dubins platform.
+    """
 
     def __init__(self, parent_platform, config, property_class=dubins_props.YawRateProp):  # pylint: disable=W0102
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
@@ -121,14 +131,15 @@ PluginLibrary.AddClassToGroup(
 
 
 class CombinedTurnRateAccelerationController(DubinsController):
-    """Applies heading rate and acceleration control to dubins plaform
+    """
+    Applies heading rate and acceleration control to dubins platform.
 
     Parameters
     ----------
     parent_platform : DubinsPlatform
-        the platform to which the controller belongs
+        The platform to which the controller belongs.
     config : dict
-        contains configuration proprties
+        Contains configuration properties.
     """
 
     def __init__(
@@ -159,14 +170,15 @@ PluginLibrary.AddClassToGroup(
 
 
 class CombinedPitchRollAccelerationController(DubinsController):
-    """Applies pitch rate, roll rate, and acceleration control to dubins platform
+    """
+    Applies pitch rate, roll rate, and acceleration control to dubins platform.
 
     Parameters
     ----------
     parent_platform : DubinsPlatform
-        the platform to which the controller belongs
+        The platform to which the controller belongs.
     config : dict
-        contains configuration proprties
+        Contains configuration properties.
     """
 
     def __init__(
@@ -194,7 +206,9 @@ PluginLibrary.AddClassToGroup(
 
 
 class PitchRateController(RateController):
-    """Applies pitch rate control to dubins platform"""
+    """
+    Applies pitch rate control to dubins platform.
+    """
 
     def __init__(self, parent_platform, config, property_class=dubins_props.PitchRateProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
@@ -208,7 +222,9 @@ PluginLibrary.AddClassToGroup(
 
 
 class RollRateController(RateController):
-    """Applies roll rate control to dubins platform"""
+    """
+    Applies roll rate control to dubins platform.
+    """
 
     def __init__(self, parent_platform, config, property_class=dubins_props.RollRateProp):  # pylint: disable=W0102
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)

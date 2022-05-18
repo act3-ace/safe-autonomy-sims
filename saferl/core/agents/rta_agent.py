@@ -24,7 +24,8 @@ class FunctorMultiWrapper(Functor):
     wrapped_glues: typing.Union['FunctorMultiWrapper', FunctorWrapper, Functor]
 
     def create_functor_glue_object(self, platform, agent_name, local_param_storage, world_param_storage):
-        """Creates a glue functor wrapper object associated with a platform and an agent.
+        """
+        Creates a glue functor wrapper object associated with a platform and an agent.
 
         Parameters
         ----------

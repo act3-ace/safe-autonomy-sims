@@ -27,17 +27,18 @@ from saferl.core.utils import get_rejoin_region_center, in_rejoin
 
 class RejoinDistanceChangeRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the RejoinDistanceChangeReward Reward Function
+    Validator for the RejoinDistanceChangeReward Reward Function.
+
     Attributes
     ----------
     radius : float
-        size of the radius of the region region
+        Size of the radius of the rejoin region.
     offset : [float,float,float]
-        vector detailing the location of the center of the rejoin region from the aircraft
+        Vector detailing the location of the center of the rejoin region from the aircraft.
     lead : str
-        name of the lead platform, for later lookup
+        Name of the lead platform, for later lookup.
     reward : float
-        reward for accomplishing the task
+        Reward for accomplishing the task.
     """
     radius: float
     offset: typing.List[float]
@@ -47,7 +48,44 @@ class RejoinDistanceChangeRewardValidator(RewardFuncBaseValidator):
 
 class RejoinDistanceChangeReward(RewardFuncBase):
     """
-    A reward function that provides a reward proportional to the change in distance from the rejoin distance.
+    A reward function that provides a reward proportional to the change in distance from the rejoin region.
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    This method calculates the current position of the agent and compares it to the previous position. The
+    difference is used to return a proportional reward.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to keys in the observation_space
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -94,10 +132,6 @@ class RejoinDistanceChangeReward(RewardFuncBase):
         ----------
         dist: float
             The current distance of the agent from the target.
-
-        Returns
-        -------
-        None
         """
         self._dist_buffer.append(dist)
 
@@ -111,32 +145,6 @@ class RejoinDistanceChangeReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
-        """
-        This method calculates the current position of the agent and compares it to the previous position. The
-        difference is used to return a proportional reward.
-
-        Parameters
-        ----------
-        observation : OrderedDict
-            The observations available to the agent from the previous state.
-        action
-            The last action performed by the agent.
-        next_observation : OrderedDict
-            The observations available to the agent from the current state.
-        state : StateDict
-            The previous state of the simulation.
-        next_state : StateDict
-            The current state of the simulation.
-        observation_space : StateDict
-            The agent's observation space.
-        observation_units : StateDict
-            The units corresponding to values in the observation_space?
-
-        Returns
-        -------
-        reward : RewardDict
-            The agent's reward for their change in distance.
-        """
 
         reward = RewardDict()
         value = 0.0
@@ -157,7 +165,22 @@ class RejoinDistanceChangeReward(RewardFuncBase):
 
 class RejoinDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
-    TODO: Get the descriptions of these values
+    Validator for the RejoinDistanceExponentialChangeReward Reward Function.
+
+    lead : str
+        Name of the lead platform, for later lookup.
+    offset : [float,float,float]
+        Vector detailing the location of the center of the rejoin region from the aircraft.
+    c : float
+        Scale factor of exponential distance function
+    a : float
+        Exponential coefficient of exponential distance function. Do not specify if `pivot` is defined.
+    pivot : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    pivot_ratio : float
+        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+    scale : float
+        Reward scaling value.
     """
     lead: str
     offset: typing.List[float]
@@ -170,7 +193,45 @@ class RejoinDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
 
 class RejoinDistanceExponentialChangeReward(RewardFuncBase):
     """
-    Calculates an exponential reward based on the change in distance of the agent.
+    Calculates an exponential reward based on the change in relative distance of the agent and the rejoin
+    region's center.
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    This method calculates the current position of the agent and compares it to the previous position. The
+    difference is used to return an exponential reward.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to keys in the observation_space
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -245,6 +306,7 @@ class RejoinDistanceExponentialChangeReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
+
         reward = RewardDict()
         val = 0.0
 
@@ -268,18 +330,18 @@ class RejoinDistanceExponentialChangeReward(RewardFuncBase):
 
 class RejoinRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the RejoinReward Reward Function
+    Validator for the RejoinReward Reward Function.
 
     Attributes
     ----------
     reward : typing.Union[float, int]
-        reward for accomplishing the task
+        Reward for accomplishing the task.
     radius : float
-        size of the radius of the region region
+        Size of the radius of the rejoin region.
     offset : [float,float,float]
-        vector detailing the offset of the center of the rejoin region from the lead platform
+        Vector detailing the offset of the center of the rejoin region from the lead platform.
     lead : str
-        name of the lead platform, for later lookup
+        Name of the lead platform, for later lookup.
     refund : bool, optional
         Flag which if true refunds reward if the rejoin region is exited. Default: False.
     """
@@ -293,6 +355,43 @@ class RejoinRewardValidator(RewardFuncBaseValidator):
 class RejoinReward(RewardFuncBase):
     """
     A reward function that provides a reward for time spent in the rejoin region.
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    This method returns a reward proportional to the number of consecutive time steps an agent craft
+    remains inside the rejoin region.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to values in the observation_space?
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -321,31 +420,6 @@ class RejoinReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
-        """
-        This method returns the reward specified in its configuration.
-
-        Parameters
-        ----------
-        observation : OrderedDict
-            The observations available to the agent from the previous state.
-        action
-            The last action performed by the agent.
-        next_observation : OrderedDict
-            The observations available to the agent from the current state.
-        state : StateDict
-            The previous state of the simulation.
-        next_state : StateDict
-            The current state of the simulation.
-        observation_space : StateDict
-            The agent's observation space.
-        observation_units : StateDict
-            The units corresponding to values in the observation_space?
-
-        Returns
-        -------
-        reward : RewardDict
-            The agent's reward.
-        """
 
         reward = RewardDict()
         value = 0.0
@@ -368,12 +442,12 @@ class RejoinReward(RewardFuncBase):
 
 class RejoinFirstTimeRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the RejoinReward Reward Function
+    Validator for the RejoinReward Reward Function.
 
     Attributes
     ----------
     reward : float
-        reward for accomplishing the task
+        Reward for accomplishing the task.
     """
     reward: typing.Union[float, int]
     radius: typing.Union[float, int]
@@ -384,6 +458,42 @@ class RejoinFirstTimeRewardValidator(RewardFuncBaseValidator):
 class RejoinFirstTimeReward(RewardFuncBase):
     """
     A reward function that provides a reward for the first time the platform enters the rejoin region.
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    This function returns an award once the agent enters into the rejoin region for the first time.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to keys in the observation_space.
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -412,31 +522,6 @@ class RejoinFirstTimeReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
-        """
-        This method returns the reward specified in its configuration.
-
-        Parameters
-        ----------
-        observation : OrderedDict
-            The observations available to the agent from the previous state.
-        action
-            The last action performed by the agent.
-        next_observation : OrderedDict
-            The observations available to the agent from the current state.
-        state : StateDict
-            The previous state of the simulation.
-        next_state : StateDict
-            The current state of the simulation.
-        observation_space : StateDict
-            The agent's observation space.
-        observation_units : StateDict
-            The units corresponding to values in the observation_space?
-
-        Returns
-        -------
-        reward : RewardDict
-            The agent's reward.
-        """
 
         reward = RewardDict()
         value = 0.0
@@ -457,21 +542,22 @@ class RejoinFirstTimeReward(RewardFuncBase):
 
 class RejoinSuccessRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the SuccessfulRejoinReward function
+    Validator for the SuccessfulRejoinReward function.
+
     Attributes
     ----------
     radius : float
-        size of the radius of the region region
+        Size of the radius of the rejoin region.
     offset : [float,float,float]
-        vector detailing the location of the center of the rejoin region from the aircraft
+        Vector detailing the location of the center of the rejoin region from the aircraf.
     lead : str
-        name of the lead platform, for later lookup
+        Name of the lead platform, for later lookup.
     reward : float
-        reward for accomplishing the task
+        Reward for accomplishing the task.
     step_size : float
-        size of one single simulation step
+        Size of one single simulation step.
     success_time : float
-        time wingman must remain in rejoin region to obtain reward
+        Time wingman must remain in rejoin region to obtain reward.
     """
     radius: typing.Union[float, int]
     offset: typing.List[typing.Union[float, int]]
@@ -484,6 +570,42 @@ class RejoinSuccessRewardValidator(RewardFuncBaseValidator):
 class RejoinSuccessReward(RewardFuncBase):
     """
     This function determines the reward for when the wingman successfully stays in the rejoin region for the given duration
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    This method calculates the agent's reward for succeeding in the rejoin task.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to keys in the observation_space.
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward for succeeding in the rejoin task.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -522,31 +644,6 @@ class RejoinSuccessReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
-        """
-        This method calculates the agent's reward for succeeding in the rejoin task.
-
-        Parameters
-        ----------
-        observation : OrderedDict
-            The observations available to the agent from the previous state.
-        action
-            The last action performed by the agent.
-        next_observation : OrderedDict
-            The observations available to the agent from the current state.
-        state : StateDict
-            The previous state of the simulation.
-        next_state : StateDict
-            The current state of the simulation.
-        observation_space : StateDict
-            The agent's observation space.
-        observation_units : StateDict
-            The units corresponding to values in the observation_space?
-
-        Returns
-        -------
-        reward : RewardDict
-            The agent's reward for succeeding in the rejoin task.
-        """
 
         reward = RewardDict()
         value = 0.0
@@ -562,29 +659,30 @@ class RejoinSuccessReward(RewardFuncBase):
 
 class RejoinFailureRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the RejoinFailureReward function
+    Validator for the RejoinFailureReward function.
+
     Attributes
     ----------
     radius : float
-        size of the radius of the region region
+        Size of the radius of the rejoin region.
     offset : [float,float,float]
-        vector detailing the location of the center of the rejoin region from the aircraft
+        Vector detailing the location of the center of the rejoin region from the aircraft.
     lead : str
-        name of the lead platform, for later lookup
+        Name of the lead platform, for later lookup.
     crash_reward : float
-        reward for violating the lead's safety margin
+        Reward for violating the lead's safety margin.
     distance_reward : float
-        reward for exceeding the max allowable distance from the lead
+        Reward for exceeding the max allowable distance from the lead.
     timeout_reward : float
-        reward for exceeding the max allowable completion time
+        Reward for exceeding the max allowable completion time.
     leave_rejoin_reward : float
-        reward for leaving the rejoin region
+        Reward for leaving the rejoin region.
     max_time : float
-        maximum allowable time
+        maximum allowable time.
     max_distance : float
-        maximum allowable distance from lead
+        Maximum allowable distance from lead.
     safety_margin : float
-        minimum allowable distance to lead
+        Minimum allowable distance to lead.
     """
     radius: typing.Union[float, int]
     offset: typing.List[typing.Union[float, int]]
@@ -601,7 +699,43 @@ class RejoinFailureRewardValidator(RewardFuncBaseValidator):
 class RejoinFailureReward(RewardFuncBase):
     """
     This function determines the reward for when the wingman reaches a failure condition.
-    TODO: Consider breaking into constituent rewards?
+    TODO: decompose into constituent rewards?
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    This method calculates reward for failing the rejoin task.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to keys in the observation_space.
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward for failing the rejoin task.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -684,31 +818,6 @@ class RejoinFailureReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
-        """
-        This method calculates reward for failing the rejoin task.
-
-        Parameters
-        ----------
-        observation : OrderedDict
-            The observations available to the agent from the previous state.
-        action
-            The last action performed by the agent.
-        next_observation : OrderedDict
-            The observations available to the agent from the current state.
-        state : StateDict
-            The previous state of the simulation.
-        next_state : StateDict
-            The current state of the simulation.
-        observation_space : StateDict
-            The agent's observation space.
-        observation_units : StateDict
-            The units corresponding to values in the observation_space?
-
-        Returns
-        -------
-        reward : RewardDict
-            The agent's reward for failing the rejoin task.
-        """
 
         reward = RewardDict()
         value = 0.0

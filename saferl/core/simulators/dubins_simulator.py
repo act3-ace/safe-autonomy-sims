@@ -22,7 +22,10 @@ from saferl.core.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimul
 
 class DubinsSimulatorValidator(SafeRLSimulatorValidator):
     """
-    lead: the name of the lead aircraft
+    Validator for DubinsSimulator.
+
+    lead: str
+        The name of the lead aircraft.
     """
     lead: str = ""
 
@@ -52,7 +55,7 @@ class DubinsSimulator(SafeRLSimulator):
 
     def register_lead(self):
         """
-        Register the lead platform with all wingman platforms.
+        Registers the lead platform with all wingman platforms.
 
         Returns
         -------
@@ -72,7 +75,7 @@ class DubinsSimulator(SafeRLSimulator):
 
 class Dubins2dSimulator(DubinsSimulator):
     """
-    A class that contains all essential components of a Dubins2D simulation
+    A class that contains all essential components of a Dubins2D simulation.
     """
 
     def _construct_platform_map(self) -> dict:
@@ -87,7 +90,7 @@ PluginLibrary.AddClassToGroup(Dubins2dSimulator, "Dubins2dSimulator", {})
 
 class Dubins3dSimulator(DubinsSimulator):
     """
-    A class that contains all essential components of a Dubins 3D simulation
+    A class that contains all essential components of a Dubins 3D simulation.
     """
 
     def _construct_platform_map(self) -> dict:

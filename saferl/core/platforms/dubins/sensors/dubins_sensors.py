@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module contains implementations of sensors that reside on the Dubins platform
+This module contains implementations of sensors that reside on the Dubins platform.
 """
 import typing
 
@@ -25,14 +25,14 @@ from saferl.core.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dS
 
 class DubinsSensorValidator(BasePlatformPartValidator):
     """
-    oriented: Flag to orient sensor value from platform's partner orientation. Default: False.
+    Oriented: Flag to orient sensor value from platform's partner orientation. Default: False.
     """
     oriented: bool = False
 
 
 class DubinsSensor(TransformSensor):
     """
-    Interface for a basic sensor of the Dubins platform
+    Interface for a basic sensor of the Dubins platform.
     """
 
     @property
@@ -51,7 +51,7 @@ class DubinsSensor(TransformSensor):
 
 class PositionSensor(DubinsSensor):
     """
-    Implementation of a sensor designed to give the position at any time
+    Implementation of a sensor designed to give the position at any time.
     """
 
     def __init__(self, parent_platform, config, property_class=dubins_props.PositionProp):
@@ -59,17 +59,17 @@ class PositionSensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the position
+        Calculate the position.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         list of ints
-            position of spacecraft
+            Position of spacecraft.
         """
         return self.parent_platform.position
 
@@ -88,7 +88,7 @@ PluginLibrary.AddClassToGroup(
 
 class VelocitySensor(DubinsSensor):
     """
-    Implementation of a sensor to give velocity at any time
+    Implementation of a sensor to give velocity at any time.
     """
 
     def __init__(self, parent_platform, config, property_class=dubins_props.VelocityProp):
@@ -96,17 +96,17 @@ class VelocitySensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - velocity
+        Calculate the measurement - velocity.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         list of floats
-            velocity of aircraft
+            Velocity of aircraft.
         """
         return self.parent_platform.velocity
 
@@ -133,17 +133,17 @@ class HeadingSensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - heading
+        Calculate the measurement - heading.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         list of floats
-            heading of aircraft
+            Heading of aircraft.
         """
         return np.array([self.parent_platform.heading], dtype=np.float32)
 
@@ -170,17 +170,17 @@ class FlightPathSensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - flight path angle
+        Calculate the measurement - flight path angle.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         float
-            flight path angle
+            Flight path angle.
         """
         return np.array([np.deg2rad(self.parent_platform.flight_path_angle)], dtype=np.float32)
 
@@ -207,17 +207,17 @@ class RollSensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - roll angle
+        Calculate the measurement - roll angle.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         float
-            roll angle
+            Roll angle.
         """
         return np.array([np.deg2rad(self.parent_platform.roll)], dtype=np.float32)
 
@@ -244,17 +244,17 @@ class QuaternionSensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - quaternion
+        Calculate the measurement - quaternion.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         np.ndarray
-            quaternion
+            Quaternion.
         """
         return self.parent_platform.orientation.as_quat()
 
@@ -273,7 +273,7 @@ PluginLibrary.AddClassToGroup(
 
 class DubinsTimeSensor(BaseTimeSensor):
     """
-    Implementation of a sensor to give the time since episode start
+    Implementation of a sensor to give the time since episode start.
     """
 
     def _calculate_measurement(self, state):
@@ -302,17 +302,17 @@ class SpeedSensor(DubinsSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - speed
+        Calculate the measurement - speed.
 
         Parameters
         ------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         np.ndarray
-            speed
+            Speed.
         """
         return np.array([self.parent_platform.v], dtype=np.float32)
 

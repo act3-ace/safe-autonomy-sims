@@ -23,13 +23,14 @@ from saferl.core.glues.normal.normal_observe_glue import NormalObserveSensorGlue
 
 class VelocityLimitGlueValidator(NormalObserveSensorGlueValidator):
     """
-    Validator for the VelocityLimitGlue
+    Validator for the VelocityLimitGlue.
+
     velocity_threshold: float
         The maximum tolerated velocity within docking region without crashing
     threshold_distance: float
         The radius of the docking region
     mean_motion: float
-        TODO: define
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     slope: float
         The slope of the linear velocity limit as a function of distance from docking region
     """

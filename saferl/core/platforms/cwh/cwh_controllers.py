@@ -26,16 +26,6 @@ class CWHController(BaseController):
     A controller created to interface with the CWH platform.
     """
 
-    # @property
-    # def name(self):
-    #     """
-    #     Returns
-    #     -------
-    #     String
-    #         name of the controller
-    #     """
-    #     return self.config.name + self.__class__.__name__
-
     def apply_control(self, control: np.ndarray) -> None:
         """
         Raises
@@ -57,23 +47,24 @@ class CWHController(BaseController):
 
 class ThrustControllerValidator(BasePlatformPartValidator):
     """
-    Controller config validator for the ThrustController
-    """
+    Controller config validator for the ThrustController.
 
+    axis : int
+        The index of the action space element corresponding to this controller's actions.
+    """
     axis: int
 
 
 class ThrustController(CWHController):
     """
-    A controller to control thrust on the CWH platrorm.
+    A controller to control thrust on the CWH platform.
 
     Parameters
     ----------
     parent_platform : cwh_platform
-        the platform to which the controller belongs
+        The platform to which the controller belongs.
     config : dict
-        contains configuration proprties
-
+        Contains configuration properties.
     """
 
     def __init__(
@@ -95,32 +86,30 @@ class ThrustController(CWHController):
         Returns
         -------
         ThrustControllerValidator
-            config validator for the ThrustController
-
+            Config validator for the ThrustController.
         """
 
         return ThrustControllerValidator
 
     def apply_control(self, control: np.ndarray) -> None:
         """
-        Applies control to the parent platform
+        Applies control to the parent platform.
 
         Parameters
         ----------
         control
-            ndarray describing the control to the platform
+            ndarray describing the control to the platform.
         """
         self.parent_platform.save_action_to_platform(action=control, axis=self.config.axis)
 
     def get_applied_control(self) -> np.ndarray:
         """
-        Retrieve the applied control to the parent platform
+        Retrieve the applied control to the parent platform.
 
         Returns
         -------
         np.ndarray
-            Previously applied action
-
+            Previously applied action.
         """
         return np.array([self.parent_platform.get_applied_action()[self.config.axis]], dtype=np.float32)
 
