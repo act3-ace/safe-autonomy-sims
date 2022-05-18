@@ -12,21 +12,14 @@ limitation or restriction. See accompanying README and LICENSE for details.
 Functions that define the terminal conditions for the Docking Environment.
 This in turn defines whether the end is episode is reached or not.
 """
-
 import typing
 from collections import OrderedDict
 
 import numpy as np
-from act3_rl_core.dones.done_func_base import (
-    DoneFuncBase,
-    DoneFuncBaseValidator,
-    DoneStatusCodes,
-    SharedDoneFuncBase,
-    SharedDoneFuncBaseValidator,
-)
-from act3_rl_core.libraries.environment_dict import DoneDict
-from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name, get_sensor_by_name
+from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase, SharedDoneFuncBaseValidator
+from corl.libraries.environment_dict import DoneDict
+from corl.libraries.state_dict import StateDict
+from corl.simulators.common_platform_utils import get_platform_by_name, get_sensor_by_name
 
 from saferl.core.utils import max_vel_violation
 
@@ -181,10 +174,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        # main:
-        # done[self.agent] = in_docking and not violated
-        # multi
         done[self.agent] = bool(in_docking and not violated)
+
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
@@ -460,14 +451,16 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         """
         Logic that returns the done condition given the current environment conditions
 
+        Parameters
+        ----------
         observation : np.ndarray
-             current observation from environment
+            current observation from environment
         action : np.ndarray
-             current action to be applied
+            current action to be applied
         next_observation : np.ndarray
-             incoming observation from environment
+            incoming observation from environment
         next_state : np.ndarray
-             incoming state from environment
+            incoming state from environment
         local_dones: DoneDict
             TODO
         local_done_info: OrderedDict
@@ -477,11 +470,13 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         -------
         done : DoneDict
             dictionary containing the condition for the current agent
-
         """
-
         # get list of spacecrafts
-        agent_names = list(local_done_info.keys())
+        agent_names = list(local_dones.keys())
+        try:
+            agent_names.remove("__all__")
+        except ValueError as err:
+            print(err)
 
         # populate DoneDict
         done = DoneDict()
@@ -512,7 +507,8 @@ class CollisionDoneFunction(SharedDoneFuncBase):
                     # collision detected. stop loop and end episode
                     for k in local_dones.keys():
                         done[k] = True
-                    break
+                    # break
+                    return done
         return done
 
 
@@ -554,14 +550,14 @@ class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
         """
         Logic that returns the done condition given the current environment conditions
 
-        Params
-        ------
+        Parameters
+        ----------
         observation : np.ndarray
-             current observation from environment
+            current observation from environment
         action : np.ndarray
-             current action to be applied
+            current action to be applied
         next_observation : np.ndarray
-             incoming observation from environment
+            incoming observation from environment
         next_state : np.ndarray
             incoming state from environment
         local_dones: DoneDict
