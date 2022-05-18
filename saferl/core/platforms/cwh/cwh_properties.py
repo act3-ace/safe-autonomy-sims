@@ -23,15 +23,15 @@ class ThrustProp(BoxProp):
     Thrust control properties.
 
     name : str
-        control property name
+        Control property name.
     low : list[float]
-        minimum bounds of control input
+        Minimum bounds of control input.
     high : list[float]
-        maximum bounds of control input
+        Maximum bounds of control input.
     unit : str
-        unit of measurement for control input
+        Unit of measurement for control input.
     description : str
-        description of control properties
+        Description of control properties.
     """
 
     name: str = "thrust"
@@ -46,15 +46,15 @@ class PositionProp(BoxProp):
     Position sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "position"
@@ -69,15 +69,15 @@ class VelocityProp(BoxProp):
     Velocity sensor properties.
 
     name : str
-        sensor property name
+        Sensor property name.
     low : list[float]
-        minimum bounds of sensor output
+        Minimum bounds of sensor output.
     high : list[float]
-        maximum bounds of sensor output
+        Maximum bounds of sensor output.
     unit : str
-        unit of measurement for sensor output
+        Unit of measurement for sensor output.
     description : str
-        description of sensor properties
+        Description of sensor properties.
     """
 
     name: str = "velocity"

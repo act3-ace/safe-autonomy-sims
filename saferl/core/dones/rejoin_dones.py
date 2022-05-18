@@ -10,7 +10,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
 Contains implementations of the necessary done functions for the rejoin environment.
-Namely three done functions : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
+Namely, three done functions : SuccessfulRejoinFunction, MaxDistanceDoneFunction, CrashDoneFunction
 """
 import typing
 from collections import OrderedDict
@@ -26,19 +26,20 @@ from saferl.core.utils import in_rejoin
 
 class RejoinSuccessDoneValidator(DoneFuncBaseValidator):
     """
-    Validator for the SuccessfulRejoinDoneFunction
+    Validator for the SuccessfulRejoinDoneFunction.
+
     Attributes
     ----------
     radius : float
-        size of the radius of the region region
+        Size of the radius of the rejoin region.
     offset : [float,float,float]
-        vector detailing the location of the center of the rejoin region from the aircraft
+        Vector detailing the location of the center of the rejoin region from the aircraft.
     lead : str
-        name of the lead platform, for later lookup
+        Name of the lead platform, for later lookup.
     step_size : float
-        size of one single simulation step
+        Size of one single simulation step.
     success_time : float
-        time wingman must remain in rejoin region to obtain reward
+        Time wingman must remain in rejoin region to obtain reward.
     """
     radius: typing.Union[float, int]
     offset: typing.List[typing.Union[float, int]]
@@ -49,7 +50,35 @@ class RejoinSuccessDoneValidator(DoneFuncBaseValidator):
 
 class RejoinSuccessDone(DoneFuncBase):
     """
-    This function determines the reward for when the wingman successfully stays in the rejoin region for the given duration
+    This function determines if the wingman has successfully stayed in the rejoin region for the
+    duration of the given rejoin_time.
+
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        next_state: StateDict,
+    ) -> DoneDict:
+
+    This method calculates the agent's reward for succeeding in the rejoin task.
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    next_state : StateDict
+        The current state of the simulation.
+
+    Returns
+    -------
+    reward : DoneDict
+        Dictionary containing the done condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -85,25 +114,6 @@ class RejoinSuccessDone(DoneFuncBase):
         next_observation: OrderedDict,
         next_state: StateDict,
     ) -> DoneDict:
-        """
-        This method calculates the agent's reward for succeeding in the rejoin task.
-
-        Parameters
-        ----------
-        observation : OrderedDict
-            The observations available to the agent from the previous state.
-        action
-            The last action performed by the agent.
-        next_observation : OrderedDict
-            The observations available to the agent from the current state.
-        next_state : StateDict
-            The current state of the simulation.
-
-        Returns
-        -------
-        reward : RewardDict
-            The agent's reward for succeeding in the rejoin task.
-        """
 
         done = DoneDict()
 
@@ -120,13 +130,14 @@ class RejoinSuccessDone(DoneFuncBase):
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
-    Validator for the MaxDistanceDoneFunction
+    Validator for the MaxDistanceDoneFunction.
+
     Attributes
     ----------
         max_distance : float
-            max distance the wingman can be away from the lead, exceeding this stops simulation
+            Max distance the wingman can be away from the lead. Exceeding this stops simulation.
         lead : str
-            name of the lead platform, for later lookup
+            Name of the lead platform, for later lookup.
     """
     max_distance: float
     lead: str
@@ -134,7 +145,30 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
 
 class MaxDistanceDoneFunction(DoneFuncBase):
     """
-    Done function that determines if the wingman  has exceeded the max distance threshold and has exited the bounds of the simulation.
+    Done function that determines if the wingman has exceeded the max distance threshold and has exited the bounds of
+    the simulation.
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Returns the done condition of the agent based on if the relative distance between the lead and the wingman has
+    exceeded the value passed by the max_distance argument.
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        Current observation from environment.
+    action : np.ndarray
+        Current action to be applied.
+    next_observation : np.ndarray
+        Incoming observation from environment.
+    next_state : np.ndarray
+        Incoming state from environment.
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the condition for the current agent.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -153,32 +187,11 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         Returns
         -------
         SuccessfulRejoinDoneValidator
-            done function validator
-
+            Done function validator.
         """
         return MaxDistanceDoneValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Logic that returns the done condition given the current environment conditions
-
-        Parameters
-        ----------
-        observation : np.ndarray
-            current observation from environment
-        action : np.ndarray
-            current action to be applied
-        next_observation : np.ndarray
-            incoming observation from environment
-        next_state : np.ndarray
-            incoming state from environment
-
-        Returns
-        -------
-        done : DoneDict
-            dictionary containing the condition for the current agent
-
-        """
 
         done = DoneDict()
 
@@ -198,13 +211,14 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
 class CrashDoneValidator(DoneFuncBaseValidator):
     """
-    Validator for the CrashDoneFunction
+    Validator for the CrashDoneFunction.
+
     Attributes
     ----------
     safety_margin : float
-        the distance between the lead and wingman that needs to be maintained
+        The minimum distance between the lead and the wingman that needs to be maintained.
     lead : str
-        name of the lead platform
+        Name of the lead platform.
     """
     safety_margin: float
     lead: str
@@ -213,6 +227,28 @@ class CrashDoneValidator(DoneFuncBaseValidator):
 class CrashDoneFunction(DoneFuncBase):
     """
     Done function that determines whether a crash occurred or not.
+
+
+    def __call__(self, observation, action, next_observation, next_state):
+
+    Returns the done condition of the agent based on if the relative distance between the lead and the wingman is
+    below the safety_margin.
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        current observation from environment
+    action : np.ndarray
+        current action to be applied
+    next_observation : np.ndarray
+        incoming observation from environment
+    next_state : np.ndarray
+        incoming state from environment
+
+    Returns
+    -------
+    done : DoneDict
+        dictionary containing the condition  for the current agent
     """
 
     def __init__(self, **kwargs) -> None:
@@ -231,32 +267,12 @@ class CrashDoneFunction(DoneFuncBase):
         Returns
         -------
         SuccessfulRejoinDoneValidator
-            done function validator
+            Done function validator.
 
         """
         return CrashDoneValidator
 
     def __call__(self, observation, action, next_observation, next_state):
-        """
-        Logic that returns the done condition given the current environment conditions
-
-        Parameters
-        ----------
-        observation : np.ndarray
-            current observation from environment
-        action : np.ndarray
-            current action to be applied
-        next_observation : np.ndarray
-            incoming observation from environment
-        next_state : np.ndarray
-            incoming state from environment
-
-        Returns
-        -------
-        done : DoneDict
-            dictionary containing the condition  for the current agent
-
-        """
 
         done = DoneDict()
 
@@ -276,8 +292,12 @@ class CrashDoneFunction(DoneFuncBase):
 
 class RejoinDoneValidator(SharedDoneFuncBaseValidator):
     """
+    Validator for the RejoinDone function.
+
+    Attributes
+    ----------
     agent_name : str
-        The name of the agent whom will determine the done status of the episode
+        The name of the agent whom will determine the done status of the episode.
     """
     agent_name: str
 
@@ -285,6 +305,34 @@ class RejoinDoneValidator(SharedDoneFuncBaseValidator):
 class RejoinDone(SharedDoneFuncBase):
     """
     Done function that determines whether the other agent is done.
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action: OrderedDict,
+        next_observation: OrderedDict,
+        next_state: StateDict,
+        local_dones: DoneDict,
+        local_done_info: OrderedDict
+    ) -> DoneDict:
+
+    Logic that returns the done condition based on the agent's done condition, whose agent_name was provided.
+
+    Parameters
+    ------
+    observation : np.ndarray
+         Current observation from environment.
+    action : np.ndarray
+         Current action to be applied.
+    next_observation : np.ndarray
+         Incoming observation from environment.
+    next_state : np.ndarray
+         Incoming state from environment.
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the condition for the current agent.
     """
 
     @property
@@ -299,7 +347,7 @@ class RejoinDone(SharedDoneFuncBase):
         Returns
         -------
         RejoinDoneValidator
-            done function validator
+            Done function validator.
 
         """
         return RejoinDoneValidator
@@ -313,26 +361,6 @@ class RejoinDone(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
-        """
-        Logic that returns the done condition given the current environment conditions
-
-        Parameters
-        ------
-        observation : np.ndarray
-             current observation from environment
-        action : np.ndarray
-             current action to be applied
-        next_observation : np.ndarray
-             incoming observation from environment
-        next_state : np.ndarray
-             incoming state from environment
-
-        Returns
-        -------
-        done : DoneDict
-            dictionary containing the condition for the current agent
-
-        """
 
         done = DoneDict()
 

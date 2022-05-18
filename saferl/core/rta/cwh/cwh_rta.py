@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft
+This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 """
 import abc
 
@@ -32,30 +32,31 @@ from saferl.core.glues.rta_glue import RTAGlue, RTAGlueValidator
 
 
 class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
-    """Base validator for cwh docking 3d rta glues
+    """
+    Base validator for cwh docking 3d rta glues.
 
     Parameters
     ----------
     m : float, optional
-        mass in kg of spacecraft, by default M_DEFAULT
+        Mass in kg of spacecraft, by default M_DEFAULT.
     n : float, optional
-        orbital mean motion in rad/s of current Hill's reference frame, by default N_DEFAULT
+        Orbital mean motion in rad/s of current Hill's reference frame, by default N_DEFAULT.
     v0 : float, optional
-        Maximum safe docking velocity in m/s, by default V0_DEFAULT
+        Maximum safe docking velocity in m/s, by default V0_DEFAULT.
         v0 of v_limit = v0 + v1*n*||r||
     v1_coef : float, optional
-        coefficient of linear component of the distance depending speed limit in 1/seconds, by default V1_COEF_DEFAULT
+        Coefficient of linear component of the distance dependent speed limit in 1/seconds, by default V1_COEF_DEFAULT.
         v1_coef of v_limit = v0 + v1_coef*n*||r||
     x_vel_limit : float, optional
-        max velocity magnitude in the x direction, by default X_VEL_LIMIT_DEFAULT
+        Max velocity magnitude in the x direction, by default X_VEL_LIMIT_DEFAULT.
     y_vel_limit : float, optional
-        max velocity magnitude in the y direction, by default Y_VEL_LIMIT_DEFAULT
+        Max velocity magnitude in the y direction, by default Y_VEL_LIMIT_DEFAULT.
     z_vel_limit : float, optional
-        max velocity magnitude in the z direction, by default Z_VEL_LIMIT_DEFAULT
+        Max velocity magnitude in the z direction, by default Z_VEL_LIMIT_DEFAULT.
     control_bounds_high : Union[float, np.ndarray], optional
-        upper bound of allowable control. Pass a list for element specific limit. By default 1
+        Upper bound of allowable control. Pass a list for element specific limit. By default, 1.
     control_bounds_low : Union[float, np.ndarray], optional
-        lower bound of allowable control. Pass a list for element specific limit. By default -1
+        Lower bound of allowable control. Pass a list for element specific limit. By default -1.
     """
     m: float = M_DEFAULT
     n: float = N_DEFAULT
@@ -69,7 +70,9 @@ class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
 
 
 class RTAGlueCWHDocking3d(RTAGlue):
-    """General RTA Glue to wrap CWH Docking 3d RTA from the run-time-assurance package"""
+    """
+    General RTA Glue to wrap CWH Docking 3d RTA from the run-time-assurance package.
+    """
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dRTAGlueValidator
@@ -103,20 +106,23 @@ class RTAGlueCWHDocking3d(RTAGlue):
 
 
 class CWHDocking3dExplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
-    """Validator for CWH Docking 3d Explicit Switching RTA Glue
+    """
+    Validator for CWH Docking 3d Explicit Switching RTA Glue.
 
     Parameters
     ----------
     backup_controller : RTABackupController, optional
-        backup controller object utilized by rta module to generate backup control.
-        By default Docking2dStopLQRBackupController
+        Backup controller object utilized by rta module to generate backup control.
+        By default, Docking2dStopLQRBackupController.
     """
     # backup_controller: RTABackupController = None
     test: int = 1
 
 
 class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
-    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+    """
+    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    """
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dExplicitSwitchingRTAGlueValidator
@@ -138,22 +144,25 @@ class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
 
 
 class CWHDocking3dImplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
-    """Validator for CWH Docking 3d Implicit Switching RTA Glue
+    """
+    Validator for CWH Docking 3d Implicit Switching RTA Glue.
 
     Parameters
     ----------
     backup_window : float
-        Duration of time in seconds to evaluate backup controller trajectory
+        Duration of time in seconds to evaluate backup controller trajectory.
     backup_controller : RTABackupController, optional
-        backup controller object utilized by rta module to generate backup control.
-        By default Docking2dStopLQRBackupController
+        Backup controller object utilized by rta module to generate backup control.
+        By default, Docking2dStopLQRBackupController.
     """
     backup_window: float = 5
     backup_controller: RTABackupController = None
 
 
 class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
-    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+    """
+    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    """
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dImplicitSwitchingRTAGlueValidator
@@ -176,19 +185,22 @@ class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
 
 
 class RTAGlueCHWDocking3dExplicitOptimization(RTAGlueCWHDocking3d):
-    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+    """
+    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    """
 
     def _instantiate_rta_module(self, **kwargs) -> RTAModule:
         return Docking3dExplicitOptimizationRTA(**kwargs)
 
 
 class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValidator):
-    """Validator for CWH Docking 3d Implicit Optimization RTA Glue
+    """
+    Validator for CWH Docking 3d Implicit Optimization RTA Glue.
 
     Parameters
     ----------
     backup_window : float
-        Duration of time in seconds to evaluate backup controller trajectory
+        Duration of time in seconds to evaluate backup controller trajectory.
     num_check_all : int
         Number of points at beginning of backup trajectory to check at every sequential simulation timestep.
         Should be <= backup_window.
@@ -199,8 +211,8 @@ class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValida
         last point in the backup trajectory as well.
         Defaults to 1, resulting in no skipping.
     backup_controller : RTABackupController, optional
-        backup controller object utilized by rta module to generate backup control.
-        By default Docking2dStopLQRBackupController
+        Backup controller object utilized by rta module to generate backup control.
+        By default, Docking2dStopLQRBackupController
     """
     backup_window: float = 5
     num_check_all: int = 5
@@ -209,7 +221,9 @@ class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValida
 
 
 class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
-    """RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package"""
+    """
+    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    """
 
     def __init__(self, **kwargs):
         self.config: CWHDocking3dImplicitOptimizationRTAGlueValidator

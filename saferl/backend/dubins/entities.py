@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements 2D and 3D Aircraft entities with Dubins phyiscs dynamics models
+This module implements 2D and 3D Aircraft entities with Dubins physics dynamics models.
 """
 
 import abc
@@ -22,7 +22,8 @@ from saferl.backend.base_models.entities import BaseEntity, BaseEntityValidator,
 
 
 class BaseDubinsAircraftValidator(BaseEntityValidator):
-    """Base validator for Dubin Aircraft implementations
+    """
+    Base validator for Dubins Aircraft implementations.
 
     Parameters
     ----------
@@ -51,7 +52,8 @@ class BaseDubinsAircraftValidator(BaseEntityValidator):
 
 
 class BaseDubinsAircraft(BaseEntity):
-    """Base interface for Dubins Entities
+    """
+    Base interface for Dubins Entities.
     """
 
     def __init__(self, dynamics, control_default, control_min=-np.inf, control_max=np.inf, control_map=None, **kwargs):
@@ -96,23 +98,23 @@ class BaseDubinsAircraft(BaseEntity):
     @property
     @abc.abstractmethod
     def v(self):
-        """get v, the velocity magnitude. aka speed."""
+        """Get v, the velocity magnitude. aka speed."""
         raise NotImplementedError
 
     @property
     def yaw(self):
-        """get yaw. Equivalent to heading for Dubins model"""
+        """Get yaw. Equivalent to heading for Dubins model"""
         return self.heading
 
     @property
     def pitch(self):
-        """get pitch. Equivalent to gamma for Dubins model"""
+        """Get pitch. Equivalent to gamma for Dubins model"""
         return self.gamma
 
     @property
     @abc.abstractmethod
     def roll(self):
-        """get roll"""
+        """Get roll."""
         raise NotImplementedError
 
     @property
@@ -136,12 +138,12 @@ class BaseDubinsAircraft(BaseEntity):
     @property
     @abc.abstractmethod
     def acceleration(self):
-        """get 3d acceleration vector"""
+        """Get 3d acceleration vector"""
         raise NotImplementedError
 
     @property
     def velocity(self):
-        """get 3d velocity vector"""
+        """Get 3d velocity vector"""
         velocity = np.array(
             [
                 self.v * math.cos(self.heading) * math.cos(self.gamma),
@@ -154,7 +156,8 @@ class BaseDubinsAircraft(BaseEntity):
 
     @property
     def orientation(self):
-        """get orientation of entity
+        """
+        Get orientation of entity.
 
         Returns
         -------
@@ -288,8 +291,7 @@ class Dubins2dAircraft(BaseDubinsAircraft):
     @property
     def roll(self):
         """
-        Get roll.
-        Always 0 for Dubins 2D.
+        Get roll. Always 0 for Dubins 2D.
         """
         return 0
 
@@ -301,7 +303,8 @@ class Dubins2dAircraft(BaseDubinsAircraft):
 
 
 class Dubins2dDynamics(BaseODESolverDynamics):
-    """State transition implementation of non-linear 2D Dubins dynamics model.
+    """
+    State transition implementation of non-linear 2D Dubins dynamics model.
     """
 
     def _compute_state_dot(self, t: float, state: np.ndarray, control: np.ndarray) -> np.ndarray:
@@ -324,7 +327,8 @@ class Dubins2dDynamics(BaseODESolverDynamics):
 
 
 class Dubins3dAircraftValidator(BaseDubinsAircraftValidator):
-    """Validator for Dubins3dAircraft
+    """
+    Validator for Dubins3dAircraft.
 
     Parameters
     ----------
@@ -489,7 +493,8 @@ class Dubins3dAircraft(BaseDubinsAircraft):
 
 
 class Dubins3dDynamics(BaseODESolverDynamics):
-    """State transition implementation of non-linear 2D Dubins dynamics model.
+    """
+    State transition implementation of non-linear 2D Dubins dynamics model.
 
     Parameters
     ----------

@@ -25,20 +25,21 @@ class SafeRLSimulatorValidator(BaseSimulatorValidator):
     """
     A validator for the SafeRLSimulator config.
 
-    step_size: A float representing how many simulated seconds pass each time the simulator updates
+    step_size: float
+        A float representing how many simulated seconds pass each time the simulator updates.
     """
-
     step_size: float
 
 
 class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     """
-    Validator for SafeRLSimator reset configs
+    Validator for SafeRLSimulator reset configs.
 
     Parameters
     ----------
     platforms: dict
-        Contains individual initialization dicts for each agent. Key is platform name, value is platform's initialization dict.
+        Contains individual initialization dicts for each agent.
+        Key is platform name, value is platform's initialization dict.
     """
     platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
 
@@ -46,9 +47,9 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
 class SafeRLSimulator(BaseSimulator):
     """
     The base simulator class used by the CWH and Dubins simulators. SafeRLSimulator is responsible for
-    initializing the platform objects for a simulation
-    and knowing how to set up episodes based on input parameters from a parameter provider.
-    It is also responsible for reporting the simulation state at each timestep.
+    initializing the platform objects for a simulation and knowing how to set up episodes based on input
+    parameters from a parameter provider. It is also responsible for reporting the simulation state at
+    each timestep.
     """
 
     @property
@@ -86,7 +87,8 @@ class SafeRLSimulator(BaseSimulator):
         Parameters
         ----------
         platforms: dict
-            Platforms initialization entry from reset config containing initialization parameters for backend sim entities
+            Platforms initialization entry from reset config containing initialization parameters for backend sim
+            entities.
 
         Returns
         -------
@@ -135,7 +137,7 @@ class SafeRLSimulator(BaseSimulator):
 
     def update_sensor_measurements(self):
         """
-        Update and cache all the measurements of all the sensors on each platform
+        Update and cache all the measurements of all the sensors on each platform.
         """
         for plat in self._state.sim_platforms:
             for sensor in plat.sensors:

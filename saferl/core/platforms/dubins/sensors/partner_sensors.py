@@ -23,22 +23,22 @@ from saferl.core.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dS
 
 class PartnerPositionSensor(d.PositionSensor):
     """
-    Implementation of a sensor designed to give the position of the platform's partner at any time
+    Implementation of a sensor designed to give the position of the platform's partner at any time.
     """
 
     def _raw_measurement(self, state):
         """
-        Calculate the position of the platform's partner
+        Calculate the position of the platform's partner.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         list of ints
-            position of spacecraft
+            Position of spacecraft.
         """
         return self.parent_platform.partner_position
 
@@ -59,22 +59,22 @@ PluginLibrary.AddClassToGroup(
 
 class PartnerVelocitySensor(d.VelocitySensor):
     """
-    Implementation of a sensor to give velocity of the platform's partner at any time
+    Implementation of a sensor to give velocity of the platform's partner at any time.
     """
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - partner velocity
+        Calculate the measurement - partner velocity.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         list of floats
-            velocity of aircraft
+            Velocity of aircraft.
         """
         return self.parent_platform.partner_velocity
 
@@ -100,17 +100,17 @@ class PartnerHeadingSensor(d.HeadingSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - partner heading
+        Calculate the measurement - partner heading.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         list of floats
-            heading of aircraft
+            Heading of aircraft.
         """
         return np.array([self.parent_platform.partner_heading], dtype=np.float32)
 
@@ -136,17 +136,17 @@ class PartnerFlightPathSensor(d.FlightPathSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - partner flight path angle
+        Calculate the measurement - partner flight path angle.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         float
-            flight path angle
+            Flight path angle.
         """
         return np.array([np.deg2rad(self.parent_platform.partner_flight_path_angle)], dtype=np.float32)
 
@@ -172,17 +172,17 @@ class PartnerRollSensor(d.RollSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - partner roll angle
+        Calculate the measurement - partner roll angle.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         float
-            roll angle
+            Roll angle.
         """
         return np.array([np.deg2rad(self.parent_platform.partner_roll)], dtype=np.float32)
 
@@ -206,17 +206,17 @@ class PartnerQuaternionSensor(d.QuaternionSensor):
 
     def _raw_measurement(self, state):
         """
-        Calculate the measurement - partner quaternion orientation
+        Calculate the measurement - partner quaternion orientation.
 
         Parameters
         ----------
         state: np.ndarray
-            current state
+            Current state.
 
         Returns
         -------
         np.ndarray
-            quaternion
+            Quaternion.
         """
         return self.parent_platform.partner_orientation.as_quat()
 

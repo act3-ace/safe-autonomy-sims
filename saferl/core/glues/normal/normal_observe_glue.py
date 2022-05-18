@@ -24,8 +24,10 @@ from saferl.core.glues.normal.normal_glue import NormalGlue, NormalGlueNormaliza
 
 class NormalObserveSensorGlueValidator(ObserveSensorValidator):
     """
-    Validate NormalObserveSensorGlue
-    normalization: enable normalization and set mu and sigma or max and min
+    Validate NormalObserveSensorGlue config.
+
+    normalization: NormalGlueNormalValidator
+        Enable normalization and set mu and sigma or max and min.
     """
     normalization = NormalGlueNormalValidator = NormalGlueNormalizationValidator()
 

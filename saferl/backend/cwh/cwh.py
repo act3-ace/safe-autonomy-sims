@@ -9,7 +9,8 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements 3D a point mass spacecraft with Clohessy-Wilshire phyiscs dynamics in non-intertial orbital Hill's reference frame
+This module implements a 3D point mass spacecraft with Clohessy-Wilshire physics dynamics in non-inertial orbital
+Hill's reference frame.
 """
 
 import numpy as np
@@ -19,14 +20,15 @@ from saferl.backend.base_models.entities import BaseEntity, BaseEntityValidator,
 
 
 class CWHSpacecraftValidator(BaseEntityValidator):
-    """Validator for CWHSpacecraft kwargs
+    """
+    Validator for CWHSpacecraft kwargs.
 
     Parameters
     ----------
     position : list[float]
-        length 3 list of x, y, z position values.
+        Length 3 list of x, y, z position values.
     velocity : list[float]
-        length 3 list of x, y, z velocity values.
+        Length 3 list of x, y, z velocity values.
 
     Raises
     ------
@@ -42,7 +44,8 @@ class CWHSpacecraftValidator(BaseEntityValidator):
 
 
 class CWHSpacecraft(BaseEntity):
-    """3D point mass spacecraft with +/- xyz thrusters and Clohessy-Wiltshire dynamics in Hill's reference frame
+    """
+    3D point mass spacecraft with +/- xyz thrusters and Clohessy-Wiltshire dynamics in Hill's reference frame.
 
     States
         x
@@ -63,13 +66,13 @@ class CWHSpacecraft(BaseEntity):
     Parameters
     ----------
     m: float
-        Mass of spacecraft in kilograms, by default 12
+        Mass of spacecraft in kilograms, by default 12.
     n: float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
     integration_method: str
-        Numerical integration method passed to dynamics model. See BaseODESolverDynamics
+        Numerical integration method passed to dynamics model. See BaseODESolverDynamics.
     kwargs:
-        Additional keyword arguments passed to CWHSpacecraftValidator
+        Additional keyword arguments passed to CWHSpacecraftValidator.
     """
 
     def __init__(self, m=12, n=0.001027, integration_method="RK45", **kwargs):
@@ -140,12 +143,13 @@ class CWHSpacecraft(BaseEntity):
 
     @property
     def orientation(self):
-        """get orientation of CWHSpacecraft. Always identity as point mass model doesn't rotate.
+        """
+        Get orientation of CWHSpacecraft, which is always an identity rotation as a point mass model doesn't rotate.
 
         Returns
         -------
         scipy.spatial.transform.Rotation
-            Rotation tranformation of the entity's local reference frame basis vectors in the global reference frame.
+            Rotation transformation of the entity's local reference frame basis vectors in the global reference frame.
             i.e. applying this rotation to [1, 0, 0] yields the entity's local x-axis in the global frame.
         """
         # always return a no rotation quaternion as points do not have an orientation
@@ -153,12 +157,13 @@ class CWHSpacecraft(BaseEntity):
 
     @property
     def velocity(self):
-        """get 3d velocity vector"""
+        """Get 3d velocity vector"""
         return self._state[3:6].copy()
 
 
 class CWHDynamics(BaseLinearODESolverDynamics):
-    """State transition implementation of 3D Clohessy-Wiltshire dynamics model.
+    """
+    State transition implementation of 3D Clohessy-Wiltshire dynamics model.
 
     Parameters
     ----------
