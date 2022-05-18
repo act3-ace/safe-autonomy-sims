@@ -1,4 +1,14 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module contains the base Simulator class used by the saferl team's CWH and Dubins simulators.
 """
 
@@ -6,9 +16,9 @@ import abc
 import typing
 
 import numpy as np
-from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.libraries.units import ValueWithUnits
-from act3_rl_core.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+from corl.libraries.state_dict import StateDict
+from corl.libraries.units import ValueWithUnits
+from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
 
 class SafeRLSimulatorValidator(BaseSimulatorValidator):

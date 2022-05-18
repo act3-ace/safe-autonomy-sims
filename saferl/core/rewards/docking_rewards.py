@@ -1,14 +1,24 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 This module implements the Reward Functions and Reward Validators specific to the docking task.
 """
 import math
 from collections import OrderedDict
 
 import numpy as np
-from act3_rl_core.libraries.environment_dict import RewardDict
-from act3_rl_core.libraries.state_dict import StateDict
-from act3_rl_core.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
-from act3_rl_core.simulators.common_platform_utils import get_platform_by_name
+from corl.libraries.environment_dict import RewardDict
+from corl.libraries.state_dict import StateDict
+from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
+from corl.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
 from saferl.core.utils import max_vel_violation
@@ -56,7 +66,7 @@ class DockingTimeReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -124,7 +134,7 @@ class DockingDistanceChangeReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -451,7 +461,7 @@ class DockingSuccessReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.
@@ -560,7 +570,7 @@ class DockingFailureReward(RewardFuncBase):
         ----------
         observation : OrderedDict
             The observations available to the agent from the previous state.
-        action :
+        action
             The last action performed by the agent.
         next_observation : OrderedDict
             The observations available to the agent from the current state.

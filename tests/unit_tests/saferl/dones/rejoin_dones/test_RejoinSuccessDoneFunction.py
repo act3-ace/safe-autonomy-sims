@@ -1,4 +1,14 @@
 """
+# -------------------------------------------------------------------------------
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning Core (CoRL) Runtime Assurance Extensions
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# -------------------------------------------------------------------------------
+
 This module holds unit tests and fixtures for the SuccessfulRejoinDoneFunction.
 
 Author: John McCarroll
@@ -169,7 +179,6 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         The mock wingman to be returned to the SuccessfulRejoinDoneFunction when it uses get_platform_by_name()
     lead : MagicMock
         The mock lead to be returned to the SuccessfulRejoinDoneFunction when it uses get_platform_by_name()
-
 
     Returns
     -------

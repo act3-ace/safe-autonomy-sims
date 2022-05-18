@@ -1,4 +1,14 @@
 """
+# -------------------------------------------------------------------------------
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning Core (CoRL) Runtime Assurance Extensions
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# -------------------------------------------------------------------------------
+
 This module defines tests for the Dubins3dSimulator class.
 
 Author: Jamie Cunningham
@@ -6,7 +16,7 @@ Author: Jamie Cunningham
 import os
 
 import pytest
-from act3_rl_core.libraries.state_dict import StateDict
+from corl.libraries.state_dict import StateDict
 
 from saferl.core.simulators.dubins_simulator import Dubins3dSimulator
 from tests.conftest import delimiter, read_test_cases

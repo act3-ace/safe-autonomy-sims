@@ -1,4 +1,14 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 Glues which reads observations from wrapped glues and can normalize the observations using a defined mu and sigma or the sensor bounds.
 
 Author: Jamie Cunningham
@@ -6,9 +16,9 @@ Author: Jamie Cunningham
 
 import typing
 
-from act3_rl_core.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
-from act3_rl_core.glues.base_multi_wrapper import BaseMultiWrapperGlue
-from act3_rl_core.glues.base_wrapper import BaseWrapperGlue
+from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
+from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue
+from corl.glues.base_wrapper import BaseWrapperGlue
 
 from saferl.core.glues.normal.normal_glue import NormalGlue, NormalGlueValidator
 

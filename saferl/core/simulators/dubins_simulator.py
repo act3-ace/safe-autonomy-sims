@@ -1,9 +1,19 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 Contains the implementations of classes that describe how the simulation is to proceed.
 """
 import abc
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
+from corl.libraries.plugin_library import PluginLibrary
 
 from saferl.backend.dubins import entities as bp
 from saferl.core.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform

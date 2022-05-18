@@ -1,18 +1,14 @@
-# ---------------------------------------------------------------------------
-# //
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core  Extension.
 #
-# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-# Reinforcement Learning (RL) Core contributed by the:
-#  -  () Team
-#  - Safe Autonomy (SA) Team
+#This is a US Government Work not subject to copyright protection in the US.
 #
-# This is a US Government Work not subject to copyright protection in the US.
-#
-# The use, dissemination or disclosure of data in this file is subject to
-# limitation or restriction. See accompanying README and LICENSE for details.
-# ---------------------------------------------------------------------------
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
 
-"agent": "act3_rl_core.agents.base_agent.TrainableBaseAgent"
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
     "parts": [
         {"part": "Controller_YawRate", "config": {"axis": 0}},
@@ -23,7 +19,7 @@
         {"part": "Sensor_Partner_Velocity", "config": {"oriented": True}},
     ],
     "episode_parameter_provider": {
-      "type": "act3_rl_core.episode_parameter_providers.simple.SimpleParameterProvider"
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
       "x": 0,
@@ -34,7 +30,7 @@
     },
     "glues": [
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config": {
                 "controller": "Controller_Acceleration",
                 "training_export_behavior": "EXCLUDE",
@@ -44,7 +40,7 @@
             },
         },
         {
-            "functor": "act3_rl_core.glues.common.controller_glue.ControllerGlue",
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
                 "controller": "Controller_YawRate",
                 "training_export_behavior": "EXCLUDE",
