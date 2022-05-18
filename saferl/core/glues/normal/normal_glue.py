@@ -1,4 +1,14 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 Glue which allows custom definition of mu and sigma for normalization.
 
 Author: Jamie Cunningham
@@ -11,8 +21,8 @@ from functools import lru_cache
 
 import gym
 import numpy as np
-from act3_rl_core.glues.base_glue import BaseAgentGlue, BaseAgentGlueNormalizationValidator, BaseAgentGlueValidator
-from act3_rl_core.libraries.env_space_util import EnvSpaceUtil
+from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueNormalizationValidator, BaseAgentGlueValidator
+from corl.libraries.env_space_util import EnvSpaceUtil
 from pydantic import validator
 
 

@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+"""
+
 from pathlib import Path
 
 from setuptools import setup, find_packages
@@ -40,13 +52,7 @@ if __name__ == '__main__':
         'factory',
     ]
 
-    docs_require = [
-        'mkdocs',
-        'mkdocs-macros-plugin',
-        'mkdocs-mermaid-plugin',
-        'inari[mkdocs]',
-        'pymdown-extensions',
-    ]
+    docs_require = parse_requirements("mkdocs-requirements.txt")
 
     setup(
         name="safe-autonomy-sims",

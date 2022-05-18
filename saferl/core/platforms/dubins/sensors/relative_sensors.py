@@ -1,11 +1,21 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 Sensors reporting relative measurements to a paired aircraft.
 
 Author: Jamie Cunningham
 """
 import typing
 
-from act3_rl_core.libraries.plugin_library import PluginLibrary
+from corl.libraries.plugin_library import PluginLibrary
 
 import saferl.core.platforms.dubins.sensors.dubins_sensors as d
 from saferl.core.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes

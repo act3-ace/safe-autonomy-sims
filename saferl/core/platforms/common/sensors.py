@@ -1,4 +1,14 @@
 """
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
 Common sensor implementations.
 
 Author: Jamie Cunningham
@@ -7,7 +17,7 @@ import abc
 import typing
 
 import numpy as np
-from act3_rl_core.simulators.base_parts import BaseSensor
+from corl.simulators.base_parts import BaseSensor
 
 
 class TransformSensor(BaseSensor):
@@ -23,6 +33,7 @@ class TransformSensor(BaseSensor):
     def _raw_measurement(self, state):
         """
         Calculate the raw sensor measurement value.
+
         Parameters
         ----------
         state: typing.Tuple
