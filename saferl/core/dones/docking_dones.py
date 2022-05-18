@@ -19,7 +19,7 @@ import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase, SharedDoneFuncBaseValidator
 from corl.libraries.environment_dict import DoneDict
 from corl.libraries.state_dict import StateDict
-from corl.simulators.common_platform_utils import get_platform_by_name, get_sensor_by_name
+from corl.simulators.common_platform_utils import get_platform_by_name
 
 from saferl.core.utils import max_vel_violation
 
@@ -419,7 +419,6 @@ class CollisionDoneFunctionValidator(SharedDoneFuncBaseValidator):
         The name of this done condition
     """
     spacecraft_safety_constraint: float = 0.5  # meters
-    position_sensor_name: str = "Sensor_Position"
 
 
 class CollisionDoneFunction(SharedDoneFuncBase):
@@ -487,8 +486,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         while len(agent_names) > 1:
             agent_name = agent_names.pop()
             agent_platform = get_platform_by_name(next_state, agent_name)
-            agent_sensor = get_sensor_by_name(agent_platform, self.config.position_sensor_name)
-            agent_position = agent_sensor.get_measurement()
+            agent_position = agent_platform.position
 
             for other_agent_name in agent_names:
 
@@ -498,8 +496,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
 
                 # check location against location of other agents for boundary violation
                 other_agent_platform = get_platform_by_name(next_state, other_agent_name)
-                other_agent_sensor = get_sensor_by_name(other_agent_platform, self.config.position_sensor_name)
-                other_agent_position = other_agent_sensor.get_measurement()
+                other_agent_position = other_agent_platform.position
 
                 radial_distance = np.linalg.norm(np.array(agent_position) - np.array(other_agent_position))
 
