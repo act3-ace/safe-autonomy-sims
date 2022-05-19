@@ -19,8 +19,8 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from saferl.core.platforms.dubins.dubins_controllers import RateController
-from saferl.core.platforms.dubins.dubins_properties import YawRateProp
+from saferl.platforms.dubins.dubins_controllers import RateController
+from saferl.platforms.dubins.dubins_properties import YawRateProp
 
 
 @pytest.fixture(name="control_properties")

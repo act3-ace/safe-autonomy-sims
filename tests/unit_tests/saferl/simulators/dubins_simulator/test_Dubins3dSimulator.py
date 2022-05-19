@@ -18,7 +18,7 @@ import os
 import pytest
 from corl.libraries.state_dict import StateDict
 
-from saferl.core.simulators.dubins_simulator import Dubins3dSimulator
+from saferl.simulators.dubins_simulator import Dubins3dSimulator
 from tests.conftest import delimiter, read_test_cases
 from tests.factories.dubins.dubins_platform import Dubins3dPlatformFactory
 

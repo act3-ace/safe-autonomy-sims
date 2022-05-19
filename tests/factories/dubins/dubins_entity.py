@@ -12,7 +12,7 @@
 
 import factory
 
-from saferl.backend.dubins import entities as e
+import safe_autonomy_dynamics.dubins as e
 
 
 class Dubins2dAircraftFactory(factory.Factory):

@@ -84,7 +84,7 @@
     "rewards": [
         {
             "name": "RejoinNoReward",
-            "functor": "saferl.core.rewards.rejoin_rewards.RejoinReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinReward",
             "config": {
                 "reward": 0,
                 "radius": 150,
