@@ -11,4 +11,4 @@ to execute. If the action is deemed **unsafe** the RTA module
 provides an alternative action which is guaranteed to be safe
 under the assumption that the system is already in a safe state.
 
-- [cwh rta](../../../reference/core/rta/cwh/cwh_rta.md)
+- [cwh rta](../../reference/rta/cwh/cwh_rta.md)
