@@ -6,6 +6,6 @@ condition for their current training episode on a given task.
 They take in the current and previous observation and action spaces
 and output a DoneDict. The DoneDict maps agent names to DoneStatuses.
 
-- [common dones](../../../reference/core/dones/common_dones.md)
-- [docking dones](../../../reference/core/dones/docking_dones.md)
-- [rejoin dones](../../../reference/core/dones/rejoin_dones.md)
+- [common dones](../../reference/dones/common_dones.md)
+- [docking dones](../../reference/dones/docking_dones.md)
+- [rejoin dones](../../reference/dones/rejoin_dones.md)

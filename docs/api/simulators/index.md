@@ -11,6 +11,6 @@ SafeRLSimulator and its subclasses pair Platforms with their backend Entities to
 environment interactions with respect to implemented dynamics models. They also coordinate
 execution of DoneFunctions to terminate training episodes appropriately.
 
-- [cwh simulator](../../../reference/core/simulators/cwh_simulator.md)
-- [dubins simulator](../../../reference/core/simulators/dubins_simulator.md)
-- [saferl simulator](../../../reference/core/simulators/saferl_simulator.md)
+- [cwh simulator](../../reference/simulators/cwh_simulator.md)
+- [dubins simulator](../../reference/simulators/dubins_simulator.md)
+- [saferl simulator](../../reference/simulators/saferl_simulator.md)

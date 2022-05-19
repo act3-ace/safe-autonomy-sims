@@ -11,8 +11,8 @@ These Platforms and Platform Parts can interact directly with
 entities in the environment simulation to read from or 
 update the simulation state.
 
-- [Cwh available platforms](../../../../reference/core/platforms/cwh/cwh_available_platforms.md)
-- [Cwh controllers](../../../../reference/core/platforms/cwh/cwh_controllers.md)
-- [Cwh platform](../../../../reference/core/platforms/cwh/cwh_platform.md)
-- [Cwh properties](../../../../reference/core/platforms/cwh/cwh_properties.md)
-- [Cwh sensors](../../../../reference/core/platforms/cwh/cwh_sensors.md)
+- [Cwh available platforms](../../../reference/platforms/cwh/cwh_available_platforms.md)
+- [Cwh controllers](../../../reference/platforms/cwh/cwh_controllers.md)
+- [Cwh platform](../../../reference/platforms/cwh/cwh_platform.md)
+- [Cwh properties](../../../reference/platforms/cwh/cwh_properties.md)
+- [Cwh sensors](../../../reference/platforms/cwh/cwh_sensors.md)

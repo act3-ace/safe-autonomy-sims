@@ -8,6 +8,6 @@ surfaces to interact with environment dynamics. Sensors measure various aspects
 of the environment. Platform Parts are often analogous to the
 parts used in a physical system.
 
-- [common](../../../reference/core/platforms/common/sensors.md)
+- [common](../../reference/platforms/common/sensors.md)
 - [cwh](cwh/index.md)
 - [dubins](dubins/index.md)

@@ -12,7 +12,7 @@ entities in the environment simulation to read from or
 update the simulation state.
 
 - [sensors](sensors/index.md)
-- [Dubins available platforms](../../../../reference/core/platforms/dubins/dubins_available_platforms.md)
-- [Dubins controllers](../../../../reference/core/platforms/dubins/dubins_controllers.md)
-- [Dubins platform](../../../../reference/core/platforms/dubins/dubins_platform.md)
-- [Dubins properties](../../../../reference/core/platforms/dubins/dubins_properties.md)
+- [Dubins available platforms](../../../reference/platforms/dubins/dubins_available_platforms.md)
+- [Dubins controllers](../../../reference/platforms/dubins/dubins_controllers.md)
+- [Dubins platform](../../../reference/platforms/dubins/dubins_platform.md)
+- [Dubins properties](../../../reference/platforms/dubins/dubins_properties.md)
