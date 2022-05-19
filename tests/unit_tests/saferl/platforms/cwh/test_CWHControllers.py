@@ -18,7 +18,7 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from saferl.core.platforms.cwh.cwh_controllers import CWHController, ThrustController
+from saferl.platforms.cwh.cwh_controllers import CWHController, ThrustController
 from tests.conftest import read_test_cases
 
 # Define test assay

@@ -16,7 +16,7 @@ import os
 import pytest
 from corl.libraries.state_dict import StateDict
 
-from saferl.core.rewards.docking_rewards import DockingFailureReward
+from saferl.rewards.docking_rewards import DockingFailureReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
