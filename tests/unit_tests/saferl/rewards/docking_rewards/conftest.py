@@ -133,8 +133,8 @@ def fixture_call_results(
     results : RewardDict
         The resulting RewardDict from calling the DockingSuccessRewardFunction
     """
-    with mock.patch("saferl.core.rewards.docking_rewards.get_platform_by_name") as func:
-        with mock.patch("saferl.core.utils.get_platform_by_name") as func1:
+    with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
+        with mock.patch("saferl.utils.get_platform_by_name") as func1:
             func.return_value = platform
             func1.return_value = platform
             results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
