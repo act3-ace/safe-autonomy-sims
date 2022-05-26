@@ -19,14 +19,14 @@
   "simulator_reset_parameters": {
   },
   "platforms": "DubinsSimulator_Platforms",
-  "plugin_paths": ["saferl.core.platforms", "saferl.core.simulators"],
+  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "episode_parameter_provider": {
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
   "dones": {
     "shared": [
       {
-        "functor": "saferl.core.dones.rejoin_dones.RejoinDone",
+        "functor": "saferl.dones.rejoin_dones.RejoinDone",
         "config": {agent_name: "blue0"},
       }
     ]

@@ -13,7 +13,7 @@ Tests for the CWHProperties module
 """
 import pytest
 
-from saferl.core.platforms.cwh.cwh_properties import PositionProp, ThrustProp, VelocityProp
+from saferl.platforms.cwh.cwh_properties import PositionProp, ThrustProp, VelocityProp
 
 
 @pytest.mark.unit_test

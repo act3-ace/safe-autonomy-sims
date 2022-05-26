@@ -20,7 +20,7 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from saferl.core.platforms.dubins.sensors.dubins_sensors import VelocitySensor
+from saferl.platforms.dubins.sensors.dubins_sensors import VelocitySensor
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
