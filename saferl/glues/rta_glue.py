@@ -66,7 +66,7 @@ class RTAGlue(BaseMultiWrapperGlue):
         self.config: RTAGlueValidator
         super().__init__(**kwargs)
         self.controller_glues = self._get_controller_glues(self)
-        self.rta = self._instantiate_rta_module()
+        self.rta = self._create_rta_module()
         self.filtered_action = None
 
     @property
@@ -145,7 +145,7 @@ class RTAGlue(BaseMultiWrapperGlue):
         return tuple(action_list)
 
     @abc.abstractmethod
-    def _instantiate_rta_module(self) -> RTAModule:
+    def _create_rta_module(self) -> RTAModule:
         raise NotImplementedError
 
     def observation_space(self):
