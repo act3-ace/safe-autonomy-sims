@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 from corl.libraries.environment_dict import DoneDict
 
-from saferl.core.dones.rejoin_dones import RejoinDone
+from saferl.dones.rejoin_dones import RejoinDone
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

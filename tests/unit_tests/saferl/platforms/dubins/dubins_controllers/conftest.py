@@ -18,7 +18,7 @@ from unittest import mock
 
 import pytest
 
-from saferl.core.platforms.dubins.dubins_platform import Dubins3dPlatform
+from saferl.platforms.dubins.dubins_platform import Dubins3dPlatform
 
 
 @pytest.fixture(name='dubins_platform')
