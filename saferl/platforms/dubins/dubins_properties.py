@@ -37,9 +37,9 @@ class AccelerationProp(BoxProp):
     """
 
     name: str = "acceleration"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-29.4132]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [29.4132]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["m/s^2"]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-96.5]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [96.5]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["ft/s^2"]
     description: str = "Direct Acceleration Control"
 
 
@@ -129,9 +129,9 @@ class YawAndAccelerationProp(BoxProp):
     """
 
     name: str = "yaw_acceleration"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=2, max_items=2)] = [np.deg2rad(-10), -29.4132]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=2, max_items=2)] = [np.deg2rad(10), 29.4132]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=2, max_items=2)] = ["rad/s", "m/s^2"]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=2, max_items=2)] = [np.deg2rad(-10), -96.5]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=2, max_items=2)] = [np.deg2rad(10), 96.5]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=2, max_items=2)] = ["rad/s", "ft/s^2"]
     description: str = "Direct Yaw Rate and Acceleration Control"
 
 
@@ -152,9 +152,9 @@ class PitchRollAndAccelerationProp(BoxProp):
     """
 
     name: str = "pitch_roll_acceleration"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [np.deg2rad(-5), np.deg2rad(-10), -29.4132]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [np.deg2rad(5), np.deg2rad(10), 29.4132]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["rad/s", "rad/s", "m/s^2"]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [np.deg2rad(-5), np.deg2rad(-10), -96.5]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [np.deg2rad(5), np.deg2rad(10), 96.5]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["rad/s", "rad/s", "ft/s^2"]
     description: str = "Direct Pitch Rate, Roll Rate and Acceleration Control"
 
 
@@ -177,7 +177,7 @@ class PositionProp(BoxProp):
     name: str = "position"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-500000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [500000.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["ft"] * 3
     description: str = "Position Sensor Properties"
 
 
@@ -198,9 +198,9 @@ class VelocityProp(BoxProp):
     """
 
     name: str = "velocity"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-609.6] * 3
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [609.6] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-2000] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["ft/s"] * 3
     description: str = "Velocity Sensor Properties"
 
 
@@ -313,7 +313,7 @@ class SpeedProp(BoxProp):
     """
 
     name: str = "speed"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [60.96]
-    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [121.92]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["m/s"]
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [3500]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["ft/s"]
     description: str = "Speed Sensor Properties"
