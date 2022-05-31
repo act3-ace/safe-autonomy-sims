@@ -143,7 +143,7 @@
         {
             "functor": "saferl.core.dones.common_dones.TimeoutDoneFunction",
             "config":{
-                "max_sim_time": 2000,
+                "max_sim_time": 10000,
             },
         },
         {
