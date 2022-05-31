@@ -20,7 +20,7 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from saferl.core.platforms.dubins.dubins_platform import DubinsPlatform
+from saferl.platforms.dubins.dubins_platform import DubinsPlatform
 from tests.conftest import delimiter, read_test_cases
 
 
@@ -53,7 +53,7 @@ def test_constructor(platform_name, platform):
     platform : mock.MagicMock
         the mock platform passed to the DubinsPlatform constructor
     """
-    with mock.patch("saferl.core.platforms.dubins.dubins_platform.BasePlatform._get_part_list") as func:
+    with mock.patch("saferl.platforms.dubins.dubins_platform.BasePlatform._get_part_list") as func:
         sensors = mock.MagicMock()
         sensors.name = "sensors"
         controllers = mock.MagicMock()

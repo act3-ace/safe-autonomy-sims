@@ -17,7 +17,7 @@ from unittest import mock
 
 import pytest
 
-from saferl.core.rewards.docking_rewards import DockingDistanceChangeReward
+from saferl.rewards.docking_rewards import DockingDistanceChangeReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
@@ -121,7 +121,7 @@ def fixture_call_results(
     results : RewardDict
         The resulting RewardDict from calling the MaxDistanceDoneFunction
     """
-    with mock.patch("saferl.core.rewards.docking_rewards.get_platform_by_name") as func:
+    with mock.patch("saferl.rewards.docking_rewards.get_platform_by_name") as func:
         platform.position = platform_position1
         func.return_value = platform
         _ = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
