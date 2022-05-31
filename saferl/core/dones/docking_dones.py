@@ -569,8 +569,10 @@ class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
 
         """
 
-        # get list of spacecrafts
+        # populate DoneDict
         done = DoneDict()
+        for name in local_dones.keys():
+            done[name] = False
 
         for agent_name in local_done_info.keys():
             if self.config.success_function_name in next_state.episode_state[agent_name]:
