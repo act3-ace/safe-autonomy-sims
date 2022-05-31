@@ -511,15 +511,18 @@ class CollisionDoneFunction(SharedDoneFuncBase):
 
 class MultiagentSuccessfulDockingDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
-    name : str
-        The name of this done condition
+    The validator for the MultiagentSuccessfulDockingDoneFunction.
+
+    success_function_name : str
+        The name of the successful docking function, which this function will reference to ensure all agents have reached a
+        DoneStatusCodes.WIN before ending the episode.
     """
     success_function_name: str = "SuccessfulDockingDoneFunction"
 
 
 class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
     """
-    Done function that determines whether the other agent is done.
+    This done function determines whether the every agent in the environment has reached a successful done condition.
     """
 
     @property
@@ -529,7 +532,7 @@ class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
 
         Returns
         -------
-        RejoinDoneValidator
+        MultiagentSuccessfulDockingDoneFunctionValidator
             done function validator
 
         """
