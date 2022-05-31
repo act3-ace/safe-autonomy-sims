@@ -475,15 +475,39 @@ class CrashDockingDoneFunction(DoneFuncBase):
 
 class CollisionDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
-    name : str
-        The name of this done condition
+    spacecraft_safety_constraint : float
+        The minimum radial distance between spacecrafts that must be maintained in order to avoid a collision.
     """
     spacecraft_safety_constraint: float = 0.5  # meters
 
 
 class CollisionDoneFunction(SharedDoneFuncBase):
     """
-    Done function that determines whether the other agent is done.
+    A done function that determines if an agent's spacecraft has collided with another
+    agent's spacecraft in the environemt.
+
+
+    def __call__(self, observation, action, next_observation, next_state, local_dones, local_done_info):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+    local_dones: DoneDict
+        DoneDict containing name to boolean KVPs representing done statuses of each agent
+    local_done_info: OrderedDict
+        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for each agent.
     """
 
     @property
@@ -493,7 +517,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
 
         Returns
         -------
-        RejoinDoneValidator
+        CollisionDoneFunctionValidator
             done function validator
         """
         return CollisionDoneFunctionValidator
@@ -507,29 +531,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
-        """
-        Logic that returns the done condition given the current environment conditions
 
-        Parameters
-        ----------
-        observation : np.ndarray
-            current observation from environment
-        action : np.ndarray
-            current action to be applied
-        next_observation : np.ndarray
-            incoming observation from environment
-        next_state : np.ndarray
-            incoming state from environment
-        local_dones: DoneDict
-            TODO
-        local_done_info: OrderedDict
-            TODO
-
-        Returns
-        -------
-        done : DoneDict
-            dictionary containing the condition for the current agent
-        """
         # get list of spacecrafts
         agent_names = list(local_dones.keys())
         try:
@@ -582,7 +584,30 @@ class MultiagentSuccessfulDockingDoneFunctionValidator(SharedDoneFuncBaseValidat
 
 class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
     """
-    This done function determines whether the every agent in the environment has reached a successful done condition.
+    This done function determines whether every agent in the environment has reached a specified successful done condition.
+
+
+    def __call__(self, observation, action, next_observation, next_state, local_dones, local_done_info):
+
+    Parameters
+    ----------
+    observation : np.ndarray
+        np.ndarray describing the current observation
+    action : np.ndarray
+        np.ndarray describing the current action
+    next_observation : np.ndarray
+        np.ndarray describing the incoming observation
+    next_state : np.ndarray
+        np.ndarray describing the incoming state
+    local_dones: DoneDict
+        DoneDict containing name to boolean KVPs representing done statuses of each agent
+    local_done_info: OrderedDict
+        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
+
+    Returns
+    -------
+    done : DoneDict
+        Dictionary containing the done condition for each agent.
     """
 
     @property
@@ -607,30 +632,6 @@ class MultiagentSuccessfulDockingDoneFunction(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
-        """
-        Logic that returns the done condition given the current environment conditions
-
-        Parameters
-        ----------
-        observation : np.ndarray
-            current observation from environment
-        action : np.ndarray
-            current action to be applied
-        next_observation : np.ndarray
-            incoming observation from environment
-        next_state : np.ndarray
-            incoming state from environment
-        local_dones: DoneDict
-            TODO ****
-        local_done_info: OrderedDict
-            TODO****
-
-        Returns
-        -------
-        done : DoneDict
-            dictionary containing the condition for the current agent
-
-        """
 
         # populate DoneDict
         done = DoneDict()
