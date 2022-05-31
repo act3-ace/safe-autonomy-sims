@@ -20,18 +20,18 @@
     },
   },
   "platforms": "CWHSimulator_Platforms",
-  "plugin_paths": ["saferl.core.platforms", "saferl.core.simulators"],
+  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "episode_parameter_provider": {
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
   "dones": {
     "shared": [
       {
-        "functor": "saferl.core.dones.docking_dones.CollisionDoneFunction",
+        "functor": "saferl.dones.docking_dones.CollisionDoneFunction",
         "config": { spacecraft_safety_constraint: 0.5 },
       },
       {
-        "functor": "saferl.core.dones.docking_dones.MultiagentSuccessfulDockingDoneFunction",
+        "functor": "saferl.dones.docking_dones.MultiagentSuccessfulDockingDoneFunction",
         "config": { success_function_name: "SuccessfulDockingDoneFunction" },
       }
     ]

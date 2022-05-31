@@ -89,7 +89,7 @@
             }
         },
         {
-            "functor": "saferl.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
             "config": {
               "sensor": "Sensor_Position",
               "normalization": {
@@ -100,7 +100,7 @@
             },
         },
         {
-            "functor": "saferl.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
             "config": {
               "sensor": "Sensor_Velocity",
               "normalization": {
@@ -111,7 +111,7 @@
             },
         },
         {
-            "functor": "saferl.core.glues.magnitude_glue.MagnitudeGlue",
+            "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
             "config":
               {
                 "sensor": "Sensor_Velocity",
@@ -123,7 +123,7 @@
               }
         },
         {
-            "functor": "saferl.core.glues.vel_limit_glue.VelocityLimitGlue",
+            "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
             "config":
               {
                 "sensor": "Sensor_Position",
@@ -141,19 +141,19 @@
     ],
     "dones": [
         {
-            "functor": "saferl.core.dones.common_dones.TimeoutDoneFunction",
+            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{
                 "max_sim_time": 10000,
             },
         },
         {
-            "functor": "saferl.core.dones.docking_dones.MaxDistanceDoneFunction",
+            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 40000,
             },
         },
 #        {
-#            "functor": "saferl.core.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
+#            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
 #            "config":{
 #              "velocity_threshold": 0.2,
 #              "threshold_distance": 0.5,
@@ -162,7 +162,7 @@
 #            },
 #        },
         {
-            "functor": "saferl.core.dones.docking_dones.CrashDockingDoneFunction",
+            "functor": "saferl.dones.docking_dones.CrashDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
               "velocity_threshold": 0.2,
@@ -172,7 +172,7 @@
             },
         },
         {
-            "functor": "saferl.core.dones.docking_dones.SuccessfulDockingDoneFunction",
+            "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
               "velocity_threshold": 0.2,
@@ -185,14 +185,14 @@
     "rewards": [
         {
             "name": "DockingDistanceExponentialChangeReward",
-            "functor": "saferl.core.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
             "config": {
                 "pivot": 100
             }
         },
       {
         "name": "DockingDeltaVReward",
-        "functor": "saferl.core.rewards.docking_rewards.DockingDeltaVReward",
+        "functor": "saferl.rewards.docking_rewards.DockingDeltaVReward",
         "config": {
           "scale": -0.01,
           "bias": 0.0,
@@ -201,7 +201,7 @@
       },
       {
         "name": "DockingVelocityConstraintReward",
-        "functor": "saferl.core.rewards.docking_rewards.DockingVelocityConstraintReward",
+        "functor": "saferl.rewards.docking_rewards.DockingVelocityConstraintReward",
         "config": {
           "scale": -0.01,
           "bias": -0.01,
@@ -213,7 +213,7 @@
       },
         {
           "name": "DockingSuccessReward",
-          "functor": "saferl.core.rewards.docking_rewards.DockingSuccessReward",
+          "functor": "saferl.rewards.docking_rewards.DockingSuccessReward",
           "config": {
             "scale": 1.0,
             "timeout": 2000,
@@ -226,7 +226,7 @@
         },
       {
         "name": "DockingFailureReward",
-        "functor": "saferl.core.rewards.docking_rewards.DockingFailureReward",
+        "functor": "saferl.rewards.docking_rewards.DockingFailureReward",
         "config": {
           "timeout_reward": -1.0,
           "distance_reward": -1.0,
