@@ -93,6 +93,38 @@ This will install the package in an editable mode within
 your environment, allowing any changes you make to the
 source to persist.
 
+## ACEHUB
+In depth ACEHUB documentation can be found here:
+https://github.com/act3-ace/have-deepsky/-/tree/master/docs/acehub
+
+
+### Safe Autonomy Sims Setup Script
+To access the safe autonomy sims setup script, set the following value for the `SAFE_AUTONOMY_VSCODE_SETUP` environment file
+```bash
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+export GIT_ASKPASS="/ace/hub/envfile/GIT_ASKPASS" 
+conda create -y -n safe_autonomy python=3.8 pip
+conda activate safe_autonomy 
+git clone https://github.com/act3-ace/act3-rl/corl.git
+git clone https://github.com/act3-ace/safe-autonomy-dynamics.git
+git clone https://github.com/act3-ace/run-time-assurance.git
+git clone https://github.com/act3-ace/safe-autonomy-sims.git
+cd corl
+git checkout v1.42.0
+pip --default-timeout=1000 install -e .
+cd ../safe-autonomy-dynamics
+pip --default-timeout=1000 install -e .
+cd ../run-time-assurance
+pip --default-timeout=1000 install -e .
+cd ../safe-autonomy-sims
+pip --default-timeout=1000 install -e .
+```
+
+Once inside your acehub instance, run the following in your terminal
+```bash
+source $SAFE_AUTONOMY_VSCODE_SETUP
+```
+
 ## Questions or Issues?
 If you have any trouble installing the safe-autonomy-sims
 package in your local environment, please feel free to
