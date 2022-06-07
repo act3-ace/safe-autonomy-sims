@@ -27,7 +27,21 @@ or HTTPS:
 git clone https://github.com/act3-ace/act3-rl/corl.git
 ```
 
-Install the CoRL module into your environment using `pip`:
+### CoRL Version
+CoRL is a developing library which is continuously introducing new
+features. We have pinned the version of CoRL which is compatible
+with safe-autonomy-sims to prevent breaking changes from CoRL. 
+
+If you receive an error regarding the required CoRL version needed for
+safe-autonomy-sims, you can use the correct version by running the
+following command:
+```shell
+cd path/to/corl/
+git checkout tags/vX.XX.X  # replace with needed version number
+```
+
+Once you have the correct version checked out, install the CoRL
+module into your environment using `pip`:
 ```shell
 pip install path/to/corl/
 ```
