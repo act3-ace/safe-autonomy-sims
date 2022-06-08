@@ -36,7 +36,7 @@ pip install path/to/corl/
 Clone a copy of the run-time-assurance source code onto
 your local machine via SSH:
 ```shell
-git clone git@github.com/act3-ace:rta/run-time-assurance.git
+git clone git@github.com/act3-ace:rta/safe-autonomy-stack/run-time-assurance.git
 ```
 or HTTPS:
 ```shell
@@ -53,7 +53,7 @@ pip install path/to/run-time-assurance/
 Clone a copy of the safe-autonomy-dynamics source code onto
 your local machine via SSH:
 ```shell
-git clone git@github.com/act3-ace:rta/safe-autonomy-dynamics.git
+git clone git@github.com/act3-ace:rta/safe-autonomy-stack/safe-autonomy-dynamics.git
 ```
 or HTTPS:
 ```shell
@@ -70,7 +70,7 @@ pip install path/to/safe-autonomy-dynamics/
 Clone a copy of the safe-autonomy-sims source code 
 onto your local machine via SSH:
 ```shell
-git clone git@github.com/act3-ace:rta/safe-autonomy-sims.git
+git clone git@github.com/act3-ace:rta/safe-autonomy-stack/safe-autonomy-sims.git
 ```
 or HTTPS:
 ```shell
