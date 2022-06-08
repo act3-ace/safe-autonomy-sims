@@ -30,7 +30,7 @@ try:
     base_dir = os.path.dirname(os.path.abspath(__file__))
 except NameError:
     base_dir = None
-with open(os.path.join(base_dir, 'safe-autonomy-sims/version.py')) as fp:
+with open(os.path.join(base_dir, 'version.py')) as fp:
      exec(fp.read(), version)
 
 if __name__ == '__main__':
