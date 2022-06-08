@@ -1,0 +1,244 @@
+# ---------------------------------------------------------------------------
+# //
+#
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning (RL) Core contributed by the:
+#  -  () Team
+#  - Safe Autonomy (SA) Team
+#
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ---------------------------------------------------------------------------
+
+
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
+"config": {
+    "parts": [
+        {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
+        {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
+        {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2, properties: {name: "z_thrust"}}},
+        {"part": "Sensor_Position"},
+        {"part": "Sensor_Velocity"}
+    ],
+    "episode_parameter_provider": {
+        "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
+    "simulator_reset_parameters": {
+      "x": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "x",
+          "units": "meters",
+          "low": 0,
+          "high": 100,
+        }
+      },
+      "y": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "x",
+          "units": "meters",
+          "low": 0,
+          "high": 100,
+        }
+      },
+      "z": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "x",
+          "units": "meters",
+          "low": 0,
+          "high": 100,
+        }
+      },
+      "xdot": 0,
+      "ydot": 0,
+      "zdot": 0,
+    },
+    "glues": [
+        {
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
+            "config": {
+                "controller": "X Thrust",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
+            },
+        },
+        {
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
+            "config":{
+                "controller": "Y Thrust",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
+            }
+        },
+        {
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
+            "config":{
+              "controller": "Z Thrust",
+              "training_export_behavior": "EXCLUDE",
+              "normalization": {
+                "enabled": False,
+              }
+            }
+        },
+        {
+            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+            "config": {
+              "sensor": "Sensor_Position",
+              "normalization": {
+                "enabled": True,
+                "mu": 0,
+                "sigma": [100, 100, 100],
+              }
+            },
+        },
+        {
+            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+            "config": {
+              "sensor": "Sensor_Velocity",
+              "normalization": {
+                "enabled": True,
+                "mu": 0,
+                "sigma": [0.5, 0.5, 0.5],
+              }
+            },
+        },
+        {
+            "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+            "config":
+              {
+                "sensor": "Sensor_Velocity",
+                "normalization": {
+                      "enabled": True,
+                      "mu": 0,
+                      "sigma": 1,
+                }
+              }
+        },
+        {
+            "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
+            "config":
+              {
+                "sensor": "Sensor_Position",
+                "normalization": {
+                      "enabled": True,
+                      "mu": 0,
+                      "sigma": 1,
+                },
+                "velocity_threshold": 0.2,
+                "threshold_distance": 0.5,
+                "mean_motion": 0.001027,
+                "slope": 2.0,
+              }
+        },
+    ],
+    "dones": [
+        {
+            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
+            "config":{
+                "max_sim_time": 10000,
+            },
+        },
+        {
+            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
+            "config":{
+                "max_distance": 40000,
+            },
+        },
+#        {
+#            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
+#            "config":{
+#              "velocity_threshold": 0.2,
+#              "threshold_distance": 0.5,
+#              "mean_motion": 0.001027,
+#              "lower_bound": False,
+#            },
+#        },
+        {
+            "functor": "saferl.dones.docking_dones.CrashDockingDoneFunction",
+            "config":{
+              "docking_region_radius": 0.5,
+              "velocity_threshold": 0.2,
+              "threshold_distance": 0.5,
+              "mean_motion": 0.001027,
+              "lower_bound": False,
+            },
+        },
+        {
+            "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
+            "config":{
+              "docking_region_radius": 0.5,
+              "velocity_threshold": 0.2,
+              "threshold_distance": 0.5,
+              "mean_motion": 0.001027,
+              "lower_bound": False,
+            },
+        },
+    ],
+    "rewards": [
+        {
+            "name": "DockingDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
+            "config": {
+                "pivot": 100
+            }
+        },
+      {
+        "name": "DockingDeltaVReward",
+        "functor": "saferl.rewards.docking_rewards.DockingDeltaVReward",
+        "config": {
+          "scale": -0.01,
+          "bias": 0.0,
+          "mass": 12.0
+        }
+      },
+      {
+        "name": "DockingVelocityConstraintReward",
+        "functor": "saferl.rewards.docking_rewards.DockingVelocityConstraintReward",
+        "config": {
+          "scale": -0.01,
+          "bias": -0.01,
+          "velocity_threshold": 0.2,
+          "threshold_distance": 0.5,
+          "mean_motion": 0.001027,
+          "lower_bound": False,
+        }
+      },
+        {
+          "name": "DockingSuccessReward",
+          "functor": "saferl.rewards.docking_rewards.DockingSuccessReward",
+          "config": {
+            "scale": 1.0,
+            "timeout": 2000,
+            "docking_region_radius": 0.5,
+            "velocity_threshold": 0.2,
+            "threshold_distance": 0.5,
+            "mean_motion": 0.001027,
+            "lower_bound": False,
+          }
+        },
+      {
+        "name": "DockingFailureReward",
+        "functor": "saferl.rewards.docking_rewards.DockingFailureReward",
+        "config": {
+          "timeout_reward": -1.0,
+          "distance_reward": -1.0,
+          "crash_reward": -1.0,
+          "timeout": 2000,
+          "max_goal_distance": 40000,
+          "docking_region_radius": 0.5,
+          "velocity_threshold": 0.2,
+          "threshold_distance": 0.5,
+          "mean_motion": 0.001027,
+          "lower_bound": False,
+        }
+      },
+    ],
+}
