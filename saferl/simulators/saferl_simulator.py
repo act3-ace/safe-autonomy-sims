@@ -19,23 +19,29 @@ import numpy as np
 from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+
 from saferl.simulators.initializers.initializer import BaseInitializer
 
 
-class SafeRLSimulatorValidator(BaseSimulatorValidator, ):
+class SafeRLSimulatorValidator(
+    BaseSimulatorValidator,
+):
     """
     A validator for the SafeRLSimulator config.
 
     step_size: float
         A float representing how many simulated seconds pass each time the simulator updates.
     """
-    
+
     initializer: typing.Optional[BaseInitializer] = None
     step_size: float
 
-
-    # class Config:
-    #     arbitrary_types_allowed = True
+    class Config:
+        """
+        arbitrary_types_allowed: bool
+            Enables BaseInitializer class to be included in SafeRLSimulatorValidator without error
+        """
+        arbitrary_types_allowed = True
 
 
 class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
