@@ -114,7 +114,10 @@ class SafeRLSimulator(BaseSimulator):
             sim_config = agent_config.sim_config
             sim_config_kwargs = sim_config.get("kwargs", {})
 
-            if platforms is None:
+            # use initializer, if provided
+            if self.config.initializer is not None:
+                agent_reset_config = self.config.initializer()
+            elif platforms is None:
                 agent_reset_config = {}
             else:
                 agent_reset_config = platforms.get(agent_id, {})
