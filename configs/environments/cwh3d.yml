@@ -15,6 +15,10 @@
       "step_size": 1
     },
   },
+  # "simulator_reset_parameters": {
+  #   "x": -100,
+  #   "test": "testify?",
+  # },
   "platforms": "CWHSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "episode_parameter_provider": {
