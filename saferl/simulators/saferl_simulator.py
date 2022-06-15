@@ -11,6 +11,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module contains the base Simulator class used by the saferl team's CWH and Dubins simulators.
 """
+# pylint: disable=W0123,W0611
 
 import abc
 import typing
@@ -20,7 +21,7 @@ from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
-from saferl.simulators.initializers.initializer import InitializerFunctor
+import saferl  # noqa: F401
 
 
 class SafeRLSimulatorValidator(
@@ -32,8 +33,6 @@ class SafeRLSimulatorValidator(
     step_size: float
         A float representing how many simulated seconds pass each time the simulator updates.
     """
-
-    initializer: typing.Optional[InitializerFunctor] = None
     step_size: float
 
 
@@ -68,9 +67,6 @@ class SafeRLSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.initializer = self.config.initializer.functor(
-            **self.config.initializer.config
-        ) if self.config.initializer is not None else None
         self.platform_map = self._construct_platform_map()
         self.sim_entities = self.construct_sim_entities()
         self._state = StateDict()
@@ -78,6 +74,11 @@ class SafeRLSimulator(BaseSimulator):
 
     def reset(self, config):
         config = self.get_reset_validator(**config)
+        for _, reset_config in config.platforms.items():
+            if "initializer" in reset_config:
+                # pass agent's reset config through initializer, if one provided
+                initializer = eval(reset_config["initializer"]["functor"])(**reset_config["initializer"]["config"])
+                reset_config = initializer(reset_config)
         self._state.clear()
         self.clock = 0.0
         self.sim_entities = self.construct_sim_entities(config.platforms)
@@ -110,10 +111,7 @@ class SafeRLSimulator(BaseSimulator):
             sim_config = agent_config.sim_config
             sim_config_kwargs = sim_config.get("kwargs", {})
 
-            # use initializer, if provided
-            if self.initializer is not None:
-                agent_reset_config = self.initializer()
-            elif platforms is None:
+            if platforms is None:
                 agent_reset_config = {}
             else:
                 agent_reset_config = platforms.get(agent_id, {})

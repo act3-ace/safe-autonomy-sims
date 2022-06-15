@@ -6,7 +6,6 @@ Author: John McCarroll
 
 import math
 import random
-import typing
 
 import numpy as np
 
@@ -33,8 +32,8 @@ def velocity_limit(position, velocity_threshold, threshold_distance, mean_motion
     float
         The velocity limit given the agent's position.
     """
-
-    dist = np.linalg.norm(position)
+    position_values = [elem.value for elem in position]
+    dist = np.linalg.norm(position_values)
     vel_limit = velocity_threshold
     if dist > threshold_distance:
         vel_limit += slope * mean_motion * (dist - threshold_distance)
@@ -49,20 +48,16 @@ class Docking3DInitializer(BaseInitializer):
     threshold_distance: float
     slope: float = 2.0
     mean_motion: float = 0.001027
-    x_range: typing.List[float] = [-100, 100]
-    y_range: typing.List[float] = [0, 100]
-    z_range: typing.List[float] = [0, 100]
-    x_dot_range: typing.List[float] = [-20, 20]
-    y_dot_range: typing.List[float] = [-20, 20]
-    z_dot_range: typing.List[float] = [-20, 20]
+    x: float = 100
+    y: float = 100
+    z: float = 100
+    xdot: float = 0
+    ydot: float = 0
+    zdot: float = 0
 
-    def __call__(self):
-        agent_reset_config = {}
-
-        # rng position
-        agent_reset_config.update({"x": random.uniform(self.x_range[0], self.x_range[1])})
-        agent_reset_config.update({"y": random.uniform(self.y_range[0], self.y_range[1])})
-        agent_reset_config.update({"z": random.uniform(self.z_range[0], self.z_range[1])})
+    def __call__(self, agent_reset_config):
+        if "x" not in agent_reset_config or "y" not in agent_reset_config or "z" not in agent_reset_config:
+            raise ValueError("agent_reset_config missing one or more positional keys")
 
         # constrained rng velocity
         vel_limit = velocity_limit(
@@ -76,17 +71,17 @@ class Docking3DInitializer(BaseInitializer):
         # find magnitude of x,y,z components of max vel limit given position
         axis_vel_limit = math.sqrt(vel_limit**2 / 3)
 
-        # compare to range
-        upper_x_dot_bound = axis_vel_limit if axis_vel_limit < self.x_dot_range[1] else self.x_dot_range[1]
-        lower_x_dot_bound = -axis_vel_limit if -axis_vel_limit > self.x_dot_range[0] else self.x_dot_range[0]
-        upper_y_dot_bound = axis_vel_limit if axis_vel_limit < self.y_dot_range[1] else self.y_dot_range[1]
-        lower_y_dot_bound = -axis_vel_limit if -axis_vel_limit > self.y_dot_range[0] else self.y_dot_range[0]
-        upper_z_dot_bound = axis_vel_limit if axis_vel_limit < self.z_dot_range[1] else self.z_dot_range[1]
-        lower_z_dot_bound = -axis_vel_limit if -axis_vel_limit > self.z_dot_range[0] else self.z_dot_range[0]
+        # # compare to range
+        # upper_x_dot_bound = axis_vel_limit if axis_vel_limit < self.x_dot[1] else self.x_dot[1]
+        # lower_x_dot_bound = -axis_vel_limit if -axis_vel_limit > self.x_dot[0] else self.x_dot[0]
+        # upper_y_dot_bound = axis_vel_limit if axis_vel_limit < self.y_dot[1] else self.y_dot[1]
+        # lower_y_dot_bound = -axis_vel_limit if -axis_vel_limit > self.y_dot[0] else self.y_dot[0]
+        # upper_z_dot_bound = axis_vel_limit if axis_vel_limit < self.z_dot[1] else self.z_dot[1]
+        # lower_z_dot_bound = -axis_vel_limit if -axis_vel_limit > self.z_dot[0] else self.z_dot[0]
 
-        # initialize from tighter boundary
-        agent_reset_config.update({"x_dot": random.uniform(lower_x_dot_bound, upper_x_dot_bound)})
-        agent_reset_config.update({"y_dot": random.uniform(lower_y_dot_bound, upper_y_dot_bound)})
-        agent_reset_config.update({"z_dot": random.uniform(lower_z_dot_bound, upper_z_dot_bound)})
+        # initialize from boundary
+        agent_reset_config.update({"xdot": random.uniform(-axis_vel_limit, axis_vel_limit)})
+        agent_reset_config.update({"ydot": random.uniform(-axis_vel_limit, axis_vel_limit)})
+        agent_reset_config.update({"zdot": random.uniform(-axis_vel_limit, axis_vel_limit)})
 
         return agent_reset_config
