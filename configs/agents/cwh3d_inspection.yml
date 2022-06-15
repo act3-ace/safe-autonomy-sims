@@ -136,7 +136,7 @@
           #TODO! need a collision check?
             "functor": "saferl.dones.inspection_dones.CrashInspectionDoneFunction",
             "config":{
-              "docking_region_radius": 0.5,
+              "Inspection_region_radius": 0.5,
               "velocity_threshold": 0.2,
               "threshold_distance": 0.5,
               "mean_motion": 0.001027,
@@ -147,7 +147,7 @@
           #TODO: need a successfull inspection!
             "functor": "saferl.dones.inspection_dones.SuccessfulInspectionDoneFunction",
             "config":{
-              "docking_region_radius": 0.5,
+              "Inspection_region_radius": 0.5,
               "velocity_threshold": 0.2,
               "threshold_distance": 0.5,
               "mean_motion": 0.001027,
