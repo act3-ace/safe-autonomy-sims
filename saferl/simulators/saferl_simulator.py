@@ -20,7 +20,7 @@ from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 
-from saferl.simulators.initializers.initializer import BaseInitializer
+from saferl.simulators.initializers.initializer import InitializerFunctor
 
 
 class SafeRLSimulatorValidator(
@@ -33,7 +33,7 @@ class SafeRLSimulatorValidator(
         A float representing how many simulated seconds pass each time the simulator updates.
     """
 
-    initializer: typing.Optional[BaseInitializer] = None
+    initializer: typing.Optional[InitializerFunctor] = None
     step_size: float
 
     class Config:
@@ -75,6 +75,9 @@ class SafeRLSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.initializer = self.config.initializer.functor(
+            **self.config.initializer.config
+        ) if self.config.initializer is not None else None
         self.platform_map = self._construct_platform_map()
         self.sim_entities = self.construct_sim_entities()
         self._state = StateDict()
@@ -115,8 +118,8 @@ class SafeRLSimulator(BaseSimulator):
             sim_config_kwargs = sim_config.get("kwargs", {})
 
             # use initializer, if provided
-            if self.config.initializer is not None:
-                agent_reset_config = self.config.initializer()
+            if self.initializer is not None:
+                agent_reset_config = self.initializer()
             elif platforms is None:
                 agent_reset_config = {}
             else:

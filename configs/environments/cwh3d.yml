@@ -12,13 +12,18 @@
   "simulator": {
     "type": "CWHSimulator",
     "config": {
-      "step_size": 1
+      "step_size": 1,
+      "initializer": {
+        "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
+        "config": {
+          "threshold_distance": 0.5,
+          "velocity_threshold": 0.2,  
+          "mean_motion": 0.001027,
+          "slope": 2.0,
+        }
+      }
     },
   },
-  # "simulator_reset_parameters": {
-  #   "x": -100,
-  #   "test": "testify?",
-  # },
   "platforms": "CWHSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "episode_parameter_provider": {
