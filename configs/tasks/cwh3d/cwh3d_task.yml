@@ -18,7 +18,7 @@ config:
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
-    local_mode: True
+    local_mode: False
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates

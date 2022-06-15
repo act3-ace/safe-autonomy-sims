@@ -36,13 +36,6 @@ class SafeRLSimulatorValidator(
     initializer: typing.Optional[InitializerFunctor] = None
     step_size: float
 
-    class Config:
-        """
-        arbitrary_types_allowed: bool
-            Enables BaseInitializer class to be included in SafeRLSimulatorValidator without error
-        """
-        arbitrary_types_allowed = True
-
 
 class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     """

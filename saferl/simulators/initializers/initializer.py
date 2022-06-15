@@ -19,7 +19,7 @@ class InitializerFunctor(BaseModel):
 
 class BaseInitializer(BaseModel):
     """
-    This abstract class defines the template for Initializer classes. Initializers are responsible
+    This class defines the template for Initializer classes. Initializers are responsible
     for providing a dictionary complete with all relevant agent_reset_config values. Initializers
     encapsulatie the  initialization of randomized and conditional (dependant) agent state values.
 
