@@ -6,15 +6,14 @@ Author: John McCarroll
 
 import typing
 
-from pydantic import BaseModel, PyObject
+from pydantic import BaseModel
 
-
-class InitializerFunctor(BaseModel):
-    """
-    The functor used by SafeRLSimulator + pydantic to pass values to initializers from the environment config
-    """
-    functor: PyObject
-    config: typing.Dict[str, typing.Any]
+# class InitializerFunctor(BaseModel):
+#     """
+#     The functor used by SafeRLSimulator + pydantic to pass values to initializers from the environment config
+#     """
+#     functor: PyObject
+#     config: typing.Dict[str, typing.Any]
 
 
 class BaseInitializer(BaseModel):

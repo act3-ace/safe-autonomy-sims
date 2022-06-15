@@ -21,9 +21,42 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": 100,
-      "y": 100,
-      "z": 100,
+      "initializer": {
+        "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
+        "config": {
+          "threshold_distance": 0.5,
+          "velocity_threshold": 0.2,
+          "mean_motion": 0.001027,
+          "slope": 2.0,
+        }
+      },
+      "x": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "x",
+          "units": "meters",
+          "low": -100,
+          "high": 100,
+        }
+      },
+      "y": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "x",
+          "units": "meters",
+          "low": -100,
+          "high": 100,
+        }
+      },
+      "z": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "x",
+          "units": "meters",
+          "low": -100,
+          "high": 100,
+        }
+      },
       "xdot": 0,
       "ydot": 0,
       "zdot": 0,
