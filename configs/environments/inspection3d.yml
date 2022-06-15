@@ -9,7 +9,6 @@
 #---------------------------------------------------------------------------
 
 {
-  #TODO: revert back to CWHSimulator, testing purposes only!
   "simulator": {
     "type": "InspectionSimulator",
     "config": {
