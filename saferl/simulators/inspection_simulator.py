@@ -41,6 +41,18 @@ class InspectionSimulator(SafeRLSimulator):
         self._state.points = self._add_points()
         return self._state
 
+    def step(self):
+        super().step()
+        #update points
+        for platform in self._state.sim_platforms:
+            agent_id = platform.name
+            #action = np.array(platform.get_applied_action(), dtype=np.float32)
+            #entity = self.sim_entities[agent_id]
+            #entity.step(action=action, step_size=self.config.step_size)
+            #platform.sim_time = self.clock
+        #return same as parent
+        return self._stat
+
     def _add_points(self) -> dict:
         points_dict = {}
         points_dict[(1, 2, 3)]= False
