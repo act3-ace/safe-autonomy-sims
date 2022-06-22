@@ -184,7 +184,7 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
         return reward
 
 
-class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
+class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the DockingDeltaVReward Reward Function.
 
@@ -203,7 +203,7 @@ class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
     mass: float
 
 
-class DockingDeltaVReward(RewardFuncBase):
+class InspectionDeltaVReward(RewardFuncBase):
     """
     Calculates reward based on the agent's fuel consumption measured in delta-v.
 
@@ -246,7 +246,7 @@ class DockingDeltaVReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs):
-        self.config: DockingDeltaVRewardValidator
+        self.config: InspectionDeltaVRewardValidator
         super().__init__(**kwargs)
         self.bias = self.config.bias
         self.scale = self.config.scale
@@ -277,7 +277,7 @@ class DockingDeltaVReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return DockingDeltaVRewardValidator
+        return InspectionDeltaVRewardValidator
 
     def __call__(
         self,
@@ -295,134 +295,7 @@ class DockingDeltaVReward(RewardFuncBase):
         return reward
 
 
-class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
-    """
-    Validator for the DockingVelocityConstraintReward Reward function.
-
-    scale : float
-        Scalar value to adjust magnitude of the reward.
-    bias : float
-        Y intercept of the linear region of the velocity constraint function.
-    step_size : float
-        The size of one simulation step (sec).
-    docking_region_radius : float
-        The radius of the docking region in meters.
-    velocity_threshold : float
-        The maximum tolerated velocity within docking region without crashing.
-    threshold_distance : float
-        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
-    slope : float
-        The slope of the linear region of the velocity constraint function.
-    mean_motion : float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
-    lower_bound : bool
-        If True, the function enforces a minimum velocity constraint on the agent's platform.
-    """
-    scale: float
-    bias: float = 0.0
-    step_size: float = 1.0
-    velocity_threshold: float
-    threshold_distance: float
-    slope: float = 2.0
-    mean_motion: float = 0.001027
-    lower_bound: bool = False
-
-
-class DockingVelocityConstraintReward(RewardFuncBase):
-    """
-    Calculates reward based on agent's violation of the velocity constraint.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> RewardDict:
-
-    This method calculates the current velocity constraint based on the relative distance from the chief.
-    It compares the velocity constraint with the deputy's current velocity. If the velocity constraint is
-    exceeded, the function returns a penalty for the agent.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : np.ndarray
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : RewardDict
-        The agent's reward for their change in distance.
-    """
-
-    def __init__(self, **kwargs):
-        self.config: DockingVelocityConstraintRewardValidator
-        super().__init__(**kwargs)
-        self.bias = self.config.bias
-        self.scale = self.config.scale
-        self.step_size = self.config.step_size
-        self.velocity_threshold = self.config.velocity_threshold
-        self.threshold_distance = self.config.threshold_distance
-        self.slope = self.config.slope
-        self.mean_motion = self.config.mean_motion
-        self.lower_bound = self.config.lower_bound
-
-        self.agent_name = self.config.agent_name
-
-    @property
-    def get_validator(self):
-        """
-        Method to return class's Validator.
-        """
-        return DockingVelocityConstraintRewardValidator
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> RewardDict:
-        reward = RewardDict()
-
-        violated, violation = max_vel_violation(
-            next_state,
-            self.config.agent_name,
-            self.config.velocity_threshold,
-            self.config.threshold_distance,
-            self.config.mean_motion,
-            self.config.lower_bound,
-            slope=self.config.slope
-        )
-
-        if violated:
-            val = self.scale * violation + self.bias
-        else:
-            val = 0
-        reward[self.config.agent_name] = val
-        return reward
-
-
-class DockingSuccessRewardValidator(RewardFuncBaseValidator):
+class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the DockingSuccessRewardValidator Reward Function.
 
@@ -453,7 +326,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     lower_bound: bool = False
 
 
-class DockingSuccessReward(RewardFuncBase):
+class InspectionSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
 
@@ -495,7 +368,7 @@ class DockingSuccessReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.config: DockingSuccessRewardValidator
+        self.config: InspectionSuccessRewardValidator
         super().__init__(**kwargs)
 
     @property
@@ -503,7 +376,7 @@ class DockingSuccessReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return DockingSuccessRewardValidator
+        return InspectionSuccessRewardValidator
 
     def __call__(
         self,
@@ -521,14 +394,9 @@ class DockingSuccessReward(RewardFuncBase):
 
         deputy = get_platform_by_name(next_state, self.config.agent_name)
 
-        position = deputy.position
         sim_time = deputy.sim_time
 
-        origin = np.array([0, 0, 0])
-        docking_region_radius = self.config.docking_region_radius
-
-        radial_distance = np.linalg.norm(np.array(position) - origin)
-        in_docking = radial_distance <= docking_region_radius
+        all_inspected = not (False in next_state.points.values())
 
         violated, _ = max_vel_violation(
             next_state,
@@ -540,7 +408,7 @@ class DockingSuccessReward(RewardFuncBase):
             slope=self.config.slope
         )
 
-        if in_docking and not violated:
+        if all_inspected and not violated:
             value = self.config.scale
             if self.config.timeout:
                 # Add time reward component, if timeout specified

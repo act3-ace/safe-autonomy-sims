@@ -157,36 +157,25 @@
     #TODO: same software engineering question
     "rewards": [
         {
-            "name": "DockingDistanceExponentialChangeReward",
+            "name": "ObservedPointsExponentialChangeReward",
             "functor": "saferl.rewards.inspection_rewards.ObservedPointsExponentialChangeReward",
             "config": {
                 "pivot": 100
             }
         },
       {
-        "name": "DockingDeltaVReward",
-        "functor": "saferl.rewards.docking_rewards.DockingDeltaVReward",
+        #TODO: leave be?
+        "name": "InspectionDeltaVReward",
+        "functor": "saferl.rewards.inspection_rewards.InspectionDeltaVReward",
         "config": {
           "scale": -0.01,
           "bias": 0.0,
           "mass": 12.0
         }
       },
-      {
-        "name": "DockingVelocityConstraintReward",
-        "functor": "saferl.rewards.docking_rewards.DockingVelocityConstraintReward",
-        "config": {
-          "scale": -0.01,
-          "bias": -0.01,
-          "velocity_threshold": 0.2,
-          "threshold_distance": 0.5,
-          "mean_motion": 0.001027,
-          "lower_bound": False,
-        }
-      },
         {
-          "name": "DockingSuccessReward",
-          "functor": "saferl.rewards.docking_rewards.DockingSuccessReward",
+          "name": "InspectionSuccessReward",
+          "functor": "saferl.rewards.inspection_rewards.InspectionSuccessReward",
           "config": {
             "scale": 1.0,
             "timeout": 2000,
