@@ -24,184 +24,7 @@ from numpy_ringbuffer import RingBuffer
 from saferl.utils import max_vel_violation
 
 
-class DockingTimeRewardValidator(RewardFuncBaseValidator):
-    """
-    Validator for the DockingTimeRewardValidator Reward Function.
-
-    scale : float
-        Scalar value to adjust magnitude of the reward.
-    step_size : float
-        The size of one simulation step (sec).
-    """
-    scale: float
-    step_size: float
-
-
-# Change name to TimeReward?
-class DockingTimeReward(RewardFuncBase):
-    """
-    This reward function allocates reward based on the number of time steps (BaseSimulator.step() method calls) that
-    have passed in a single episode.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> RewardDict:
-
-    This method allocates reward based on the step size of the simulation.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to values in the observation_space?
-
-    Returns
-    -------
-    reward : RewardDict
-        The agent's reward for the change in time.
-    """
-
-    def __init__(self, **kwargs):
-        self.config: DockingTimeRewardValidator
-        super().__init__(**kwargs)
-
-    @property
-    def get_validator(self):
-        """
-        Method to return class's Validator.
-        """
-        return DockingTimeRewardValidator
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> RewardDict:
-
-        reward = RewardDict()
-        reward[self.config.agent_name] = self.config.scale * self.config.step_size
-
-        return reward
-
-
-class DockingDistanceChangeRewardValidator(RewardFuncBaseValidator):
-    """
-    Validator for the DockingTimeRewardValidator Reward Function.
-
-    scale : float
-        Scalar value to adjust magnitude of the reward.
-    """
-    scale: float
-
-
-class DockingDistanceChangeReward(RewardFuncBase):
-    """
-    This RewardFuncBase extension is responsible for calculating the reward associated with a change in agent position.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> RewardDict:
-
-    This method calculates the current position of the agent and compares it to the previous position. The
-    difference is used to return a proportional reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : RewardDict
-        The agent's reward for their change in distance.
-    """
-
-    def __init__(self, **kwargs):
-        self.config: DockingDistanceChangeRewardValidator
-        super().__init__(**kwargs)
-        self._dist_buffer = RingBuffer(capacity=2, dtype=float)
-
-    @property
-    def get_validator(self):
-        """
-        Method to return class's Validator.
-        """
-        return DockingDistanceChangeRewardValidator
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> RewardDict:
-
-        reward = RewardDict()
-        val = 0
-
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-        position = deputy.position
-
-        distance = np.linalg.norm(position)
-        self._dist_buffer.append(distance)
-
-        # TODO intialize distance buffer from initial state
-        if len(self._dist_buffer) == 2:
-            val = self.config.scale * (self._dist_buffer[1] - self._dist_buffer[0])
-
-        reward[self.config.agent_name] = val
-
-        return reward
-
-
-class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
+class ObservedPointsExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the DockingDistanceExponentialChangeReward Reward Function.
 
@@ -223,7 +46,7 @@ class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     scale: float = 1.0
 
 
-class DockingDistanceExponentialChangeReward(RewardFuncBase):
+class ObservedPointsExponentialChangeReward(RewardFuncBase):
     """
     Calculates an exponential reward based on the change in distance of the agent.
     Reward is based on the multiplicative scale factor to the exponential potential function:
@@ -268,7 +91,7 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs):
-        self.config: DockingDistanceExponentialChangeRewardValidator
+        self.config: ObservedPointsExponentialChangeRewardValidator
         super().__init__(**kwargs)
         self._dist_buffer = RingBuffer(capacity=2, dtype=float)
 
@@ -288,7 +111,7 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return DockingDistanceExponentialChangeRewardValidator
+        return ObservedPointsExponentialChangeRewardValidator
 
     @property
     def prev_dist(self):
@@ -343,18 +166,21 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         reward = RewardDict()
         val = 0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-        position = deputy.position
+        num_new_points = 0
+        total_points_found = 0
 
-        distance = np.linalg.norm(position)
-        self.update_dist(distance)
+        old_points = state.points
+        new_points = next_state.points
+        for point in old_points:
+            if new_points[point]:
+                total_points_found +=1
+            if not old_points[point] == new_points[point]:
+                num_new_points+=1
 
-        # TODO initialize distance buffer from initial state
-        if len(self._dist_buffer) == 2:
-            val = self.c * (math.exp(-self.a * self.curr_dist) - math.exp(-self.a * self.prev_dist))
-            val = self.scale * val
 
-        reward[self.config.agent_name] = val
+        #TODO: more complicated, expontential reward
+        #TODO: question, do we need to
+        reward[self.config.agent_name] = num_new_points #+ num_new_points * (total_points_found / len(old_points))
         return reward
 
 
