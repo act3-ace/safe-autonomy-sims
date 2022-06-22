@@ -418,7 +418,7 @@ class InspectionSuccessReward(RewardFuncBase):
         return reward
 
 
-class DockingFailureRewardValidator(RewardFuncBaseValidator):
+class InspectionFailureRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the DockingFailureRewardValidator Reward Function.
 
@@ -449,7 +449,7 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     distance_reward: float
     crash_reward: float
     timeout: float
-    max_goal_distance: float
+    min_goal_points: int
     docking_region_radius: float
     velocity_threshold: float
     threshold_distance: float
@@ -458,7 +458,7 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     lower_bound: bool = False
 
 
-class DockingFailureReward(RewardFuncBase):
+class InspectionFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
 
@@ -500,7 +500,7 @@ class DockingFailureReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.config: DockingFailureRewardValidator
+        self.config: InspectionFailureRewardValidator
         super().__init__(**kwargs)
 
     @property
@@ -508,7 +508,7 @@ class DockingFailureReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return DockingFailureRewardValidator
+        return InspectionFailureRewardValidator
 
     def __call__(
         self,
@@ -526,13 +526,16 @@ class DockingFailureReward(RewardFuncBase):
 
         deputy = get_platform_by_name(next_state, self.config.agent_name)
 
-        position = deputy.position
         sim_time = deputy.sim_time
 
         # TODO: update to chief location when multiple platforms enabled
-        origin = np.array([0, 0, 0])
-        radial_distance = np.linalg.norm(np.array(position) - origin)
-        in_docking = radial_distance <= self.config.docking_region_radius
+        all_inspected = not (False in next_state.points.values())
+        total_points_found = 0
+
+        points = next_state.points
+        for point in points:
+            if points[point]:
+                total_points_found += 1
 
         violated, _ = max_vel_violation(
             next_state,
@@ -547,10 +550,10 @@ class DockingFailureReward(RewardFuncBase):
         if sim_time >= self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
-        elif radial_distance >= self.config.max_goal_distance:
+        elif total_points_found >= self.config.min_goal_points:
             # agent exceeded max distance from goal
             value = self.config.distance_reward
-        elif in_docking and violated:
+        elif all_inspected and violated:
             # agent exceeded velocity constraint within docking region
             value = self.config.crash_reward
 
