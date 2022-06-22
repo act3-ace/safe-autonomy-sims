@@ -154,11 +154,11 @@
             },
         },
     ],
-    #TODO: update all!
+    #TODO: same software engineering question
     "rewards": [
         {
             "name": "DockingDistanceExponentialChangeReward",
-            "functor": "saferl.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.inspection_rewards.ObservedPointsExponentialChangeReward",
             "config": {
                 "pivot": 100
             }
