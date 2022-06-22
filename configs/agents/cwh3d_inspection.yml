@@ -132,19 +132,18 @@
 #              "lower_bound": False,
 #            },
 #        },
-        #{
-          #TODO! need a collision check?
-        #    "functor": "saferl.dones.inspection_dones.CrashInspectionDoneFunction",
-        #    "config":{
-        #      "Inspection_region_radius": 0.5,
-        #      "velocity_threshold": 0.2,
-        #      "threshold_distance": 0.5,
-        #      "mean_motion": 0.001027,
-        #      "lower_bound": False,
-        #    },
-        #},
         {
-          #TODO: need a successfull inspection!
+          #TODO! software engineering consideration - no changes to docking version... should we move to shared done?
+           "functor": "saferl.dones.docking_dones.CrashDockingDoneFunction",
+            "config":{
+              "docking_region_radius": 0.5,
+              "velocity_threshold": 0.2,
+              "threshold_distance": 0.5,
+              "mean_motion": 0.001027,
+              "lower_bound": False,
+            },
+        },
+        {
             "functor": "saferl.dones.inspection_dones.SuccessfulInspectionDoneFunction",
             "config":{
               "Inspection_region_radius": 0.5,
