@@ -12,7 +12,9 @@
   "simulator": {
     "type": "InspectionSimulator",
     "config": {
-      "step_size": 1
+      "step_size": 1,
+      "num_points": 30,
+      "radius" : 40
     },
   },
   "platforms": "CWHSimulator_Platforms",

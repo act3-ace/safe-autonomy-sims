@@ -19,13 +19,28 @@ from corl.libraries.plugin_library import PluginLibrary
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl.simulators.saferl_simulator import SafeRLSimulator
+from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
 
+
+class InspectionSimulatorValidator(SafeRLSimulatorValidator):
+    """
+    A validator for the SafeRLSimulator config.
+
+    step_size: float
+        A float representing how many simulated seconds pass each time the simulator updates.
+    """
+    step_size: float
+    num_points: int
+    radius: float
 
 class InspectionSimulator(SafeRLSimulator):
     """
     Simulator for CWH Inspection Task. Interfaces CWH platforms with underlying CWH entities in Inspection simulation.
     """
+
+    @property
+    def get_simulator_validator(self):
+        return InspectionSimulatorValidator
 
     def _construct_platform_map(self) -> dict:
         return {
@@ -56,13 +71,15 @@ class InspectionSimulator(SafeRLSimulator):
         return self._state
 
     def _add_points(self) -> dict:
+        r = self.config.radius
+        num_points = self.config.num_points
         points_dict = {}
         points_dict[(1, 2, 3)]= False
         points_dict[(4, 5, 6)]= False
         return points_dict
 
     def _update_points(self, position):
-        r = 10 #TODO: move to config
+        r = self.config.radius #TODO: move to config
         for point in self._state.points:
             #TODO: check if point is in view and update if it is
             if not self._state.points[point]:
