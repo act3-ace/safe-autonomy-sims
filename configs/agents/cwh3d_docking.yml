@@ -21,15 +21,12 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "initializer": {
-        "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
-        "config": {
-          "threshold_distance": 0.5,
-          "velocity_threshold": 0.2,
-          "mean_motion": 0.001027,
-          "slope": 2.0,
-        }
-      },
+      # "initializer": {
+      #   "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
+      #   "config": {
+
+      #   }
+      # },
       "x": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
