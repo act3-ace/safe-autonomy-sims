@@ -117,12 +117,13 @@
                 "max_sim_time": 2000,
             },
         },
-        {
-            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
-            "config":{
-                "max_distance": 40000,
-            },
-        },
+               #TODO: put back later
+        #{
+        #    "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
+        #    "config":{
+        #        "max_distance": 40000,
+        #    },
+        #},
 #        {
 #            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
 #            "config":{
@@ -163,16 +164,16 @@
                 "pivot": 100
             }
         },
-      {
-        #TODO: leave be?
-        "name": "InspectionDeltaVReward",
-        "functor": "saferl.rewards.inspection_rewards.InspectionDeltaVReward",
-        "config": {
-          "scale": -0.01,
-          "bias": 0.0,
-          "mass": 12.0
-        }
-      },
+      #{
+      #  #TODO: add later
+      #  "name": "InspectionDeltaVReward",
+      #  "functor": "saferl.rewards.inspection_rewards.InspectionDeltaVReward",
+      #  "config": {
+      #    "scale": -0.01,
+      #    "bias": 0.0,
+      #    "mass": 12.0
+      #  }
+      #},
         {
           "name": "InspectionSuccessReward",
           "functor": "saferl.rewards.inspection_rewards.InspectionSuccessReward",
