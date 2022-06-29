@@ -124,7 +124,7 @@ git clone https://github.com/act3-ace/safe-autonomy-dynamics.git
 git clone https://github.com/act3-ace/run-time-assurance.git
 git clone https://github.com/act3-ace/safe-autonomy-sims.git
 cd corl
-git checkout v1.42.0
+git checkout v1.44.2
 pip --default-timeout=1000 install -e .
 cd ../safe-autonomy-dynamics
 pip --default-timeout=1000 install -e .
