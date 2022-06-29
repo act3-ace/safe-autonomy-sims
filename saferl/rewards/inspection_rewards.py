@@ -180,7 +180,7 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
 
         #TODO: more complicated, expontential reward
         #TODO: question, do we need to
-        reward[self.config.agent_name] = num_new_points #+ num_new_points * (total_points_found / len(old_points))
+        reward[self.config.agent_name] = total_points_found ** num_new_points #+ num_new_points * (total_points_found / len(old_points))
         return reward
 
 
@@ -550,7 +550,7 @@ class InspectionFailureReward(RewardFuncBase):
         if sim_time >= self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
-        elif total_points_found >= self.config.min_goal_points:
+        elif not all_inspected:
             # agent exceeded max distance from goal
             value = self.config.distance_reward
         elif all_inspected and violated:

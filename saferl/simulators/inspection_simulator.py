@@ -12,6 +12,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 This module contains the CWH Simulator for interacting with the CWH Docking task simulator
 """
 import math
+import random
 
 import numpy as np
 
@@ -74,8 +75,33 @@ class InspectionSimulator(SafeRLSimulator):
         r = self.config.radius
         num_points = self.config.num_points
         points_dict = {}
-        points_dict[(1, 2, 3)]= False
-        points_dict[(4, 5, 6)]= False
+        #generate points using CMU algorithm
+        '''
+        n_count = 0
+        a = (4 * math.pi * (r**2))/num_points
+        d = math.sqrt(a)
+        M_theta = round(math.pi / d) + 1 #TODO: round?
+        d_theta = math.pi / M_theta
+        d_phi = a/d_theta
+        for m in range(0, M_theta):
+            theta = math.pi * ((m+ 0.5)/M_theta)
+            M_phi = round((2 * math.pi * math.sin(theta))/d_phi)
+            for n in range(0, M_phi):
+                phi = (2 * math.pi * n)/ M_phi
+                points_dict[((math.sin(theta)* math.cos(phi)),(math.sin(theta)* math.sin(phi)),math.cos(theta) )] = False
+                n_count += 1
+
+        #points_dict[(1, 2, 3)]= False
+        #points_dict[(4, 5, 6)]= False
+        '''
+        #temporarily use random algorithm
+        for i in range(0, num_points):
+            z = random.uniform(-r, r)
+            phi = random.uniform(0, 2* math.pi)
+            x = math.sqrt((r ** 2) - (z ** 2)) * math.cos(phi)
+            y = math.sqrt((r ** 2) - (z ** 2)) * math.sin(phi)
+            points_dict[(x,y,z)] = False
+
         return points_dict
 
     def _update_points(self, position):
@@ -93,6 +119,6 @@ class InspectionSimulator(SafeRLSimulator):
                 #check if point is in view
                 if (mag > r - h):
                     self._state.points[point] = True
-            print(point)
+            #print(point)
 
 PluginLibrary.AddClassToGroup(InspectionSimulator, "InspectionSimulator", {})
