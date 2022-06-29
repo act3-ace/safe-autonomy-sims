@@ -8,15 +8,8 @@ import typing
 
 from pydantic import BaseModel
 
-# class InitializerFunctor(BaseModel):
-#     """
-#     The functor used by SafeRLSimulator + pydantic to pass values to initializers from the environment config
-#     """
-#     functor: PyObject
-#     config: typing.Dict[str, typing.Any]
 
-
-class BaseInitializer(BaseModel):
+class BaseInitializer():
     """
     This class defines the template for Initializer classes. Initializers are responsible
     for providing a dictionary complete with all relevant agent_reset_config values. Initializers
@@ -24,6 +17,16 @@ class BaseInitializer(BaseModel):
 
     TODO: call method docstring
     """
+
+    @property
+    def get_validator(self) -> typing.Type[BaseModel]:
+        """
+        get validator for this Done Functor
+
+        Returns:
+            DoneFuncBaseValidator -- validator the done functor will use to generate a configuration
+        """
+        return BaseModel
 
     def __call__(self) -> typing.Dict:
         raise NotImplementedError

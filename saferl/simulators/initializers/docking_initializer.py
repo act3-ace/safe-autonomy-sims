@@ -8,6 +8,7 @@ import math
 import random
 
 import numpy as np
+from pydantic import BaseModel
 
 from saferl.simulators.initializers.initializer import BaseInitializer
 
@@ -40,10 +41,34 @@ def velocity_limit(position, velocity_threshold, threshold_distance, mean_motion
     return vel_limit
 
 
-class Docking3DInitializer(BaseInitializer):
+class Docking3DInitializerValidator(BaseModel):
     """
-    This class handles the initialization of agent reset parameters for the cwh 3D docking problem.
+    Validator for Docking3DInitializer.
+
+    Parameters
+    ----------
+    velocity_threshold : float
+        The maximum tolerated velocity within docking region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
+    x: float
+        The reset value for the x position of the agent
+    y: float
+        The reset value for the y position of the agent
+    z: float
+        The reset value for the z position of the agent
+    xdot: float
+        The reset value for the x velocity of the agent
+    ydot: float
+        The reset value for the y velocity of the agent
+    zdot: float
+        The reset value for the z velocity of the agent
     """
+
     velocity_threshold: float
     threshold_distance: float
     slope: float = 2.0
@@ -55,33 +80,61 @@ class Docking3DInitializer(BaseInitializer):
     ydot: float = 0
     zdot: float = 0
 
-    def __call__(self, agent_reset_config):
-        if "x" not in agent_reset_config or "y" not in agent_reset_config or "z" not in agent_reset_config:
-            raise ValueError("agent_reset_config missing one or more positional keys")
 
-        # constrained rng velocity
-        vel_limit = velocity_limit(
-            [agent_reset_config["x"], agent_reset_config["y"], agent_reset_config["z"]],
-            self.velocity_threshold,
-            self.threshold_distance,
-            self.mean_motion,
-            self.slope
-        )
+class Docking3DInitializer(BaseInitializer):
+    """
+    This class handles the initialization of agent reset parameters for the cwh 3D docking environment.
+    It ensures that the initial velocity of the deputy does not violate the maximum velocity safety constraint.
 
-        # find magnitude of x,y,z components of max vel limit given position
-        axis_vel_limit = math.sqrt(vel_limit**2 / 3)
+    def __call__(self, reset_config):
 
-        # # compare to range
-        # upper_x_dot_bound = axis_vel_limit if axis_vel_limit < self.x_dot[1] else self.x_dot[1]
-        # lower_x_dot_bound = -axis_vel_limit if -axis_vel_limit > self.x_dot[0] else self.x_dot[0]
-        # upper_y_dot_bound = axis_vel_limit if axis_vel_limit < self.y_dot[1] else self.y_dot[1]
-        # lower_y_dot_bound = -axis_vel_limit if -axis_vel_limit > self.y_dot[0] else self.y_dot[0]
-        # upper_z_dot_bound = axis_vel_limit if axis_vel_limit < self.z_dot[1] else self.z_dot[1]
-        # lower_z_dot_bound = -axis_vel_limit if -axis_vel_limit > self.z_dot[0] else self.z_dot[0]
+    Parameters
+    ----------
+    reset_config: dict
+        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
+        are the values
 
-        # initialize from boundary
-        agent_reset_config.update({"xdot": random.uniform(-axis_vel_limit, axis_vel_limit)})
-        agent_reset_config.update({"ydot": random.uniform(-axis_vel_limit, axis_vel_limit)})
-        agent_reset_config.update({"zdot": random.uniform(-axis_vel_limit, axis_vel_limit)})
+    Returns
+    -------
+    reset_config: dict
+        The modified reset config of agent name to initialization values KVPs.
+    """
 
-        return agent_reset_config
+    def __init__(self, config):
+        self.config = self.get_validator(**config)
+
+    @property
+    def get_validator(self):
+        """
+        Returns
+        -------
+        Docking3DInitializerValidator
+            Config validator for the Docking3DInitializerValidator.
+        """
+        return Docking3DInitializerValidator
+
+    def __call__(self, reset_config):
+
+        for agent_name, agent_reset_config in reset_config.items():
+
+            if "x" not in agent_reset_config or "y" not in agent_reset_config or "z" not in agent_reset_config:
+                raise ValueError("{} agent_reset_config missing one or more positional keys".format(agent_name))
+
+            # constrained rng velocity
+            vel_limit = velocity_limit(
+                [agent_reset_config["x"], agent_reset_config["y"], agent_reset_config["z"]],
+                self.config.velocity_threshold,
+                self.config.threshold_distance,
+                self.config.mean_motion,
+                self.config.slope
+            )
+
+            # find magnitude of x,y,z components of max vel limit given position
+            axis_vel_limit = math.sqrt(vel_limit**2 / 3)
+
+            # initialize from boundary
+            agent_reset_config.update({"xdot": random.uniform(-axis_vel_limit, axis_vel_limit)})
+            agent_reset_config.update({"ydot": random.uniform(-axis_vel_limit, axis_vel_limit)})
+            agent_reset_config.update({"zdot": random.uniform(-axis_vel_limit, axis_vel_limit)})
+
+        return reset_config
