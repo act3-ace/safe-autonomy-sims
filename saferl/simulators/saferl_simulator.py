@@ -11,6 +11,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module contains the base Simulator class used by the saferl team's CWH and Dubins simulators.
 """
+# pylint: disable=W0123,W0611
 
 import abc
 import typing
@@ -19,9 +20,14 @@ import numpy as np
 from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+from pydantic import BaseModel, PyObject
+
+import saferl  # noqa: F401
 
 
-class SafeRLSimulatorValidator(BaseSimulatorValidator):
+class SafeRLSimulatorValidator(
+    BaseSimulatorValidator,
+):
     """
     A validator for the SafeRLSimulator config.
 
@@ -29,6 +35,19 @@ class SafeRLSimulatorValidator(BaseSimulatorValidator):
         A float representing how many simulated seconds pass each time the simulator updates.
     """
     step_size: float
+
+
+class InitializerResetValidator(BaseModel):
+    """
+    A validator for the Initializaer config.
+
+    functor: str
+        The class module of the Initializer to be instantiated.
+    config: dict
+        The dict of values to be passed to the Initializer's construtor.
+    """
+    functor: PyObject
+    config: typing.Dict = {}
 
 
 class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
@@ -40,8 +59,12 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     platforms: dict
         Contains individual initialization dicts for each agent.
         Key is platform name, value is platform's initialization dict.
+    initializer: InitializerResetValidator
+        Optionally, the user can define the functor and config for a BaseInitializer class, which modifies
+        the agent-specific initialization dicts found in platforms.
     """
     platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
+    initializer: typing.Optional[typing.Union[InitializerResetValidator, None]] = None
 
 
 class SafeRLSimulator(BaseSimulator):
@@ -69,6 +92,10 @@ class SafeRLSimulator(BaseSimulator):
 
     def reset(self, config):
         config = self.get_reset_validator(**config)
+        if config.initializer is not None:
+            # if an initializer defined, pass agent reset configs through it
+            initializer = config.initializer.functor(config=config.initializer.config)
+            config.platforms = initializer(config.platforms)
         self._state.clear()
         self.clock = 0.0
         self.sim_entities = self.construct_sim_entities(config.platforms)
