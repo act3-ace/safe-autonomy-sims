@@ -1,12 +1,17 @@
-#--------------------------------------------------------------------------
-#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-#Reinforcement Learning (RL) Core  Extension.
+# ---------------------------------------------------------------------------
+# //
 #
-#This is a US Government Work not subject to copyright protection in the US.
+# Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+# Reinforcement Learning (RL) Core contributed by the:
+#  -  () Team
+#  - Safe Autonomy (SA) Team
 #
-#The use, dissemination or disclosure of data in this file is subject to
-#limitation or restriction. See accompanying README and LICENSE for details.
-#---------------------------------------------------------------------------
+# This is a US Government Work not subject to copyright protection in the US.
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ---------------------------------------------------------------------------
+
 
 "agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
@@ -21,18 +26,12 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      # "initializer": {
-      #   "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
-      #   "config": {
-
-      #   }
-      # },
       "x": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -100,
+          "low": 0,
           "high": 100,
         }
       },
@@ -41,7 +40,7 @@
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -100,
+          "low": 0,
           "high": 100,
         }
       },
@@ -50,7 +49,7 @@
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -100,
+          "low": 0,
           "high": 100,
         }
       },
@@ -144,7 +143,7 @@
         {
             "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{
-                "max_sim_time": 2000,
+                "max_sim_time": 10000,
             },
         },
         {
