@@ -6,11 +6,15 @@ a [virtualenv](https://virtualenv.pypa.io/en/stable/#)
 or [conda](https://docs.conda.io/projects/conda/en/latest/index.html)
 environment.
 
-The safe-autonomy-sims library is built on the [CoRL](https://github.com/act3-ace/act3-rl/corl)
-reinforcement learning framework using the [Run Time Assurance](https://github.com/act3-ace/run-time-assurance) package. These dependencies are required
-in order to use safe-autonomy-sims. At the time of writing,
-neither dependency is available on any public package repos and
-must be installed from source.
+The safe-autonomy-sims library is built on the 
+[CoRL](https://github.com/act3-ace/act3-rl/corl)
+reinforcement learning framework using the 
+[run-time-assurance](https://github.com/act3-ace/run-time-assurance)
+and [safe-autonomy-dynamics](https://github.com/act3-ace/safe-autonomy-dynamics) 
+packages. These dependencies are required in order to use
+safe-autonomy-sims. At the time of writing,
+none of these dependencies are available on any public package
+repos and must be installed from source.
 
 ## Installing CoRL
 Clone a copy of the CoRL source code onto
@@ -23,13 +27,27 @@ or HTTPS:
 git clone https://github.com/act3-ace/act3-rl/corl.git
 ```
 
-Install the CoRL module into your environment using `pip`:
+### CoRL Version
+CoRL is a developing library which is continuously introducing new
+features. We have pinned the version of CoRL which is compatible
+with safe-autonomy-sims to prevent breaking changes from CoRL. 
+
+If you receive an error regarding the required CoRL version needed for
+safe-autonomy-sims, you can use the correct version by running the
+following command:
+```shell
+cd path/to/corl/
+git checkout tags/vX.XX.X  # replace with needed version number
+```
+
+Once you have the correct version checked out, install the CoRL
+module into your environment using `pip`:
 ```shell
 pip install path/to/corl/
 ```
 
-## Installing Run Time Assurance
-Clone a copy of the Run Time Assurance source code onto your local machine via SSH:
+## Installing run-time-assurance
+Clone a copy of the run-time-assurance source code onto your local machine via SSH:
 ```shell
 git clone git@github.com/act3-ace:rta/run-time-assurance.git
 ```
@@ -38,10 +56,26 @@ or HTTPS:
 git clone https://github.com/act3-ace/run-time-assurance.git
 ```
 
-Install the Run Time Assurance module into your 
+Install the run-time-assurance module into your 
 environment using `pip`:
 ```shell
 pip install path/to/run-time-assurance/
+```
+
+## Installing safe-autonomy-dynamics
+Clone a copy of the safe-autonomy-dynamics source code onto your local machine via SSH:
+```shell
+git clone git@github.com/act3-ace:rta/safe-autonomy-dynamics.git
+```
+or HTTPS:
+```shell
+git clone https://github.com/act3-ace/safe-autonomy-dynamics.git
+```
+
+Install the safe-autonomy-dynamics module into your 
+environment using `pip`:
+```shell
+pip install path/to/safe-autonomy-dynamics/
 ```
 
 ## Installing safe-autonomy-sims
@@ -72,6 +106,38 @@ pip install -e path/to/safe-autonomy-sims/
 This will install the package in an editable mode within
 your environment, allowing any changes you make to the
 source to persist.
+
+## ACEHUB
+In depth ACEHUB documentation can be found here:
+https://github.com/act3-ace/have-deepsky/-/tree/master/docs/acehub
+
+
+### Safe Autonomy Sims Setup Script
+To access the safe autonomy sims setup script, set the following value for the `SAFE_AUTONOMY_VSCODE_SETUP` environment file
+```bash
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+export GIT_ASKPASS="/ace/hub/envfile/GIT_ASKPASS" 
+conda create -y -n safe_autonomy python=3.8 pip
+conda activate safe_autonomy 
+git clone https://github.com/act3-ace/act3-rl/corl.git
+git clone https://github.com/act3-ace/safe-autonomy-dynamics.git
+git clone https://github.com/act3-ace/run-time-assurance.git
+git clone https://github.com/act3-ace/safe-autonomy-sims.git
+cd corl
+git checkout v1.44.2
+pip --default-timeout=1000 install -e .
+cd ../safe-autonomy-dynamics
+pip --default-timeout=1000 install -e .
+cd ../run-time-assurance
+pip --default-timeout=1000 install -e .
+cd ../safe-autonomy-sims
+pip --default-timeout=1000 install -e .
+```
+
+Once inside your acehub instance, run the following in your terminal
+```bash
+source $SAFE_AUTONOMY_VSCODE_SETUP
+```
 
 ## Questions or Issues?
 If you have any trouble installing the safe-autonomy-sims

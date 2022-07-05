@@ -18,7 +18,7 @@ import os
 import pytest
 from corl.libraries.state_dict import StateDict
 
-from saferl.core.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.cwh_simulator import CWHSimulator
 from tests.conftest import delimiter, read_test_cases
 from tests.factories.cwh.cwh_platform import CWHPlatformFactory
 

@@ -119,78 +119,71 @@ nav:
   - "API":
 #      - reference/SUMMARY.md  # API "Table of Contents"
       - api/index.md
-      - "backend":
-          - api/backend/index.md
-          - "entities": reference/backend/base_models/entities.md
-          - "cwh entities": reference/backend/cwh/cwh.md
-          - "dubins entities": reference/backend/dubins/entities.md
-      - "core":
-          - api/core/index.md
-          - "agents":
-              - api/core/agents/index.md
-              - "rta agent":
-                  - reference/core/agents/rta_agent.md
-          - "dones":
-              - api/core/dones/index.md
-              - "common dones":
-                  - reference/core/dones/common_dones.md
-              - "docking dones":
-                  - reference/core/dones/docking_dones.md
-              - "rejoin dones":
-                  - reference/core/dones/rejoin_dones.md
-          - "glues":
-              - api/core/glues/index.md
-              - "normal":
-                  - api/core/glues/normal/index.md
-                  - reference/core/glues/normal/normal_glue.md
-                  - reference/core/glues/normal/normal_observe_glue.md
-                  - reference/core/glues/normal/normal_wrapper_glue.md
-              - reference/core/glues/magnitude_glue.md
-              - reference/core/glues/rejoin_region_glue.md
-              - reference/core/glues/rta_glue.md
-              - reference/core/glues/unit_vector_glue.md
-              - reference/core/glues/vel_limit_glue.md
-          - "platforms":
-              - api/core/platforms/index.md
-              - "common":
-                  - reference/core/platforms/common/sensors.md
-              - "cwh":
-                  - api/core/platforms/cwh/index.md
-                  - reference/core/platforms/cwh/cwh_available_platforms.md
-                  - reference/core/platforms/cwh/cwh_controllers.md
-                  - reference/core/platforms/cwh/cwh_platform.md
-                  - reference/core/platforms/cwh/cwh_properties.md
-                  - reference/core/platforms/cwh/cwh_sensors.md
-              - "dubins":
-                  - api/core/platforms/dubins/index.md
-                  - "sensors":
-                      - api/core/platforms/dubins/sensors/index.md
-                      - "dubins sensors":
-                          - reference/core/platforms/dubins/sensors/dubins_sensors.md
-                      - "partner sensors":
-                          - reference/core/platforms/dubins/sensors/partner_sensors.md
-                      - "relative sensors":
-                          - reference/core/platforms/dubins/sensors/relative_sensors.md
-                  - reference/core/platforms/dubins/dubins_available_platforms.md
-                  - reference/core/platforms/dubins/dubins_controllers.md
-                  - reference/core/platforms/dubins/dubins_platform.md
-                  - reference/core/platforms/dubins/dubins_properties.md
-          - "rewards":
-              - api/core/rewards/index.md
-              - "docking rewards":
-                  - reference/core/rewards/docking_rewards.md
-              - "rejoin rewards":
-                  - reference/core/rewards/rejoin_rewards.md
-          - "rta":
-              - api/core/rta/index.md
-              - "cwh_rta":
-                  - reference/core/rta/cwh/cwh_rta.md
-          - "simulators":
-              - api/core/simulators/index.md
-              - "cwh simulator":
-                  - reference/core/simulators/cwh_simulator.md
-              - "dubins simulator":
-                  - reference/core/simulators/dubins_simulator.md
-              - "saferl simulator":
-                  - reference/core/simulators/saferl_simulator.md
-          - reference/core/utils.md
+      - "agents":
+          - api/agents/index.md
+          - "rta agent":
+              - reference/agents/rta_agent.md
+      - "dones":
+          - api/dones/index.md
+          - "common dones":
+              - reference/dones/common_dones.md
+          - "docking dones":
+              - reference/dones/docking_dones.md
+          - "rejoin dones":
+              - reference/dones/rejoin_dones.md
+      - "glues":
+          - api/glues/index.md
+          - "normal":
+              - api/glues/normal/index.md
+              - reference/glues/normal/normal_glue.md
+              - reference/glues/normal/normal_observe_glue.md
+              - reference/glues/normal/normal_wrapper_glue.md
+          - reference/glues/magnitude_glue.md
+          - reference/glues/rejoin_region_glue.md
+          - reference/glues/rta_glue.md
+          - reference/glues/unit_vector_glue.md
+          - reference/glues/vel_limit_glue.md
+      - "platforms":
+          - api/platforms/index.md
+          - "common":
+              - reference/platforms/common/sensors.md
+          - "cwh":
+              - api/platforms/cwh/index.md
+              - reference/platforms/cwh/cwh_available_platforms.md
+              - reference/platforms/cwh/cwh_controllers.md
+              - reference/platforms/cwh/cwh_platform.md
+              - reference/platforms/cwh/cwh_properties.md
+              - reference/platforms/cwh/cwh_sensors.md
+          - "dubins":
+              - api/platforms/dubins/index.md
+              - "sensors":
+                  - api/platforms/dubins/sensors/index.md
+                  - "dubins sensors":
+                      - reference/platforms/dubins/sensors/dubins_sensors.md
+                  - "partner sensors":
+                      - reference/platforms/dubins/sensors/partner_sensors.md
+                  - "relative sensors":
+                      - reference/platforms/dubins/sensors/relative_sensors.md
+              - reference/platforms/dubins/dubins_available_platforms.md
+              - reference/platforms/dubins/dubins_controllers.md
+              - reference/platforms/dubins/dubins_platform.md
+              - reference/platforms/dubins/dubins_properties.md
+      - "rewards":
+          - api/rewards/index.md
+          - "docking rewards":
+              - reference/rewards/docking_rewards.md
+          - "rejoin rewards":
+              - reference/rewards/rejoin_rewards.md
+      - "rta":
+          - api/rta/index.md
+          - "cwh_rta":
+              - reference/rta/cwh/cwh_rta.md
+      - "simulators":
+          - api/simulators/index.md
+          - "cwh simulator":
+              - reference/simulators/cwh_simulator.md
+          - "dubins simulator":
+              - reference/simulators/dubins_simulator.md
+          - "saferl simulator":
+              - reference/simulators/saferl_simulator.md
+      - "utils": reference/utils.md
