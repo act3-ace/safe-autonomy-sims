@@ -24,8 +24,8 @@ class RllibAPIExperimentValidator(RllibExperimentValidator):
     """
     The validator for the RllibAPIExperiment class.
     """
-    serialized_ray_config_path: str = "/tmp/safe_autonomy/ray_results/ACT3-RLLIB-AGENTS/CWH-3D-DOCKING-MULTIAGENT-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_eb363_00000_0_num_gpus=1,num_workers=10,rollout__2022-05-26_12-35-57/params.pkl"  # noqa: E501
-    trained_models_checkpoint_path: str = "/tmp/safe_autonomy/ray_results/ACT3-RLLIB-AGENTS/CWH-3D-DOCKING-MULTIAGENT-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_eb363_00000_0_num_gpus=1,num_workers=10,rollout__2022-05-26_12-35-57/checkpoint_000275/checkpoint-275"  # noqa: E501
+    serialized_ray_config_path: str  # path to params.pkl file
+    trained_models_checkpoint_path: str  # path to checkpoint directory
 
 
 class RllibAPIExperiment(RllibExperiment):
@@ -156,7 +156,6 @@ class RllibAPIExperiment(RllibExperiment):
 
             while not all(dones.values()):
                 # progress environment state
-
                 action_dict = {}
                 for name in obs.keys():
                     action_dict[name] = agents.compute_single_action(obs[name], policy_id=name)
