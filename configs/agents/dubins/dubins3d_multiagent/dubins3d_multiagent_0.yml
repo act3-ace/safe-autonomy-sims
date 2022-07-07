@@ -81,7 +81,7 @@
             }
         },
         {
-          "functor": "saferl.core.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
           "config": {
             "sensor": "Sensor_Relative_Position",
             "normalization": {
@@ -92,7 +92,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
           "config": {
             "sensor": "Sensor_Relative_Position",
             "normalization": {
@@ -103,7 +103,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
           "config": {
             "sensor": "Sensor_Relative_Rejoin_Position",
             "normalization": {
@@ -114,7 +114,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
           "config": {
             "sensor": "Sensor_Relative_Rejoin_Position",
             "normalization": {
@@ -125,7 +125,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
           "config": {
             "sensor": "Sensor_Velocity",
             "normalization": {
@@ -136,7 +136,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
           "config": {
             "sensor": "Sensor_Velocity",
             "normalization": {
@@ -147,7 +147,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
           "config": {
             "sensor": "Sensor_Partner_Velocity",
             "normalization": {
@@ -158,7 +158,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
           "config": {
             "sensor": "Sensor_Partner_Velocity",
             "normalization": {
@@ -169,7 +169,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+          "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
           "config": {
             "sensor": "Sensor_Roll",
             "normalization": {
@@ -180,7 +180,7 @@
           },
         },
         {
-          "functor": "saferl.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+          "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
           "config": {
             "sensor": "Sensor_Flight_Path_Angle",
             "normalization": {
@@ -193,27 +193,27 @@
     ],
     "dones": [
         {
-            "functor": "saferl.core.dones.common_dones.TimeoutDoneFunction",
+            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{
                 "max_sim_time": 2000,
             },
         },
         {
-            "functor": "saferl.core.dones.rejoin_dones.MaxDistanceDoneFunction",
+            "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
             "config":{
                 "max_distance": 100000,
                 "lead": "red0",
             },
         },
         {
-            "functor": "saferl.core.dones.rejoin_dones.CrashDoneFunction",
+            "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
             "config":{
                 "safety_margin": 100,
                 "lead": "red0",
             },
         },
         {
-            "functor": "saferl.core.dones.rejoin_dones.RejoinSuccessDone",
+            "functor": "saferl.dones.rejoin_dones.RejoinSuccessDone",
             "config":{
                 "radius": 150,
                 "offset": [500, 500, 0],
@@ -226,7 +226,7 @@
     "rewards": [
         {
             "name": "RejoinDistanceExponentialChangeReward",
-            "functor": "saferl.core.rewards.rejoin_rewards.RejoinDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinDistanceExponentialChangeReward",
             "config": {
                 "offset": [ 500, 500, 0 ],
                 "lead": "red0",
@@ -235,7 +235,7 @@
         },
         {
             "name": "RejoinReward",
-            "functor": "saferl.core.rewards.rejoin_rewards.RejoinReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinReward",
             "config": {
                 "reward": 0.1,
                 "refund": True,
@@ -246,7 +246,7 @@
         },
         {
             "name": "RejoinFirstTimeReward",
-            "functor": "saferl.core.rewards.rejoin_rewards.RejoinFirstTimeReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinFirstTimeReward",
             "config": {
                 "reward": 0.25,
                 "radius": 150,
@@ -256,7 +256,7 @@
         },
         {
             "name": "RejoinSuccessReward",
-            "functor": "saferl.core.rewards.rejoin_rewards.RejoinSuccessReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinSuccessReward",
             "config": {
                 "reward": 1,
                 "radius": 150,
@@ -268,7 +268,7 @@
         },
         {
             "name": "RejoinFailureReward",
-            "functor": "saferl.core.rewards.rejoin_rewards.RejoinFailureReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinFailureReward",
             "config": {
                 "crash_reward": -1,
                 "distance_reward": -1,
