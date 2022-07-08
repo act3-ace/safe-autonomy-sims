@@ -16,7 +16,7 @@
 # Override values used by the setup
 ####################################################################
 auto_system_detect_class: corl.experiments.base_experiment.BaseAutoDetect
-experiment_class: saferl.experiments.logging_experiment.LoggingExperiment
+experiment_class: saferl.experiments.rllib_api_experiment.RllibAPIExperiment
 
 config:
   rllib_config_updates: &rllib_config_updates
