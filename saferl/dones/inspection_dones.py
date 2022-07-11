@@ -283,6 +283,6 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
         if all_inspected:
             for k in local_dones.keys():
                 done[k] = True
-        
+
         return done
 
