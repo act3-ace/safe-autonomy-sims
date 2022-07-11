@@ -18,8 +18,8 @@ sgd_minibatch_size: 1200
 batch_mode: complete_episodes
 
 # === Resources ===
-num_workers: 10
-num_cpus_per_worker: 2
+num_workers: 1
+num_cpus_per_worker: 1
 num_gpus_per_worker: 0
 num_envs_per_worker: 1
 

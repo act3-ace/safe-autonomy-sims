@@ -1,6 +1,6 @@
 # This yaml defines the launch config for cwh 3d multiagent in CoRL
 
-config: configs/tasks/cwh3d_multiagent/cwh3d_multiagent_task.yml
+config: configs/tasks/cwh3d_inspection_multiagent/cwh3d_task.yml
 platform_config:
   - [blue0, configs/platforms/cwh_platform.yml]
   - [blue1, configs/platforms/cwh_platform.yml]
