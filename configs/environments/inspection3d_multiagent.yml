@@ -1,0 +1,38 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core  Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+{
+  "simulator": {
+    "type": "InspectionSimulator",
+    "config": {
+      "step_size": 1,
+      "num_points": 30,
+      "radius" : 40
+    },
+  },
+  "platforms": "CWHSimulator_Platforms",
+  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
+  "episode_parameter_provider": {
+    "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+  },
+  "dones": {
+             #TODO: make these inspection dones!
+    "shared": [
+      {
+        "functor": "saferl.dones.docking_dones.CollisionDoneFunction",
+        "config": { spacecraft_safety_constraint: 0.5 },
+      },
+      {
+        "functor": "saferl.dones.docking_dones.MultiagentSuccessfulDockingDoneFunction",
+        "config": { success_function_name: "SuccessfulDockingDoneFunction" },
+      }
+    ]
+  }
+}

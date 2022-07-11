@@ -96,7 +96,6 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
 
         all_inspected = not (False in next_state.points.values())
 
-
         violated, _ = max_vel_violation(
             next_state,
             self.config.agent_name,
