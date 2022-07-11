@@ -142,12 +142,12 @@
             },
         },
                #TODO: put back later
-        #{
-        #    "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
-        #    "config":{
-        #        "max_distance": 40000,
-        #    },
-        #},
+        {
+            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
+            "config":{
+                "max_distance": 40000,
+            },
+        },
 #        {
 #            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
 #            "config":{
