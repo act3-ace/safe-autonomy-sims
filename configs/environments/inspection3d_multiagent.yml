@@ -26,12 +26,12 @@
              #TODO: make these inspection dones!
     "shared": [
       {
-        "functor": "saferl.dones.docking_dones.CollisionDoneFunction",
+        "functor": "saferl.dones.inspection_dones.CollisionDoneFunction",
         "config": { spacecraft_safety_constraint: 0.5 },
       },
       {
-        "functor": "saferl.dones.docking_dones.MultiagentSuccessfulDockingDoneFunction",
-        "config": { success_function_name: "SuccessfulDockingDoneFunction" },
+        "functor": "saferl.dones.inspection_dones.MultiagentSuccessfulInspectionDoneFunction",
+        "config": { success_function_name: "SuccessfulInspectionDoneFunction" },
       }
     ]
   }
