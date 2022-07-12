@@ -20,11 +20,13 @@ experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 
 config:
   rllib_config_updates: &rllib_config_updates
-    horizon: 5000
+    horizon: 2000
+    # num_gpus: 0
+    # num_workers: 1
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
-    local_mode: True
+    local_mode: False
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates

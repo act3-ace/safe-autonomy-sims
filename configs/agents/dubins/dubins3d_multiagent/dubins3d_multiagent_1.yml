@@ -19,7 +19,7 @@
         {"part": "Controller_PitchRate", "config": {"axis": 1}},
         {"part": "Controller_Acceleration", "config": {"axis": 2}},
         {"part": "Sensor_Relative_Position", "config": {"oriented": True}},
-        {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [ 1000, 0, 0 ]}},
+        {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [ -1000, 0, 0 ]}},
         {"part": "Sensor_Velocity", "config": {"oriented": True}},
         {"part": "Sensor_Partner_Velocity", "config": {"oriented": True}},
         {"part": "Sensor_Flight_Path_Angle"},
@@ -34,8 +34,8 @@
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -500,
-          "high": 500,
+          "low": 0,
+          "high": 2000,
         },
       },
       "y": {
@@ -43,8 +43,8 @@
         "config": {
           "name": "y",
           "units": "meters",
-          "low": -500,
-          "high": 500,
+          "low": -1000,
+          "high": 1000,
         },
       },
       "z": {
