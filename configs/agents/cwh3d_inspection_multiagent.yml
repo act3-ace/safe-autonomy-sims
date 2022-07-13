@@ -168,16 +168,6 @@
               "lower_bound": False,
             },
         },
-        {
-            "functor": "saferl.dones.inspection_dones.SuccessfulInspectionDoneFunction",
-            "config":{
-              "Inspection_region_radius": 0.5,
-              "velocity_threshold": 0.2,
-              "threshold_distance": 0.5,
-              "mean_motion": 0.001027,
-              "lower_bound": False,
-            },
-        },
     ],
     #TODO: same software engineering question
     "rewards": [
