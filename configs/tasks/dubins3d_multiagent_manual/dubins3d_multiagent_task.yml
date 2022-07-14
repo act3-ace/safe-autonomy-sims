@@ -16,15 +16,14 @@
 # Override values used by the setup
 ####################################################################
 auto_system_detect_class: corl.experiments.base_experiment.BaseAutoDetect
-experiment_class: corl.experiments.rllib_experiment.RllibExperiment
+experiment_class: saferl.experiments.rllib_api_experiment.RllibAPIExperiment
 
 config:
   rllib_config_updates: &rllib_config_updates
-    horizon: 5000
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
-    local_mode: False
+    local_mode: True
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
