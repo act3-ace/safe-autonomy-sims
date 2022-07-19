@@ -105,16 +105,19 @@ class InspectionSimulator(SafeRLSimulator):
         return points_dict
 
     def _update_points(self, position):
+        #convert position to cartesian
+        position_temp = position #(position[0], position[1], position[2])
         r = self.config.radius #TODO: move to config
         for point in self._state.points:
             #TODO: check if point is in view and update if it is
+
             if not self._state.points[point]:
                 #normalize position
-                p_norm = position / np.linalg.norm(position)
+                p_norm = position_temp / np.linalg.norm(position_temp)
                 #calc magnitute of projection of test point
                 mag = np.dot(point, p_norm)
                 #calculate h of the spherical cap
-                rt = math.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
+                rt = math.sqrt(position_temp[0]**2 + position_temp[1]**2 + position_temp[2]**2)
                 h = 2 * r * ((rt-r)/2*rt)
                 #check if point is in view
                 if (mag > r - h):

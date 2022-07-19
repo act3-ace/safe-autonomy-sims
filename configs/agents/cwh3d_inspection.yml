@@ -23,7 +23,7 @@
     "simulator_reset_parameters": {
       "x": 100,
       "y": 100,
-      "z": 100,
+      "z": 50,
       "xdot": 0,
       "ydot": 0,
       "zdot": 0,
