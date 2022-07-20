@@ -141,7 +141,6 @@
                 "max_sim_time": 2000,
             },
         },
-               #TODO: put back later
         {
             "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{

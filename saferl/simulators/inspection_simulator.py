@@ -107,7 +107,7 @@ class InspectionSimulator(SafeRLSimulator):
     def _update_points(self, position):
         #convert position to cartesian
         position_temp = position #(position[0], position[1], position[2])
-        r = self.config.radius #TODO: move to config
+        r = self.config.radius
         for point in self._state.points:
             #TODO: check if point is in view and update if it is
 
