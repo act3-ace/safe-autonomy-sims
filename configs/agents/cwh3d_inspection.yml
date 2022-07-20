@@ -23,7 +23,7 @@
     "simulator_reset_parameters": {
       "x": 100,
       "y": 100,
-      "z": 50,
+      "z": 100,
       "xdot": 0,
       "ydot": 0,
       "zdot": 0,
@@ -117,7 +117,6 @@
                 "max_sim_time": 2000,
             },
         },
-               #TODO: put back later
         {
             "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
             "config":{
