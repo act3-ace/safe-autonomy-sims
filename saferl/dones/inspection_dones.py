@@ -98,7 +98,11 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
         # eventually will include velocity constraint
         done = DoneDict()
 
-        all_inspected = not (False in next_state.points.values())
+        #all_inspected = not (False in next_state.points.values())
+        all_inspected = True
+        for point in next_state.points:
+            if next_state.points[point] == False:
+                all_inspected = False
 
         violated, _ = max_vel_violation(
             next_state,
