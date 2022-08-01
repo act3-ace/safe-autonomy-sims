@@ -1,0 +1,24 @@
+Eval usage steps:
+
+- switch to corl eval_callbacks branch. CoRL 1.44.2 does not have the evaluation framework code.
+    `$ cd /path/to/corl/root`
+    `$ git checkout eval_callbacks`
+
+- may need to reinstall corl via pip (if you didn't install corl in 'editable' mode using the `-e`)
+    `corl/root$ pip install -e .`
+
+- run a training using the train_rl module from corl to generate a checkpoint for your environment's agent's policies.
+
+- configure your evaluation episode(s) via the safe-autonomy-sims/saferl/evaluation/inspection_coverage/inspection_tests.yml config file. Adding lists of values will cause the evaluation framework to run multiple episodes.
+
+- update the safe-autonomy-sims/saferl/evaluation/inspection_coverage/inspection.yml so that each agent's 'checkpoint_filename' contains the path to the checkpoint resulting from your prior training. 
+
+- run your evaluation episode(s) using the following command from the root of the corl repo:
+    `$ python -m corl.evaluation.launchers.evaluate_from_config --cfg /path/to/safe-autonomy-sims/saferl/evaluation/inspection_coverage/inspection.yml`
+
+- this cmd will generate a directory at the location specified by line 77 in the safe-autonomy-sims/saferl/evaluation/inspection_coverage/inspection.yml file. By default it is set to /tmp/data/inspection.
+
+- next, we generate metrics using the following command from the root of the corl repo:
+    `$ python -m corl.evaluation.cli_generate_metrics --source-folder /path/to/evaluate_from_config/output --metrics-config path/to/safe-autonomy-sims/saferl/evaluation/inspection_coverage/metrics.yml --alerts-config config/evaluation/alerts/base_alerts.yml --out-pickle gen-metrics.pkl
+
+- this cmd will generate a pkl file named gen-metrics.pkl in the same dir as the '--source-folder'. By unserializing this pkl file, and navigating the SceneProcessor + Event objects, we can gain access to our custom metrics data and report off of them. I have created a basic safe-autonomy-sims/saferl/evaluation/inspection_coverage/read_metric.py file to demonstrate the syntax of this navigation.

@@ -1,0 +1,15 @@
+episode_parameter_providers:
+  blue0:
+    simulator_reset:
+      x: 
+        value: 100
+      y: 
+        value: 100
+      z: 
+        value: 100
+      x_dot:
+        value: 0
+      y_dot:
+        value: 0
+      z_dot:
+        value: 0
