@@ -528,15 +528,6 @@ class InspectionFailureReward(RewardFuncBase):
 
         sim_time = deputy.sim_time
 
-        # TODO: update to chief location when multiple platforms enabled
-        all_inspected = not (False in next_state.points.values())
-        total_points_found = 0
-
-        points = next_state.points
-        for point in points:
-            if points[point]:
-                total_points_found += 1
-
         violated, _ = max_vel_violation(
             next_state,
             self.config.agent_name,
@@ -550,12 +541,10 @@ class InspectionFailureReward(RewardFuncBase):
         if sim_time >= self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
-        elif not all_inspected:
-            # agent exceeded max distance from goal
-            value = self.config.distance_reward
-        elif all_inspected and violated:
+
+        #elif  violated:
             # agent exceeded velocity constraint within docking region
-            value = self.config.crash_reward
+        #    value = self.config.crash_reward
 
         reward[self.config.agent_name] = value
         return reward
