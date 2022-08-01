@@ -1,0 +1,56 @@
+world:
+  -
+    name: WallTime(Sec)
+    functor: corl.evaluation.metrics.generators.meta.runtime.Runtime
+    config: {}
+  -
+    name: AverageWallTime
+    functor: corl.evaluation.metrics.aggregators.average.Average
+    config:
+      metrics_to_use: WallTime(Sec)
+      scope: null
+
+  -
+    name: EpisodeLength(Steps)
+    functor: corl.evaluation.metrics.generators.meta.episode_length.EpisodeLength_Steps
+    config: {}
+
+  -
+    name: rate_of_runs_lt_5steps
+    functor: corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate
+    config:
+      metrics_to_use: EpisodeLength(Steps)
+      scope:
+          type: corl.evaluation.metrics.scopes.from_string
+          config: {name: "evaluation"}
+      condition:
+        operator: <
+        lhs: 5
+
+agent:
+  __default__:
+    -
+      name: TrueState
+      functor: saferl.evaluation.inspection_coverage.metrics.TrueStateMetric
+      config: {
+        platform_properties: ["position", "velocity"]
+      }
+    -
+      name: Dones
+      functor: corl.evaluation.metrics.generators.dones.DonesVec
+      config: {}
+    -
+      name: TotalReward
+      functor: corl.evaluation.metrics.generators.rewards.TotalReward
+      config: {}
+    # -
+    #   name: CompletionRate
+    #   functor: corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate
+    #   config:
+    #     metrics_to_use: Result
+    #     scope: null
+    #     condition:
+    #       operator: ==
+    #       lhs:
+    #         functor: corl.dones.done_func_base.DoneStatusCodes
+    #         config: {value: 1} # 1 is win

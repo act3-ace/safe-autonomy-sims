@@ -1,0 +1,46 @@
+teams:
+  team_participant_map:
+    blue:
+    # blue0
+    - platform_config: ../safe-autonomy-sims/configs/platforms/cwh_platform.yml
+      agents:
+      - name: blue0
+        agent_config: ../safe-autonomy-sims/configs/agents/cwh3d_inspection.yml
+        policy_config: config/policy/ppo/default_config.yml
+        agent_loader:
+          class_path: corl.evaluation.loader.check_point_file.CheckpointFile
+          init_args:
+            checkpoint_filename: /media/john/HDD/AFRL/CWH-3D-INSPECTION-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_45509_00000_0_num_gpus=0,num_workers=6,rollout_fragment__2022-08-01_11-33-20/checkpoint_000070/checkpoint-70
+            policy_id: blue0
+  # If platform names ever change from <side><idx> format this will need to be changed
+  participant_id_schema: "%team_name%%idx%"
+
+task:
+    config_yaml_file: ../safe-autonomy-sims/configs/tasks/cwh3d_inspection/cwh3d_task.yml
+
+# unsure if this works properly
+test_cases:
+  pandas:
+    data: ../safe-autonomy-sims/saferl/evaluation/inspection_coverage/inspection_tests.yml
+    source_form: FILE_YAML_CONFIGURATION
+    randomize: False
+
+# eval_config_update is required in a bit of a bad way
+plugins:
+    platform_serialization:
+        class_path: saferl.evaluation.inspection_coverage.serialize_platforms.serialize_cwh3d
+
+engine:
+    rllib:
+        callbacks: [
+          # "corl.evaluation.util.callbacks.LoggingCallback"
+        ]
+        # add workers to distribute eval rollouts
+        workers: 0
+        debug_mode: False
+
+recorders:
+- class_path: corl.evaluation.recording.folder.Folder
+  init_args:
+    dir: /tmp/data/inspection/
+    append_timestamp: False
