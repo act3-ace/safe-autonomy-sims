@@ -10,7 +10,7 @@ teams:
         agent_loader:
           class_path: corl.evaluation.loader.check_point_file.CheckpointFile
           init_args:
-            checkpoint_filename: /media/john/HDD/AFRL/CWH-3D-INSPECTION-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_45509_00000_0_num_gpus=0,num_workers=6,rollout_fragment__2022-08-01_11-33-20/checkpoint_000070/checkpoint-70
+            checkpoint_filename: /media/john/HDD/AFRL/CWH-3D-INSPECTION-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_ab7bb_00000_0_num_gpus=0,num_workers=6,rollout_fragment__2022-08-01_21-37-29/checkpoint_000035/checkpoint-35
             policy_id: blue0
   # If platform names ever change from <side><idx> format this will need to be changed
   participant_id_schema: "%team_name%%idx%"
