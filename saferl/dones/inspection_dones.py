@@ -43,13 +43,7 @@ class SuccessfulInspectionDoneValidator(DoneFuncBaseValidator):
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
     """
-
     Inspection_region_radius: float
-    velocity_threshold: float
-    threshold_distance: float
-    mean_motion: float = 0.001027
-    lower_bound: bool = False
-    slope: float = 2.0
 
 #TODO
 class SuccessfulInspectionDoneFunction(DoneFuncBase):
@@ -104,17 +98,8 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
             if next_state.points[point] == False:
                 all_inspected = False
 
-        violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
-            self.config.velocity_threshold,
-            self.config.threshold_distance,
-            self.config.mean_motion,
-            self.config.lower_bound,
-            slope=self.config.slope
-        )
 
-        done[self.agent] = bool(all_inspected and not violated)
+        done[self.agent] = bool(all_inspected)
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)

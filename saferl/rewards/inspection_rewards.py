@@ -39,11 +39,6 @@ class ObservedPointsExponentialChangeRewardValidator(RewardFuncBaseValidator):
     scale : float
         Reward scaling value.
     """
-    c: float = 2.0
-    a: float = math.inf
-    pivot: float = math.inf
-    pivot_ratio: float = 2.0
-    scale: float = 1.0
 
 
 class ObservedPointsExponentialChangeReward(RewardFuncBase):
@@ -93,18 +88,8 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
     def __init__(self, **kwargs):
         self.config: ObservedPointsExponentialChangeRewardValidator
         super().__init__(**kwargs)
-        self._dist_buffer = RingBuffer(capacity=2, dtype=float)
 
-        assert not (self.config.a == math.inf and self.config.pivot == math.inf), "Both 'a' and 'pivot' cannot be specified."
-        assert self.config.a != math.inf or self.config.pivot != math.inf, "Either 'a' or 'pivot' must be specified."
-
-        if self.config.a != math.inf:
-            self.a = self.config.a
-        else:
-            self.a = math.log(self.config.pivot_ratio) / self.config.pivot
-
-        self.c = self.config.c
-        self.scale = self.config.scale
+        self.num_points_inspected = 0
 
     @property
     def get_validator(self):
@@ -113,44 +98,6 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
         """
         return ObservedPointsExponentialChangeRewardValidator
 
-    @property
-    def prev_dist(self):
-        """
-        The previous distance of the agent from the target.
-
-        Returns
-        -------
-        float
-            The previous distance of the agent from the target.
-        """
-        return self._dist_buffer[0]
-
-    @property
-    def curr_dist(self):
-        """
-        The current distance of the agent from the target.
-
-        Returns
-        -------
-        float
-            The current distance of the agent from the target.
-        """
-        return self._dist_buffer[1]
-
-    def update_dist(self, dist):
-        """
-        Store the current distance from the agent to the target.
-
-        Parameters
-        ----------
-        dist: float
-            The current distance of the agent from the target.
-
-        Returns
-        -------
-        None
-        """
-        self._dist_buffer.append(dist)
 
     def __call__(
         self,
@@ -164,22 +111,20 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
     ) -> RewardDict:
 
         reward = RewardDict()
-        val = 0
 
-        num_new_points = 0
         total_points_found = 0
 
-        old_points = state.points
         new_points = next_state.points
-        for point in old_points:
+        for point in new_points:
             if new_points[point]:
                 total_points_found +=1
-            if not old_points[point] == new_points[point]:
-                num_new_points+=1
+        num_new_points = total_points_found - self.num_points_inspected
+        reward_value = 0.0
 
+        if num_new_points:
+            self.num_points_inspected = total_points_found
+            reward_value = total_points_found / len(new_points)
 
-        #TODO: more complicated, expontential reward
-        #TODO: question, do we need to
         reward[self.config.agent_name] = num_new_points #+ num_new_points * (total_points_found / len(old_points))
         return reward
 
@@ -319,12 +264,6 @@ class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
     scale: float
     timeout: float
     docking_region_radius: float
-    velocity_threshold: float
-    threshold_distance: float
-    slope: float = 2.0
-    mean_motion: float = 0.001027
-    lower_bound: bool = False
-
 
 class InspectionSuccessReward(RewardFuncBase):
     """
@@ -398,17 +337,7 @@ class InspectionSuccessReward(RewardFuncBase):
 
         all_inspected = not (False in next_state.points.values())
 
-        violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
-            self.config.velocity_threshold,
-            self.config.threshold_distance,
-            self.config.mean_motion,
-            self.config.lower_bound,
-            slope=self.config.slope
-        )
-
-        if all_inspected and not violated:
+        if all_inspected:
             value = self.config.scale
             if self.config.timeout:
                 # Add time reward component, if timeout specified
@@ -450,12 +379,6 @@ class InspectionFailureRewardValidator(RewardFuncBaseValidator):
     crash_reward: float
     timeout: float
     min_goal_points: int
-    docking_region_radius: float
-    velocity_threshold: float
-    threshold_distance: float
-    slope: float = 2.0
-    mean_motion: float = 0.001027
-    lower_bound: bool = False
 
 
 class InspectionFailureReward(RewardFuncBase):
@@ -527,16 +450,6 @@ class InspectionFailureReward(RewardFuncBase):
         deputy = get_platform_by_name(next_state, self.config.agent_name)
 
         sim_time = deputy.sim_time
-
-        violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
-            self.config.velocity_threshold,
-            self.config.threshold_distance,
-            self.config.mean_motion,
-            self.config.lower_bound,
-            slope=self.config.slope
-        )
 
         if sim_time >= self.config.timeout:
             # episode reached max time
