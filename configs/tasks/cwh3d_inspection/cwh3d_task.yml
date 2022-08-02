@@ -18,7 +18,7 @@ config:
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
-    local_mode: False
+    local_mode: false
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
@@ -28,6 +28,7 @@ config:
   # Change the default path for saving out the data
   tune_config_updates: &tune_config_updates
     local_dir: /tmp/safe_autonomy/ray_results/
+    checkpoint_freq: 5  # FOR EVAL
 
   ####################################################################
   # Setup the actual keys used by the code
