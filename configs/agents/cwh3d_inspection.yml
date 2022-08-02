@@ -21,12 +21,55 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": 100,
-      "y": 100,
-      "z": 100,
-      "xdot": 0,
-      "ydot": 0,
-      "zdot": 0,
+    "x": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+          "name": "x",
+          "value": 100,
+        }
+      },
+      "y": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+          "name": "y",
+          "value": 100,
+        }
+      },
+      "z": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+          "name": "z",
+          "value": 100,
+        }
+      },
+      "x_dot": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+          "name": "x_dot",
+          "value": 0,
+        }
+      },
+      "y_dot": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+          "name": "y_dot",
+          "value": 0,
+        }
+      },
+      "z_dot": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+          "name": "z_dot",
+          "value": 0,
+        }
+      },
+      # wrapped these values for eval framework compatibility
+      # "x": 100,
+      # "y": 100,
+      # "z": 100,
+      # "xdot": 0,
+      # "ydot": 0,
+      # "zdot": 0,
     },
     "glues": [
         {
