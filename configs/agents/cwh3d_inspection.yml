@@ -114,7 +114,7 @@
         {
             "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{
-                "max_sim_time": 2000,
+                "max_sim_time": 10000,
             },
         },
         {
@@ -163,7 +163,7 @@
                 "pivot": 100
             }
         },
-      #{
+      {
       #  #TODO: add later
       #  "name": "InspectionDeltaVReward",
       #  "functor": "saferl.rewards.inspection_rewards.InspectionDeltaVReward",
@@ -173,12 +173,12 @@
       #    "mass": 12.0
       #  }
       #},
-        {
+     #   {
           "name": "InspectionSuccessReward",
           "functor": "saferl.rewards.inspection_rewards.InspectionSuccessReward",
           "config": {
             "scale": 1.0,
-            "timeout": 2000,
+           "timeout": 10000,
             "docking_region_radius": 0.5,
             "velocity_threshold": 0.2,
             "threshold_distance": 0.5,
@@ -193,8 +193,8 @@
           "timeout_reward": -1.0,
           "distance_reward": -1.0,
           "crash_reward": -1.0,
-          "timeout": 2000,
-          #TODO: pick better amount
+          "timeout": 10000,
+    #      #TODO: pick better amount
           "min_goal_points": 40,
           "docking_region_radius": 0.5,
           "velocity_threshold": 0.2,
