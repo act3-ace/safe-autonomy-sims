@@ -75,10 +75,12 @@ class InspectionSimulator(SafeRLSimulator):
         r = self.config.radius
         num_points = self.config.num_points
         points_dict = {}
+        #work around to get algorithm to generate enough points
+        N = num_points * r * r
         #generate points using CMU algorithm
-        '''
+
         n_count = 0
-        a = (4 * math.pi * (r**2))/num_points
+        a = (4 * math.pi * (r**2))/N
         d = math.sqrt(a)
         M_theta = round(math.pi / d) + 1 #TODO: round?
         d_theta = math.pi / M_theta
@@ -88,8 +90,9 @@ class InspectionSimulator(SafeRLSimulator):
             M_phi = round((2 * math.pi * math.sin(theta))/d_phi)
             for n in range(0, M_phi):
                 phi = (2 * math.pi * n)/ M_phi
-                points_dict[((math.sin(theta)* math.cos(phi)),(math.sin(theta)* math.sin(phi)),math.cos(theta) )] = False
+                points_dict[(r * (math.sin(theta)* math.cos(phi)),(r * math.sin(theta)* math.sin(phi)), r * math.cos(theta) )] = False
                 n_count += 1
+
 
         #points_dict[(1, 2, 3)]= False
         #points_dict[(4, 5, 6)]= False
@@ -101,7 +104,7 @@ class InspectionSimulator(SafeRLSimulator):
             x = math.sqrt((r ** 2) - (z ** 2)) * math.cos(phi)
             y = math.sqrt((r ** 2) - (z ** 2)) * math.sin(phi)
             points_dict[(x,y,z)] = False
-
+        '''
         return points_dict
 
     def _update_points(self, position):
