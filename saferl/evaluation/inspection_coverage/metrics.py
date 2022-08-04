@@ -44,8 +44,11 @@ class TrueStateMetric(MetricGeneratorTerminalEventScope):
             state_history[agent_id][step_num] = {}
             for var in self.platform_properties:
                 state_history[agent_id][step_num][var] = step.platforms[current_index][var]
+                state_history[agent_id][step_num]['reward'] = step.agents[agent_id].total_reward
 
+ 
         return state_history
+
 
 
 # class FieldOfViewMetric(MetricGeneratorTerminalEventScope):
