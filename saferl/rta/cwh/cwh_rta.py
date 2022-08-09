@@ -13,7 +13,8 @@ This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 """
 import abc
 
-from run_time_assurance.rta import RTABackupController, RTAModule
+from run_time_assurance.controller import RTABackupController
+from run_time_assurance.rta import RTAModule
 from run_time_assurance.zoo.cwh.docking_3d import (
     M_DEFAULT,
     N_DEFAULT,
