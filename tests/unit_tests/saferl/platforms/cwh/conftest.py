@@ -105,7 +105,7 @@ def setup_CWHSpacecraft_vel(vel_input):
     """
     setup a CWHSpacecraft at a certain velocity
     """
-    add_args = {'name': 'CWH', 'xdot': vel_input[0], 'ydot': vel_input[1], 'zdot': vel_input[2]}
+    add_args = {'name': 'CWH', 'x_dot': vel_input[0], 'y_dot': vel_input[1], 'z_dot': vel_input[2]}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft
