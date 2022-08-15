@@ -18,7 +18,7 @@ import pytest
 
 
 @pytest.fixture()
-def call_results(cut, observation, action, next_observation, next_state, platform):
+def call_results(cut, observation, action, next_observation, next_state, observation_space, observation_units, platform):
     """
     A fixture responsible for calling the appropriate component under test and returns the results.
     This variation of the function is specific to docking_dones
@@ -45,5 +45,5 @@ def call_results(cut, observation, action, next_observation, next_state, platfor
     """
     with mock.patch("saferl.dones.common_dones.get_platform_by_name") as func:
         func.return_value = platform
-        results = cut(observation, action, next_observation, next_state)
+        results = cut(observation, action, next_observation, next_state, observation_space, observation_units)
         return results
