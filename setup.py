@@ -27,30 +27,7 @@ reqs = parse_requirements("requirements.txt")
 
 
 if __name__ == '__main__':
-    tests_require = [
-        'flake8',
-        'mypy',
-        'mypy-extensions',
-        'mypy-protobuf',
-        'pylint',
-        'pytest',
-        'pytest-mock',
-        'pytest-cov',
-        'pytest-order',
-        'yapf',
-        'isort',
-        'rope',
-        'pre-commit',
-        'pre-commit-hooks',
-        'detect-secrets',
-        'blacken-docs',
-        'bashate',
-        'fish',
-        'watchdog',
-        'speedscope',
-        'pandas-profiling',
-        'factory',
-    ]
+    tests_require = parse_requirements("tests-requirements.txt")
 
     docs_require = parse_requirements("mkdocs-requirements.txt")
 
