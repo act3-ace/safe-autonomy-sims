@@ -83,6 +83,14 @@ class SafeRLSimulator(BaseSimulator):
     def get_reset_validator(self):
         return SafeRLSimulatorResetValidator
 
+    @property
+    def sim_time(self) -> float:
+        return self.clock
+
+    @property
+    def platforms(self) -> typing.List:
+        return list(self._state.sim_platforms)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.platform_map = self._construct_platform_map()

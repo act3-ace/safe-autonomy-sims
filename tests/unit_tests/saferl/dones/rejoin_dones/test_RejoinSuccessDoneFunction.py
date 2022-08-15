@@ -159,7 +159,7 @@ def fixture_cut(cut_name, agent_name, lead_name, radius, offset, step_size, succ
 
 
 @pytest.fixture(name='call_results')
-def fixture_call_results(cut, observation, action, next_observation, next_state, platform, lead):
+def fixture_call_results(cut, observation, action, next_observation, next_state, observation_space, observation_units, platform, lead):
     """
     A fixture responsible for calling the SuccessfulRejoinDoneFunction and returning the results.
 
@@ -193,7 +193,7 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
             platforms.append(lead)
         func.side_effect = platforms
 
-        results = cut(observation, action, next_observation, next_state)
+        results = cut(observation, action, next_observation, next_state, observation_space, observation_units)
         return results
 
 
