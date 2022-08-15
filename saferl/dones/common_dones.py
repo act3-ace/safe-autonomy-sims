@@ -15,6 +15,7 @@ This module contains functions that define common terminal conditions across env
 import typing
 from collections import OrderedDict
 
+import gym
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase, SharedDoneFuncBaseValidator
 from corl.libraries.environment_dict import DoneDict
@@ -53,7 +54,15 @@ class TimeoutDoneFunction(DoneFuncBase):
         """
         return TimeoutDoneValidator
 
-    def __call__(self, observation, action, next_observation, next_state):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
         """
         Parameters
         ----------
@@ -103,7 +112,17 @@ class CollisionDoneFunction(SharedDoneFuncBase):
     agent's spacecraft in the environemt.
 
 
-    def __call__(self, observation, action, next_observation, next_state, local_dones, local_done_info):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space,
+        observation_units,
+        local_dones,
+        local_done_info
+    ) -> DoneDict:
 
     Parameters
     ----------
@@ -115,6 +134,10 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
+    observation_space : gym.spaces.dict.Dict
+        The agent observation space.
+    observation_units : gym.spaces.dict.Dict
+        The units of the observations in the observation space. This may be None.
     local_dones: DoneDict
         DoneDict containing name to boolean KVPs representing done statuses of each agent
     local_done_info: OrderedDict
@@ -144,6 +167,8 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         action: OrderedDict,
         next_observation: OrderedDict,
         next_state: StateDict,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
@@ -203,7 +228,17 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
     This done function determines whether every agent in the environment has reached a specified successful done condition.
 
 
-    def __call__(self, observation, action, next_observation, next_state, local_dones, local_done_info):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space,
+        observation_units,
+        local_dones,
+        local_done_info
+    ) -> DoneDict:
 
     Parameters
     ----------
@@ -215,6 +250,10 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
+    observation_space : gym.spaces.dict.Dict
+        The agent observation space.
+    observation_units : gym.spaces.dict.Dict
+        The units of the observations in the observation space. This may be None.
     local_dones: DoneDict
         DoneDict containing name to boolean KVPs representing done statuses of each agent
     local_done_info: OrderedDict
@@ -245,11 +284,16 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         action: OrderedDict,
         next_observation: OrderedDict,
         next_state: StateDict,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
 
+        # populate DoneDict
         done = DoneDict()
+        for name in local_dones.keys():
+            done[name] = False
 
         for agent_name in local_done_info.keys():
             if self.config.success_function_name in next_state.episode_state[agent_name]:
