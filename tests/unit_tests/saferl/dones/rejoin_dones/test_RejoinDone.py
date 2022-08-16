@@ -111,7 +111,9 @@ def fixture_cut(cut_name, agent_name):
 
 
 @pytest.fixture(name='call_results')
-def fixture_call_results(cut, observation, action, next_observation, next_state, local_dones, local_done_info):
+def fixture_call_results(
+    cut, observation, action, next_observation, next_state, observation_space, observation_units, local_dones, local_done_info
+):
     """
     A fixture responsible for calling the CrashDoneFunction and returning the results.
 
@@ -138,7 +140,7 @@ def fixture_call_results(cut, observation, action, next_observation, next_state,
         The resulting DoneDict from calling the CrashDoneFunction
     """
 
-    results = cut(observation, action, next_observation, next_state, local_dones, local_done_info)
+    results = cut(observation, action, next_observation, next_state, observation_space, observation_units, local_dones, local_done_info)
     return results
 
 
