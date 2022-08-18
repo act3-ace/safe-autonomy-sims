@@ -15,6 +15,7 @@ Namely, three done functions : SuccessfulRejoinFunction, MaxDistanceDoneFunction
 import typing
 from collections import OrderedDict
 
+import gym
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase, SharedDoneFuncBaseValidator
 from corl.libraries.environment_dict import DoneDict
@@ -56,10 +57,12 @@ class RejoinSuccessDone(DoneFuncBase):
 
     def __call__(
         self,
-        observation: OrderedDict,
+        observation,
         action,
-        next_observation: OrderedDict,
-        next_state: StateDict,
+        next_observation,
+        next_state,
+        observation_space,
+        observation_units
     ) -> DoneDict:
 
     This method calculates the agent's reward for succeeding in the rejoin task.
@@ -74,6 +77,10 @@ class RejoinSuccessDone(DoneFuncBase):
         The observations available to the agent from the current state.
     next_state : StateDict
         The current state of the simulation.
+    observation_space : gym.spaces.dict.Dict
+        The agent observation space.
+    observation_units : gym.spaces.dict.Dict
+        The units of the observations in the observation space. This may be None.
 
     Returns
     -------
@@ -113,6 +120,8 @@ class RejoinSuccessDone(DoneFuncBase):
         action,
         next_observation: OrderedDict,
         next_state: StateDict,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
     ) -> DoneDict:
 
         done = DoneDict()
@@ -149,7 +158,15 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     the simulation.
 
 
-    def __call__(self, observation, action, next_observation, next_state):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space,
+        observation_units
+    ) -> DoneDict:
 
     Returns the done condition of the agent based on if the relative distance between the lead and the wingman has
     exceeded the value passed by the max_distance argument.
@@ -164,6 +181,10 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         Incoming observation from environment.
     next_state : np.ndarray
         Incoming state from environment.
+    observation_space : gym.spaces.dict.Dict
+        The agent observation space.
+    observation_units : gym.spaces.dict.Dict
+        The units of the observations in the observation space. This may be None.
 
     Returns
     -------
@@ -191,7 +212,15 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         """
         return MaxDistanceDoneValidator
 
-    def __call__(self, observation, action, next_observation, next_state):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
 
         done = DoneDict()
 
@@ -229,7 +258,15 @@ class CrashDoneFunction(DoneFuncBase):
     Done function that determines whether a crash occurred or not.
 
 
-    def __call__(self, observation, action, next_observation, next_state):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space,
+        observation_units
+    ) -> DoneDict:
 
     Returns the done condition of the agent based on if the relative distance between the lead and the wingman is
     below the safety_margin.
@@ -244,6 +281,10 @@ class CrashDoneFunction(DoneFuncBase):
         incoming observation from environment
     next_state : np.ndarray
         incoming state from environment
+    observation_space : gym.spaces.dict.Dict
+        The agent observation space.
+    observation_units : gym.spaces.dict.Dict
+        The units of the observations in the observation space. This may be None.
 
     Returns
     -------
@@ -272,7 +313,15 @@ class CrashDoneFunction(DoneFuncBase):
         """
         return CrashDoneValidator
 
-    def __call__(self, observation, action, next_observation, next_state):
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
 
         done = DoneDict()
 
@@ -308,12 +357,14 @@ class RejoinDone(SharedDoneFuncBase):
 
     def __call__(
         self,
-        observation: OrderedDict,
-        action: OrderedDict,
-        next_observation: OrderedDict,
-        next_state: StateDict,
-        local_dones: DoneDict,
-        local_done_info: OrderedDict
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space,
+        observation_units,
+        local_dones,
+        local_done_info
     ) -> DoneDict:
 
     Logic that returns the done condition based on the agent's done condition, whose agent_name was provided.
@@ -328,6 +379,10 @@ class RejoinDone(SharedDoneFuncBase):
          Incoming observation from environment.
     next_state : np.ndarray
          Incoming state from environment.
+    observation_space : gym.spaces.dict.Dict
+        The agent observation space.
+    observation_units : gym.spaces.dict.Dict
+        The units of the observations in the observation space. This may be None.
 
     Returns
     -------
@@ -358,6 +413,8 @@ class RejoinDone(SharedDoneFuncBase):
         action: OrderedDict,
         next_observation: OrderedDict,
         next_state: StateDict,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
