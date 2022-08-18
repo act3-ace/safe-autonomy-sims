@@ -16,6 +16,7 @@ Author: John McCarroll
 
 from unittest import mock
 
+import gym
 import pytest
 
 
@@ -46,8 +47,26 @@ def expected_status(request):
     return request.param
 
 
+@pytest.fixture(name='observation_space')
+def fixture_observation_space():
+    """
+    A fixture to return a gym.spaces.dict.Dict.
+    """
+    return gym.spaces.dict.Dict()
+
+
+@pytest.fixture(name='observation_untis')
+def fixture_observation_units():
+    """
+    A fixture to return a gym.spaces.dict.Dict.
+    """
+    return gym.spaces.dict.Dict()
+
+
+# TODO: generalize patch so that this function need not be duplicated by lower level conftests. same function is being patched, just the
+# file it is being imported into changes in each lower dir.
 @pytest.fixture()
-def call_results(cut, observation, action, next_observation, next_state, platform):
+def call_results(cut, observation, action, next_observation, next_state, observation_space, observation_units, platform):
     """
     A fixture responsible for calling the appropriate component under test and returns the results.
     This variation of the function is specific to docking_dones
@@ -74,5 +93,5 @@ def call_results(cut, observation, action, next_observation, next_state, platfor
     """
     with mock.patch("saferl.core.dones.docking_dones.get_platform_by_name") as func:
         func.return_value = platform
-        results = cut(observation, action, next_observation, next_state)
+        results = cut(observation, action, next_observation, next_state, observation_space, observation_units)
         return results

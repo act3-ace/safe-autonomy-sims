@@ -1,0 +1,14 @@
+# This yaml defines the launch config for dubins 3d multiagent in CoRL
+
+config: configs/tasks/dubins3d_multiagent/dubins3d_multiagent_task.yml
+platform_config:
+  - [red0, configs/platforms/dubins3d_platform.yml]
+  - [blue0, configs/platforms/dubins3d_platform.yml]
+  - [blue1, configs/platforms/dubins3d_platform.yml]
+  - [blue2, configs/platforms/dubins3d_platform.yml]
+agent_config:
+  - [red0, red0, configs/agents/dubins/dubins3d/dubins3d_rejoin_noop.yml, configs/policy/rejoin/scripted_lead_3d.yml]
+  - [blue0, blue0, configs/agents/dubins/dubins3d_multiagent/dubins3d_multiagent_0.yml, ../corl/config/policy/ppo/default_config.yml]
+  - [blue1, blue1, configs/agents/dubins/dubins3d_multiagent/dubins3d_multiagent_1.yml, ../corl/config/policy/ppo/default_config.yml]
+  - [blue2, blue2, configs/agents/dubins/dubins3d_multiagent/dubins3d_multiagent_2.yml, ../corl/config/policy/ppo/default_config.yml]
+compute_platform: local
