@@ -12,7 +12,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 """
-
+import os
 from pathlib import Path
 
 from setuptools import setup, find_packages
@@ -25,6 +25,13 @@ def parse_requirements(filename: str):
 
 reqs = parse_requirements("requirements.txt")
 
+version = {}
+try:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    base_dir = None
+with open(os.path.join(base_dir, 'saferl/version.py')) as fp:
+     exec(fp.read(), version)
 
 if __name__ == '__main__':
     tests_require = [
@@ -70,9 +77,8 @@ if __name__ == '__main__':
             'setuptools_scm',
             'pytest-runner'
         ],
-        use_scm_version={
-            'fallback_version': '0.0.0',
-        },
+        
+        version=version["__version__"],
 
         # add in package_data
         include_package_data=True,
