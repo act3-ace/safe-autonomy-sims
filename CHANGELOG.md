@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.1.1...v0.2.0) (2022-08-30)
+
+
+### Features
+
+* **corl:** updated for corl 1.50.1 ([5534e42](https://github.com/act3-ace/safe-autonomy-sims/commit/5534e42076f7a9e7a2ebcbb7161590c5de0e072a))
+
 ## [0.1.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.1.0...v0.1.1) (2022-08-22)
 
 
