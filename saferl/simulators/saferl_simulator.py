@@ -178,8 +178,15 @@ class SafeRLSimulator(BaseSimulator):
             for sensor in plat.sensors:
                 sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
 
-    def mark_episode_done(self, done_string: str):
-        pass
+    def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict):
+        """
+        Takes in the done_info specifying how the episode completed
+        and does any book keeping around ending an episode
+
+        Arguments:
+            done_info {OrderedDict} -- The Dict describing which Done conditions ended an episode
+            episode_state {OrderedDict} -- The episode state at the end of the simulation
+        """
 
     def save_episode_information(self, dones, rewards, observations):
         pass
