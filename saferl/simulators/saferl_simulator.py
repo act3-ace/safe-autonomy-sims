@@ -62,7 +62,7 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     initializer: InitializerResetValidator
         Optionally, the user can define the functor and config for a BaseInitializer class, which modifies
         the agent-specific initialization dicts found in platforms.
-    platforms: dict
+    additional_entities: dict
         Contains individual initialization dicts for additional, non-agent simulation entities
         Key is entity name, value is entity's initialization dict.
     """
