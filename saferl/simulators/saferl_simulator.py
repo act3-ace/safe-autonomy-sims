@@ -98,7 +98,7 @@ class SafeRLSimulator(BaseSimulator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.platform_map = self._construct_platform_map()
-        self.sim_entities = {}  # self._construct_sim_entities()
+        self.sim_entities = self._construct_sim_entities()
         self._state = StateDict()
         self.clock = 0.0
 
@@ -119,7 +119,7 @@ class SafeRLSimulator(BaseSimulator):
     def _construct_platform_map(self) -> dict:
         ...
 
-    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator):
+    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator = None):
         """Constructs the simulator
 
         Parameters
@@ -132,6 +132,8 @@ class SafeRLSimulator(BaseSimulator):
         dict[str: sim_entity]
             Dictionary mapping entity id to simulation backend entity.
         """
+        if reset_config is None:
+            reset_config = SafeRLSimulatorResetValidator()
 
         agent_sim_entities = self._construct_agent_sim_entities(reset_config.platforms)
 
