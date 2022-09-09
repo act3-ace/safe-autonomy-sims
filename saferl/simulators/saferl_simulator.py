@@ -22,7 +22,7 @@ from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from pydantic import BaseModel, PyObject
 
-import saferl  # noqa: F401
+from saferl.utils import KeyCollisionError, shallow_dict_merge
 
 
 class SafeRLSimulatorValidator(
@@ -139,12 +139,7 @@ class SafeRLSimulator(BaseSimulator):
 
         additional_sim_entities = self._construct_additional_sim_entities(reset_config)
 
-        sim_entities = agent_sim_entities
-
-        for entity_name, entity in additional_sim_entities.items():
-            assert entity_name not in sim_entities, \
-                f"entity name collision: '{entity_name}' is used for an agent entity and an additional entity"
-            sim_entities[entity_name] = entity
+        sim_entities = shallow_dict_merge(agent_sim_entities, additional_sim_entities, in_place=True, allow_collisions=False)
 
         return sim_entities
 
@@ -201,7 +196,8 @@ class SafeRLSimulator(BaseSimulator):
         entities = {}
 
         for entity_name, entity_config in reset_config.additional_entities.items():
-            assert entity_name not in entities, f"entity name collision: '{entity_name}' is used twice"
+            if entity_name in entities:
+                KeyCollisionError(entity_name, f"additional entity name collision: '{entity_name}' is used twice")
             entity_class = self.platform_map[entity_config.get('entity')][0]
             entities[entity_name] = entity_class(entity_config['config'])
 
