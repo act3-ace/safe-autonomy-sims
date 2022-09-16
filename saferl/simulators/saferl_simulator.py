@@ -21,6 +21,7 @@ from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from pydantic import BaseModel, PyObject
+from safe_autonomy_dynamics.base_models import BaseEntity
 
 from saferl.utils import KeyCollisionError, shallow_dict_merge
 
@@ -97,8 +98,8 @@ class SafeRLSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.agent_sim_entities = {}
-        self.additional_sim_entities = {}
+        self.agent_sim_entities: typing.Dict[str, BaseEntity] = {}
+        self.additional_sim_entities: typing.Dict[str, BaseEntity] = {}
         self.platform_map = self._construct_platform_map()
         self.sim_entities = self._construct_sim_entities()
         self._state = StateDict()
@@ -121,7 +122,7 @@ class SafeRLSimulator(BaseSimulator):
     def _construct_platform_map(self) -> dict:
         ...
 
-    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator = None):
+    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator = None) -> typing.Dict[str, BaseEntity]:
         """Constructs the simulator
 
         Parameters
@@ -145,7 +146,7 @@ class SafeRLSimulator(BaseSimulator):
 
         return sim_entities
 
-    def _construct_agent_sim_entities(self, platforms: dict = None) -> dict:
+    def _construct_agent_sim_entities(self, platforms: dict = None) -> typing.Dict[str, BaseEntity]:
         """
         Gets the correct backend simulation entity for each agent.
 
@@ -182,7 +183,7 @@ class SafeRLSimulator(BaseSimulator):
 
         return sim_entities
 
-    def _construct_additional_sim_entities(self, reset_config: SafeRLSimulatorResetValidator):
+    def _construct_additional_sim_entities(self, reset_config: SafeRLSimulatorResetValidator) -> typing.Dict[str, BaseEntity]:
         """Constructs the simulator
 
         Parameters
