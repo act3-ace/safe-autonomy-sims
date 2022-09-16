@@ -97,6 +97,8 @@ class SafeRLSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.agent_sim_entities = {}
+        self.additional_sim_entities = {}
         self.platform_map = self._construct_platform_map()
         self.sim_entities = self._construct_sim_entities()
         self._state = StateDict()
@@ -135,11 +137,11 @@ class SafeRLSimulator(BaseSimulator):
         if reset_config is None:
             reset_config = SafeRLSimulatorResetValidator()
 
-        agent_sim_entities = self._construct_agent_sim_entities(reset_config.platforms)
+        self.agent_sim_entities = self._construct_agent_sim_entities(reset_config.platforms)
 
-        additional_sim_entities = self._construct_additional_sim_entities(reset_config)
+        self.additional_sim_entities = self._construct_additional_sim_entities(reset_config)
 
-        sim_entities = shallow_dict_merge(agent_sim_entities, additional_sim_entities, in_place=True, allow_collisions=False)
+        sim_entities = shallow_dict_merge(self.agent_sim_entities, self.additional_sim_entities, in_place=False, allow_collisions=False)
 
         return sim_entities
 
