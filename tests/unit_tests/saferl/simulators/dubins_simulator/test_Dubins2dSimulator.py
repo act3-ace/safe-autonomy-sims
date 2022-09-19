@@ -37,14 +37,14 @@ def fixture_agent_configs():
     """Returns valid agent configuration for testing"""
     configs = {
         "blue0": {
-            "sim_config": {
+            "platform_config": {
                 "name": 'DUBINS2D'
-            }, "platform_config": Dubins2dPlatformFactory.platform_config
+            }, "parts_list": Dubins2dPlatformFactory.parts_list
         },
         "red0": {
-            "sim_config": {
+            "platform_config": {
                 "name": 'DUBINS2D'
-            }, "platform_config": Dubins2dPlatformFactory.platform_config
+            }, "parts_list": Dubins2dPlatformFactory.parts_list
         }
     }
     return configs

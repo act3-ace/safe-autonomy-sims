@@ -22,4 +22,4 @@ class BasePlatformFactory(factory.Factory):
 
     platform_name = None
     platform = None
-    platform_config: typing.List = []
+    parts_list: typing.List = []
