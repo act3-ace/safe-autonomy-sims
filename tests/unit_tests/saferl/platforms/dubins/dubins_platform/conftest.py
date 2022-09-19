@@ -25,11 +25,3 @@ def get_platform_name():
     Returns string of platform's name
     """
     return "cut"
-
-
-@pytest.fixture(name="platform")
-def get_platform():
-    """
-    Returns a mock platform object
-    """
-    return mock.MagicMock(name="platform")
