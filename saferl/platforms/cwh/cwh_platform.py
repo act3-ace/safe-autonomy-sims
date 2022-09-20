@@ -14,10 +14,11 @@ operating under the Clohessy-Wiltshire dynamics model.
 """
 
 import numpy as np
-from corl.simulators.base_platform import BasePlatform
+
+from saferl.platforms.common.platform import BaseSafeRLPlatform
 
 
-class CWHPlatform(BasePlatform):
+class CWHPlatform(BaseSafeRLPlatform):
     """
     A platform representing a spacecraft operating under CWH dynamics.
     Allows for saving an action to the platform for when the platform needs
@@ -31,12 +32,13 @@ class CWHPlatform(BasePlatform):
         Backend simulation entity associated with the platform.
     platform_config : dict
         Platform-specific configuration dictionary.
+    sim_time : float
+        simulation time at platform creation
     """
 
-    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=platform_config)
+    def __init__(self, platform_name, platform, platform_config, sim_time=0.0):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=platform_config, sim_time=sim_time)
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
-        self._sim_time = 0.0
 
     def get_applied_action(self):
         """
