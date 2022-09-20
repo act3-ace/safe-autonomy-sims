@@ -1,12 +1,12 @@
 - step_size: 1
   expected_platform_configs: [
         {
-            "platform_name": "blue0",
+            "platform_name": "blue0", "sim_time": 1.0,
             "platform__x": 200, "platform__y": 0, "platform__z": 0,
             "platform__heading": 0, "platform__v": 200
         },
         {
-            "platform_name": "red0",
+            "platform_name": "red0", "sim_time": 1.0,
             "platform__x": 1200, "platform__y": 0, "platform__z": 0,
             "platform__heading": 0, "platform__v": 200
         }
