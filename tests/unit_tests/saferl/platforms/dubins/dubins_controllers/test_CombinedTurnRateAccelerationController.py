@@ -32,12 +32,12 @@ def get_control_properties():
 
 
 @pytest.fixture(name="controller")
-def setup_controller(dubins_platform):
+def setup_controller(dubins3d_platform):
     """
     Set up CombinedTurnRateAccelerationController with default values
     """
     config = {}
-    return CombinedTurnRateAccelerationController(parent_platform=dubins_platform, config=config)
+    return CombinedTurnRateAccelerationController(parent_platform=dubins3d_platform, config=config)
 
 
 # Unit Tests
