@@ -32,9 +32,6 @@ class CWHPlatformValidator(BasePlatformValidator):
 
     platform: CWHSpacecraft
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 class CWHPlatform(BasePlatform):
     """
