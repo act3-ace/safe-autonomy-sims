@@ -13,8 +13,24 @@ This module defines the platform used with saferl CWHSimulator class. It represe
 operating under the Clohessy-Wiltshire dynamics model.
 """
 
+import typing
+
 import numpy as np
-from corl.simulators.base_platform import BasePlatform
+from corl.simulators.base_platform import BasePlatform, BasePlatformValidator
+from safe_autonomy_dynamics.cwh import CWHSpacecraft
+
+
+class CWHPlatformValidator(BasePlatformValidator):
+    """
+    DubinsPlatform2dValidator
+
+    Parameters
+    ----------
+    platform : Dubins2dAircraft
+        underlying dynamics platform
+    """
+
+    platform: CWHSpacecraft
 
 
 class CWHPlatform(BasePlatform):
@@ -33,10 +49,22 @@ class CWHPlatform(BasePlatform):
         Platform-specific configuration dictionary.
     """
 
-    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=platform_config)
+    def __init__(self, platform_name, platform, parts_list):  # pylint: disable=W0613
+        self.config: CWHPlatformValidator
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list)
+        self._platform = self.config.platform
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
         self._sim_time = 0.0
+
+    @property
+    def get_validator(self) -> typing.Type[CWHPlatformValidator]:
+        """
+        get validator for this Dubins2dPlatform
+
+        Returns:
+            DubinsPlatform2dValidator -- validator the platform will use to generate a configuration
+        """
+        return CWHPlatformValidator
 
     def get_applied_action(self):
         """
