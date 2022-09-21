@@ -1,3 +1,15 @@
+# [0.3.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.2.0...v0.3.0) (2022-09-21)
+
+
+### Bug Fixes
+
+* update to use CoRL platform validator ([24b0cc4](https://github.com/act3-ace/safe-autonomy-sims/commit/24b0cc4f4f5629956e95be540399de8f694f0cb6))
+
+
+### Features
+
+* update CoRL to 1.51.0 ([22db10e](https://github.com/act3-ace/safe-autonomy-sims/commit/22db10e7d37487f0c05cf65dec89c1e242394e4d))
+
 # [0.2.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.1.1...v0.2.0) (2022-08-30)
 
 
