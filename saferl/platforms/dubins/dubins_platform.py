@@ -31,9 +31,6 @@ class DubinsPlatformValidator(BasePlatformValidator):
     """
     platform: BaseDubinsAircraft
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 class DubinsPlatform(BasePlatform, abc.ABC):
     """
@@ -240,9 +237,6 @@ class DubinsPlatform2dValidator(DubinsPlatformValidator):
     """
     platform: Dubins2dAircraft
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 class Dubins2dPlatform(DubinsPlatform):
     """
@@ -285,9 +279,6 @@ class DubinsPlatform3dValidator(DubinsPlatformValidator):
         underlying dynamics platform
     """
     platform: Dubins3dAircraft
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class Dubins3dPlatform(DubinsPlatform):
