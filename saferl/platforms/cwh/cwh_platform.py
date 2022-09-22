@@ -96,21 +96,5 @@ class CWHPlatform(BaseSafeRLPlatform):
         return self._platform.velocity
 
     @property
-    def sim_time(self):
-        """
-        The current simulation time in seconds.
-
-        Returns
-        -------
-        float
-            Current simulation time.
-        """
-        return self._sim_time
-
-    @sim_time.setter
-    def sim_time(self, time):
-        self._sim_time = time
-
-    @property
     def operable(self):
         return True

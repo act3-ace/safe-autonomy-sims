@@ -34,3 +34,19 @@ class BaseSafeRLPlatform(BasePlatform):
     def __init__(self, platform_name, platform, parts_list, sim_time=0.0):  # pylint: disable=W0613
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list)
         self._sim_time = sim_time
+
+    @property
+    def sim_time(self):
+        """
+        The current simulation time in seconds.
+
+        Returns
+        -------
+        float
+            Current simulation time.
+        """
+        return self._sim_time
+
+    @sim_time.setter
+    def sim_time(self, time):
+        self._sim_time = time
