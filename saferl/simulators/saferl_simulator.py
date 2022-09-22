@@ -203,7 +203,7 @@ class SafeRLSimulator(BaseSimulator):
         entity_actions = self._step_get_entity_actions(step_size=step_size)
 
         for entity_name, entity in self.sim_entities.items():
-            action = entity_actions[entity_name]
+            action = entity_actions.get(entity_name, None)
             entity.step(action=action, step_size=step_size)
 
     def _step_get_entity_actions(self, step_size: float) -> typing.Dict:  # pylint: disable = unused-argument
