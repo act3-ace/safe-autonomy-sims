@@ -216,7 +216,7 @@ class SafeRLSimulator(BaseSimulator):
             Collection of platforms associated with each simulation entity.
         """
         sim_platforms = []
-        for agent_id, entity in self.sim_entities.items():
+        for agent_id, entity in self.agent_sim_entities.items():
             agent_config = self.config.agent_configs[agent_id]
             sim_config = agent_config.sim_config
             platform_config = agent_config.platform_config
