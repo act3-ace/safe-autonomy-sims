@@ -181,22 +181,6 @@ class DubinsPlatform(BaseSafeRLPlatform):
         return self._platform.partner.orientation if self._platform.partner is not None else None
 
     @property
-    def sim_time(self):
-        """
-        The current simulation time in seconds.
-
-        Returns
-        -------
-        float
-            Current simulation time.
-        """
-        return self._sim_time
-
-    @sim_time.setter
-    def sim_time(self, time):
-        self._sim_time = time
-
-    @property
     def operable(self):
         return True
 
