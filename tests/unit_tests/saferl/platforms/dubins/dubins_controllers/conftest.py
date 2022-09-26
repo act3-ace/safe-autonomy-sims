@@ -17,21 +17,22 @@ Author: John McCarroll
 from unittest import mock
 
 import pytest
+from safe_autonomy_dynamics.dubins import Dubins3dAircraft
 
 from saferl.platforms.dubins.dubins_platform import Dubins3dPlatform
 
 
-@pytest.fixture(name='dubins_platform')
+@pytest.fixture(name='dubins3d_platform')
 def setup_dubins_platform():
     """
     Set up basic Dubins3dPlatform, with default values
     """
 
     platform_name = 'friendly_platform'
-    platform_config = []
-    aircraft = mock.MagicMock()
+    parts_list = []
+    aircraft = Dubins3dAircraft(name=platform_name)
 
-    platform_obj = Dubins3dPlatform(platform_name, aircraft, platform_config)
+    platform_obj = Dubins3dPlatform(platform_name, aircraft, parts_list)
     return platform_obj
 
 
