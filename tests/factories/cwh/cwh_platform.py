@@ -29,7 +29,7 @@ class CWHPlatformFactory(BasePlatformFactory):
         name=platform_name,
     )
 
-    platform_config = [
+    parts_list = [
         (c.ThrustController, {'name': 'x_thrust', 'axis': 0}),
         (c.ThrustController, {'name': 'y_thrust', 'axis': 1}),
         (c.ThrustController, {'name': 'z_thrust', 'axis': 2}),

@@ -18,8 +18,17 @@ from unittest import mock
 
 import numpy as np
 import pytest
+from safe_autonomy_dynamics.dubins import Dubins3dAircraft
 
 from saferl.platforms.dubins.dubins_platform import Dubins3dPlatform
+
+
+@pytest.fixture(name="platform")
+def get_platform(platform_name):
+    """
+    Returns a mock platform object
+    """
+    return Dubins3dAircraft(name=platform_name)
 
 
 @pytest.fixture(name="dubins_3d_platform")
@@ -34,8 +43,8 @@ def get_dubins_3d_platform(platform_name, platform):
     platform : mock.MagicMock
         A mock platform
     """
-    config = {}
-    return Dubins3dPlatform(platform_name=platform_name, platform=platform, platform_config=config)
+    config = []
+    return Dubins3dPlatform(platform_name=platform_name, platform=platform, parts_list=config)
 
 
 # Test constructor
@@ -58,9 +67,9 @@ def test_constructor(platform_name, platform):
         controllers.name = "controllers"
         func.side_effect = [sensors, controllers]
 
-        config = {}
+        config = []
 
-        cut = Dubins3dPlatform(platform_name=platform_name, platform=platform, platform_config=config)
+        cut = Dubins3dPlatform(platform_name=platform_name, platform=platform, parts_list=config)
 
         assert np.array_equal(cut._last_applied_action, np.array([0., 0., 0.], dtype=np.float32))  # pylint: disable=W0212
         assert cut._sim_time == 0.0  # pylint: disable=W0212

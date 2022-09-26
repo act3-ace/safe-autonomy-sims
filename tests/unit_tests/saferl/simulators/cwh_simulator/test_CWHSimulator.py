@@ -37,9 +37,9 @@ def fixture_agent_configs():
     """Returns valid agent configuration for testing"""
     configs = {
         "blue0": {
-            "sim_config": {
+            "platform_config": {
                 "name": 'CWH'
-            }, "platform_config": CWHPlatformFactory.platform_config
+            }, "parts_list": CWHPlatformFactory.parts_list
         },
     }
     return configs
