@@ -32,12 +32,12 @@ def get_control_properties():
 
 
 @pytest.fixture(name="rate_controller")
-def setup_rate_controller(dubins_platform, control_properties, config):
+def setup_rate_controller(dubins3d_platform, control_properties, config):
     """
     Set up RateController with default values
     """
 
-    return RateController(property_class=control_properties, parent_platform=dubins_platform, config=config)
+    return RateController(property_class=control_properties, parent_platform=dubins3d_platform, config=config)
 
 
 # Unit Tests

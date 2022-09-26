@@ -29,7 +29,7 @@ class Dubins2dPlatformFactory(BasePlatformFactory):
         name=platform_name,
     )
 
-    platform_config = [
+    parts_list = [
         (c.AccelerationController, {'axis': 0}),
         (c.YawRateController, {'axis': 1}),
         (s.PositionSensor, {}),
@@ -44,7 +44,7 @@ class Dubins3dPlatformFactory(BasePlatformFactory):
 
     platform = factory.SubFactory(Dubins3dAircraftFactory)
     platform_name = factory.Faker('first_name_nonbinary')
-    platform_config = [
+    parts_list = [
         (c.AccelerationController, {'axis': 0}),
         (c.YawRateController, {'axis': 1}),
         (s.PositionSensor, {}),
