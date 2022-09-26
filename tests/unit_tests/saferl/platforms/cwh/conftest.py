@@ -36,9 +36,9 @@ def setup_cwhplatform(cwh_spacecraft):
     """
 
     platform_name = 'blue0'
-    platform_config = []
+    parts_list = []
 
-    platform_obj = CWHPlatform(platform_name, cwh_spacecraft, platform_config)
+    platform_obj = CWHPlatform(platform_name, cwh_spacecraft, parts_list)
     return platform_obj
 
 

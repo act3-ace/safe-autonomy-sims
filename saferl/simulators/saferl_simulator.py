@@ -164,8 +164,8 @@ class SafeRLSimulator(BaseSimulator):
 
         sim_entities = {}
         for agent_id, agent_config in self.config.agent_configs.items():
-            sim_config = agent_config.sim_config
-            sim_config_kwargs = sim_config.get("kwargs", {})
+            platform_config = agent_config.platform_config
+            sim_config_kwargs = platform_config.get("kwargs", {})
 
             if platforms is None:
                 agent_reset_config = {}
@@ -178,7 +178,7 @@ class SafeRLSimulator(BaseSimulator):
                 if isinstance(val, ValueWithUnits):
                     entity_kwargs[key] = val.value
 
-            entity_class = self.platform_map[sim_config.get('platform', 'default')][0]
+            entity_class = self.platform_map[platform_config.get('platform', 'default')][0]
             sim_entities[agent_id] = entity_class(name=agent_id, **entity_kwargs)
 
         return sim_entities
@@ -218,10 +218,9 @@ class SafeRLSimulator(BaseSimulator):
         sim_platforms = []
         for agent_id, entity in self.agent_sim_entities.items():
             agent_config = self.config.agent_configs[agent_id]
-            sim_config = agent_config.sim_config
             platform_config = agent_config.platform_config
-            platform_class = self.platform_map[sim_config.get('platform', 'default')][1]
-            sim_platforms.append(platform_class(platform_name=agent_id, platform=entity, platform_config=platform_config))
+            platform_class = self.platform_map[platform_config.get('platform', 'default')][1]
+            sim_platforms.append(platform_class(platform_name=agent_id, platform=entity, parts_list=agent_config.parts_list))
         return tuple(sim_platforms)
 
     def update_sensor_measurements(self):
