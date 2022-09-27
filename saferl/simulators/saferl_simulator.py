@@ -21,8 +21,9 @@ from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from pydantic import BaseModel, PyObject
+from safe_autonomy_dynamics.base_models import BaseEntity
 
-import saferl  # noqa: F401
+from saferl.utils import KeyCollisionError, shallow_dict_merge
 
 
 class SafeRLSimulatorValidator(
@@ -62,9 +63,13 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     initializer: InitializerResetValidator
         Optionally, the user can define the functor and config for a BaseInitializer class, which modifies
         the agent-specific initialization dicts found in platforms.
+    additional_entities: dict
+        Contains individual initialization dicts for additional, non-agent simulation entities
+        Key is entity name, value is entity's initialization dict.
     """
     platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
     initializer: typing.Optional[typing.Union[InitializerResetValidator, None]] = None
+    additional_entities: typing.Dict[str, typing.Dict] = {}
 
 
 class SafeRLSimulator(BaseSimulator):
@@ -93,8 +98,10 @@ class SafeRLSimulator(BaseSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.agent_sim_entities: typing.Dict[str, BaseEntity] = {}
+        self.additional_sim_entities: typing.Dict[str, BaseEntity] = {}
         self.platform_map = self._construct_platform_map()
-        self.sim_entities = self.construct_sim_entities()
+        self.sim_entities = self._construct_sim_entities()
         self._state = StateDict()
         self.clock = 0.0
 
@@ -106,7 +113,7 @@ class SafeRLSimulator(BaseSimulator):
             config.platforms = initializer(config.platforms)
         self._state.clear()
         self.clock = 0.0
-        self.sim_entities = self.construct_sim_entities(config.platforms)
+        self.sim_entities = self._construct_sim_entities(config)
         self._state.sim_platforms = self.construct_platforms()
         self.update_sensor_measurements()
         return self._state
@@ -115,7 +122,31 @@ class SafeRLSimulator(BaseSimulator):
     def _construct_platform_map(self) -> dict:
         ...
 
-    def construct_sim_entities(self, platforms: dict = None) -> dict:
+    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator = None) -> typing.Dict[str, BaseEntity]:
+        """Constructs the simulator
+
+        Parameters
+        ----------
+        reset_config : SafeRLSimulatorResetValidator
+            reset config validator
+
+        Returns
+        -------
+        dict[str: sim_entity]
+            Dictionary mapping entity id to simulation backend entity.
+        """
+        if reset_config is None:
+            reset_config = SafeRLSimulatorResetValidator()
+
+        self.agent_sim_entities = self._construct_agent_sim_entities(reset_config.platforms)
+
+        self.additional_sim_entities = self._construct_additional_sim_entities(reset_config)
+
+        sim_entities = shallow_dict_merge(self.agent_sim_entities, self.additional_sim_entities, in_place=False, allow_collisions=False)
+
+        return sim_entities
+
+    def _construct_agent_sim_entities(self, platforms: dict = None) -> typing.Dict[str, BaseEntity]:
         """
         Gets the correct backend simulation entity for each agent.
 
@@ -152,6 +183,29 @@ class SafeRLSimulator(BaseSimulator):
 
         return sim_entities
 
+    def _construct_additional_sim_entities(self, reset_config: SafeRLSimulatorResetValidator) -> typing.Dict[str, BaseEntity]:
+        """Constructs the simulator
+
+        Parameters
+        ----------
+        reset_config : SafeRLSimulatorResetValidator
+            reset config validator
+
+        Returns
+        -------
+        dict[str: sim_entity]
+            Dictionary mapping entity id to simulation backend entity.
+        """
+        entities = {}
+
+        for entity_name, entity_config in reset_config.additional_entities.items():
+            if entity_name in entities:
+                KeyCollisionError(entity_name, f"additional entity name collision: '{entity_name}' is used twice")
+            entity_class = self.platform_map[entity_config.get('entity')][0]
+            entities[entity_name] = entity_class(entity_config['config'])
+
+        return entities
+
     def construct_platforms(self) -> tuple:
         """
         Gets the platform object associated with each simulation entity.
@@ -162,7 +216,7 @@ class SafeRLSimulator(BaseSimulator):
             Collection of platforms associated with each simulation entity.
         """
         sim_platforms = []
-        for agent_id, entity in self.sim_entities.items():
+        for agent_id, entity in self.agent_sim_entities.items():
             agent_config = self.config.agent_configs[agent_id]
             platform_config = agent_config.platform_config
             platform_class = self.platform_map[platform_config.get('platform', 'default')][1]
