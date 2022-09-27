@@ -60,7 +60,7 @@ def test_constructor(platform_name, platform):
     platform : mock.MagicMock
         the mock platform passed to the Dubins3dPlatform constructor
     """
-    with mock.patch("saferl.platforms.dubins.dubins_platform.BasePlatform._get_part_list") as func:
+    with mock.patch("corl.simulators.base_platform.BasePlatform._get_part_list") as func:
         sensors = mock.MagicMock()
         sensors.name = "sensors"
         controllers = mock.MagicMock()

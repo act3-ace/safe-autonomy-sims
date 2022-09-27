@@ -191,12 +191,33 @@ class SafeRLSimulator(BaseSimulator):
         pass
 
     def step(self):
+        step_size = self.config.step_size
+        self._step_entity_state(step_size=step_size)
+        self._step_update_time(step_size=step_size)
+        self._step_update_sim_statuses(step_size=step_size)
+        self.update_sensor_measurements()
+        return self._state
+
+    def _step_entity_state(self, step_size: float):
+        entity_actions = self._step_get_entity_actions(step_size=step_size)
+
+        for entity_name, entity in self.sim_entities.items():
+            action = entity_actions.get(entity_name, None)
+            entity.step(action=action, step_size=step_size)
+
+    def _step_get_entity_actions(self, step_size: float) -> typing.Dict:  # pylint: disable = unused-argument
+        entity_actions = {}
         for platform in self._state.sim_platforms:
             agent_id = platform.name
             action = np.array(platform.get_applied_action(), dtype=np.float32)
-            entity = self.sim_entities[agent_id]
-            entity.step(action=action, step_size=self.config.step_size)
+            entity_actions[agent_id] = action
+
+        return entity_actions
+
+    def _step_update_time(self, step_size: float):
+        self.clock += step_size
+        for platform in self._state.sim_platforms:
             platform.sim_time = self.clock
-        self.update_sensor_measurements()
-        self.clock += self.config.step_size
-        return self._state
+
+    def _step_update_sim_statuses(self, step_size: float):
+        """perform custom updates on derived simulation status properties"""
