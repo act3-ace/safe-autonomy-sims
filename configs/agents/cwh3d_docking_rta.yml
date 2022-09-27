@@ -21,9 +21,27 @@
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": -5000,
-      "y": 6000,
-      "z": 6000,
+      "x": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+        "config": {
+          "value": 6000,
+          "units": "meters",
+        }
+      },
+      "y": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+        "config": {
+          "value": 6000,
+          "units": "meters",
+        }
+      },
+      "z": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+        "config": {
+          "value": 6000,
+          "units": "meters",
+        }
+      },
       "xdot": 0,
       "ydot": 0,
       "zdot": 0,
