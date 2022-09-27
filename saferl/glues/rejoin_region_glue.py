@@ -16,21 +16,25 @@ Author: Jamie Cunningham
 from collections import OrderedDict
 
 import numpy as np
+from corl.glues.base_glue import BaseAgentGlueNormalizationValidator
+from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
+from corl.libraries.normalization import StandardNormalNormalizer
 
-from saferl.glues.normal.normal_observe_glue import NormalObserveSensorGlue, NormalObserveSensorGlueValidator
 
-
-class InRejoinGlueValidator(NormalObserveSensorGlueValidator):
+class InRejoinGlueValidator(ObserveSensorValidator):
     """
     Validator for InRejoinGlue.
 
     radius: float
         The radius of the rejoin region.
+    normalization: BaseAgentGlueNormalizationValidator
+        Default normalization
     """
     radius: float
+    normalization: BaseAgentGlueNormalizationValidator = BaseAgentGlueNormalizationValidator(normalizer=StandardNormalNormalizer)
 
 
-class InRejoinGlue(NormalObserveSensorGlue):
+class InRejoinGlue(ObserveSensor):
     """
     Reports if sensor measurements indicate that the agent is inside a rejoin region.
     """
