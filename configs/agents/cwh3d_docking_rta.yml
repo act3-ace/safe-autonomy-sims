@@ -32,11 +32,12 @@
         {
           # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitSwitching",
           # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitSwitching",
-          # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
-          "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitOptimization",
+          "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
+          # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitOptimization",
           "config": {
               "step_size": 1,
-              "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"]
+              "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"],
+              "enabled": True,
           },
           "wrapped": [
             {

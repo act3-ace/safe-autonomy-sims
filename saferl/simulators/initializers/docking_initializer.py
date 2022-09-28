@@ -33,8 +33,7 @@ def velocity_limit(position, velocity_threshold, threshold_distance, mean_motion
     float
         The velocity limit given the agent's position.
     """
-    position_values = [elem.value for elem in position]
-    dist = np.linalg.norm(position_values)
+    dist = np.linalg.norm(position)
     vel_limit = velocity_threshold
     if dist > threshold_distance:
         vel_limit += slope * mean_motion * (dist - threshold_distance)
