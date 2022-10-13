@@ -16,8 +16,10 @@ import abc
 import typing
 
 import numpy as np
-from corl.simulators.base_platform import BasePlatform, BasePlatformValidator
+from corl.simulators.base_platform import BasePlatformValidator
 from safe_autonomy_dynamics.dubins import BaseDubinsAircraft, Dubins2dAircraft, Dubins3dAircraft
+
+from saferl.platforms.common.platform import BaseSafeRLPlatform
 
 
 class DubinsPlatformValidator(BasePlatformValidator):
@@ -32,7 +34,7 @@ class DubinsPlatformValidator(BasePlatformValidator):
     platform: BaseDubinsAircraft
 
 
-class DubinsPlatform(BasePlatform, abc.ABC):
+class DubinsPlatform(BaseSafeRLPlatform, abc.ABC):
     """
     A platform representing an aircraft operating under Dubins dynamics.
     Allows for saving an action to the platform for when the platform needs
@@ -46,14 +48,15 @@ class DubinsPlatform(BasePlatform, abc.ABC):
         Backend simulation entity associated with the platform.
     platform_config : dict
         Platform-specific configuration dictionary.
+    sim_time : float
+        simulation time at platform creation
     """
 
-    def __init__(self, platform_name, platform, parts_list):  # pylint: disable=W0613
+    def __init__(self, platform_name, platform, parts_list, sim_time=0.0):  # pylint: disable=W0613
         self.config: DubinsPlatformValidator
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list)
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._platform = self.config.platform
         self._last_applied_action = None
-        self._sim_time = 0.0
 
     def __eq__(self, other):
         if isinstance(other, DubinsPlatform):
@@ -206,22 +209,6 @@ class DubinsPlatform(BasePlatform, abc.ABC):
         return self._platform.partner.orientation if self._platform.partner is not None else None
 
     @property
-    def sim_time(self):
-        """
-        The current simulation time in seconds.
-
-        Returns
-        -------
-        float
-            Current simulation time.
-        """
-        return self._sim_time
-
-    @sim_time.setter
-    def sim_time(self, time):
-        self._sim_time = time
-
-    @property
     def operable(self):
         return True
 
@@ -254,8 +241,8 @@ class Dubins2dPlatform(DubinsPlatform):
         Platform-specific configuration dictionary.
     """
 
-    def __init__(self, platform_name, platform, parts_list):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list)
+    def __init__(self, platform_name, platform, parts_list, **kwargs):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, **kwargs)
         self._last_applied_action = np.array([0, 0], dtype=np.float32)  # turn rate, acceleration
 
     @property
@@ -297,8 +284,8 @@ class Dubins3dPlatform(DubinsPlatform):
         Platform-specific configuration dictionary.
     """
 
-    def __init__(self, platform_name, platform, parts_list):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list)
+    def __init__(self, platform_name, platform, parts_list, **kwargs):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, **kwargs)
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)  # elevator, ailerons, throttle
 
     @property
