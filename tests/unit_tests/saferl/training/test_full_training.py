@@ -23,7 +23,7 @@ from corl.parsers.yaml_loader import load_file
 from corl.train_rl import MainUtilACT3Core
 
 from saferl.experiments.rllib_api_experiment import RllibAPIExperiment
-from scripts.test_cwh_rta_final import RTAExperiment
+from scripts.base_rta_test import RTAExperiment
 
 
 @pytest.fixture(name="_ray_session_temp_dir", scope="session", autouse=True)
