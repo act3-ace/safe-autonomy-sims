@@ -1,4 +1,4 @@
-corl==1.51.0
+corl==1.52.6
 tensorflow==2.9.1
 numpy==1.22.2
 run-time-assurance==1.1.1
