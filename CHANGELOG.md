@@ -1,3 +1,16 @@
+## [0.3.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.3.0...v0.3.1) (2022-10-18)
+
+
+### Bug Fixes
+
+* add tqdm ([b4d19e0](https://github.com/act3-ace/safe-autonomy-sims/commit/b4d19e0a6bbed72af73eaa341a92c2560c715d97))
+* ci resources ([55af9bd](https://github.com/act3-ace/safe-autonomy-sims/commit/55af9bd025e22eac20cd44f7781a396e4a5271ac))
+* remove glue refs ([2185eb2](https://github.com/act3-ace/safe-autonomy-sims/commit/2185eb2643577dd6d769d7419d574cc5029e7483))
+* remove unused docs ([2155464](https://github.com/act3-ace/safe-autonomy-sims/commit/21554641b5638d7534cf4c68e68aa95a5160287a))
+* update corl version ([d551706](https://github.com/act3-ace/safe-autonomy-sims/commit/d551706f92c141df827194161397639af72a976b))
+* update corl version ([ac3aa5c](https://github.com/act3-ace/safe-autonomy-sims/commit/ac3aa5c667a079c74b3fa71c80cba0e918b197c9))
+* update to corl normalizers ([b6ea43c](https://github.com/act3-ace/safe-autonomy-sims/commit/b6ea43cbaf02f45b6032d615d06bd24dabd5a2e0))
+
 # [0.3.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.2.0...v0.3.0) (2022-09-21)
 
 
