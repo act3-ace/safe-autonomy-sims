@@ -17,11 +17,12 @@ from collections import OrderedDict
 
 import gym
 import numpy as np
+from corl.glues.base_glue import BaseAgentGlueNormalizationValidator
+from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
+from corl.libraries.normalization import StandardNormalNormalizer
 
-from saferl.glues.normal.normal_observe_glue import NormalObserveSensorGlue, NormalObserveSensorGlueValidator
 
-
-class VelocityLimitGlueValidator(NormalObserveSensorGlueValidator):
+class VelocityLimitGlueValidator(ObserveSensorValidator):
     """
     Validator for the VelocityLimitGlue.
 
@@ -33,14 +34,17 @@ class VelocityLimitGlueValidator(NormalObserveSensorGlueValidator):
         Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     slope: float
         The slope of the linear velocity limit as a function of distance from docking region
+    normalization: BaseAgentGlueNormalizationValidator
+        Default normalization
     """
     velocity_threshold: float = 0.2
     threshold_distance: float = 0.5
     mean_motion: float = 0.001027
     slope: float = 2.0
+    normalization: BaseAgentGlueNormalizationValidator = BaseAgentGlueNormalizationValidator(normalizer=StandardNormalNormalizer)
 
 
-class VelocityLimitGlue(NormalObserveSensorGlue):
+class VelocityLimitGlue(ObserveSensor):
     """
     Computes a velocity constraint from position and velocity sensor data.
     """
