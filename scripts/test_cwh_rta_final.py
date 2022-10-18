@@ -5,7 +5,7 @@ import numpy as np
 
 from safe_autonomy_dynamics.cwh import M_DEFAULT, N_DEFAULT, generate_cwh_matrices
 
-from base_rta_test import RTAExperiment, main
+from scripts.base_rta_test import RTAExperiment, main
 
 
 class TestController():
@@ -53,7 +53,7 @@ class DockingRTAExperiment(RTAExperiment):
         i = 0
 
         while not done:
-            
+
             position = obs[agent]["ObserveSensor_Sensor_Position"]["direct_observation"]
             velocity = obs[agent]["ObserveSensor_Sensor_Velocity"]["direct_observation"]
             state = np.concatenate((position, velocity))

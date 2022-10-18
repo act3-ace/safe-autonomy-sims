@@ -50,91 +50,143 @@
             }
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Relative_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 1000,
-            }
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0,
+                  "sigma": 1000,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": "Sensor_Relative_Position",
+              },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Relative_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1],
+              "config": {
+                "mu": 0,
+                "sigma": [1, 1],
+              }
             }
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": "Sensor_Relative_Position",
+              },
           },
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Relative_Rejoin_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 1000,
-            }
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0,
+                  "sigma": 1000,
+              },
+            },
+          },
+          "wrapped": {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config":{
+              "sensor": "Sensor_Relative_Rejoin_Position",
+            },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Relative_Rejoin_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1],
-            }
+              "config": {
+                 "mu": 0,
+                 "sigma": [1, 1],
+               }
+             },
+           },
+           "wrapped": {
+               "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+               "config":{
+                 "sensor": "Sensor_Relative_Rejoin_Position",
+               },
+           },
+        },
+        {
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          "config": {
+            "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0,
+                  "sigma": 400,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Velocity,
+              },
           },
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 400,
+              "config": {
+                "mu": 0,
+                "sigma": [1, 1],
+              }
             }
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Velocity,
+              },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1],
-            }
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0,
+                "sigma": 400,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Partner_Velocity,
+              },
           },
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Partner_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 400,
+              "config": {
+                "mu": 0,
+                "sigma": [1, 1],
+              }
             }
           },
-        },
-        {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
-          "config": {
-            "sensor": "Sensor_Partner_Velocity",
-            "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1],
-            }
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Partner_Velocity,
+              },
           },
         },
     ],
