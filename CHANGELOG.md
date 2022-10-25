@@ -1,3 +1,11 @@
+## [0.3.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.3.1...v0.3.2) (2022-10-25)
+
+
+### Bug Fixes
+
+* configs and trianing test ([1295a94](https://github.com/act3-ace/safe-autonomy-sims/commit/1295a944931c2258cde905839a134762b40e66e3))
+* updat corl ([0b16755](https://github.com/act3-ace/safe-autonomy-sims/commit/0b167555f0887ae708888b47ff9b9dbf7412fb0d))
+
 ## [0.3.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.3.0...v0.3.1) (2022-10-18)
 
 
