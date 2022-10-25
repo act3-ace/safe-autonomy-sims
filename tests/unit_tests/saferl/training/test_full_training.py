@@ -102,7 +102,7 @@ def test_experiment(
     experiment_parse = ExperimentParse(**config)
 
     # RllibAPIExperiment is used for debuging not training
-    if not isinstance(experiment_parse.experiment_class, RllibAPIExperiment):
+    if experiment_parse.experiment_class is RllibAPIExperiment:
         return
 
     experiment_class = experiment_parse.experiment_class(**experiment_parse.config)
