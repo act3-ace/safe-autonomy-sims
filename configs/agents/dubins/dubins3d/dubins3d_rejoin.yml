@@ -70,8 +70,8 @@
             "normalization": {
               "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
               "config": {
-                "mu": 0,
-                "sigma": 1000,
+                "mu": 0.0,
+                "sigma": 1000.0,
               },
             },
           },
@@ -87,7 +87,7 @@
           "config": {
             "normalization": {
               "config": {
-                "mu": 0,
+                "mu": 0.0,
                 "sigma": [1, 1, 1],
               }
             },
@@ -105,8 +105,8 @@
             "normalization": {
               "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
               "config": {
-                "mu": 0,
-                "sigma": 1000,
+                "mu": 0.0,
+                "sigma": 1000.0,
               },
             },
           },
@@ -122,7 +122,7 @@
           "config": {
             "normalization": {
               "config": {
-                "mu": 0,
+                "mu": 0.0,
                 "sigma": [1, 1, 1],
               }
             }
@@ -140,8 +140,8 @@
             "normalization": {
               "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
               "config": {
-                "mu": 0,
-                "sigma": 400,
+                "mu": 0.0,
+                "sigma": 400.0,
               },
             },
           },
@@ -157,7 +157,7 @@
           "config": {
             "normalization": {
               "config": {
-                "mu": 0,
+                "mu": 0.0,
                 "sigma": [1, 1, 1],
               }
             }
@@ -175,8 +175,8 @@
             "normalization": {
               "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
               "config": {
-                "mu": 0,
-                "sigma": 400,
+                "mu": 0.0,
+                "sigma": 400.0,
               },
             },
           },
@@ -192,7 +192,7 @@
           "config": {
             "normalization": {
               "config": {
-                "mu": 0,
+                "mu": 0.0,
                 "sigma": [1, 1, 1],
               }
             }
@@ -211,7 +211,7 @@
             "normalization": {
               "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
               "config": {
-                "mu": 0,
+                "mu": 0.0,
                 "sigma": 1.04719755,  # pi/3
               }
             }
@@ -224,7 +224,7 @@
             "normalization": {
               "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
               "config": {
-                "mu": 0,
+                "mu": 0.0,
                 "sigma": 0.34906585039,  # pi/9
               }
             }
