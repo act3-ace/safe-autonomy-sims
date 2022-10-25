@@ -95,7 +95,7 @@
               "normalization": {
                 "normalizer": corl.libraries.normalization.StandardNormalNormalizer,
                 "config": {
-                  "mu": 0,
+                  "mu": 0.0,
                   "sigma": [100, 100, 100],
                 }
               }
@@ -108,7 +108,7 @@
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
-                  "mu": 0,
+                  "mu": 0.0,
                   "sigma": [0.5, 0.5, 0.5],
                 }
               }
