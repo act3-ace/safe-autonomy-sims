@@ -47,7 +47,7 @@ class DubinsSimulator(SafeRLSimulator):
         config = self.get_reset_validator(**config)
         self._state.clear()
         self.clock = 0.0
-        self.sim_entities = self.construct_sim_entities(config.platforms)
+        self.sim_entities = self._construct_sim_entities(config)
         self.register_lead()
         self._state.sim_platforms = self.construct_platforms()
         self.update_sensor_measurements()

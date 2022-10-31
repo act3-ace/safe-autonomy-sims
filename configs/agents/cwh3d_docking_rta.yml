@@ -21,9 +21,27 @@
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": -5000,
-      "y": 6000,
-      "z": 6000,
+      "x": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+        "config": {
+          "units": "meters",
+          "value": -5000,
+        }
+      },
+      "y": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+        "config": {
+          "units": "meters",
+          "value": 6000,
+        }
+      },
+      "z": {
+        "type": "corl.libraries.parameters.ConstantParameter",
+        "config": {
+          "units": "meters",
+          "value": 6000,
+        }
+      },
       "xdot": 0,
       "ydot": 0,
       "zdot": 0,
@@ -32,11 +50,12 @@
         {
           # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitSwitching",
           # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitSwitching",
-          # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
-          "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitOptimization",
+          "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
+          # "functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitOptimization",
           "config": {
               "step_size": 1,
-              "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"]
+              "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"],
+              "enabled": True,
           },
           "wrapped": [
             {

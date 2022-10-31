@@ -17,9 +17,6 @@ Multiple glues may be used in a decorator pattern to
 reuse common transformation logic. See [CoRL
 documentation](https://act3-rl.github.com/act3-ace/corl/reference/glues/__init__/) for more details!
 
-- [normal](normal/index.md)
-- [Magnitude glue](../../reference/glues/magnitude_glue.md)
 - [Rejoin region glue](../../reference/glues/rejoin_region_glue.md)
 - [Rta glue](../../reference/glues/rta_glue.md)
-- [Unit vector glue](../../reference/glues/unit_vector_glue.md)
 - [Vel limit glue](../../reference/glues/vel_limit_glue.md)

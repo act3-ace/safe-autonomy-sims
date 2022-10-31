@@ -12,12 +12,29 @@ limitation or restriction. See accompanying README and LICENSE for details.
 This module defines the platforms used with saferl Dubins2dSimulator and Dubins3dSimulator classes. It represents an
 aircraft operating under the Dubins dynamics model.
 """
+import abc
+import typing
 
 import numpy as np
-from corl.simulators.base_platform import BasePlatform
+from corl.simulators.base_platform import BasePlatformValidator
+from safe_autonomy_dynamics.dubins import BaseDubinsAircraft, Dubins2dAircraft, Dubins3dAircraft
+
+from saferl.platforms.common.platform import BaseSafeRLPlatform
 
 
-class DubinsPlatform(BasePlatform):
+class DubinsPlatformValidator(BasePlatformValidator):
+    """
+    DubinsPlatformValidator
+
+    Parameters
+    ----------
+    platform : BaseDubinsAircraft
+        underlying dynamics platform
+    """
+    platform: BaseDubinsAircraft
+
+
+class DubinsPlatform(BaseSafeRLPlatform, abc.ABC):
     """
     A platform representing an aircraft operating under Dubins dynamics.
     Allows for saving an action to the platform for when the platform needs
@@ -31,12 +48,15 @@ class DubinsPlatform(BasePlatform):
         Backend simulation entity associated with the platform.
     platform_config : dict
         Platform-specific configuration dictionary.
+    sim_time : float
+        simulation time at platform creation
     """
 
-    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=platform_config)
+    def __init__(self, platform_name, platform, parts_list, sim_time=0.0):  # pylint: disable=W0613
+        self.config: DubinsPlatformValidator
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
+        self._platform = self.config.platform
         self._last_applied_action = None
-        self._sim_time = 0.0
 
     def __eq__(self, other):
         if isinstance(other, DubinsPlatform):
@@ -47,6 +67,16 @@ class DubinsPlatform(BasePlatform):
             eq = eq and self.sim_time == other.sim_time
             return eq
         return False
+
+    @property
+    def get_validator(self) -> typing.Type[DubinsPlatformValidator]:
+        """
+        get validator for this DubinsPlatform
+
+        Returns:
+            DubinsPlatformValidator -- validator the platform will use to generate a configuration
+        """
+        return DubinsPlatformValidator
 
     def get_applied_action(self):
         """
@@ -179,24 +209,20 @@ class DubinsPlatform(BasePlatform):
         return self._platform.partner.orientation if self._platform.partner is not None else None
 
     @property
-    def sim_time(self):
-        """
-        The current simulation time in seconds.
-
-        Returns
-        -------
-        float
-            Current simulation time.
-        """
-        return self._sim_time
-
-    @sim_time.setter
-    def sim_time(self, time):
-        self._sim_time = time
-
-    @property
     def operable(self):
         return True
+
+
+class DubinsPlatform2dValidator(DubinsPlatformValidator):
+    """
+    DubinsPlatform2dValidator
+
+    Parameters
+    ----------
+    platform : Dubins2dAircraft
+        underlying dynamics platform
+    """
+    platform: Dubins2dAircraft
 
 
 class Dubins2dPlatform(DubinsPlatform):
@@ -215,9 +241,31 @@ class Dubins2dPlatform(DubinsPlatform):
         Platform-specific configuration dictionary.
     """
 
-    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, platform_config=platform_config)
+    def __init__(self, platform_name, platform, parts_list, **kwargs):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, **kwargs)
         self._last_applied_action = np.array([0, 0], dtype=np.float32)  # turn rate, acceleration
+
+    @property
+    def get_validator(self) -> typing.Type[DubinsPlatform2dValidator]:
+        """
+        get validator for this Dubins2dPlatform
+
+        Returns:
+            DubinsPlatform2dValidator -- validator the platform will use to generate a configuration
+        """
+        return DubinsPlatform2dValidator
+
+
+class DubinsPlatform3dValidator(DubinsPlatformValidator):
+    """
+    DubinsPlatform3dValidator
+
+    Parameters
+    ----------
+    platform : Dubins3dAircraft
+        underlying dynamics platform
+    """
+    platform: Dubins3dAircraft
 
 
 class Dubins3dPlatform(DubinsPlatform):
@@ -236,9 +284,19 @@ class Dubins3dPlatform(DubinsPlatform):
         Platform-specific configuration dictionary.
     """
 
-    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, platform_config=platform_config)
+    def __init__(self, platform_name, platform, parts_list, **kwargs):  # pylint: disable=W0613
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, **kwargs)
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)  # elevator, ailerons, throttle
+
+    @property
+    def get_validator(self) -> typing.Type[DubinsPlatform3dValidator]:
+        """
+        get validator for this DubinsPlatform3d
+
+        Returns:
+            DubinsPlatform3dValidator -- validator the platform will use to generate a configuration
+        """
+        return DubinsPlatform3dValidator
 
     @property
     def flight_path_angle(self):

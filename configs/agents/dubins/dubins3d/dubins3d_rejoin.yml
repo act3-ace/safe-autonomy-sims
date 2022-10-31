@@ -65,112 +65,168 @@
             }
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Relative_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 1000,
-            }
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 1000.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Relative_Position,
+              },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Relative_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1, 1],
-            }
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1, 1],
+              }
+            },
+          },
+          "wrapped": {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config":{
+                "sensor": Sensor_Relative_Position,
+            },
           },
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Relative_Rejoin_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 1000,
-            }
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 1000.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Relative_Rejoin_Position,
+              },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Relative_Rejoin_Position",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1, 1],
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1, 1],
+              }
             }
+          },
+          "wrapped": {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config":{
+              "sensor": Sensor_Relative_Rejoin_Position,
+            },
           },
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 400,
-            }
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 400.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Velocity,
+              },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1, 1],
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1, 1],
+              }
             }
+          },
+          "wrapped": {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config":{
+              "sensor": Sensor_Velocity,
+            },
           },
         },
         {
-          "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
           "config": {
-            "sensor": "Sensor_Partner_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 400,
-            }
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 400.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Partner_Velocity,
+              },
           },
         },
         {
-          "functor": "saferl.glues.unit_vector_glue.UnitVectorGlue",
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
           "config": {
-            "sensor": "Sensor_Partner_Velocity",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": [1, 1, 1],
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1, 1],
+              }
             }
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Partner_Velocity,
+              },
           },
         },
         {
-          "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
           "config": {
             "sensor": "Sensor_Roll",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 1.04719755,  # pi/3
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 1.04719755,  # pi/3
+              }
             }
           },
         },
         {
-          "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
           "config": {
             "sensor": "Sensor_Flight_Path_Angle",
             "normalization": {
-              "enabled": True,
-              "mu": 0,
-              "sigma": 0.34906585039,  # pi/9
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 0.34906585039,  # pi/9
+              }
             }
           },
         },
