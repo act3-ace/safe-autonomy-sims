@@ -12,7 +12,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 """
-
+import os
 from pathlib import Path
 
 from setuptools import setup, find_packages
@@ -25,32 +25,16 @@ def parse_requirements(filename: str):
 
 reqs = parse_requirements("requirements.txt")
 
+version = {}
+try:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    base_dir = None
+with open(os.path.join(base_dir, 'version.py')) as fp:
+     exec(fp.read(), version)
 
 if __name__ == '__main__':
-    tests_require = [
-        'flake8',
-        'mypy',
-        'mypy-extensions',
-        'mypy-protobuf',
-        'pylint',
-        'pytest',
-        'pytest-mock',
-        'pytest-cov',
-        'pytest-order',
-        'yapf',
-        'isort',
-        'rope',
-        'pre-commit',
-        'pre-commit-hooks',
-        'detect-secrets',
-        'blacken-docs',
-        'bashate',
-        'fish',
-        'watchdog',
-        'speedscope',
-        'pandas-profiling',
-        'factory',
-    ]
+    tests_require = parse_requirements("tests-requirements.txt")
 
     docs_require = parse_requirements("mkdocs-requirements.txt")
 
@@ -70,9 +54,8 @@ if __name__ == '__main__':
             'setuptools_scm',
             'pytest-runner'
         ],
-        use_scm_version={
-            'fallback_version': '0.0.0',
-        },
+        
+        version=version["__version__"],
 
         # add in package_data
         include_package_data=True,

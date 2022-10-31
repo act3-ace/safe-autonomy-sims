@@ -55,6 +55,7 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
     """
     step_size: float
     state_observation_names: typing.List[str]
+    enabled: bool = True
 
 
 class RTAGlue(BaseMultiWrapperGlue):
@@ -67,6 +68,7 @@ class RTAGlue(BaseMultiWrapperGlue):
         super().__init__(**kwargs)
         self.controller_glues = self._get_controller_glues(self)
         self.rta = self._create_rta_module()
+        self.rta.enable = self.config.enabled
         self.filtered_action = None
 
     @property

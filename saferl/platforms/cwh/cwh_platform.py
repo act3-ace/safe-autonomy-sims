@@ -13,11 +13,29 @@ This module defines the platform used with saferl CWHSimulator class. It represe
 operating under the Clohessy-Wiltshire dynamics model.
 """
 
+import typing
+
 import numpy as np
-from corl.simulators.base_platform import BasePlatform
+from corl.simulators.base_platform import BasePlatformValidator
+from safe_autonomy_dynamics.cwh import CWHSpacecraft
+
+from saferl.platforms.common.platform import BaseSafeRLPlatform
 
 
-class CWHPlatform(BasePlatform):
+class CWHPlatformValidator(BasePlatformValidator):
+    """
+    DubinsPlatform2dValidator
+
+    Parameters
+    ----------
+    platform : Dubins2dAircraft
+        underlying dynamics platform
+    """
+
+    platform: CWHSpacecraft
+
+
+class CWHPlatform(BaseSafeRLPlatform):
     """
     A platform representing a spacecraft operating under CWH dynamics.
     Allows for saving an action to the platform for when the platform needs
@@ -31,12 +49,25 @@ class CWHPlatform(BasePlatform):
         Backend simulation entity associated with the platform.
     platform_config : dict
         Platform-specific configuration dictionary.
+    sim_time : float
+        simulation time at platform creation
     """
 
-    def __init__(self, platform_name, platform, platform_config):  # pylint: disable=W0613
-        super().__init__(platform_name=platform_name, platform=platform, parts_list=platform_config)
+    def __init__(self, platform_name, platform, parts_list, sim_time=0.0):  # pylint: disable=W0613
+        self.config: CWHPlatformValidator
+        super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
+        self._platform = self.config.platform
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
-        self._sim_time = 0.0
+
+    @property
+    def get_validator(self) -> typing.Type[CWHPlatformValidator]:
+        """
+        get validator for this Dubins2dPlatform
+
+        Returns:
+            DubinsPlatform2dValidator -- validator the platform will use to generate a configuration
+        """
+        return CWHPlatformValidator
 
     def get_applied_action(self):
         """
@@ -92,22 +123,6 @@ class CWHPlatform(BasePlatform):
             The velocity vector of the platform.
         """
         return self._platform.velocity
-
-    @property
-    def sim_time(self):
-        """
-        The current simulation time in seconds.
-
-        Returns
-        -------
-        float
-            Current simulation time.
-        """
-        return self._sim_time
-
-    @sim_time.setter
-    def sim_time(self, time):
-        self._sim_time = time
 
     @property
     def operable(self):

@@ -36,9 +36,9 @@ def setup_cwhplatform(cwh_spacecraft):
     """
 
     platform_name = 'blue0'
-    platform_config = []
+    parts_list = []
 
-    platform_obj = CWHPlatform(platform_name, cwh_spacecraft, platform_config)
+    platform_obj = CWHPlatform(platform_name, cwh_spacecraft, parts_list)
     return platform_obj
 
 
@@ -105,7 +105,7 @@ def setup_CWHSpacecraft_vel(vel_input):
     """
     setup a CWHSpacecraft at a certain velocity
     """
-    add_args = {'name': 'CWH', 'xdot': vel_input[0], 'ydot': vel_input[1], 'zdot': vel_input[2]}
+    add_args = {'name': 'CWH', 'x_dot': vel_input[0], 'y_dot': vel_input[1], 'z_dot': vel_input[2]}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft

@@ -37,14 +37,14 @@ def fixture_agent_configs():
     """Returns valid agent configuration for testing"""
     configs = {
         "blue0": {
-            "sim_config": {
+            "platform_config": {
                 "name": 'DUBINS2D'
-            }, "platform_config": Dubins2dPlatformFactory.platform_config
+            }, "parts_list": Dubins2dPlatformFactory.parts_list
         },
         "red0": {
-            "sim_config": {
+            "platform_config": {
                 "name": 'DUBINS2D'
-            }, "platform_config": Dubins2dPlatformFactory.platform_config
+            }, "parts_list": Dubins2dPlatformFactory.parts_list
         }
     }
     return configs
@@ -113,7 +113,7 @@ test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_construct_sim_entities(cut, expected_sim_entities):
     """Tests the construct_sim_entities method of the Dubins2dSimulator"""
-    sim_entities = cut.construct_sim_entities()
+    sim_entities = cut._construct_sim_entities()  # pylint: disable=protected-access
     assert sim_entities == expected_sim_entities
 
 

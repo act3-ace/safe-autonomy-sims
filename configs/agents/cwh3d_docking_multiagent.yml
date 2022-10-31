@@ -89,49 +89,50 @@
             }
         },
         {
-            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Position",
               "normalization": {
-                "enabled": True,
-                "mu": 0,
-                "sigma": [100, 100, 100],
+                "normalizer": corl.libraries.normalization.StandardNormalNormalizer,
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [100, 100, 100],
+                }
               }
             },
         },
         {
-            "functor": "saferl.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Velocity",
               "normalization": {
-                "enabled": True,
-                "mu": 0,
-                "sigma": [0.5, 0.5, 0.5],
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [0.5, 0.5, 0.5],
+                }
               }
             },
         },
         {
-            "functor": "saferl.glues.magnitude_glue.MagnitudeGlue",
-            "config":
-              {
-                "sensor": "Sensor_Velocity",
-                "normalization": {
-                      "enabled": True,
-                      "mu": 0,
-                      "sigma": 1,
-                }
-              }
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+            "config": {
+              "normalization": {
+                  "normalizer": "corl.libraries.normalization.StandardNormalNormalizer"
+              },
+            },
+            "wrapped": {
+                "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+                "config":{
+                    "sensor": Sensor_Velocity,
+                },
+            },
         },
         {
             "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
             "config":
               {
                 "sensor": "Sensor_Position",
-                "normalization": {
-                      "enabled": True,
-                      "mu": 0,
-                      "sigma": 1,
-                },
                 "velocity_threshold": 0.2,
                 "threshold_distance": 0.5,
                 "mean_motion": 0.001027,

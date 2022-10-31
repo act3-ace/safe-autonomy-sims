@@ -27,11 +27,11 @@
   "dones": {
     "shared": [
       {
-        "functor": "saferl.dones.docking_dones.CollisionDoneFunction",
-        "config": { spacecraft_safety_constraint: 0.5 },
+        "functor": "saferl.dones.common_dones.CollisionDoneFunction",
+        "config": { safety_constraint: 0.5 },
       },
       {
-        "functor": "saferl.dones.docking_dones.MultiagentSuccessfulDockingDoneFunction",
+        "functor": "saferl.dones.common_dones.MultiagentSuccessDoneFunction",
         "config": { success_function_name: "SuccessfulDockingDoneFunction" },
       }
     ]

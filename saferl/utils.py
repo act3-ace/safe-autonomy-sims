@@ -13,9 +13,70 @@ This module contains various utility functions.
 
 Author: Jamie Cunningham
 """
+import typing
 
 import numpy as np
 from corl.simulators.common_platform_utils import get_platform_by_name
+
+
+def shallow_dict_merge(a: typing.Dict, b: typing.Dict, in_place: bool = False, allow_collisions: bool = True):
+    """
+    Merges dictionaries a and b. Keeps entries from input a if collisions as ignored.
+
+    This is a shallow merge, values in a and b are not copied
+
+    Parameters
+    ----------
+    a : dict
+        Merged into output dictionary. Values preferred in key collision if allow_collisions is false. Modified in-place if in_place True
+    b : dict
+        Merged into output dictionary. Values ignored if key collides with a and allow_collisions is false.
+    in_place: bool
+        Modifies input dict a in-place if True, by default False
+    allow_collisions : bool, optional
+        If True, takes values from input dict a when keys collide.
+        If False, raises KeyCollisionError when keys collide.
+        By default False
+
+    Returns
+    -------
+    dict
+        Formed by merging dictionaries a and b
+    """
+
+    if in_place:
+        output = a
+    else:
+        output = {**a}
+
+    for k, v in b.items():
+        if k in output:
+            if allow_collisions:
+                continue
+
+            raise KeyCollisionError(k)
+
+        output[k] = v
+
+    return output
+
+
+class KeyCollisionError(Exception):
+    """Custom exception for dictionary merging key collision errors
+
+    Parameters
+    ----------
+    key : Any
+        colliding key
+    message: str
+        Optional error message
+    """
+
+    def __init__(self, key, message: str = None):
+        self.key = key
+        if message is None:
+            message = f"Keys '{key}' collided"
+        super().__init__(message)
 
 
 def velocity_limit(state, agent_name, velocity_threshold, threshold_distance, mean_motion, slope=2.0):
