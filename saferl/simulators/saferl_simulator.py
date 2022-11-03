@@ -81,11 +81,11 @@ class SafeRLSimulator(BaseSimulator):
     """
 
     @property
-    def get_simulator_validator(self):
+    def get_simulator_validator(self) -> typing.Type[SafeRLSimulatorValidator]:
         return SafeRLSimulatorValidator
 
     @property
-    def get_reset_validator(self):
+    def get_reset_validator(self) -> typing.Type[SafeRLSimulatorResetValidator]:
         return SafeRLSimulatorResetValidator
 
     @property
@@ -97,6 +97,7 @@ class SafeRLSimulator(BaseSimulator):
         return list(self._state.sim_platforms)
 
     def __init__(self, **kwargs):
+        self.config: SafeRLSimulatorValidator
         super().__init__(**kwargs)
         self.agent_sim_entities: typing.Dict[str, BaseEntity] = {}
         self.additional_sim_entities: typing.Dict[str, BaseEntity] = {}
