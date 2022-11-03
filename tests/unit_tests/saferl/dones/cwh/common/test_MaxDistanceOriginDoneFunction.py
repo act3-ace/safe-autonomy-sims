@@ -18,12 +18,12 @@ import os
 
 import pytest
 
-from saferl.dones.docking_dones import MaxDistanceDoneFunction
+from saferl.dones.cwh.common import MaxDistanceOriginDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/MaxDistanceDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../../test_cases/dones/cwh/docking/common/MaxDistanceOriginDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = ["platform_position", "max_distance", "expected_value", "expected_status"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
@@ -75,7 +75,7 @@ def fixture_cut(cut_name, agent_name, max_distance):
     MaxDistanceDoneFunction
         An instantiated component under test
     """
-    return MaxDistanceDoneFunction(name=cut_name, platform_name=agent_name, max_distance=max_distance, agent_name=agent_name)
+    return MaxDistanceOriginDoneFunction(name=cut_name, platform_name=agent_name, max_distance=max_distance, agent_name=agent_name)
 
 
 @pytest.mark.unit_test

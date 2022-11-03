@@ -127,8 +127,13 @@ nav:
           - api/dones/index.md
           - "common dones":
               - reference/dones/common_dones.md
-          - "docking dones":
-              - reference/dones/docking_dones.md
+          - "cwh":
+              - "common":
+                  - reference/dones/cwh/common.md
+              - "docking dones":
+                  - reference/dones/cwh/docking_dones.md
+              - "inspection dones":
+                  - reference/dones/cwh/inspection_dones.md
           - "rejoin dones":
               - reference/dones/rejoin_dones.md
       - "glues":
