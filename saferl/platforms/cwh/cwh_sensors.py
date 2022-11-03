@@ -18,6 +18,7 @@ from corl.simulators.base_parts import BaseSensor
 import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.inspection_simulator import InspectionSimulator
 
 
 class CWHSensor(BaseSensor):
@@ -66,6 +67,12 @@ PluginLibrary.AddClassToGroup(
     }
 )
 
+PluginLibrary.AddClassToGroup(
+    PositionSensor, "Sensor_Position", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
 
 class VelocitySensor(CWHSensor):
     """
@@ -91,5 +98,11 @@ class VelocitySensor(CWHSensor):
 PluginLibrary.AddClassToGroup(
     VelocitySensor, "Sensor_Velocity", {
         "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    VelocitySensor, "Sensor_Velocity", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )

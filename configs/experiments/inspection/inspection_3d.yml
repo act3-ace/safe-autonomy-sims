@@ -7,32 +7,16 @@
 #The use, dissemination or disclosure of data in this file is subject to
 #limitation or restriction. See accompanying README and LICENSE for details.
 #---------------------------------------------------------------------------
-
-# === Environment ===
-horizon: 2000
-
-# === Execution ===
-rollout_fragment_length: 200
-train_batch_size: 1200  # set to num_workers * rollout_fragment_length
-sgd_minibatch_size: 1200
-batch_mode: complete_episodes
-
-# === Resources ===
-num_workers: 2
-num_cpus_per_worker: 1
-num_gpus_per_worker: 0
-num_envs_per_worker: 1
-
-custom_resources_per_worker: {}
-
-num_cpus_for_driver: 1
-num_gpus: 0
-
-# === PPO ===
-num_sgd_iter: 30
-
-# === Other ===
-seed: 1
-
-
-
+"config": "configs/tasks/cwh3d_inspection/cwh3d_task.yml"
+"platform_config":
+  - [
+      "blue0",
+      "configs/platforms/cwh_platform.yml",
+    ]
+"agent_config":
+  - [
+      "blue0",
+      "blue0",
+      "configs/agents/cwh3d_inspection.yml",
+      "configs/policy/ppo/default_config.yml",
+    ]
