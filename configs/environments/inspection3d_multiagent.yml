@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 #Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-#Reinforcement Learning (RL) Core  Extension.
+#Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
 #
 #This is a US Government Work not subject to copyright protection in the US.
 #
@@ -23,15 +23,14 @@
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
   "dones": {
-             #TODO: make these inspection dones!
     "shared": [
       {
-        "functor": "saferl.dones.inspection_dones.CollisionDoneFunction",
+        "functor": "saferl.dones.common_dones.CollisionDoneFunction",
         "config": { spacecraft_safety_constraint: 0.5 },
       },
       {
-        "functor": "saferl.dones.inspection_dones.MultiagentSuccessfulInspectionDoneFunction",
-        "config": { success_function_name: "SuccessfulInspectionDoneFunction" },
+        "functor": "saferl.dones.common_dones.MultiagentSuccessDoneFunction",
+        "config": { "SuccessfulInspectionDoneFunction" },
       }
     ]
   }

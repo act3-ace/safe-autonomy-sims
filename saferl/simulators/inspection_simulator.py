@@ -93,7 +93,6 @@ def points_on_sphere_cmu(num_points: int, radius: float) -> list:
             point = (radius * math.sin(theta) * math.cos(phi), radius * math.sin(theta) * math.sin(phi), radius * math.cos(theta))
             points.append(point)
             n_count += 1
-    print(f"{n_count} equidistant points generated on sphere")
     return points
 
 
@@ -110,7 +109,7 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
     points_algorithm: str = "cmu"
 
     @validator("points_algorithm")
-    def valid_algorithm(self, v):
+    def valid_algorithm(cls, v):
         """
         Check if provided algorithm is a valid choice.
         """

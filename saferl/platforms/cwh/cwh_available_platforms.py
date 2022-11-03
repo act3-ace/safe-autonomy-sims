@@ -58,6 +58,6 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
         raise RuntimeError(f'name: {config["name"]} did not match a known platform type')
 
-#TODO: figure out how to have both types of simulators here
+
 PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": CWHSimulator})
 PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": InspectionSimulator})

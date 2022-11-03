@@ -149,7 +149,7 @@
             },
         },
         {
-            "functor": "saferl.dones.docking_dones.MaxDistanceDoneFunction",
+            "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
             "config":{
                 "max_distance": 40000,
             },
@@ -164,17 +164,17 @@
 #            },
 #        },
         {
-            "functor": "saferl.dones.docking_dones.CrashDockingDoneFunction",
+            "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
             "config":{
-              "docking_region_radius": 0.5,
-              "velocity_threshold": 0.2,
-              "threshold_distance": 0.5,
-              "mean_motion": 0.001027,
-              "lower_bound": False,
+              "crash_region_radius": 0.5,
+              "velocity_constraint": {
+                "velocity_threshold": 0.2,
+                "threshold_distance": 0.5,
+              }
             },
         },
         {
-            "functor": "saferl.dones.docking_dones.SuccessfulDockingDoneFunction",
+            "functor": "saferl.dones.cwh.docking_dones.SuccessfulDockingDoneFunction",
             "config":{
               "docking_region_radius": 0.5,
               "velocity_threshold": 0.2,
@@ -187,14 +187,14 @@
     "rewards": [
         {
             "name": "DockingDistanceExponentialChangeReward",
-            "functor": "saferl.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.cwh.docking_rewards.DockingDistanceExponentialChangeReward",
             "config": {
                 "pivot": 100
             }
         },
       {
         "name": "DockingDeltaVReward",
-        "functor": "saferl.rewards.docking_rewards.DockingDeltaVReward",
+        "functor": "saferl.rewards.cwh.docking_rewards.DockingDeltaVReward",
         "config": {
           "scale": -0.01,
           "bias": 0.0,
@@ -203,7 +203,7 @@
       },
       {
         "name": "DockingVelocityConstraintReward",
-        "functor": "saferl.rewards.docking_rewards.DockingVelocityConstraintReward",
+        "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
         "config": {
           "scale": -0.01,
           "bias": -0.01,
@@ -215,7 +215,7 @@
       },
         {
           "name": "DockingSuccessReward",
-          "functor": "saferl.rewards.docking_rewards.DockingSuccessReward",
+          "functor": "saferl.rewards.cwh.docking_rewards.DockingSuccessReward",
           "config": {
             "scale": 1.0,
             "timeout": 2000,
@@ -228,7 +228,7 @@
         },
       {
         "name": "DockingFailureReward",
-        "functor": "saferl.rewards.docking_rewards.DockingFailureReward",
+        "functor": "saferl.rewards.cwh.docking_rewards.DockingFailureReward",
         "config": {
           "timeout_reward": -1.0,
           "distance_reward": -1.0,
