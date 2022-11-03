@@ -18,12 +18,12 @@ import os
 
 import pytest
 
-from saferl.dones.cwh.common import CrashOriginDoneFunction
+from saferl.dones.cwh.docking_dones import SuccessfulDockingDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/CrashDockingDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../../../test_cases/dones/cwh/docking/SuccessfulDockingDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
     "platform_position",
@@ -150,7 +150,7 @@ def fixture_cut(
     SuccessfulDockingDoneFunction
         An instantiated component under test
     """
-    return CrashOriginDoneFunction(
+    return SuccessfulDockingDoneFunction(
         name=cut_name,
         agent_name=agent_name,
         platform_name=agent_name,

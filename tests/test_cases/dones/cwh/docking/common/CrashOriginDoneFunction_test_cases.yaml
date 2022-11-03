@@ -2,7 +2,7 @@
 - ID: inside docking boundary region and below velocity constraint
   platform_position: np.array([9, 0, 0])
   platform_velocity: np.array([0, 0, 0])
-  docking_region_radius: 10
+  crash_region_radius: 10
   velocity_threshold: 10.0
   threshold_distance: 0.5
   slope: 2.0
@@ -13,7 +13,7 @@
 - ID: on docking region boundary and below velocity constraint
   platform_position: np.array([10, 0, 0])
   platform_velocity: np.array([0, 0, 0])
-  docking_region_radius: 10
+  crash_region_radius: 10
   velocity_threshold: 10.0
   threshold_distance: 0.5
   slope: 2.0
@@ -24,7 +24,7 @@
 - ID: outside docking region boundary and below velocity constraint
   platform_position: np.array([11, 0, 0])
   platform_velocity: np.array([0, 0, 0])
-  docking_region_radius: 10
+  crash_region_radius: 10
   velocity_threshold: 10.0
   threshold_distance: 0.5
   slope: 2.0
@@ -35,7 +35,7 @@
 - ID: inside docking region boundary and below velocity constraint
   platform_position: np.array([9, 0, 0])
   platform_velocity: np.array([9, 0, 0])
-  docking_region_radius: 10
+  crash_region_radius: 10
   velocity_threshold: 10.0
   threshold_distance: 0.5
   slope: 2.0
@@ -46,7 +46,7 @@
 - ID: inside docking region boundary and at velocity constraint
   platform_position: np.array([9, 0, 0])
   platform_velocity: np.array([10, 0, 0])
-  docking_region_radius: 10
+  crash_region_radius: 10
   velocity_threshold: 10.0
   threshold_distance: 0.5
   slope: 2.0
@@ -57,7 +57,7 @@
 - ID: inside docking region boundary and above velocity constraint
   platform_position: np.array([9, 0, 0])
   platform_velocity: np.array([11, 0, 0])
-  docking_region_radius: 10
+  crash_region_radius: 10
   velocity_threshold: 10.0
   threshold_distance: 0.5
   slope: 2.0
