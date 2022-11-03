@@ -18,7 +18,7 @@ import os
 
 import pytest
 
-from saferl.dones.docking_dones import SuccessfulDockingDoneFunction
+from saferl.dones.cwh.docking_dones import SuccessfulDockingDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

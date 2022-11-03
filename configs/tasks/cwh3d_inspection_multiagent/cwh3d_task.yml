@@ -11,7 +11,9 @@
 ####################################################################
 # Override values used by the setup
 ####################################################################
+auto_system_detect_class: corl.experiments.base_experiment.BaseAutoDetect
 experiment_class: corl.experiments.rllib_experiment.RllibExperiment
+
 config:
   rllib_config_updates: &rllib_config_updates
     horizon: 5000

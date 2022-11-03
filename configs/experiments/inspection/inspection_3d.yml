@@ -7,20 +7,16 @@
 #The use, dissemination or disclosure of data in this file is subject to
 #limitation or restriction. See accompanying README and LICENSE for details.
 #---------------------------------------------------------------------------
-#TODO - done? feels not done enough?
 "config": "configs/tasks/cwh3d_inspection/cwh3d_task.yml"
 "platform_config":
   - [
       "blue0",
-      #done
       "configs/platforms/cwh_platform.yml",
     ]
 "agent_config":
   - [
       "blue0",
       "blue0",
-      #todo
       "configs/agents/cwh3d_inspection.yml",
-      #done
       "configs/policy/ppo/default_config.yml",
     ]

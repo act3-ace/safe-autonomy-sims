@@ -18,7 +18,7 @@ import os
 
 import pytest
 
-from saferl.dones.docking_dones import CrashDockingDoneFunction
+from saferl.dones.cwh.common import CrashOriginDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
@@ -150,7 +150,7 @@ def fixture_cut(
     SuccessfulDockingDoneFunction
         An instantiated component under test
     """
-    return CrashDockingDoneFunction(
+    return CrashOriginDoneFunction(
         name=cut_name,
         agent_name=agent_name,
         platform_name=agent_name,

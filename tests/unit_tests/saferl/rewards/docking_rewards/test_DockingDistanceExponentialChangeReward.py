@@ -17,7 +17,7 @@ from unittest import mock
 
 import pytest
 
-from saferl.rewards.docking_rewards import DockingDistanceExponentialChangeReward
+from saferl.rewards.cwh.docking_rewards import DockingDistanceExponentialChangeReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
