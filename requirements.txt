@@ -1,7 +1,7 @@
 corl==1.53.3
 tensorflow==2.9.1
 numpy==1.22.2
-run-time-assurance==1.1.1
+run-time-assurance==1.2.0
 safe-autonomy-dynamics==0.4.0
 factory-boy==3.2.1
 jsonlines

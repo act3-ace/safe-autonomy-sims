@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 #Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-#Reinforcement Learning (RL) Core  Extension.
+#Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
 #
 #This is a US Government Work not subject to copyright protection in the US.
 #
@@ -21,18 +21,12 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      # "initializer": {
-      #   "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
-      #   "config": {
-
-      #   }
-      # },
       "x": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -100,
+          "low": 0,
           "high": 100,
         }
       },
@@ -41,7 +35,7 @@
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -100,
+          "low": 0,
           "high": 100,
         }
       },
@@ -50,7 +44,7 @@
         "config": {
           "name": "x",
           "units": "meters",
-          "low": -100,
+          "low": 0,
           "high": 100,
         }
       },
@@ -94,7 +88,7 @@
             "config": {
               "sensor": "Sensor_Position",
               "normalization": {
-                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "normalizer": corl.libraries.normalization.StandardNormalNormalizer,
                 "config": {
                   "mu": 0.0,
                   "sigma": [100, 100, 100],
@@ -111,15 +105,15 @@
                 "config": {
                   "mu": 0.0,
                   "sigma": [0.5, 0.5, 0.5],
+                }
               }
             },
-          },
         },
         {
           "functor": "corl.glues.common.magnitude.MagnitudeGlue",
             "config": {
               "normalization": {
-                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer"
+                  "normalizer": "corl.libraries.normalization.StandardNormalNormalizer"
               },
             },
             "wrapped": {
@@ -143,104 +137,54 @@
     ],
     "dones": [
         {
-            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
-            "config":{
-                "max_sim_time": 2000,
-            },
-        },
-        {
+            # Max distance from origin
             "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
             "config":{
                 "max_distance": 40000,
             },
         },
-#        {
-#            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
-#            "config":{
-#              "velocity_threshold": 0.2,
-#              "threshold_distance": 0.5,
-#              "mean_motion": 0.001027,
-#              "lower_bound": False,
-#            },
-#        },
         {
+            # Crash into origin (exceeded velocity constraint within crashing region)
             "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
             "config":{
               "crash_region_radius": 0.5,
               "velocity_constraint": {
                 "velocity_threshold": 0.2,
                 "threshold_distance": 0.5,
-              }
+              },
             },
         },
-        {
-            "functor": "saferl.dones.cwh.docking_dones.SuccessfulDockingDoneFunction",
-            "config":{
-              "docking_region_radius": 0.5,
-              "velocity_threshold": 0.2,
-              "threshold_distance": 0.5,
-              "mean_motion": 0.001027,
-              "lower_bound": False,
-            },
-        },
+      {
+        # Success (inspected all points)
+        "functor": "saferl.dones.cwh.inspection_dones.SuccessfulInspectionDoneFunction",
+        "config": { },
+      },
     ],
     "rewards": [
         {
-            "name": "DockingDistanceExponentialChangeReward",
-            "functor": "saferl.rewards.cwh.docking_rewards.DockingDistanceExponentialChangeReward",
+            # reward = number of newly observed points
+            "name": "ObservedPointsReward",
+            "functor": "saferl.rewards.cwh.inspection_rewards.ObservedPointsReward",
+            "config": {}
+        },
+        {
+            # reward = scale + time_component
+            # time_component = 1 - (sim_time/timeout) or 0 if no timeout given
+            "name": "InspectionSuccessReward",
+            "functor": "saferl.rewards.cwh.inspection_rewards.InspectionSuccessReward",
             "config": {
-                "pivot": 100
+              "scale": 1.0,
+              "timeout": 10000,
             }
         },
-      {
-        "name": "DockingDeltaVReward",
-        "functor": "saferl.rewards.cwh.docking_rewards.DockingDeltaVReward",
-        "config": {
-          "scale": -0.01,
-          "bias": 0.0,
-          "mass": 12.0
-        }
-      },
-      {
-        "name": "DockingVelocityConstraintReward",
-        "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
-        "config": {
-          "scale": -0.01,
-          "bias": -0.01,
-          "velocity_threshold": 0.2,
-          "threshold_distance": 0.5,
-          "mean_motion": 0.001027,
-          "lower_bound": False,
-        }
-      },
         {
-          "name": "DockingSuccessReward",
-          "functor": "saferl.rewards.cwh.docking_rewards.DockingSuccessReward",
+          # reward = timeout_reward if timeout reached else 0
+          "name": "InspectionFailureReward",
+          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionFailureReward",
           "config": {
-            "scale": 1.0,
-            "timeout": 2000,
-            "docking_region_radius": 0.5,
-            "velocity_threshold": 0.2,
-            "threshold_distance": 0.5,
-            "mean_motion": 0.001027,
-            "lower_bound": False,
+            "timeout_reward": -1.0,
+            "timeout": 10000,
           }
         },
-      {
-        "name": "DockingFailureReward",
-        "functor": "saferl.rewards.cwh.docking_rewards.DockingFailureReward",
-        "config": {
-          "timeout_reward": -1.0,
-          "distance_reward": -1.0,
-          "crash_reward": -1.0,
-          "timeout": 2000,
-          "max_goal_distance": 40000,
-          "docking_region_radius": 0.5,
-          "velocity_threshold": 0.2,
-          "threshold_distance": 0.5,
-          "mean_motion": 0.001027,
-          "lower_bound": False,
-        }
-      },
     ],
 }

@@ -299,7 +299,7 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
             if self.config.success_function_name in next_state.episode_state[agent_name]:
                 # docking kvp exists
                 if next_state.episode_state[agent_name][self.config.success_function_name] != DoneStatusCodes.WIN:
-                    # agent failed to dock
+                    # agent failed to reach WIN condition
                     return done
             else:
                 # agent has not reached done condition
