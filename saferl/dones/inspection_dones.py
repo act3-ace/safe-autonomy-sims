@@ -16,8 +16,7 @@ import typing
 from collections import OrderedDict
 
 import numpy as np
-from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBaseValidator, \
-    SharedDoneFuncBase
+from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase, SharedDoneFuncBaseValidator
 from corl.libraries.environment_dict import DoneDict
 from corl.libraries.state_dict import StateDict
 from corl.simulators.common_platform_utils import get_platform_by_name
@@ -45,7 +44,7 @@ class SuccessfulInspectionDoneValidator(DoneFuncBaseValidator):
     """
     Inspection_region_radius: float
 
-#TODO
+
 class SuccessfulInspectionDoneFunction(DoneFuncBase):
     """
     A done function that determines if the deputy has successfully docked with the chief.
@@ -98,12 +97,12 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
             if next_state.points[point] == False:
                 all_inspected = False
 
-
         done[self.agent] = bool(all_inspected)
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
         return done
+
 
 class CollisionDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
@@ -274,4 +273,3 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
                 done[k] = True
 
         return done
-

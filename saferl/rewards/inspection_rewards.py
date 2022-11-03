@@ -98,7 +98,6 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
         """
         return ObservedPointsExponentialChangeRewardValidator
 
-
     def __call__(
         self,
         observation: OrderedDict,
@@ -117,7 +116,7 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
         new_points = next_state.points
         for point in new_points:
             if new_points[point]:
-                total_points_found +=1
+                total_points_found += 1
         num_new_points = total_points_found - self.num_points_inspected
         reward_value = 0.0
 
@@ -125,7 +124,7 @@ class ObservedPointsExponentialChangeReward(RewardFuncBase):
             self.num_points_inspected = total_points_found
             reward_value = total_points_found / len(new_points)
 
-        reward[self.config.agent_name] = num_new_points #+ num_new_points * (total_points_found / len(old_points))
+        reward[self.config.agent_name] = num_new_points  # + num_new_points * (total_points_found / len(old_points))
         return reward
 
 
@@ -264,6 +263,7 @@ class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
     scale: float
     timeout: float
     docking_region_radius: float
+
 
 class InspectionSuccessReward(RewardFuncBase):
     """
@@ -456,7 +456,7 @@ class InspectionFailureReward(RewardFuncBase):
             value = self.config.timeout_reward
 
         #elif  violated:
-            # agent exceeded velocity constraint within docking region
+        # agent exceeded velocity constraint within docking region
         #    value = self.config.crash_reward
 
         reward[self.config.agent_name] = value
