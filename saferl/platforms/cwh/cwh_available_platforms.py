@@ -16,6 +16,7 @@ from corl.libraries.plugin_library import PluginLibrary
 from corl.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
 from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.inspection_simulator import InspectionSimulator
 
 
 class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
@@ -59,3 +60,4 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
 
 PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": CWHSimulator})
+PluginLibrary.AddClassToGroup(CWHAvailablePlatformTypes, "CWHSimulator_Platforms", {"simulator": InspectionSimulator})

@@ -19,6 +19,7 @@ from corl.simulators.base_parts import BaseController, BasePlatformPartValidator
 import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.inspection_simulator import InspectionSimulator
 
 
 class CWHController(BaseController):
@@ -117,5 +118,11 @@ class ThrustController(CWHController):
 PluginLibrary.AddClassToGroup(
     ThrustController, "Controller_Thrust", {
         "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    ThrustController, "Controller_Thrust", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )

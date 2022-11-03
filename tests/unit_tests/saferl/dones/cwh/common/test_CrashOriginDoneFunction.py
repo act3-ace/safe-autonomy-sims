@@ -18,17 +18,17 @@ import os
 
 import pytest
 
-from saferl.dones.docking_dones import SuccessfulDockingDoneFunction
+from saferl.dones.cwh.common import CrashOriginDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/SuccessfulDockingDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../../test_cases/dones/cwh/docking/common/CrashOriginDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
     "platform_position",
     "platform_velocity",
-    "docking_region_radius",
+    "crash_region_radius",
     "velocity_threshold",
     "threshold_distance",
     "slope",
@@ -66,11 +66,11 @@ def fixture_platform_velocity(request):
     return request.param
 
 
-@pytest.fixture(name='docking_region_radius')
-def fixture_docking_region_radius(request):
+@pytest.fixture(name='crash_region_radius')
+def fixture_crash_region_radius(request):
     """
-    Parameterized fixture for returning the docking_region_radius passed to the SuccessfulDockingDoneFunction's constructor, as defined
-    in test_configs.
+    Parameterized fixture for returning the crash_region_radius passed to the CrashOriginDoneFunction's constructor,
+    as defined in test_configs.
 
     Returns
     -------
@@ -124,7 +124,7 @@ def fixture_lower_bound(request):
 def fixture_cut(
     cut_name,
     agent_name,
-    docking_region_radius,
+    crash_region_radius,
     velocity_threshold,
     threshold_distance,
     slope,
@@ -140,27 +140,30 @@ def fixture_cut(
         The name of the component under test
     agent_name : str
         The name of the agent
-    docking_region_radius : int
-        The radius of the docking region passed to the SuccessfulDockingDoneFunction constructor
+    crash_region_radius : int
+        The radius of the crash region passed to the CrashOriginDoneFunction constructor
     velocity_limit : int
-        The velocity limit passed to the SuccessfulDockingDoneFunction constructor
+        The velocity limit passed to the CrashOriginDoneFunction constructor
 
     Returns
     -------
     SuccessfulDockingDoneFunction
         An instantiated component under test
     """
-    return SuccessfulDockingDoneFunction(
-        name=cut_name,
-        agent_name=agent_name,
-        platform_name=agent_name,
-        docking_region_radius=docking_region_radius,
-        velocity_threshold=velocity_threshold,
-        threshold_distance=threshold_distance,
-        slope=slope,
-        mean_motion=mean_motion,
-        lower_bound=lower_bound,
-    )
+    kwargs = {
+        "name": cut_name,
+        "agent_name": agent_name,
+        "platform_name": agent_name,
+        "crash_region_radius": crash_region_radius,
+        "velocity_constraint": {
+            "velocity_threshold": velocity_threshold,
+            "threshold_distance": threshold_distance,
+            "slope": slope,
+            "mean_motion": mean_motion,
+            "lower_bound": lower_bound,
+        }
+    }
+    return CrashOriginDoneFunction(**kwargs)
 
 
 @pytest.mark.unit_test
