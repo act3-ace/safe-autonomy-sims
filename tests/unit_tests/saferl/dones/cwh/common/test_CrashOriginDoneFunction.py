@@ -9,7 +9,8 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # -------------------------------------------------------------------------------
 
-This module holds unit tests and fixtures for the DockingRelativeVelocityConstraintDoneFunction.
+This module holds unit tests and fixtures for the SuccessfulDockingDoneFunction.
+
 Author: John McCarroll
 """
 
@@ -17,15 +18,17 @@ import os
 
 import pytest
 
-from saferl.dones.cwh.docking_dones import DockingRelativeVelocityConstraintDoneFunction
+from saferl.dones.cwh.common import CrashOriginDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../test_cases/dones/docking/DockingRelativeVelocityConstraintDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../../test_cases/dones/cwh/docking/common/CrashOriginDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
+    "platform_position",
     "platform_velocity",
+    "crash_region_radius",
     "velocity_threshold",
     "threshold_distance",
     "slope",
@@ -37,6 +40,19 @@ parameterized_fixture_keywords = [
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
+@pytest.fixture(name='platform_position')
+def fixture_platform_position(request):
+    """
+    Parameterized fixture for returning platform position defined in test_configs.
+
+    Returns
+    -------
+    numpy.ndarray
+        Three element array describing platform's 3D position
+    """
+    return request.param
+
+
 @pytest.fixture(name='platform_velocity')
 def fixture_platform_velocity(request):
     """
@@ -46,6 +62,20 @@ def fixture_platform_velocity(request):
     -------
     numpy.ndarray
         Three element array describing platform's 3D velocity
+    """
+    return request.param
+
+
+@pytest.fixture(name='crash_region_radius')
+def fixture_crash_region_radius(request):
+    """
+    Parameterized fixture for returning the crash_region_radius passed to the CrashOriginDoneFunction's constructor,
+    as defined in test_configs.
+
+    Returns
+    -------
+    int
+        The max allowed distance in a docking episode
     """
     return request.param
 
@@ -94,6 +124,7 @@ def fixture_lower_bound(request):
 def fixture_cut(
     cut_name,
     agent_name,
+    crash_region_radius,
     velocity_threshold,
     threshold_distance,
     slope,
@@ -101,7 +132,7 @@ def fixture_cut(
     lower_bound,
 ):
     """
-    A fixture that instantiates a DockingRelativeVelocityConstraintDoneFunction and returns it.
+    A fixture that instantiates a SuccessfulDockingDoneFunction and returns it.
 
     Parameters
     ----------
@@ -109,40 +140,44 @@ def fixture_cut(
         The name of the component under test
     agent_name : str
         The name of the agent
-    constraint_velocity : int
-        The velocity limit passed to the DockingRelativeVelocityConstraintDoneFunction constructor
-    target_name : str
-        The name of the target agent
+    crash_region_radius : int
+        The radius of the crash region passed to the CrashOriginDoneFunction constructor
+    velocity_limit : int
+        The velocity limit passed to the CrashOriginDoneFunction constructor
 
     Returns
     -------
-    DockingRelativeVelocityConstraintDoneFunction
+    SuccessfulDockingDoneFunction
         An instantiated component under test
     """
-    return DockingRelativeVelocityConstraintDoneFunction(
-        name=cut_name,
-        agent_name=agent_name,
-        platform_name=agent_name,
-        velocity_threshold=velocity_threshold,
-        threshold_distance=threshold_distance,
-        slope=slope,
-        mean_motion=mean_motion,
-        lower_bound=lower_bound,
-    )
+    kwargs = {
+        "name": cut_name,
+        "agent_name": agent_name,
+        "platform_name": agent_name,
+        "crash_region_radius": crash_region_radius,
+        "velocity_constraint": {
+            "velocity_threshold": velocity_threshold,
+            "threshold_distance": threshold_distance,
+            "slope": slope,
+            "mean_motion": mean_motion,
+            "lower_bound": lower_bound,
+        }
+    }
+    return CrashOriginDoneFunction(**kwargs)
 
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, indirect=True, ids=IDs)
 def test_call(call_results, next_state, agent_name, cut_name, expected_value, expected_status):
     """
-    A parameterized test to ensure that the DockingRelativeVelocityConstraintDoneFunction behaves as intended.
+    A parameterized test to ensure that the SuccessfulDockingDoneFunction behaves as intended.
 
     Parameters
     ----------
     call_results : DoneDict
-        The resulting DoneDict from calling the DockingRelativeVelocityConstraintDoneFunction
+        The resulting DoneDict from calling the SuccessfulDockingDoneFunction
     next_state : StateDict
-        The StateDict that may have been mutated by the DockingRelativeVelocityConstraintDoneFunction
+        The StateDict that may have been mutated by the SuccessfulDockingDoneFunction
     agent_name : str
         The name of the agent
     cut_name : str
