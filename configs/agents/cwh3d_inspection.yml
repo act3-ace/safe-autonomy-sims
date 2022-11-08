@@ -129,7 +129,7 @@
               {
                 "sensor": "Sensor_Position",
                 "velocity_threshold": 0.2,
-                "threshold_distance": 0,
+                "threshold_distance": 10,
                 "mean_motion": 0.001027,
                 "slope": 2.0,
               }
@@ -150,7 +150,7 @@
               "crash_region_radius": 10,
               "velocity_constraint": {
                 "velocity_threshold": 0.2,
-                "threshold_distance": 0,
+                "threshold_distance": 10,
               },
             },
         },
