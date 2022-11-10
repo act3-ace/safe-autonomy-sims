@@ -165,25 +165,37 @@
             # reward = number of newly observed points
             "name": "ObservedPointsReward",
             "functor": "saferl.rewards.cwh.inspection_rewards.ObservedPointsReward",
-            "config": {}
+            "config": {
+              "scale": 0.01
+            }
         },
         {
-            # reward = scale + time_component
-            # time_component = 1 - (sim_time/timeout) or 0 if no timeout given
+            # reward = scale (if all points are inspected)
             "name": "InspectionSuccessReward",
             "functor": "saferl.rewards.cwh.inspection_rewards.InspectionSuccessReward",
             "config": {
               "scale": 1.0,
-              "timeout": 10000,
             }
         },
         {
-          # reward = timeout_reward if timeout reached else 0
-          "name": "InspectionFailureReward",
-          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionFailureReward",
+          # reward = scale (if crash occurs)
+          "name": "InspectionCrashOriginReward",
+          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashOriginReward",
           "config": {
-            "timeout_reward": -1.0,
-            "timeout": 10000,
+            "scale": -1.0,
+            "crash_region_radius": 10,
+          }
+        },
+        {
+          "name": "InspectionVelocityConstraintReward",
+          "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
+          "config": {
+            "scale": -0.01,
+            "bias": -0.01,
+            "velocity_threshold": 0.2,
+            "threshold_distance": 10,
+            "mean_motion": 0.001027,
+            "lower_bound": False,
           }
         },
     ],
