@@ -79,16 +79,16 @@ def points_on_sphere_cmu(num_points: int, radius: float) -> list:
     """
     points = []
 
-    a = 4.0 * math.pi*(1 / num_points)
+    a = 4.0 * math.pi * (1 / num_points)
     d = math.sqrt(a)
     m_theta = int(round(math.pi / d))
     d_theta = math.pi / m_theta
     d_phi = a / d_theta
 
-    for m in range(0,m_theta):
+    for m in range(0, m_theta):
         theta = math.pi * (m + 0.5) / m_theta
         m_phi = int(round(2.0 * math.pi * math.sin(theta) / d_phi))
-        for n in range(0,m_phi):
+        for n in range(0, m_phi):
             phi = 2.0 * math.pi * n / m_phi
             point = (radius * math.sin(theta) * math.cos(phi), radius * math.sin(theta) * math.sin(phi), radius * math.cos(theta))
             points.append(point)
