@@ -17,6 +17,7 @@ import typing
 
 import numpy as np
 from corl.simulators.common_platform_utils import get_platform_by_name
+from pydantic import BaseModel
 
 
 def shallow_dict_merge(a: typing.Dict, b: typing.Dict, in_place: bool = False, allow_collisions: bool = True):
@@ -204,3 +205,25 @@ def in_rejoin(wingman, lead, radius, offset):
     distance = np.linalg.norm(wingman.position - rejoin_center)
     in_region = distance <= radius
     return in_region, distance
+
+
+class VelocityConstraintValidator(BaseModel):
+    """
+    Validator for velocity constraint configuration options.
+
+    velocity_threshold : float
+        The maximum tolerated velocity within crashing region without crashing.
+    threshold_distance : float
+        The distance at which the velocity constraint reaches a minimum (typically the crashing region radius).
+    slope : float
+        The slope of the linear region of the velocity constraint function.
+    mean_motion : float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
+    lower_bound : bool
+        If True, the function enforces a minimum velocity constraint on the agent's platform.
+    """
+    velocity_threshold: float
+    threshold_distance: float
+    mean_motion: float = 0.001027
+    lower_bound: bool = False
+    slope: float = 2.0
