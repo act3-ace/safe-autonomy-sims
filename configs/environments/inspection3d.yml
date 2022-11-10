@@ -13,8 +13,8 @@
     "type": "InspectionSimulator",
     "config": {
       "step_size": 1,
-      "num_points": 30,
-      "radius" : 40
+      "num_points": 100,
+      "radius" : 10
     },
   },
   "simulator_reset_parameters": {

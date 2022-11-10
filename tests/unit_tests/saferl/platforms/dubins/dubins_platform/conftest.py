@@ -14,8 +14,6 @@ This module defines fixtures common to dubins controller unit tests
 Author: John McCarroll
 """
 
-from unittest import mock
-
 import pytest
 
 
