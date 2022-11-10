@@ -11,6 +11,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 Functions that define the terminal conditions for CWH Spacecraft Environments.
 """
+import typing
 
 import gym
 import numpy as np
@@ -147,7 +148,7 @@ class CrashOriginDoneValidator(DoneFuncBaseValidator):
         Velocity constraint parameters.
     """
     crash_region_radius: float
-    velocity_constraint: VelocityConstraintValidator
+    velocity_constraint: typing.Union[VelocityConstraintValidator, None] = None
 
 
 class CrashOriginDoneFunction(DoneFuncBase):
@@ -222,18 +223,22 @@ class CrashOriginDoneFunction(DoneFuncBase):
         position = deputy.position
         in_crash_region = np.linalg.norm(np.array(position)) <= self.config.crash_region_radius
 
-        # check velocity constraint
-        violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
-            self.config.velocity_constraint.velocity_threshold,
-            self.config.velocity_constraint.threshold_distance,
-            self.config.velocity_constraint.mean_motion,
-            self.config.velocity_constraint.lower_bound,
-            slope=self.config.velocity_constraint.slope
-        )
+        done[self.agent] = in_crash_region
 
-        done[self.agent] = in_crash_region and violated
+        if self.config.velocity_constraint is not None:
+            # check velocity constraint
+            violated, _ = max_vel_violation(
+                next_state,
+                self.config.agent_name,
+                self.config.velocity_constraint.velocity_threshold,
+                self.config.velocity_constraint.threshold_distance,
+                self.config.velocity_constraint.mean_motion,
+                self.config.velocity_constraint.lower_bound,
+                slope=self.config.velocity_constraint.slope
+            )
+
+            done[self.agent] = done[self.agent] and violated
+
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
