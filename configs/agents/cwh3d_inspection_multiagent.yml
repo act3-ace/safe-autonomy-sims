@@ -148,10 +148,6 @@
             "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
             "config":{
               "crash_region_radius": 10,
-              "velocity_constraint": {
-                "velocity_threshold": 0.2,
-                "threshold_distance": 10,
-              },
             },
         },
       {
