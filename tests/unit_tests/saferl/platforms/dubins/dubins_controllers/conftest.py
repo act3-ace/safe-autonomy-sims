@@ -14,8 +14,6 @@ This module defines common fixtures for dubins controller tests
 Author: John McCarroll
 """
 
-from unittest import mock
-
 import pytest
 from safe_autonomy_dynamics.dubins import Dubins3dAircraft
 
