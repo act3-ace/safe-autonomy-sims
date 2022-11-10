@@ -17,9 +17,8 @@ import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
-from pydantic import BaseModel
 
-from saferl.utils import max_vel_violation
+from saferl.utils import VelocityConstraintValidator, max_vel_violation
 
 
 class MaxDistanceOriginDoneValidator(DoneFuncBaseValidator):
@@ -113,28 +112,6 @@ class MaxDistanceOriginDoneFunction(DoneFuncBase):
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
         return done
-
-
-class VelocityConstraintValidator(BaseModel):
-    """
-    Validator for velocity constraint configuration options.
-
-    velocity_threshold : float
-        The maximum tolerated velocity within crashing region without crashing.
-    threshold_distance : float
-        The distance at which the velocity constraint reaches a minimum (typically the crashing region radius).
-    slope : float
-        The slope of the linear region of the velocity constraint function.
-    mean_motion : float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
-    lower_bound : bool
-        If True, the function enforces a minimum velocity constraint on the agent's platform.
-    """
-    velocity_threshold: float
-    threshold_distance: float
-    mean_motion: float = 0.001027
-    lower_bound: bool = False
-    slope: float = 2.0
 
 
 class CrashOriginDoneValidator(DoneFuncBaseValidator):

@@ -20,28 +20,7 @@ from pydantic import BaseModel
 
 from saferl.simulators.initializers.docking_initializer import velocity_limit
 from saferl.simulators.initializers.initializer import BaseInitializer
-
-
-class CWH3DRadialInitializerValidator(BaseModel):
-    """
-    Validator for CWH3DInitializer.
-
-    Parameters
-    ----------
-    velocity_threshold : float
-        The maximum tolerated velocity within docking region without crashing.
-    threshold_distance : float
-        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
-    slope : float
-        The slope of the linear region of the velocity constraint function.
-    mean_motion : float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
-    """
-
-    velocity_threshold: float = 0.2
-    threshold_distance: float = 0
-    slope: float = 2.0
-    mean_motion: float = 0.001027
+from saferl.utils import VelocityConstraintValidator
 
 
 class CWH3DRadialInitializer(BaseInitializer):
@@ -71,10 +50,10 @@ class CWH3DRadialInitializer(BaseInitializer):
         """
         Returns
         -------
-        CWH3DRadialInitializerValidator
-            Config validator for the CWH3DRadialInitializerValidator.
+        VelocityConstraintValidator
+            Config validator for the VelocityConstraintValidator.
         """
-        return CWH3DRadialInitializerValidator
+        return VelocityConstraintValidator
 
     def __call__(self, reset_config):
 
