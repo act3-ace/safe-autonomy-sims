@@ -21,36 +21,59 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": {
+      "radius": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
-          "name": "x",
+          "name": "radius",
           "units": "meters",
-          "low": 0,
+          "low": 50,
           "high": 100,
         }
       },
-      "y": {
+      "azimuth_angle": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
-          "name": "x",
-          "units": "meters",
+          "name": "azimuth_angle",
+          "units": "radians",
           "low": 0,
-          "high": 100,
+          "high": 6.283,
         }
       },
-      "z": {
+      "elevation_angle": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
-          "name": "x",
-          "units": "meters",
-          "low": 0,
-          "high": 100,
+          "name": "elevation_angle",
+          "units": "radians",
+          "low": -1.57,
+          "high": 1.57,
         }
       },
-      "xdot": 0,
-      "ydot": 0,
-      "zdot": 0,
+      "vel_max_ratio": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "vel_max_ratio",
+          "low": 0,
+          "high": 0.8,
+        }
+      },
+      "vel_azimuth_angle": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "vel_azimuth_angle",
+          "units": "radians",
+          "low": 0,
+          "high": 6.283,
+        }
+      },
+      "vel_elevation_angle": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "vel_elevation_angle",
+          "units": "radians",
+          "low": -1.57,
+          "high": 1.57,
+        }
+      },
     },
     "glues": [
         {
@@ -129,7 +152,7 @@
               {
                 "sensor": "Sensor_Position",
                 "velocity_threshold": 0.2,
-                "threshold_distance": 0.5,
+                "threshold_distance": 10,
                 "mean_motion": 0.001027,
                 "slope": 2.0,
               }
@@ -140,18 +163,14 @@
             # Max distance from origin
             "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
             "config":{
-                "max_distance": 40000,
+                "max_distance": 500,
             },
         },
         {
             # Crash into origin (exceeded velocity constraint within crashing region)
             "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
             "config":{
-              "crash_region_radius": 0.5,
-              "velocity_constraint": {
-                "velocity_threshold": 0.2,
-                "threshold_distance": 0.5,
-              },
+              "crash_region_radius": 10,
             },
         },
       {
@@ -165,25 +184,37 @@
             # reward = number of newly observed points
             "name": "ObservedPointsReward",
             "functor": "saferl.rewards.cwh.inspection_rewards.ObservedPointsReward",
-            "config": {}
+            "config": {
+              "scale": 0.01
+            }
         },
         {
-            # reward = scale + time_component
-            # time_component = 1 - (sim_time/timeout) or 0 if no timeout given
+            # reward = scale (if all points are inspected)
             "name": "InspectionSuccessReward",
             "functor": "saferl.rewards.cwh.inspection_rewards.InspectionSuccessReward",
             "config": {
               "scale": 1.0,
-              "timeout": 10000,
             }
         },
         {
-          # reward = timeout_reward if timeout reached else 0
-          "name": "InspectionFailureReward",
-          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionFailureReward",
+          # reward = scale (if crash occurs)
+          "name": "InspectionCrashOriginReward",
+          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashOriginReward",
           "config": {
-            "timeout_reward": -1.0,
-            "timeout": 10000,
+            "scale": -1.0,
+            "crash_region_radius": 10,
+          }
+        },
+        {
+          "name": "InspectionVelocityConstraintReward",
+          "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
+          "config": {
+            "scale": -0.01,
+            "bias": -0.01,
+            "velocity_threshold": 0.2,
+            "threshold_distance": 10,
+            "mean_motion": 0.001027,
+            "lower_bound": False,
           }
         },
     ],

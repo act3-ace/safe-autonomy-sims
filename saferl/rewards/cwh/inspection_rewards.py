@@ -23,8 +23,11 @@ from corl.simulators.common_platform_utils import get_platform_by_name
 class ObservedPointsRewardValidator(RewardFuncBaseValidator):
     """
     Configuration validator for ObservedPointsReward.
+
+    scale : float
+        A scalar value applied to reward.
     """
-    ...
+    scale: float
 
 
 class ObservedPointsReward(RewardFuncBase):
@@ -101,7 +104,7 @@ class ObservedPointsReward(RewardFuncBase):
 
         self.num_points_inspected += num_new_points
 
-        reward[self.config.agent_name] = num_new_points
+        reward[self.config.agent_name] = self.config.scale * num_new_points
         return reward
 
 
@@ -222,11 +225,8 @@ class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
 
     scale : float
         Scalar value to adjust magnitude of the reward.
-    timeout : float
-        The max time for an episode.
     """
     scale: float
-    timeout: float
 
 
 class InspectionSuccessReward(RewardFuncBase):
@@ -295,56 +295,31 @@ class InspectionSuccessReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-
-        sim_time = deputy.sim_time
-
         all_inspected = False not in next_state.points.values()
 
         if all_inspected:
             value = self.config.scale
-            if self.config.timeout:
-                # Add time reward component, if timeout specified
-                value += 1 - (sim_time / self.config.timeout)
 
         reward[self.config.agent_name] = value
         return reward
 
 
-class InspectionFailureRewardValidator(RewardFuncBaseValidator):
+class InspectionCrashOriginRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingFailureRewardValidator Reward Function.
+    Validator for the InspectionCollisionRewardValidator Reward Function.
 
-    timeout_reward : float
-        Reward (penalty) associated with a failure by exceeding max episode time.
-    distance_reward : float
-        Reward (penalty) associated with a failure by exceeding max distance.
-    crash_reward : float
-        Reward (penalty) associated with a failure by crashing.
-    timeout : float
-        Max episode time.
-    max_goal_distance : float
-        Max distance from the goal.
-    docking_region_radius : float
-        Radius of the docking region in meters.
-    velocity_threshold : float
-        The maximum tolerated velocity within docking region without crashing.
-    threshold_distance : float
-        The distance at which the velocity constraint reaches a minimum (typically the docking region radius).
-    slope : float
-        The slope of the linear region of the velocity constraint function.
-    mean_motion : float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027.
-    lower_bound : bool
-        If True, the function enforces a minimum velocity constraint on the agent's platform.
+    scale : float
+        Scalar value to adjust magnitude of the reward.
+    crash_region_radius : float
+        The radius of the crashing region in meters.
     """
-    timeout_reward: float
-    timeout: float
+    scale: float
+    crash_region_radius: float
 
 
-class InspectionFailureReward(RewardFuncBase):
+class InspectionCrashOriginReward(RewardFuncBase):
     """
-    This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
+    This Reward Function is responsible for calculating the reward (penalty) associated with a collision.
 
 
     def __call__(
@@ -384,7 +359,7 @@ class InspectionFailureReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.config: InspectionFailureRewardValidator
+        self.config: InspectionCrashOriginRewardValidator
         super().__init__(**kwargs)
 
     @property
@@ -392,7 +367,7 @@ class InspectionFailureReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return InspectionFailureRewardValidator
+        return InspectionCrashOriginRewardValidator
 
     def __call__(
         self,
@@ -409,12 +384,11 @@ class InspectionFailureReward(RewardFuncBase):
         value = 0.0
 
         deputy = get_platform_by_name(next_state, self.config.agent_name)
+        position = deputy.position
+        in_crash_region = np.linalg.norm(np.array(position)) <= self.config.crash_region_radius
 
-        sim_time = deputy.sim_time
-
-        if sim_time >= self.config.timeout:
-            # episode reached max time
-            value = self.config.timeout_reward
+        if in_crash_region:
+            value = self.config.scale
 
         reward[self.config.agent_name] = value
         return reward

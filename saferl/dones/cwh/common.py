@@ -11,15 +11,15 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 Functions that define the terminal conditions for CWH Spacecraft Environments.
 """
+import typing
 
 import gym
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
-from pydantic import BaseModel
 
-from saferl.utils import max_vel_violation
+from saferl.utils import VelocityConstraintValidator, max_vel_violation
 
 
 class MaxDistanceOriginDoneValidator(DoneFuncBaseValidator):
@@ -115,28 +115,6 @@ class MaxDistanceOriginDoneFunction(DoneFuncBase):
         return done
 
 
-class VelocityConstraintValidator(BaseModel):
-    """
-    Validator for velocity constraint configuration options.
-
-    velocity_threshold : float
-        The maximum tolerated velocity within crashing region without crashing.
-    threshold_distance : float
-        The distance at which the velocity constraint reaches a minimum (typically the crashing region radius).
-    slope : float
-        The slope of the linear region of the velocity constraint function.
-    mean_motion : float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
-    lower_bound : bool
-        If True, the function enforces a minimum velocity constraint on the agent's platform.
-    """
-    velocity_threshold: float
-    threshold_distance: float
-    mean_motion: float = 0.001027
-    lower_bound: bool = False
-    slope: float = 2.0
-
-
 class CrashOriginDoneValidator(DoneFuncBaseValidator):
     """
     Configuration validator for CrashOriginDoneFunction
@@ -147,7 +125,7 @@ class CrashOriginDoneValidator(DoneFuncBaseValidator):
         Velocity constraint parameters.
     """
     crash_region_radius: float
-    velocity_constraint: VelocityConstraintValidator
+    velocity_constraint: typing.Union[VelocityConstraintValidator, None] = None
 
 
 class CrashOriginDoneFunction(DoneFuncBase):
@@ -222,18 +200,22 @@ class CrashOriginDoneFunction(DoneFuncBase):
         position = deputy.position
         in_crash_region = np.linalg.norm(np.array(position)) <= self.config.crash_region_radius
 
-        # check velocity constraint
-        violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
-            self.config.velocity_constraint.velocity_threshold,
-            self.config.velocity_constraint.threshold_distance,
-            self.config.velocity_constraint.mean_motion,
-            self.config.velocity_constraint.lower_bound,
-            slope=self.config.velocity_constraint.slope
-        )
+        done[self.agent] = in_crash_region
 
-        done[self.agent] = in_crash_region and violated
+        if self.config.velocity_constraint is not None:
+            # check velocity constraint
+            violated, _ = max_vel_violation(
+                next_state,
+                self.config.agent_name,
+                self.config.velocity_constraint.velocity_threshold,
+                self.config.velocity_constraint.threshold_distance,
+                self.config.velocity_constraint.mean_motion,
+                self.config.velocity_constraint.lower_bound,
+                slope=self.config.velocity_constraint.slope
+            )
+
+            done[self.agent] = done[self.agent] and violated
+
         if done[self.agent]:
             next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
