@@ -13,9 +13,20 @@
     "type": "InspectionSimulator",
     "config": {
       "step_size": 1,
-      "num_points": 30,
-      "radius" : 40
+      "num_points": 100,
+      "radius" : 10
     },
+  },
+  "simulator_reset_parameters": {
+    "initializer": {
+      "functor": "saferl.simulators.initializers.cwh_initializer.CWH3DRadialInitializer",
+      "config": {
+          "threshold_distance": 0,
+          "velocity_threshold": 0.2,
+          "mean_motion": 0.001027,
+          "slope": 2.0,
+      }
+    }
   },
   "platforms": "CWHSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],

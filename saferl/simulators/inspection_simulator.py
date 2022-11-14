@@ -62,6 +62,9 @@ def points_on_sphere_cmu(num_points: int, radius: float) -> list:
     in https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf. Number
     of points may not be exact.
 
+    Mostly the same as CMU algorithm, most important tweak is that the constant "a" should not depend on r
+    (Paper assumed r = 1)
+
     Parameters
     ----------
     num_points: int
@@ -75,24 +78,21 @@ def points_on_sphere_cmu(num_points: int, radius: float) -> list:
         Set of equidistant points on sphere in cartesian coordinates
     """
     points = []
-    # work around to get algorithm to generate enough points
-    n = num_points * radius**2
 
-    # generate points using CMU algorithm
-    n_count = 0
-    a = (4 * math.pi * (radius**2)) / n
+    a = 4.0 * math.pi * (1 / num_points)
     d = math.sqrt(a)
-    m_theta = round(math.pi / d) + 1
+    m_theta = int(round(math.pi / d))
     d_theta = math.pi / m_theta
     d_phi = a / d_theta
+
     for m in range(0, m_theta):
-        theta = math.pi * ((m + 0.5) / m_theta)
-        m_phi = round((2 * math.pi * math.sin(theta)) / d_phi)
+        theta = math.pi * (m + 0.5) / m_theta
+        m_phi = int(round(2.0 * math.pi * math.sin(theta) / d_phi))
         for n in range(0, m_phi):
-            phi = (2 * math.pi * n) / m_phi
+            phi = 2.0 * math.pi * n / m_phi
             point = (radius * math.sin(theta) * math.cos(phi), radius * math.sin(theta) * math.sin(phi), radius * math.cos(theta))
             points.append(point)
-            n_count += 1
+
     return points
 
 
