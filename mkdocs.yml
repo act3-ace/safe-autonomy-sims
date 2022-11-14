@@ -176,6 +176,8 @@ nav:
           - api/rta/index.md
           - "cwh_rta":
               - reference/rta/cwh/cwh_rta.md
+          - "inspection_rta_1v1":
+              - reference/rta/cwh/inspection_rta_1v1.md
       - "simulators":
           - api/simulators/index.md
           - "cwh simulator":
