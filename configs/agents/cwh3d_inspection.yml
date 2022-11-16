@@ -79,14 +79,18 @@
         {
             "functor": "saferl.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
             "config": {
-              "step_size": 1,
               "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"],
               "enabled": False,
               "constraints": ["chief_collision", "rel_vel"],
-              "chief_radius": 5,
-              "deputy_radius": 5,
-              "v0": 0.2,
-              "v1_coef": 2,
+              "deputy_radius": 0,
+          },
+          "references": {
+            "step_size": "step_size",
+            "chief_radius": "collision_radius",
+            "v0": "velocity_threshold",
+            "v1_coef": "vel_limit_slope",
+            "n": "mean_motion",
+            "r_max": "max_distance",
           },
           "wrapped": [
             {
@@ -166,26 +170,28 @@
             "config":
               {
                 "sensor": "Sensor_Position",
-                "velocity_threshold": 0.2,
-                "threshold_distance": 10,
-                "mean_motion": 0.001027,
-                "slope": 2.0,
-              }
+              },
+            "references": {
+              "velocity_threshold": "velocity_threshold",
+              "threshold_distance": "collision_radius",
+              "mean_motion": "mean_motion",
+              "slope": "vel_limit_slope",
+            },
         },
     ],
     "dones": [
         {
             # Max distance from origin
             "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
-            "config":{
-                "max_distance": 500,
+            "references": {
+              "max_distance": "max_distance",
             },
         },
         {
             # Crash into origin (exceeded velocity constraint within crashing region)
             "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
-            "config":{
-              "crash_region_radius": 10,
+            "references": {
+              "crash_region_radius": "collision_radius",
             },
         },
         {
@@ -217,8 +223,10 @@
           "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashOriginReward",
           "config": {
             "scale": -1.0,
-            "crash_region_radius": 10,
-          }
+          },
+          "references": {
+            "crash_region_radius": "collision_radius",
+          },
         },
         {
           "name": "InspectionVelocityConstraintReward",
@@ -226,11 +234,14 @@
           "config": {
             "scale": -0.01,
             "bias": -0.01,
-            "velocity_threshold": 0.2,
-            "threshold_distance": 10,
-            "mean_motion": 0.001027,
             "lower_bound": False,
-          }
+          },
+          "references": {
+            "velocity_threshold": "velocity_threshold",
+            "threshold_distance": "collision_radius",
+            "mean_motion": "mean_motion",
+          },
         },
     ],
+    "reference_store": !include ../parameters/inspection_3d.yml
 }
