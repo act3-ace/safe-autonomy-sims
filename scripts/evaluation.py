@@ -9,6 +9,7 @@ from corl.evaluation.launchers import launch_evaluate
 from corl.evaluation.runners.section_factories.teams import Teams, Platform, Agent
 from corl.evaluation.runners.section_factories.task import Task
 from corl.evaluation.runners.section_factories.test_cases.pandas import Pandas
+from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
 from corl.evaluation.runners.section_factories.plugins.plugins import Plugins
 from corl.evaluation.default_config_updates import DoNothingConfigUpdate
 from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import RllibTrainer
@@ -51,12 +52,26 @@ team_participant_map = {
     "blue": blue_team
 }
 
-## Panda panda panda panda
-panda_args = {
+test_case_strategy_config = {
     "data": "../corl/config/evaluation/test_cases_config/docking1d_tests.yml",
     "source_form": Pandas.SourceForm.FILE_YAML_CONFIGURATION,
-    "randomize": False
+    "randomize": False,
+    "separator": '.'
 }
+test_case_manager_config = {
+    "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.tabular_strategy.TabularStrategy",
+    "config": test_case_strategy_config
+
+}
+# test_case_strategy_config = {
+#     "num_test_cases": 5
+# }
+# test_case_manager_config = {
+#     "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
+#     "config": test_case_strategy_config
+
+# }
+
 
 ## plugins
 platform_serialization_obj = serialize_Docking_1d()
@@ -81,7 +96,7 @@ recorder_args = {
 # instantiate eval objects
 teams = Teams(team_participant_map=team_participant_map)
 task = Task(config_yaml_file=task_path)
-panda_panda_panda = Pandas(**panda_args)
+test_case_manager = TestCaseManager(**test_case_manager_config)
 plugins = Plugins(**plugins_args)
 plugins.eval_config_update = eval_config_updates
 engine = RllibTrainer(**rllib_engine_args)
@@ -93,7 +108,7 @@ namespace = {
     "teams": teams,
     "task": task,
     "test_cases": {
-        "pandas": panda_panda_panda
+        "test_case_manager": test_case_manager
     },
     "plugins": plugins,
     "engine": {
