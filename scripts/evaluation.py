@@ -69,7 +69,6 @@ test_case_manager_config = {
 # test_case_manager_config = {
 #     "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
 #     "config": test_case_strategy_config
-
 # }
 
 
