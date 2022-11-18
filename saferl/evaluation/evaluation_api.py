@@ -5,20 +5,25 @@ Author: John McCarroll
 """
 import os
 
-from corl.evaluation.launchers import launch_evaluate, launch_generate_metrics
-from corl.evaluation.runners.section_factories.teams import Teams, Platform, Agent
+from corl.evaluation.default_config_updates import DoNothingConfigUpdate
+from corl.evaluation.evaluation_artifacts import (
+    EvaluationArtifact_EvaluationOutcome,
+    EvaluationArtifact_Metrics,
+    EvaluationArtifact_Visualization,
+)
+from corl.evaluation.launchers import launch_evaluate, launch_generate_metrics, launch_visualize
+from corl.evaluation.loader.check_point_file import CheckpointFile
+from corl.evaluation.recording.folder import Folder, FolderRecord
+from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import RllibTrainer
+from corl.evaluation.runners.section_factories.plugins.plugins import Plugins
 from corl.evaluation.runners.section_factories.task import Task
+from corl.evaluation.runners.section_factories.teams import Agent, Platform, Teams
 from corl.evaluation.runners.section_factories.test_cases.pandas import Pandas
 from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
-from corl.evaluation.runners.section_factories.plugins.plugins import Plugins
-from corl.evaluation.default_config_updates import DoNothingConfigUpdate
-from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import RllibTrainer
-from corl.evaluation.recording.folder import Folder
-from corl.evaluation.loader.check_point_file import CheckpointFile
-from corl.evaluation.evaluation_artifacts import EvaluationArtifact_EvaluationOutcome, EvaluationArtifact_Metrics
-from corl.evaluation.recording.folder import FolderRecord
+
 # TODO: flexible import of platform serialization class
 from corl.evaluation.serialize_platforms import serialize_Docking_1d
+from corl.evaluation.visualization.print import Print
 from corl.parsers.yaml_loader import load_file
 
 
@@ -46,25 +51,16 @@ def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, expe
     #     "config": test_case_strategy_config
     # }
 
-
     ## plugins
     platform_serialization_obj = serialize_Docking_1d()
-    plugins_args = {
-        "platform_serialization": platform_serialization_obj
-    }
-    eval_config_updates = [DoNothingConfigUpdate()]     # default creates list of string(s), isntead of objects
+    plugins_args = {"platform_serialization": platform_serialization_obj}
+    eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), isntead of objects
 
     ## engine
-    rllib_engine_args = {
-        "callbacks": [],
-        "workers": 0
-    }
+    rllib_engine_args = {"callbacks": [], "workers": 0}
 
     # recorders
-    recorder_args = {
-        "dir": output_path,
-        "append_timestamp": False
-    }
+    recorder_args = {"dir": output_path, "append_timestamp": False}
 
     # instantiate eval objects
     teams = Teams(team_participant_map=team_participant_map)
@@ -74,7 +70,6 @@ def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, expe
     plugins.eval_config_update = eval_config_updates
     engine = RllibTrainer(**rllib_engine_args)
     recorder = Folder(**recorder_args)
-
 
     # construct namespace dict
     namespace = {
@@ -95,11 +90,6 @@ def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, expe
 
 
 def generate_metrics(evaluate_output_path: str):
-
-    # define variables
-    evaluate_output_path = "/tmp/omg_save_me"
-
-
     # construct constructor args
 
     location = FolderRecord(absolute_path=evaluate_output_path)
@@ -123,7 +113,7 @@ def generate_metrics(evaluate_output_path: str):
                 "config": {
                     "description": "calculated average wall time over all test case rollouts",
                     "metrics_to_use": "WallTime(Sec)",
-                    "scope": None #null
+                    "scope": None  #null
                 }
             },
             {
@@ -140,14 +130,12 @@ def generate_metrics(evaluate_output_path: str):
                     "description": "alert metric to see if any episode length is less than 5 steps",
                     "metrics_to_use": "EpisodeLength(Steps)",
                     "scope": {
-                        "type": "corl.evaluation.metrics.scopes.from_string",
-                        "config": {
+                        "type": "corl.evaluation.metrics.scopes.from_string", "config": {
                             "name": "evaluation"
-                            }
+                        }
                     },
                     "condition": {
-                        "operator": '<',
-                        "lhs": 5
+                        "operator": '<', "lhs": 5
                     }
                 }
             },
@@ -158,8 +146,7 @@ def generate_metrics(evaluate_output_path: str):
                     "name": "Result",
                     "functor": "corl.evaluation.metrics.generators.dones.StatusCode",
                     "config": {
-                        "description": "was docking performed successfully or not",
-                        "done_condition": "DockingDoneFunction"
+                        "description": "was docking performed successfully or not", "done_condition": "DockingDoneFunction"
                     }
                 },
                 {
@@ -182,12 +169,14 @@ def generate_metrics(evaluate_output_path: str):
                     "config": {
                         "description": "out of the number of test case rollouts how many resulted in successful docking",
                         "metrics_to_use": "Result",
-                        "scope": None, #null
+                        "scope": None,  #null
                         "condition": {
                             "operator": "==",
                             "lhs": {
                                 "functor": "corl.dones.done_func_base.DoneStatusCodes",
-                                "config": {"value": 1} # 1 is win
+                                "config": {
+                                    "value": 1
+                                }  # 1 is win
                             }
                         }
                     }
@@ -214,14 +203,21 @@ def generate_metrics(evaluate_output_path: str):
     launch_generate_metrics.main(namespace)
 
 
-def visualize():
-    return None
+def visualize(output_path: str):
+
+    artifact_metrics = EvaluationArtifact_Metrics(location=output_path)
+    artifact_visualization = EvaluationArtifact_Visualization(location=output_path)
+    visualizations = [Print(event_table_print=True)]
+
+    namespace = {"artifact_metrics": artifact_metrics, "artifact_visualization": artifact_visualization, "visualizations": visualizations}
+
+    launch_visualize.main(namespace)
 
 
 # assumes cwd appropriate to experiment_config paths
 def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint_path: str):
 
-    # parse experiment config    
+    # parse experiment config
     experiment_config = load_file(experiment_config_path)
 
     assert 'agent_config' in experiment_config
@@ -230,9 +226,9 @@ def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint
     platforms_config = experiment_config['platform_config']
 
     # populate teams based on experiment config
-    blue_team = []          # assumes only one team!!!
+    blue_team = []  # assumes only one team!!!
     for i in range(0, len(agents_config)):
-        agent_name, policy_id, agent_config_path, policy_config_path = agents_config[i]     # assumes policy_id == platform_name!!!
+        agent_name, policy_id, agent_config_path, policy_config_path = agents_config[i]  # assumes policy_id == platform_name!!!
         platform_name, platform_config_path = platforms_config[i]
 
         # handle relative paths (join w cwd)
@@ -243,36 +239,26 @@ def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint
         agent_loader = CheckpointFile(checkpoint_filename=checkpoint_path, policy_id=policy_id)
 
         agent_config = {
-            "name": agent_name,
-            "agent_config": agent_config_path,
-            "policy_config": policy_config_path,
-            "agent_loader": agent_loader
+            "name": agent_name, "agent_config": agent_config_path, "policy_config": policy_config_path, "agent_loader": agent_loader
         }
 
-        agents = [
-            Agent(**agent_config)
-        ]
+        agents = [Agent(**agent_config)]
 
-        platform_config = {
-            "platform_config": platform_config_path,
-            "agents": agents
-        }
+        platform_config = {"platform_config": platform_config_path, "agents": agents}
         blue_team.append(Platform(**platform_config))
 
-    team_participant_map = {
-        "blue": blue_team
-    }
+    team_participant_map = {"blue": blue_team}
 
     return team_participant_map
 
 
+# # define variables
+output_path = "/tmp/output_1"
+# expr_config = "../corl/config/experiments/docking_1d.yml"
+# task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
+# checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
 
+# evaluate(task_config_path, checkpoint_path, output_path, expr_config)
 
-# define variables
-output_path = "/tmp/omg_save_me"
-expr_config = "../corl/config/experiments/docking_1d.yml"
-task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
-checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
-
-
-evaluate(task_config_path, checkpoint_path, output_path, expr_config)
+# stage  3
+visualize(output_path)
