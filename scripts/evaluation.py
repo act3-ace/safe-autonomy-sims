@@ -3,6 +3,7 @@ Test script for running eval framework programmatically (python api).
 
 Author: John McCarroll
 """
+import os
 
 from corl.evaluation.launchers import launch_evaluate, launch_generate_metrics
 from corl.evaluation.runners.section_factories.teams import Teams, Platform, Agent
@@ -18,42 +19,14 @@ from corl.evaluation.evaluation_artifacts import EvaluationArtifact_EvaluationOu
 from corl.evaluation.recording.folder import FolderRecord
 # TODO: flexible import of platform serialization class
 from corl.evaluation.serialize_platforms import serialize_Docking_1d
+from corl.parsers.yaml_loader import load_file
 
 
-def launch_evaluate():
-
-    # define variables
-    task_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
-    output_path = "/tmp/omg_save_me"
-    # define per agent
-    checkpoint_filename = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
-    policy_id = "blue0"
+def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, experiment_config_path: str):
 
     # construct constructor args
-    ## teams participent map -> eval Platform and Agent objects
 
-    agent_loader = CheckpointFile(checkpoint_filename=checkpoint_filename, policy_id=policy_id)
-
-    agent_config = {
-        "name": "blue0",
-        "agent_config": "../corl/config/tasks/docking_1d/docking1d_agent.yml",
-        "policy_config": "../corl/config/policy/ppo/default_config.yml",
-        "agent_loader": agent_loader
-    }
-
-    agents = [
-        Agent(**agent_config)
-    ]
-
-    platform_config = {
-        "platform_config": "../corl/config/tasks/docking_1d/docking1d_platform.yml",
-        "agents": agents
-    }
-    blue_team = [Platform(**platform_config)]
-
-    team_participant_map = {
-        "blue": blue_team
-    }
+    team_participant_map = construct_teams_map_from_task_config(experiment_config_path, checkpoint_path)
 
     test_case_strategy_config = {
         "data": "../corl/config/evaluation/test_cases_config/docking1d_tests.yml",
@@ -64,7 +37,6 @@ def launch_evaluate():
     test_case_manager_config = {
         "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.tabular_strategy.TabularStrategy",
         "config": test_case_strategy_config
-
     }
     # test_case_strategy_config = {
     #     "num_test_cases": 5
@@ -82,7 +54,7 @@ def launch_evaluate():
     }
     eval_config_updates = [DoNothingConfigUpdate()]     # default creates list of string(s), isntead of objects
 
-    ## engine (choo choo thomas)
+    ## engine
     rllib_engine_args = {
         "callbacks": [],
         "workers": 0
@@ -96,7 +68,7 @@ def launch_evaluate():
 
     # instantiate eval objects
     teams = Teams(team_participant_map=team_participant_map)
-    task = Task(config_yaml_file=task_path)
+    task = Task(config_yaml_file=task_config_path)
     test_case_manager = TestCaseManager(**test_case_manager_config)
     plugins = Plugins(**plugins_args)
     plugins.eval_config_update = eval_config_updates
@@ -122,15 +94,15 @@ def launch_evaluate():
     launch_evaluate.main(namespace)
 
 
-def launch_gen_metrics():
+def generate_metrics(evaluate_output_path: str):
 
     # define variables
-    eval_output_path = "/tmp/omg_save_me"
+    evaluate_output_path = "/tmp/omg_save_me"
 
 
     # construct constructor args
 
-    location = FolderRecord(absolute_path=eval_output_path)
+    location = FolderRecord(absolute_path=evaluate_output_path)
 
     # alerts_config = None    # TODO: enable evaluation without alertsssssss
     alerts_config_path = "../corl/config/evaluation/alerts/base_alerts.yml"
@@ -228,7 +200,7 @@ def launch_gen_metrics():
 
     # instantiate eval objects
     outcome = EvaluationArtifact_EvaluationOutcome(location=location)
-    metrics = EvaluationArtifact_Metrics(location=eval_output_path)
+    metrics = EvaluationArtifact_Metrics(location=evaluate_output_path)
 
     # construct namespace dict
     namespace = {
@@ -242,5 +214,65 @@ def launch_gen_metrics():
     launch_generate_metrics.main(namespace)
 
 
+def visualize():
+    return None
 
-# launch_gen_metrics()
+
+# assumes cwd appropriate to experiment_config paths
+def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint_path: str):
+
+    # parse experiment config    
+    experiment_config = load_file(experiment_config_path)
+
+    assert 'agent_config' in experiment_config
+    assert 'platform_config' in experiment_config
+    agents_config = experiment_config['agent_config']
+    platforms_config = experiment_config['platform_config']
+
+    # populate teams based on experiment config
+    blue_team = []          # assumes only one team!!!
+    for i in range(0, len(agents_config)):
+        agent_name, policy_id, agent_config_path, policy_config_path = agents_config[i]     # assumes policy_id == platform_name!!!
+        platform_name, platform_config_path = platforms_config[i]
+
+        # handle relative paths (join w cwd)
+        agent_config_path = os.path.join(os.getcwd(), agent_config_path)
+        platform_config_path = os.path.join(os.getcwd(), platform_config_path)
+        policy_config_path = os.path.join(os.getcwd(), policy_config_path)
+
+        agent_loader = CheckpointFile(checkpoint_filename=checkpoint_path, policy_id=policy_id)
+
+        agent_config = {
+            "name": agent_name,
+            "agent_config": agent_config_path,
+            "policy_config": policy_config_path,
+            "agent_loader": agent_loader
+        }
+
+        agents = [
+            Agent(**agent_config)
+        ]
+
+        platform_config = {
+            "platform_config": platform_config_path,
+            "agents": agents
+        }
+        blue_team.append(Platform(**platform_config))
+
+    team_participant_map = {
+        "blue": blue_team
+    }
+
+    return team_participant_map
+
+
+
+
+# define variables
+output_path = "/tmp/omg_save_me"
+expr_config = "../corl/config/experiments/docking_1d.yml"
+task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
+checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
+
+
+evaluate(task_config_path, checkpoint_path, output_path, expr_config)
