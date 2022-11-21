@@ -58,8 +58,8 @@ class PositionProp(BoxProp):
     """
 
     name: str = "position"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-80000.0] * 3
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [80000.0] * 3
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-10000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [10000.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
     description: str = "Position Sensor Properties"
 
@@ -81,7 +81,7 @@ class VelocityProp(BoxProp):
     """
 
     name: str = "velocity"
-    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-10000.0] * 3
-    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [10000.0] * 3
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1000.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
     description: str = "Velocity Sensor Properties"
