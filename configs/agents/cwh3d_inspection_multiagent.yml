@@ -218,13 +218,5 @@
             "lower_bound": False,
           }
         },
-        {
-          # reward = scale (if RTA is intervening)
-          "name": "InspectionRTAReward",
-          "functor": "saferl.rewards.rta_rewards.RTAInterveningReward",
-          "config": {
-            "scale": -0.01,
-          }
-        },
     ],
 }
