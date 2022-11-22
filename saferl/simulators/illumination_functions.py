@@ -110,12 +110,12 @@ def check_illum(point, sun_angle, r_avg, radius):
     # (i.e. the point on the chief is not blocked by the chief itself)
     if intersect_var is None:
         bool_val = True
-    
+
     return bool_val
 
 def evaluate_RGB(RGB):
     """
-    Receive RGB array 
+    Receive RGB array
     Return boolean based on thresholding logic
     For now, only would work for red
 
@@ -129,7 +129,6 @@ def evaluate_RGB(RGB):
     RGB_bool: bool
         boolean assigned for illuminated or not
     """
-    
     RGB_bool = True
 
     # Too dark
@@ -185,7 +184,8 @@ def save_image_test_delete(color):
     string = string + '.png'
     plt.imsave('figs_results/' + string, image)
 
-def compute_illum(deputy_position, sun_angle, r_avg, resolution, radius, focal_length, chief_properties, light_properties):
+def compute_illum(deputy_position, sun_position, resolution, radius, focal_length, chief_properties, light_properties):
+    # pylint: disable-msg=too-many-locals
     """
     Renders the full scene using backwards ray tracing and returns a full RGB image
     """
@@ -194,7 +194,6 @@ def compute_illum(deputy_position, sun_angle, r_avg, resolution, radius, focal_l
     chief_position = [0,0,0]
     sensor_dir = normalize(chief_position - deputy_position)
     image_plane_position = deputy_position + sensor_dir * focal_length
-    sun_position = [r_avg*(math.cos(sun_angle)), -r_avg*(math.sin(sun_angle)), 0]
     # There are an infinite number of vectors normal to sensor_dir -- choose one
     x = -1
     y = 1
@@ -215,13 +214,10 @@ def compute_illum(deputy_position, sun_angle, r_avg, resolution, radius, focal_l
         for j in range(int(resolution[0])): # x coords
             # Initialize pixel
             illumination = np.zeros((3))
-            
             # Convert to CWH coordinates
             pixel_location = image_plane_position+((norm2_range/2) - (i*step_norm2))*(norm2) + (-(norm1_range/2) + (j*step_norm1))*(norm1)
-
             ray_direction = normalize(pixel_location - deputy_position)
             dist_2_intersect = sphere_intersect(chief_position, radius, deputy_position, ray_direction)
-            
             # Light ray hits sphere, so we continue - else get next pixel
             if dist_2_intersect is not None:
                 intersection_point = deputy_position + dist_2_intersect * ray_direction
@@ -373,7 +369,7 @@ def concat_images(imga, imgb):
     if max_height == ha:
         delta = (int(max_height/2) - int(hb/2))
         new_img[:ha,:wa]=imga
-        new_img[delta:delta+hb,wa:wa+wb]=imgb   
+        new_img[delta:delta+hb,wa:wa+wb]=imgb
     return new_img
 
 def concat_n_images(image_path_list):
@@ -408,18 +404,17 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
     ax_xz = axes[2]
     ax_yz = axes[3]
     line_scalar = 200
-
+    chief_position = [0,0,0]
+    sun_vector = normalize(np.array(sun_position) - chief_position)
+    point_inSunDir = chief_position + line_scalar * sun_vector
     # Only runs once at first step
     if current_time == step_rate:
         fig.suptitle('Real-time 3D Inspection Problem with Illumination', fontsize=16)
         ax_3d.set(xlabel='X in CWH C.S. [meters]', ylabel='Y in CWH C.S. [meters]', zlabel='Z in CWH C.S. [meters]')
         # Subplots
         ax_xy.set(xlabel='X in CWH C.S. [meters]', ylabel='Y in CWH C.S. [meters]')
-        ax_xy.axis('square')
         ax_xz.set(xlabel='X in CWH C.S. [meters]', ylabel='Z in CWH C.S. [meters]')
-        ax_xz.axis('square')
         ax_yz.set(xlabel='Y in CWH C.S. [meters]', ylabel='Z in CWH C.S. [meters]')
-        ax_yz.axis('square')
         fig.set_size_inches(10,10)
         ax_3d.view_init(elev=20, azim = 56)
         u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
@@ -428,10 +423,7 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
         z = radius*np.cos(v)
         ax_3d.plot_surface(x, y, z, color = 'red')
         ax_3d.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-        chief_position = [0,0,0]
         ax_3d.scatter3D(chief_position[0], chief_position[1], chief_position[2], marker='o', color='red', label='Chief Spacecraft')
-        sun_vector = normalize(np.array(sun_position) - chief_position)
-        point_inSunDir = chief_position + line_scalar * sun_vector
         ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
             color='#FFD700', linewidth = 6, label = 'Sun vector')
         ax_3d.set_box_aspect((1,1,1))
@@ -453,9 +445,6 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
         plt.show()
     else:
         ax_3d.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-        chief_position = [0,0,0]
-        sun_vector = normalize(np.array(sun_position) - chief_position)
-        point_inSunDir = chief_position + line_scalar * sun_vector
         ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
             color='#FFD700', linewidth = 6, label = 'Sun vector')
         ax_3d.autoscale()
@@ -465,7 +454,6 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
         ax_xz.axis('square')
         ax_xy.axis('square')
         ax_yz.axis('square')
-        
     plt.draw()
     plt.pause(.0001)
 
@@ -496,7 +484,7 @@ def render_3d(fig, deputy_position, sun_position, radius, current_time, step_rat
         point_inSunDir = chief_position + line_scalar * sun_vector
         ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
             color='#FFD700', linewidth = 6, label = 'Sun vector')
-        ax.set_box_aspect((1,1,1)) 
+        ax.set_box_aspect((1,1,1))
         set_axes_equal(ax)
         ax.legend()
         plt.ion()
