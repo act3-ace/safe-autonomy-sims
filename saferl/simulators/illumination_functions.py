@@ -1,3 +1,17 @@
+"""
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
+This module contains custom illumination functions utilized in the CWH inspection task.
+"""
+
 import math
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
@@ -27,10 +41,9 @@ def get_sun_position(current_time, dt, angular_velocity, initial_theta, r_avg):
     sun_position: array
         array of sun position in meters (CWH coordinates)
     """
-    
     d_theta = angular_velocity * dt
     current_theta = d_theta * current_time + initial_theta
-    sun_position = [r_avg*(math.cos(current_theta)), -r_avg*(math.sin(current_theta)), 0]  
+    sun_position = [r_avg*(math.cos(current_theta)), -r_avg*(math.sin(current_theta)), 0]
 
     return sun_position
 
@@ -54,9 +67,9 @@ def get_sun_angle(current_time, dt, angular_velocity, initial_theta):
     current_theta: float
         angle of sun with respect to chief in radians
     """
-    
     d_theta = angular_velocity * dt
     current_theta = d_theta * current_time + initial_theta
+
     return current_theta
 
 def check_illum(point, sun_angle, r_avg, radius):
@@ -123,7 +136,7 @@ def evaluate_RGB(RGB):
     if RGB[0] < .12:
         RGB_bool = False
     # Too bright/white
-    if RGB[0] > .8 and RGB[1] > .8 and RGB[2] > .8: 
+    if RGB[0] > .8 and RGB[1] > .8 and RGB[2] > .8:
         RGB_bool = False
 
     return RGB_bool
@@ -132,9 +145,8 @@ def compute_illum_pt(point, sun_angle, deputy_position, r_avg, radius, chief_pro
     """
     Receive a candidate point as an input
     Receive sun position as an input
-    Output is bool and color (zeros for not illuminated)
+    Returns a color (all zeros (black) for not illuminated)
     """
-
     # Chief position is origin [cwh dynamics]
     center = [0,0,0]
     normal_to_surface = normalize(point)
@@ -142,29 +154,23 @@ def compute_illum_pt(point, sun_angle, deputy_position, r_avg, radius, chief_pro
     shifted_point = point + 1e-5 * normal_to_surface
     sun_position = [r_avg*(math.cos(sun_angle)), -r_avg*(math.sin(sun_angle)), 0]
     intersection_to_light = normalize(sun_position - shifted_point)
-
     intersect_var = sphere_intersect(center, radius, shifted_point, intersection_to_light)
 
+    illumination = np.zeros((3))
     # No intersection means that the point in question is illuminated in some capacity
     # (i.e. the point on the chief is not blocked by the chief itself)
     if intersect_var is None:
-        illumination = np.zeros((3))
-        
         # Blinn-Phong Illumination Model
         # https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
-
         illumination += np.array(chief_properties['ambient']) * np.array(light_properties['ambient'])
-        illumination += np.array(chief_properties['diffuse']) * np.array(light_properties['diffuse']) * np.dot(intersection_to_light, normal_to_surface)
+        illumination += np.array(chief_properties['diffuse']) * np.array(light_properties['diffuse']) * \
+            np.dot(intersection_to_light, normal_to_surface)
         intersection_to_camera = normalize(deputy_position - point)
         H = normalize(intersection_to_light + intersection_to_camera)
-        
-        illumination += np.array(chief_properties['specular']) * np.array(light_properties['specular']) * np.dot(normal_to_surface, H)**(chief_properties['shininess']/4)
-
-        color =  np.clip(illumination,0,1)
-        return True, color
-    else:
-        # print("Point is shadowed")
-        return False, np.zeros((3))
+        illumination += np.array(chief_properties['specular']) * np.array(light_properties['specular']) * \
+            np.dot(normal_to_surface, H)**(chief_properties['shininess']/4)
+        illumination =  np.clip(illumination,0,1)
+    return illumination
 
 def save_image_test_delete(color):
     """
@@ -179,87 +185,66 @@ def save_image_test_delete(color):
     string = string + '.png'
     plt.imsave('figs_results/' + string, image)
 
-def compute_illum(deputy_position, sun_angle, current_time, r_avg, resolution, radius, focal_length, chief_properties, light_properties):
+def compute_illum(deputy_position, sun_angle, r_avg, resolution, radius, focal_length, chief_properties, light_properties):
     """
     Renders the full scene using backwards ray tracing and returns a full RGB image
     """
-    visualization_flag = True
     ratio = float(resolution[0])/resolution[1]
     # For now, assuming deputy sensor always pointed at chief (which is origin)
-
     chief_position = [0,0,0]
     sensor_dir = normalize(chief_position - deputy_position)
     image_plane_position = deputy_position + sensor_dir * focal_length
     sun_position = [r_avg*(math.cos(sun_angle)), -r_avg*(math.sin(sun_angle)), 0]
-
     # There are an infinite number of vectors normal to sensor_dir -- choose one
     x = -1
     y = 1
     z = -(image_plane_position[0]*x + image_plane_position[1]*y)/image_plane_position[2]
     norm1 = normalize([x,y,z])
-
     # np.cross bug work-around https://github.com/microsoft/pylance-release/issues/3277
     def cross2(a:np.ndarray,b:np.ndarray)->np.ndarray:
         return np.cross(a,b)
-
     norm2 = cross2(sensor_dir,norm1)
-
     # Used for x,y,z pixel locations - there will be resolution[0] * resolution[1] pixels
     norm1_range = 1
     norm2_range = 1/ratio
     step_norm1 = norm1_range/(resolution[0])
     step_norm2 = norm2_range/(resolution[1]) 
-
     # 3D matrix (ie. height-by-width matrix with each entry being an array of size 3) which creates an image
     image = np.zeros((resolution[1], resolution[0], 3))
-
-    if visualization_flag:
-        visualize3D(deputy_position, current_time, sun_position, radius)
-
     for i in range(int(resolution[1])): # y coords
         for j in range(int(resolution[0])): # x coords
             # Initialize pixel
-            color = np.zeros((3))
+            illumination = np.zeros((3))
             
             # Convert to CWH coordinates
-            pixel_location = image_plane_position + ((norm2_range/2) - (i*step_norm2))*(norm2) + (-(norm1_range/2) + (j*step_norm1))*(norm1)
+            pixel_location = image_plane_position+((norm2_range/2) - (i*step_norm2))*(norm2) + (-(norm1_range/2) + (j*step_norm1))*(norm1)
 
             ray_direction = normalize(pixel_location - deputy_position)
             dist_2_intersect = sphere_intersect(chief_position, radius, deputy_position, ray_direction)
             
             # Light ray hits sphere, so we continue - else get next pixel
             if dist_2_intersect is not None:
-                
                 intersection_point = deputy_position + dist_2_intersect * ray_direction
                 normal_to_surface = normalize(intersection_point - chief_position)
-
                 shifted_point = intersection_point + 1e-5 * normal_to_surface
                 intersection_to_light = normalize(sun_position - shifted_point)
-
                 intersect_var = sphere_intersect(chief_position, radius, shifted_point, intersection_to_light)
-                
                 # If the shifted point doesn't intersect with the chief on the way to the light, it is unobstructed
                 if intersect_var is None:
-                    illumination = np.zeros((3))
-                    
                     # Blinn-Phong Illumination Model
                     # https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
 
                     illumination += np.array(chief_properties['ambient']) * np.array(light_properties['ambient'])
-                    illumination += np.array(chief_properties['diffuse']) * np.array(light_properties['diffuse']) * np.dot(intersection_to_light, normal_to_surface)
+                    illumination += np.array(chief_properties['diffuse']) * np.array(light_properties['diffuse']) * \
+                        np.dot(intersection_to_light, normal_to_surface)
                     intersection_to_camera = normalize(deputy_position - intersection_point)
                     H = normalize(intersection_to_light + intersection_to_camera)
-                    
-                    illumination += np.array(chief_properties['specular']) * np.array(light_properties['specular']) * np.dot(normal_to_surface, H)**(chief_properties['shininess']/4)
-
-                    color = illumination
-                    
+                    illumination += np.array(chief_properties['specular']) * np.array(light_properties['specular']) * \
+                        np.dot(normal_to_surface, H)**(chief_properties['shininess']/4)
                 # Shadowed
                 else:
                     continue
-
-            image[i,j] = np.clip(color,0,1)
-            
+            image[i,j] = np.clip(illumination,0,1)
     return image
 
 def normalize(vector):
@@ -270,7 +255,7 @@ def normalize(vector):
 
 def sphere_intersect(center, radius, ray_origin, ray_direction):
     """
-    Sphere intersection, returns closest distance if intersection found, 
+    Sphere intersection, returns closest distance if intersection found,
     Returns None upon no intersection
     """
     b = 2 * np.dot(ray_direction, ray_origin-center)
@@ -288,51 +273,23 @@ def sphere_intersect(center, radius, ray_origin, ray_direction):
 
 ################################################# VISUALIZATION AND VERIFICATION #################################################
 
-def visualizePoints(fig_obj, deputy_position, current_time, sun_position, points):
+def visualizePoints(deputy_position, current_time, sun_position, points):
     """
     Plot the points on the chief and light up green when inspected
     Saves a figure locally
     """
-
-    def set_axes_equal(ax: plt.Axes):
-        """Set 3D plot axes to equal scale.
-
-        Make axes of 3D plot have equal scale so that spheres appear as
-        spheres and cubes as cubes.  Required since `ax.axis('equal')`
-        and `ax.set_aspect('equal')` don't work on 3D.
-        """
-        limits = np.array([
-            ax.get_xlim3d(),
-            ax.get_ylim3d(),
-            ax.get_zlim3d(),
-        ])
-        origin = np.mean(limits, axis=1)
-        radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
-        _set_axes_radius(ax, origin, radius)
-
-    def _set_axes_radius(ax, origin, radius):
-        x, y, z = origin
-        ax.set_xlim3d([x - radius, x + radius])
-        ax.set_ylim3d([y - radius, y + radius])
-        ax.set_zlim3d([z - radius, z + radius])
-
     fig = plt.figure(1)
     ax = fig.gca(projection='3d')
     ax.set_title("3D Plot at time: " + str(current_time) + " (sec)")
     plt.grid()
-
     # Change resolution with this and changing the dpi
     fig.set_size_inches(8,8)
-
     chief_position = [0,0,0]
-    # sun_vector = normalize(chief_position - np.array(sun_position))
     sun_vector = normalize(np.array(sun_position) - chief_position)
-
     line_scalar = 200
-
     point_inSunDir = chief_position + line_scalar * sun_vector
-    ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-    
+    ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
+        color='#FFD700', linewidth = 6, label = 'Sun vector')
     temp1 = 0
     temp2 = 0
     for point in points:
@@ -350,15 +307,12 @@ def visualizePoints(fig_obj, deputy_position, current_time, sun_position, points
                 ax.scatter3D(point[0], point[1], point[2], marker='.', color='red')
 
     ax.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-
     ax.set_xlabel('X in CWH C.S. [meters]')
     ax.set_ylabel('Y in CWH C.S. [meters]')
     ax.set_zlabel('Z in CWH C.S. [meters]')
-
-    ax.set_box_aspect((1,1,1)) 
+    ax.set_box_aspect((1,1,1))
     set_axes_equal(ax)
     ax.legend()
-
     plt.savefig('figs_results/' + 'timestep_' + str(current_time) + 'sec_PointPlot.png', dpi = 100)
     plt.close(fig)
 
@@ -367,46 +321,18 @@ def visualize3D(deputy_position, current_time, sun_position, radius):
     Plot deputy, chief and sun direction vector
     Saves a figure locally
     """
-    
-    def set_axes_equal(ax: plt.Axes):
-        """Set 3D plot axes to equal scale.
-
-        Make axes of 3D plot have equal scale so that spheres appear as
-        spheres and cubes as cubes.  Required since `ax.axis('equal')`
-        and `ax.set_aspect('equal')` don't work on 3D.
-        """
-        limits = np.array([
-            ax.get_xlim3d(),
-            ax.get_ylim3d(),
-            ax.get_zlim3d(),
-        ])
-        origin = np.mean(limits, axis=1)
-        radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
-        _set_axes_radius(ax, origin, radius)
-
-    def _set_axes_radius(ax, origin, radius):
-        x, y, z = origin
-        ax.set_xlim3d([x - radius, x + radius])
-        ax.set_ylim3d([y - radius, y + radius])
-        ax.set_zlim3d([z - radius, z + radius])
-
     fig = plt.figure(1)
     ax = fig.gca(projection='3d')
     ax.set_title("3D Plot at time: " + str(current_time) + " (sec)")
     plt.grid()
-
     # Change resolution with this and changing the dpi
     fig.set_size_inches(8,8)
-
     chief_position = [0,0,0]
-    # sun_vector = normalize(chief_position - np.array(sun_position))
     sun_vector = normalize(np.array(sun_position) - chief_position)
-
     line_scalar = 200
-
     point_inSunDir = chief_position + line_scalar * sun_vector
-    ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-
+    ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
+        color='#FFD700', linewidth = 6, label = 'Sun vector')
     u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
     x = radius*np.cos(u) * np.sin(v)
     y = radius*np.sin(u) * np.sin(v)
@@ -416,11 +342,9 @@ def visualize3D(deputy_position, current_time, sun_position, radius):
     ax.set_xlabel('X in CWH C.S. [meters]')
     ax.set_ylabel('Y in CWH C.S. [meters]')
     ax.set_zlabel('Z in CWH C.S. [meters]')
-
-    ax.set_box_aspect((1,1,1)) 
+    ax.set_box_aspect((1,1,1))
     set_axes_equal(ax)
     ax.legend()
-
     plt.savefig('figs_results/' + 'timestep_' + str(current_time) + 'sec_3DPlot.png', dpi = 100)
     plt.close(fig)
 
@@ -449,8 +373,7 @@ def concat_images(imga, imgb):
     if max_height == ha:
         delta = (int(max_height/2) - int(hb/2))
         new_img[:ha,:wa]=imga
-        new_img[delta:delta+hb,wa:wa+wb]=imgb
-        
+        new_img[delta:delta+hb,wa:wa+wb]=imgb   
     return new_img
 
 def concat_n_images(image_path_list):
@@ -480,35 +403,11 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
     Real-time rendering of scene with subplots (xy, xz, yz)
     TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
     """
-
     ax_3d = axes[0]
     ax_xy = axes[1]
     ax_xz = axes[2]
     ax_yz = axes[3]
     line_scalar = 200
-
-    def set_axes_equal(ax: plt.Axes):
-        """Set 3D plot axes to equal scale.
-
-        Make axes of 3D plot have equal scale so that spheres appear as
-        spheres and cubes as cubes.  Required since `ax.axis('equal')`
-        and `ax.set_aspect('equal')` don't work on 3D.
-        """
-        limits = np.array([
-            ax.get_xlim3d(),
-            ax.get_ylim3d(),
-            ax.get_zlim3d(),
-        ])
-
-        origin = np.mean(limits, axis=1)
-        radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
-        _set_axes_radius(ax, origin, radius)
-
-    def _set_axes_radius(ax, origin, radius):
-        x, y, z = origin
-        ax.set_xlim3d([x - radius, x + radius])
-        ax.set_ylim3d([y - radius, y + radius])
-        ax.set_zlim3d([z - radius, z + radius])
 
     # Only runs once at first step
     if current_time == step_rate:
@@ -521,67 +420,48 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
         ax_xz.axis('square')
         ax_yz.set(xlabel='Y in CWH C.S. [meters]', ylabel='Z in CWH C.S. [meters]')
         ax_yz.axis('square')
-
         fig.set_size_inches(10,10)
         ax_3d.view_init(elev=20, azim = 56)
-
         u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
         x = radius*np.cos(u) * np.sin(v)
         y = radius*np.sin(u) * np.sin(v)
         z = radius*np.cos(v)
         ax_3d.plot_surface(x, y, z, color = 'red')
         ax_3d.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-
         chief_position = [0,0,0]
         ax_3d.scatter3D(chief_position[0], chief_position[1], chief_position[2], marker='o', color='red', label='Chief Spacecraft')
-
         sun_vector = normalize(np.array(sun_position) - chief_position)
-
         point_inSunDir = chief_position + line_scalar * sun_vector
-        ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-        
-        ax_3d.set_box_aspect((1,1,1)) 
+        ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
+            color='#FFD700', linewidth = 6, label = 'Sun vector')
+        ax_3d.set_box_aspect((1,1,1))
         set_axes_equal(ax_3d)
         ax_3d.legend()
-
         circle1 = Circle((0,0), radius, color = 'red')
         circle2 = Circle((0,0), radius, color = 'red')
         circle3 = Circle((0,0), radius, color = 'red')
-
         ax_xy.scatter(deputy_position[0],deputy_position[1], marker='o', color = 'blue')
         ax_xy.add_patch(circle1)
         ax_xz.scatter(deputy_position[0],deputy_position[2], marker='o', color = 'blue')
         ax_xz.add_patch(circle2)
         ax_yz.scatter(deputy_position[1],deputy_position[2], marker='o', color = 'blue')
         ax_yz.add_patch(circle3)
-
         ax_xz.axis('square')
         ax_xy.axis('square')
         ax_yz.axis('square')
-
         plt.ion()
         plt.show()
-
-        # mng = plt.get_current_fig_manager()
-        # mng.resize(*mng.window.maxsize())
-
     else:
-
         ax_3d.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-
         chief_position = [0,0,0]
         sun_vector = normalize(np.array(sun_position) - chief_position)
-
         point_inSunDir = chief_position + line_scalar * sun_vector
-        ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-
+        ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
+            color='#FFD700', linewidth = 6, label = 'Sun vector')
         ax_3d.autoscale()
-
         ax_xy.scatter(deputy_position[0],deputy_position[1], marker='o', color = 'blue')
         ax_xz.scatter(deputy_position[0],deputy_position[2], marker='o', color = 'blue')
         ax_yz.scatter(deputy_position[1],deputy_position[2], marker='o', color = 'blue')
-        # ax.set_box_aspect((1,1,1)) 
-        # set_axes_equal(ax)
         ax_xz.axis('square')
         ax_xy.axis('square')
         ax_yz.axis('square')
@@ -594,79 +474,66 @@ def render_3d(fig, deputy_position, sun_position, radius, current_time, step_rat
     Real-time rendering of scene
     TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
     """
-
-    def set_axes_equal(ax: plt.Axes):
-        """Set 3D plot axes to equal scale.
-
-        Make axes of 3D plot have equal scale so that spheres appear as
-        spheres and cubes as cubes.  Required since `ax.axis('equal')`
-        and `ax.set_aspect('equal')` don't work on 3D.
-        """
-        limits = np.array([
-            ax.get_xlim3d(),
-            ax.get_ylim3d(),
-            ax.get_zlim3d(),
-        ])
-
-        origin = np.mean(limits, axis=1)
-        radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
-        _set_axes_radius(ax, origin, radius)
-
-    def _set_axes_radius(ax, origin, radius):
-        x, y, z = origin
-        ax.set_xlim3d([x - radius, x + radius])
-        ax.set_ylim3d([y - radius, y + radius])
-        ax.set_zlim3d([z - radius, z + radius])
-
     ax = fig.gca(projection='3d')
     line_scalar = 200
-
     # Initialization
     if current_time == step_rate:
         fig.set_size_inches(10,10)
-
         ax.set_title("3D Plot, Inspection Problem")
         ax.set_xlabel('X in CWH C.S. [meters]')
         ax.set_ylabel('Y in CWH C.S. [meters]')
         ax.set_zlabel('Z in CWH C.S. [meters]')
         ax.view_init(elev = 20, azim = 56)
-
         u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
         x = radius * np.cos(u) * np.sin(v)
         y = radius * np.sin(u) * np.sin(v)
         z = radius * np.cos(v)
         ax.plot_surface(x, y, z, color = 'red')
         ax.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-
         chief_position = [0,0,0]
         ax.scatter3D(chief_position[0], chief_position[1], chief_position[2], marker='o', color='red', label='Chief Spacecraft')
-
         sun_vector = normalize(np.array(sun_position) - chief_position)
-
         point_inSunDir = chief_position + line_scalar * sun_vector
-        ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-        
+        ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
+            color='#FFD700', linewidth = 6, label = 'Sun vector')
         ax.set_box_aspect((1,1,1)) 
         set_axes_equal(ax)
         ax.legend()
-
         plt.ion()
         plt.show()
-
     else:
         ax.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-
         chief_position = [0,0,0]
         sun_vector = normalize(np.array(sun_position) - chief_position)
-
         point_inSunDir = chief_position + line_scalar * sun_vector
-        ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-
+        ax.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], \
+            color='#FFD700', linewidth = 6, label = 'Sun vector')
         ax.autoscale()
-        # ax.set_box_aspect((1,1,1)) 
-        # set_axes_equal(ax)
 
     plt.draw()
     plt.pause(.0001)
+
+def set_axes_equal(ax: plt.Axes):
+    """Set 3D plot axes to equal scale.
+
+    Make axes of 3D plot have equal scale so that spheres appear as
+    spheres and cubes as cubes.  Required since `ax.axis('equal')`
+    and `ax.set_aspect('equal')` don't work on 3D.
+    """
+    limits = np.array([
+        ax.get_xlim3d(),
+        ax.get_ylim3d(),
+        ax.get_zlim3d(),
+    ])
+
+    origin = np.mean(limits, axis=1)
+    radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
+    _set_axes_radius(ax, origin, radius)
+
+def _set_axes_radius(ax, origin, radius):
+    x, y, z = origin
+    ax.set_xlim3d([x - radius, x + radius])
+    ax.set_ylim3d([y - radius, y + radius])
+    ax.set_zlim3d([z - radius, z + radius])
 
 ################################################# VISUALIZATION AND VERIFICATION #################################################
