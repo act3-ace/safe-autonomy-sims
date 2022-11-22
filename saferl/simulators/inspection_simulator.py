@@ -18,35 +18,28 @@ import matplotlib.pyplot as plt
 from corl.libraries.plugin_library import PluginLibrary
 from pydantic import validator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
+from pydantic import BaseModel
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
-import saferl.simulators.illumination_functions as illum 
-from pydantic import BaseModel
+import saferl.simulators.illumination_functions as illum
 
 class IlluminationValidator(BaseModel):
     """
     mean_motion: float 
         A float representing the mean motion of the spacecraft in Low Earth Orbit (LEO) in [RADIANS/SECOND].
-    
     avg_rad_Earth2Sun: float
         A float representing the average distance between the Earth and the Sun in [METERS].
-    
     sun_angle: float
         A float representing the initial relative angle of sun wrt chief in [RADIANS] assuming sun travels in xy plane.
-
     light_properties: dict
         A dict containing the ambient, specular and diffuse light properties.
-
     chief_properties: dict
         A dict containing the ambient, specular, diffuse, shininess and reflective properties of the chief spacecraft.
-
     resolution: list
         A list containing the resolution of the sensor, represented by x and y pixel density respectively.
-
     focal_length: float
         A float representing the focal length of the sensor in [METERS]. The virtual image is created a distance of focal length away from the sensor origin.    
-
     bin_ray_flag: bool
         A bool flag for utilization of "binary ray" vs. illumination features.
     """
@@ -56,6 +49,7 @@ class IlluminationValidator(BaseModel):
     sun_angle: float
     light_properties: dict
     chief_properties: dict
+    resolution: list
     focal_length: float
     bin_ray_flag: bool
     render_flag_3d: bool
@@ -204,7 +198,7 @@ class InspectionSimulator(SafeRLSimulator):
                 # Render scene every m simulation seconds
                 if self.config.illumination_params.render_flag_3d or self.config.illumination_params.render_flag_subplots:
                     current_time = self.clock
-                    sun_position = illum.sun_position(current_time, dt=self.config.step_size, angular_velocity=self.config.illumination_params.mean_motion, initial_theta=self.config.illumination_params.sun_angle, r_avg=self.config.illumination_params.avg_rad_Earth2Sun)
+                    sun_position = illum.get_sun_position(current_time, dt=self.config.step_size, angular_velocity=self.config.illumination_params.mean_motion, initial_theta=self.config.illumination_params.sun_angle, r_avg=self.config.illumination_params.avg_rad_Earth2Sun)
                     m = 10
                     if (current_time % (m)) == 0:
                         if self.config.illumination_params.render_flag_3d:
@@ -266,7 +260,7 @@ class InspectionSimulator(SafeRLSimulator):
                         r_avg = self.config.illumination_params.avg_rad_Earth2Sun
                         chief_properties = self.config.illumination_params.chief_properties
                         light_properties = self.config.illumination_params.light_properties
-                        current_theta = illum.sun_angle(current_time=self.clock, dt=self.config.step_size, angular_velocity=self.config.illumination_params.mean_motion, initial_theta=self.config.illumination_params.sun_angle)
+                        current_theta = illum.get_sun_angle(current_time=self.clock, dt=self.config.step_size, angular_velocity=self.config.illumination_params.mean_motion, initial_theta=self.config.illumination_params.sun_angle)
                         if self.config.illumination_params.bin_ray_flag:
                             self._state.points[point] = illum.check_illum(point, current_theta, r_avg, r)
                         else:

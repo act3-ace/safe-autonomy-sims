@@ -1,19 +1,32 @@
-import os
-from array import array
 import math
-from turtle import pos
 import matplotlib.pyplot as plt
-import matplotlib.animation as anim
 from matplotlib.patches import Circle
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-
 import numpy as np
-from numpy import random
 
 ########################################################## ILLUMINATION ##########################################################
 
-def sun_position(current_time, dt, angular_velocity, initial_theta, r_avg):
-    # Return current sun position based on initial sun position and time elapsed
+def get_sun_position(current_time, dt, angular_velocity, initial_theta, r_avg):
+    """
+    Returns current sun position based on initial sun position and elapsed time
+
+    Parameters
+    ----------
+    current_time: int
+        current simulation time in seconds
+    dt: float
+        radius of the sphere in meters
+    angular_velocity: float
+        mean motion of sun in meters per second
+    initial_theta: float
+        initial angle of sun with respect to chief in radians
+    r_avg: float
+        average distance from earth to sun in meters
+
+    Returns
+    -------
+    sun_position: array
+        array of sun position in meters (CWH coordinates)
+    """
     
     d_theta = angular_velocity * dt
     current_theta = d_theta * current_time + initial_theta
@@ -21,17 +34,53 @@ def sun_position(current_time, dt, angular_velocity, initial_theta, r_avg):
 
     return sun_position
 
-def sun_angle(current_time, dt, angular_velocity, initial_theta):
-    # Return current sun angle based on initial sun position and time elapsed
+def get_sun_angle(current_time, dt, angular_velocity, initial_theta):
+    """
+    Return current sun angle based on initial sun position and time elapsed
+
+    Parameters
+    ----------
+    current_time: int
+        current simulation time in seconds
+    dt: float
+        radius of the sphere in meters
+    angular_velocity: float
+        mean motion of sun in meters per second
+    initial_theta: float
+        initial angle of sun with respect to chief in radians
+
+    Returns
+    -------
+    current_theta: float
+        angle of sun with respect to chief in radians
+    """
     
     d_theta = angular_velocity * dt
     current_theta = d_theta * current_time + initial_theta
     return current_theta
 
 def check_illum(point, sun_angle, r_avg, radius):
-    # Receive a candidate point as an input
-    # Receive sun position as an input
-    # Output should be boolean (sun obstructed or not)
+    """
+    Receive a candidate point as an input
+    Receive sun position as an input
+    Output should be boolean (sun obstructed or not)
+
+    Parameters
+    ----------
+    point: array
+       point on chief
+    sun_angle: float
+        current sun angle
+    r_avg: float
+        average distance from earth to sun in meters
+    radius: float
+        radius of chief in meters
+
+    Returns
+    -------
+    bool_val: bool
+        boolean assigned for illuminated or not
+    """
 
     # Chief position is origin [cwh dynamics]
     center = [0,0,0]
@@ -43,19 +92,30 @@ def check_illum(point, sun_angle, r_avg, radius):
 
     intersect_var = sphere_intersect(center, radius, shifted_point, intersection_to_light)
 
+    bool_val = False
     # No intersection means that the point in question is illuminated in some capacity
     # (i.e. the point on the chief is not blocked by the chief itself)
     if intersect_var is None:
-        # print("Point is illuminated")
-        return True
-    else:
-        # print("Point is shadowed")
-        return False
+        bool_val = True
+    
+    return bool_val
 
 def evaluate_RGB(RGB):
-    # Receive RGB array 
-    # Return boolean based on thresholding logic
-    # For now, only would work for red
+    """
+    Receive RGB array 
+    Return boolean based on thresholding logic
+    For now, only would work for red
+
+    Parameters
+    ----------
+    RGB: array
+        3x1 array containing RGB value
+
+    Returns
+    -------
+    RGB_bool: bool
+        boolean assigned for illuminated or not
+    """
     
     RGB_bool = True
 
@@ -69,9 +129,11 @@ def evaluate_RGB(RGB):
     return RGB_bool
 
 def compute_illum_pt(point, sun_angle, deputy_position, r_avg, radius, chief_properties, light_properties):
-    # Receive a candidate point as an input
-    # Receive sun position as an input
-    # Output should be RGB if point is illuminated
+    """
+    Receive a candidate point as an input
+    Receive sun position as an input
+    Output is bool and color (zeros for not illuminated)
+    """
 
     # Chief position is origin [cwh dynamics]
     center = [0,0,0]
@@ -105,7 +167,9 @@ def compute_illum_pt(point, sun_angle, deputy_position, r_avg, radius, chief_pro
         return False, np.zeros((3))
 
 def save_image_test_delete(color):
-    # Recieves RGB array and saves an image
+    """
+    Recieves RGB array and saves an image
+    """
     image = np.zeros((200, 200, 3))
     for i in range(200):
         for j in range(200):
@@ -116,10 +180,9 @@ def save_image_test_delete(color):
     plt.imsave('figs_results/' + string, image)
 
 def compute_illum(deputy_position, sun_angle, current_time, r_avg, resolution, radius, focal_length, chief_properties, light_properties):
-    # Receive a candidate point as an input
-    # Receive sun position as an input
-    # Output should be RGB
-
+    """
+    Renders the full scene using backwards ray tracing and returns a full RGB image
+    """
     visualization_flag = True
     ratio = float(resolution[0])/resolution[1]
     # For now, assuming deputy sensor always pointed at chief (which is origin)
@@ -151,7 +214,7 @@ def compute_illum(deputy_position, sun_angle, current_time, r_avg, resolution, r
     image = np.zeros((resolution[1], resolution[0], 3))
 
     if visualization_flag:
-        visualize3D(deputy_position, current_time, sun_position)
+        visualize3D(deputy_position, current_time, sun_position, radius)
 
     for i in range(int(resolution[1])): # y coords
         for j in range(int(resolution[0])): # x coords
@@ -189,13 +252,6 @@ def compute_illum(deputy_position, sun_angle, current_time, r_avg, resolution, r
                     
                     illumination += np.array(chief_properties['specular']) * np.array(light_properties['specular']) * np.dot(normal_to_surface, H)**(chief_properties['shininess']/4)
 
-                    # Reflection
-                    # color += reflection * illumination
-                    # reflection *= nearest_object['reflection']
-
-                    # origin = shifted_point
-                    # direction = reflected(direction, normal_to_surface)    
-
                     color = illumination
                     
                 # Shadowed
@@ -207,9 +263,16 @@ def compute_illum(deputy_position, sun_angle, current_time, r_avg, resolution, r
     return image
 
 def normalize(vector):
+    """
+    Normalize
+    """
     return vector/np.linalg.norm(vector)
 
 def sphere_intersect(center, radius, ray_origin, ray_direction):
+    """
+    Sphere intersection, returns closest distance if intersection found, 
+    Returns None upon no intersection
+    """
     b = 2 * np.dot(ray_direction, ray_origin-center)
     c = np.linalg.norm(ray_origin-center)**2 - radius**2
     delta = b**2 - 4*c
@@ -221,15 +284,15 @@ def sphere_intersect(center, radius, ray_origin, ray_direction):
     # No intersection
     return None
 
-def reflected(vector, axis):
-    return vector - 2 * np.dot(vector, axis) * axis
-
 ########################################################## ILLUMINATION ##########################################################
 
 ################################################# VISUALIZATION AND VERIFICATION #################################################
 
 def visualizePoints(fig_obj, deputy_position, current_time, sun_position, points):
-    # Plot the points on the chief and light them up when inspected
+    """
+    Plot the points on the chief and light up green when inspected
+    Saves a figure locally
+    """
 
     def set_axes_equal(ax: plt.Axes):
         """Set 3D plot axes to equal scale.
@@ -300,7 +363,10 @@ def visualizePoints(fig_obj, deputy_position, current_time, sun_position, points
     plt.close(fig)
 
 def visualize3D(deputy_position, current_time, sun_position, radius):
-    # Plot deputy, chief and sun direction vector
+    """
+    Plot deputy, chief and sun direction vector
+    Saves a figure locally
+    """
     
     def set_axes_equal(ax: plt.Axes):
         """Set 3D plot axes to equal scale.
@@ -359,7 +425,10 @@ def visualize3D(deputy_position, current_time, sun_position, radius):
     plt.close(fig)
 
 def save_image(RGB, current_time):
-    # Recieves RGB array and saves an image
+    """
+    Recieves RGB array and saves an image
+    """
+
     string = 'timestep_' + str(current_time) + 'sec_camera.png'
     plt.imsave('figs_results/' + string, RGB)
 
@@ -398,15 +467,19 @@ def concat_n_images(image_path_list):
     return output
 
 def combine_images(image1, image2, current_time):
+    """
+    Combines images into one image and saves result locally
+    """
     im_array = [image1, image2]
     final_image = concat_n_images(im_array)
     string = 'timestep_' + str(current_time) + 'sec_COMBINED.png'
     plt.imsave('figs_results/' + string, final_image)
 
 def render_subplots(fig, axes, deputy_position, sun_position, radius, current_time, step_rate):
-    # Real-time rendering of scene
-    # TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
-    # TODO: Erase previous sun vectors 
+    """
+    Real-time rendering of scene with subplots (xy, xz, yz)
+    TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
+    """
 
     ax_3d = axes[0]
     ax_xy = axes[1]
@@ -516,154 +589,11 @@ def render_subplots(fig, axes, deputy_position, sun_position, radius, current_ti
     plt.draw()
     plt.pause(.0001)
 
-def render_subplots_points(deputy_position, sun_position, current_time, step_rate, new_pts_list, radius):
-    # Real-time rendering of scene
-    # TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
-    # TODO: Erase previous sun vectors 
-    # TODO: Color points initially and then just update the color of each point so dont keep plotting same stuff 
-
-    def set_axes_equal(ax: plt.Axes):
-        """Set 3D plot axes to equal scale.
-
-        Make axes of 3D plot have equal scale so that spheres appear as
-        spheres and cubes as cubes.  Required since `ax.axis('equal')`
-        and `ax.set_aspect('equal')` don't work on 3D.
-        """
-        limits = np.array([
-            ax.get_xlim3d(),
-            ax.get_ylim3d(),
-            ax.get_zlim3d(),
-        ])
-
-        origin = np.mean(limits, axis=1)
-        radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
-        _set_axes_radius(ax, origin, radius)
-
-    def _set_axes_radius(ax, origin, radius):
-        x, y, z = origin
-        ax.set_xlim3d([x - radius, x + radius])
-        ax.set_ylim3d([y - radius, y + radius])
-        ax.set_zlim3d([z - radius, z + radius])
-
-    # Only runs once at first step
-    if current_time == step_rate:
-        fig = plt.figure(1)
-        fig.suptitle('Real-time 3D Inspection Problem with Illumination', fontsize=16)
-        ax_3d = fig.add_subplot(2, 2, 1, projection='3d')
-        ax_3d.set(xlabel='X in CWH C.S. [meters]', ylabel='Y in CWH C.S. [meters]', zlabel='Z in CWH C.S. [meters]')
-
-        ax_xy = fig.add_subplot(2, 2, 2)
-        ax_xy.set(xlabel='X in CWH C.S. [meters]', ylabel='Y in CWH C.S. [meters]')
-        ax_xy.axis('square')
-        ax_xz = fig.add_subplot(2, 2, 3)
-        ax_xz.set(xlabel='X in CWH C.S. [meters]', ylabel='Z in CWH C.S. [meters]')
-        ax_xz.axis('square')
-        ax_yz = fig.add_subplot(2, 2, 4)
-        ax_yz.set(xlabel='Y in CWH C.S. [meters]', ylabel='Z in CWH C.S. [meters]')
-        ax_yz.axis('square')
-
-        fig.set_size_inches(10,10)
-
-    line_scalar = 200
-
-    # Also runs only once
-    if not hasattr('animation_objects'):
-
-        ax_3d.view_init(elev=20, azim = 56)
-        animation_objects = {}
-
-        red_pts = _state.points
-
-        for point in _state.points:
-
-            if _state.points[point]:
-                ax_3d.scatter3D(point[0], point[1], point[2], marker='.', color='green')
-
-                if point[2] > 0:
-                    ax_xy.scatter(point[0], point[1], color = 'green')
-                if point[1] < 0:
-                    ax_xz.scatter(point[0], point[2], color = 'green')
-                if point[0] > 0:
-                    ax_yz.scatter(point[1], point[2], color = 'green')
-            else:
-                ax_3d.scatter3D(point[0], point[1], point[2], marker='.', color='red')
-
-                if point[2] > 0:
-                    ax_xy.scatter(point[0], point[1], color = 'red')
-                if point[1] < 0:
-                    ax_xz.scatter(point[0], point[2], color = 'red')
-                if point[0] > 0:
-                    ax_yz.scatter(point[1], point[2], color = 'red')
-        
-        animation_objects["deputy"] = ax_3d.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue', label='Deputy Spacecraft')
-
-        chief_position = [0,0,0]
-        animation_objects["fake_chief"] = ax_3d.scatter3D(chief_position[0], chief_position[1], chief_position[2], marker='o', color='red', label='Chief Spacecraft')
-
-        sun_vector = normalize(np.array(sun_position) - chief_position)
-
-        point_inSunDir = chief_position + line_scalar * sun_vector
-        animation_objects["sun"] = ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6, label = 'Sun vector')
-        
-        ax_3d.set_box_aspect((1,1,1)) 
-        set_axes_equal(ax_3d)
-        ax_3d.legend()
-
-        animation_objects["xy"] = ax_xy.scatter(deputy_position[0],deputy_position[1], marker='o', color = 'blue')
-        animation_objects["xz"] = ax_xz.scatter(deputy_position[0],deputy_position[2], marker='o', color = 'blue')
-        animation_objects["yz"] = ax_yz.scatter(deputy_position[1],deputy_position[2], marker='o', color = 'blue')
-
-        ax_xz.axis('square')
-        ax_xy.axis('square')
-        ax_yz.axis('square')
-
-        plt.ion()
-        plt.show()
-
-        # mng = plt.get_current_fig_manager()
-        # mng.resize(*mng.window.maxsize())
-
-    else:
-
-        ax_3d.scatter3D(deputy_position[0], deputy_position[1], deputy_position[2], marker='o', color='blue')
-        
-        for i in range(0,len(new_pts_list)):
-            point = new_pts_list[i]
-            print(point)
-            ax_3d.scatter3D(point[0], point[1], point[2], marker='.', color='green')
-            if point[2] > 0:
-                ax_xy.scatter(point[0], point[1], color = 'green')
-            if point[1] < 0:
-                ax_xz.scatter(point[0], point[2], color = 'green')
-            if point[0] > 0:
-                ax_yz.scatter(point[1], point[2], color = 'green')
-
-        chief_position = [0,0,0]
-        sun_vector = normalize(np.array(sun_position) - chief_position)
-
-        point_inSunDir = chief_position + line_scalar * sun_vector
-        ax_3d.plot([point_inSunDir[0], chief_position[0]],[point_inSunDir[1], chief_position[1]],[point_inSunDir[2], chief_position[2]], color='#FFD700', linewidth = 6)
-
-        ax_3d.autoscale()
-
-        ax_xy.scatter(deputy_position[0],deputy_position[1], marker='o', color = 'blue')
-        ax_xz.scatter(deputy_position[0],deputy_position[2], marker='o', color = 'blue')
-        ax_yz.scatter(deputy_position[1],deputy_position[2], marker='o', color = 'blue')
-        
-        ax_xz.axis('square')
-        ax_xy.axis('square')
-        ax_yz.axis('square')
-
-        # ax.set_box_aspect((1,1,1)) 
-        # set_axes_equal(ax)
-
-    plt.draw()
-    plt.pause(.0001)
-
 def render_3d(fig, deputy_position, sun_position, radius, current_time, step_rate):
-    # Real-time rendering of scene
-    # TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
-    # TODO: Erase previous sun vectors 
+    """
+    Real-time rendering of scene
+    TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
+    """
 
     def set_axes_equal(ax: plt.Axes):
         """Set 3D plot axes to equal scale.
