@@ -16,10 +16,8 @@ import typing
 import numpy as np
 import matplotlib.pyplot as plt
 from corl.libraries.plugin_library import PluginLibrary
-from pydantic import validator
+from pydantic import validator, BaseModel
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
-
-from pydantic import BaseModel
 
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
@@ -40,7 +38,7 @@ class IlluminationValidator(BaseModel):
     resolution: list
         A list containing the resolution of the sensor, represented by x and y pixel density respectively.
     focal_length: float
-        A float representing the focal length of the sensor in [METERS]. The virtual image is created a 
+        A float representing the focal length of the sensor in [METERS]. The virtual image is created a
         distance of focal length away from the sensor origin.
     bin_ray_flag: bool
         A bool flag for utilization of "binary ray" vs. illumination features.
@@ -243,7 +241,6 @@ class InspectionSimulator(SafeRLSimulator):
         -------
         None
         """
-
         # calculate h of the spherical cap (inspection zone)
         r = self.config.radius
         rt = np.linalg.norm(position)
