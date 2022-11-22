@@ -207,7 +207,7 @@ def compute_illum(deputy_position, sun_position, resolution, radius, focal_lengt
     norm1_range = 1
     norm2_range = 1/ratio
     step_norm1 = norm1_range/(resolution[0])
-    step_norm2 = norm2_range/(resolution[1]) 
+    step_norm2 = norm2_range/(resolution[1])
     # 3D matrix (ie. height-by-width matrix with each entry being an array of size 3) which creates an image
     image = np.zeros((resolution[1], resolution[0], 3))
     for i in range(int(resolution[1])): # y coords
@@ -395,6 +395,7 @@ def combine_images(image1, image2, current_time):
     plt.imsave('figs_results/' + string, final_image)
 
 def render_subplots(fig, axes, deputy_position, sun_position, radius, current_time, step_rate):
+    # pylint: disable-msg=too-many-statements
     """
     Real-time rendering of scene with subplots (xy, xz, yz)
     TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
