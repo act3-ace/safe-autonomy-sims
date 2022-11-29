@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.3.2...v0.4.0) (2022-11-29)
+
+
+### Features
+
+* inpsection problem and dependency updates ([28b7cc1](https://github.com/act3-ace/safe-autonomy-sims/commit/28b7cc145a97b60c019481797f0bfa46fd0c49fe))
+
 ## [0.3.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.3.1...v0.3.2) (2022-10-25)
 
 
