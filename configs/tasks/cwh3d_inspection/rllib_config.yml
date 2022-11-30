@@ -13,12 +13,12 @@ horizon: 10000
 
 # === Execution ===
 rollout_fragment_length: 200
-train_batch_size: 200  # set to num_workers * rollout_fragment_length
-sgd_minibatch_size: 200
+train_batch_size: 1200  # set to num_workers * rollout_fragment_length
+sgd_minibatch_size: 1200
 batch_mode: complete_episodes
 
 # === Resources ===
-num_workers: 1
+num_workers: 6
 num_cpus_per_worker: 1
 num_gpus_per_worker: 0
 num_envs_per_worker: 1
