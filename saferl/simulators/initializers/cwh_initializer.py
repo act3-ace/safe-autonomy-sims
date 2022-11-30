@@ -212,13 +212,13 @@ class CWH3DENMTInitializer(BaseInitializer):
         )
         z = ConstantParameter(value=radius.value * np.sin(elevation_angle.value), units=radius.units.value[1][0])
 
-        x_dot = self.config.mean_motion * y.get_value(0).value / 2
-        y_dot = -2 * self.config.mean_motion * x.get_value(0).value
+        x_dot = self.config.mean_motion * y.get_value(0, None).value / 2
+        y_dot = -2 * self.config.mean_motion * x.get_value(0, None).value
 
         return {
-            'x': x.get_value(0),
-            'y': y.get_value(0),
-            'z': z.get_value(0),
+            'x': x.get_value(0, None),
+            'y': y.get_value(0, None),
+            'z': z.get_value(0, None),
             'x_dot': x_dot,
             'y_dot': y_dot,
             'z_dot': z_dot,
