@@ -4,6 +4,7 @@ Test script for running eval framework programmatically (python api).
 Author: John McCarroll
 """
 import os
+from glob import glob
 
 from corl.evaluation.default_config_updates import DoNothingConfigUpdate
 from corl.evaluation.evaluation_artifacts import (
@@ -20,18 +21,17 @@ from corl.evaluation.runners.section_factories.task import Task
 from corl.evaluation.runners.section_factories.teams import Agent, Platform, Teams
 from corl.evaluation.runners.section_factories.test_cases.pandas import Pandas
 from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
-
-# TODO: flexible import of platform serialization class
-from corl.evaluation.serialize_platforms import serialize_Docking_1d
 from corl.evaluation.visualization.print import Print
 from corl.parsers.yaml_loader import load_file
+from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
+from corl.evaluation.serialize_platforms import serialize_Docking_1d
 
 
-def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, experiment_config_path: str):
-
+def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, experiment_config_path: str, serialize_platforms_class: PlatformSerializer = serialize_Docking_1d):
+    # TODO: remove PlatformSerializer default
     # construct constructor args
 
-    team_participant_map = construct_teams_map_from_task_config(experiment_config_path, checkpoint_path)
+    team_participant_map = construct_teams_map_from_experiment_config(experiment_config_path, checkpoint_path)
 
     test_case_strategy_config = {
         "data": "../corl/config/evaluation/test_cases_config/docking1d_tests.yml",
@@ -52,7 +52,7 @@ def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, expe
     # }
 
     ## plugins
-    platform_serialization_obj = serialize_Docking_1d()
+    platform_serialization_obj = serialize_platforms_class()
     plugins_args = {"platform_serialization": platform_serialization_obj}
     eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), isntead of objects
 
@@ -215,7 +215,7 @@ def visualize(output_path: str):
 
 
 # assumes cwd appropriate to experiment_config paths
-def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint_path: str):
+def construct_teams_map_from_experiment_config(experiment_config_path: str, checkpoint_path: str):
 
     # parse experiment config
     experiment_config = load_file(experiment_config_path)
@@ -226,9 +226,9 @@ def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint
     platforms_config = experiment_config['platform_config']
 
     # populate teams based on experiment config
-    blue_team = []  # assumes only one team!!!
+    blue_team = []  # TODO: fix one team assumption!!!
     for i in range(0, len(agents_config)):
-        agent_name, policy_id, agent_config_path, policy_config_path = agents_config[i]  # assumes policy_id == platform_name!!!
+        agent_name, platform_name, agent_config_path, policy_config_path = agents_config[i]  # assumes policy_id == agent_name!!!
         platform_name, platform_config_path = platforms_config[i]
 
         # handle relative paths (join w cwd)
@@ -236,7 +236,7 @@ def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint
         platform_config_path = os.path.join(os.getcwd(), platform_config_path)
         policy_config_path = os.path.join(os.getcwd(), policy_config_path)
 
-        agent_loader = CheckpointFile(checkpoint_filename=checkpoint_path, policy_id=policy_id)
+        agent_loader = CheckpointFile(checkpoint_filename=checkpoint_path, policy_id=agent_name)
 
         agent_config = {
             "name": agent_name, "agent_config": agent_config_path, "policy_config": policy_config_path, "agent_loader": agent_loader
@@ -252,13 +252,32 @@ def construct_teams_map_from_task_config(experiment_config_path: str, checkpoint
     return team_participant_map
 
 
+def checkpoints_list_from_training_output(training_output_path: str, output_dir: str = "/tmp/ablation_results", experiment_name: str = "test"):
+    # assume training_output path absolute
+    ckpt_dirs = sorted(glob(training_output_path + "/checkpoint_*"), key=lambda path: int(path.split("/")[-1].split("_")[-1]))
+    output_dir_paths = []
+    # add checkpoint files
+    for i in range(0,len(ckpt_dirs)):
+        ckpt_num = str(int(ckpt_dirs[i].split("/")[-1].split("_")[-1]))
+        ckpt_dirs[i] += "/checkpoint-" + ckpt_num
+
+        # add checkpoint to list of outputs
+        output_path = output_dir + "/" + experiment_name + "/" + "ckpt_" + ckpt_num
+        output_dir_paths.append(output_path)
+
+    return ckpt_dirs, output_dir_paths  # TODO: need ckpt nums for tracking iterations / training interactions?
+
+
 # # define variables
 output_path = "/tmp/output_1"
-# expr_config = "../corl/config/experiments/docking_1d.yml"
-# task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
-# checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
+expr_config = "../corl/config/experiments/docking_1d.yml"
+task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
+checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
 
-# evaluate(task_config_path, checkpoint_path, output_path, expr_config)
+evaluate(task_config_path, checkpoint_path, output_path, expr_config)
 
 # stage  3
-visualize(output_path)
+# visualize(output_path)
+
+# # test ckpt getter
+# checkpoints_list_from_training_output("/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/")
