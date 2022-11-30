@@ -1,3 +1,18 @@
+# [0.5.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.4.0...v0.5.0) (2022-11-30)
+
+
+### Bug Fixes
+
+* fix access to parameter ([98c53a9](https://github.com/act3-ace/safe-autonomy-sims/commit/98c53a9d07ff2374c2895a04d2b9712f77376af5))
+* update to 1.58.0 [skip ci] ([d4b6474](https://github.com/act3-ace/safe-autonomy-sims/commit/d4b6474deb9e39e0e1454cc5f7dbdd80f86c0b17))
+* update usage for dependent variables ([945b7c8](https://github.com/act3-ace/safe-autonomy-sims/commit/945b7c8d4c05663724bf1316fa56a1b46ba002ea))
+
+
+### Features
+
+* update corl ([b5dea79](https://github.com/act3-ace/safe-autonomy-sims/commit/b5dea79a642117d0b4f5f03090f1df5f343f48c1))
+* update corl to 1.57.0 [skip ci] ([155b66e](https://github.com/act3-ace/safe-autonomy-sims/commit/155b66e39f9f8b050612c2331e2fca6fa6d9e446))
+
 # [0.4.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.3.2...v0.4.0) (2022-11-29)
 
 
