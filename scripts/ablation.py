@@ -18,7 +18,11 @@ def run_ablation_study(experiment_training_outputs: dict, task_config_path: str,
     experiment_to_eval_results_map = {}
     for experiment_name, experiment_dir in experiment_training_outputs.items():
         checkpoint_paths, output_paths = checkpoints_list_from_training_output(experiment_dir, experiment_name=experiment_name)
-        experiment_to_eval_results_map[experiment_name]= output_paths
+        metadata = extract_metadata(checkpoint_paths)
+        experiment_to_eval_results_map[experiment_name] = {
+            "output_paths": output_paths,
+            "metadata": metadata
+        }
         run_evaluations(task_config_path, experiemnt_config_path, checkpoint_paths, output_paths)
     
     # create sample complexity plot
@@ -40,6 +44,24 @@ def run_evaluations(task_config_path: str, experiemnt_config_path: str, checkpoi
         visualize(output_paths[i])
 
 
+def extract_metadata(checkpoint_paths):
+    # iterate through checkpoint dirs for given experiment, extract data on training duration
+    training_meta_data = []
+    for ckpt_path in checkpoint_paths:
+        metadata_path = ckpt_path + ".tune_metadata"
+        metadata = pickle.load(open(metadata_path, 'rb'))
+        num_env_interactions = metadata["timesteps_total"] if metadata["timesteps_total"] else metadata["last_result"]["counters"]["num_env_steps_trained"]
+        checkpoint_data = {
+            'num_env_interactions': num_env_interactions,
+            'num_episodes': metadata["episodes_total"],
+            'walltime': metadata["time_total"],
+            'iterations': metadata["iteration"],
+        }
+        training_meta_data.append(checkpoint_data)
+
+    return training_meta_data
+
+
 def construct_reward_dataframe(results: dict):
     """
     function to parse reward data from evaluation results. returns a pandas.DataFrame
@@ -47,14 +69,20 @@ def construct_reward_dataframe(results: dict):
     # need to parse each metrics.pkl file + construct DataFrame
     data = []
     rewards = {}
-    for experiment_name, output_paths in results.items():
+    for experiment_name in results.keys():
+        output_paths = results[experiment_name]['output_paths']
+        training_metadata = results[experiment_name]['metadata']
+
         # collect reward info per experiment
-        for output_path in output_paths:
+        for i in range(0, len(output_paths)):
+        
             # extract amouunt of training policy had before eval
-            ckpt_num = int(output_path.split('/')[-1].split('_')[-1])
+            num_env_interactions = training_metadata[i]["num_env_interactions"]
+            num_episodes = training_metadata[i]["num_episodes"]
+            num_iterations = training_metadata[i]["iterations"]
 
             # collect reward info per ckpt
-            metrics_file = open(output_path + "/metrics.pkl", 'rb')
+            metrics_file = open(output_paths[i] + "/metrics.pkl", 'rb')
             metrics = pickle.load(metrics_file)
             episode_events = list(metrics.participants.values())[0].events  # assumes single agent environment
 
@@ -76,12 +104,12 @@ def construct_reward_dataframe(results: dict):
                 episode_id = index
                 index += 1
                 
-                # add row to dataset (experiment name, checkpoint num, episode ID/trial, param values, reward)
-                row = [experiment_name, ckpt_num, episode_id, reward]
+                # add row to dataset (experiment name, iteration, num_episodes, num_interactions, episode ID/trial, param values, reward)
+                row = [experiment_name, num_iterations, num_episodes, num_env_interactions, episode_id, reward]
                 data.append(row)
 
     # convert data into DataFrame
-    dataframe = pd.DataFrame(data, columns=['experiment', 'checkpoint number', 'episode ID', 'reward'])
+    dataframe = pd.DataFrame(data, columns=['experiment', 'iterations', 'num_episodes', 'num_interactions', 'episode ID', 'reward'])
 
     file = open('/media/john/HDD/AFRL/test_dataframe.df', 'wb')
     pickle.dump(dataframe, file)
@@ -89,7 +117,7 @@ def construct_reward_dataframe(results: dict):
     return dataframe
 
 
-def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xaxis='checkpoint number', yaxis='reward', hue='experiment', ci='sd', xmax=None, ylim=None, **kwargs):
+def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xaxis='num_interactions', yaxis='reward', hue='experiment', ci='sd', xmax=None, ylim=None, **kwargs):
     # format plot
     # TODO: upgrade seaborn to 0.12.0 and swap depricated 'ci' for 'errorbar' kwarg: errorbar=('sd', 1) or (''ci', 95)
     # TODO: add smooth kwarg
@@ -105,16 +133,20 @@ def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xax
     # plt.legend(loc='upper center', ncol=3, handlelength=1,
     #           borderaxespad=0., prop={'size': 13})
 
-    if xaxis == 'checkpoint number':
-        plt.xlabel('Iterations')
-    if xaxis == 'TotalEnvInteracts':
+    if xaxis == 'num_interactions':
         plt.xlabel('Timesteps')
-    if yaxis == 'AverageTestEpRet' or yaxis == 'AverageAltTestEpRet':
-        plt.ylabel('Average Return')
-    if yaxis == 'TestEpLen' or yaxis == 'AltTestEpLen':
-        plt.ylabel('Average Episode Length')
-    if yaxis == 'Success' or yaxis == 'AltSuccess':
-        plt.ylabel('Average Success')
+    if xaxis == 'num_episodes':
+        plt.xlabel('Episodes')
+    if xaxis == 'iterations':
+        plt.xlabel('Iterations')
+    if yaxis == 'reward':
+      plt.ylabel('Average Reward')
+    # if yaxis == 'AverageTestEpRet' or yaxis == 'AverageAltTestEpRet':
+    #     plt.ylabel('Average Return')
+    # if yaxis == 'TestEpLen' or yaxis == 'AltTestEpLen':
+    #     plt.ylabel('Average Episode Length')
+    # if yaxis == 'Success' or yaxis == 'AltSuccess':
+    #     plt.ylabel('Average Success')
 
     if xmax is None:
         xmax = np.max(np.asarray(data[xaxis]))
