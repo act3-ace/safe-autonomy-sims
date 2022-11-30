@@ -16,18 +16,24 @@ from corl.evaluation.launchers import launch_evaluate, launch_generate_metrics, 
 from corl.evaluation.loader.check_point_file import CheckpointFile
 from corl.evaluation.recording.folder import Folder, FolderRecord
 from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import RllibTrainer
+from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
 from corl.evaluation.runners.section_factories.plugins.plugins import Plugins
 from corl.evaluation.runners.section_factories.task import Task
 from corl.evaluation.runners.section_factories.teams import Agent, Platform, Teams
 from corl.evaluation.runners.section_factories.test_cases.pandas import Pandas
 from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
+from corl.evaluation.serialize_platforms import serialize_Docking_1d
 from corl.evaluation.visualization.print import Print
 from corl.parsers.yaml_loader import load_file
-from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
-from corl.evaluation.serialize_platforms import serialize_Docking_1d
 
 
-def evaluate(task_config_path: str, checkpoint_path: str, output_path: str, experiment_config_path: str, serialize_platforms_class: PlatformSerializer = serialize_Docking_1d):
+def evaluate(
+    task_config_path: str,
+    checkpoint_path: str,
+    output_path: str,
+    experiment_config_path: str,
+    serialize_platforms_class: PlatformSerializer = serialize_Docking_1d
+):
     # TODO: remove PlatformSerializer default
     # construct constructor args
 
@@ -252,12 +258,14 @@ def construct_teams_map_from_experiment_config(experiment_config_path: str, chec
     return team_participant_map
 
 
-def checkpoints_list_from_training_output(training_output_path: str, output_dir: str = "/tmp/ablation_results", experiment_name: str = "test"):
+def checkpoints_list_from_training_output(
+    training_output_path: str, output_dir: str = "/tmp/ablation_results", experiment_name: str = "test"
+):
     # assume training_output path absolute
     ckpt_dirs = sorted(glob(training_output_path + "/checkpoint_*"), key=lambda path: int(path.split("/")[-1].split("_")[-1]))
     output_dir_paths = []
     # add checkpoint files
-    for i in range(0,len(ckpt_dirs)):
+    for i in range(0, len(ckpt_dirs)):
         ckpt_num = str(int(ckpt_dirs[i].split("/")[-1].split("_")[-1]))
         ckpt_dirs[i] += "/checkpoint-" + ckpt_num
 
