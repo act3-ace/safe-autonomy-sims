@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.5.0...v0.5.1) (2022-11-30)
+
+
+### Bug Fixes
+
+* trigger image build for ver 0.5 ([7be1903](https://github.com/act3-ace/safe-autonomy-sims/commit/7be19035b6c77fb6ccc6042820563edac089405c))
+
 # [0.5.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.4.0...v0.5.0) (2022-11-30)
 
 
