@@ -13,15 +13,17 @@ This module contains the InspectionSimulator for interacting with the CWH inspec
 """
 import math
 import typing
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
-from pydantic import validator, BaseModel
+from pydantic import BaseModel, validator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 
+import saferl.simulators.illumination_functions as illum
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
 from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
-import saferl.simulators.illumination_functions as illum
+
 
 class IlluminationValidator(BaseModel):
     """
@@ -54,6 +56,7 @@ class IlluminationValidator(BaseModel):
     bin_ray_flag: bool
     render_flag_3d: bool
     render_flag_subplots: bool
+
 
 def points_on_sphere_fibonacci(num_points: int, radius: float) -> list:
     """
@@ -198,8 +201,13 @@ class InspectionSimulator(SafeRLSimulator):
                 # Render scene every m simulation seconds
                 if self.config.illumination_params.render_flag_3d or self.config.illumination_params.render_flag_subplots:
                     current_time = self.clock
-                    sun_position = illum.get_sun_position(current_time,self.config.step_size,self.config.illumination_params.mean_motion,
-                    self.config.illumination_params.sun_angle,self.config.illumination_params.avg_rad_Earth2Sun)
+                    sun_position = illum.get_sun_position(
+                        current_time,
+                        self.config.step_size,
+                        self.config.illumination_params.mean_motion,
+                        self.config.illumination_params.sun_angle,
+                        self.config.illumination_params.avg_rad_Earth2Sun
+                    )
                     m = 10
                     if (current_time % (m)) == 0:
                         if self.config.illumination_params.render_flag_3d:
@@ -260,12 +268,17 @@ class InspectionSimulator(SafeRLSimulator):
                         r_avg = self.config.illumination_params.avg_rad_Earth2Sun
                         chief_properties = self.config.illumination_params.chief_properties
                         light_properties = self.config.illumination_params.light_properties
-                        current_theta = illum.get_sun_angle(self.clock, self.config.step_size,
-                            self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle)
+                        current_theta = illum.get_sun_angle(
+                            self.clock,
+                            self.config.step_size,
+                            self.config.illumination_params.mean_motion,
+                            self.config.illumination_params.sun_angle
+                        )
                         if self.config.illumination_params.bin_ray_flag:
                             self._state.points[point] = illum.check_illum(point, current_theta, r_avg, r)
                         else:
-                            RGB = illum.compute_illum_pt(point,current_theta,position,r_avg,r,chief_properties,light_properties)
+                            RGB = illum.compute_illum_pt(point, current_theta, position, r_avg, r, chief_properties, light_properties)
                             self._state.points[point] = illum.evaluate_RGB(RGB)
+
 
 PluginLibrary.AddClassToGroup(InspectionSimulator, "InspectionSimulator", {})
