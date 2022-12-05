@@ -1,5 +1,7 @@
 """
-Test script for running eval framework programmatically (python api).
+
+
+This module leverages CoRL's evaluation framework's python API to streamline visualization and analysis of comparative RL test assays.
 
 Author: John McCarroll
 """
@@ -10,38 +12,69 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from saferl.evaluation.evaluation_api import evaluate, generate_metrics, visualize, checkpoints_list_from_training_output
+from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
+from saferl.evaluation.evaluation_api import evaluate, generate_metrics, visualize, checkpoints_list_from_training_output, add_required_metrics
 
 
-def run_ablation_study(experiment_training_outputs: dict, task_config_path: str, experiemnt_config_path: str, plot_output_path: str):
+def run_ablation_study(
+    experiment_training_output_paths: dict, 
+    task_config_path: str, 
+    experiemnt_config_path: str, 
+    metrics_config: dict, 
+    platfrom_serializer_class: PlatformSerializer,
+    plot_output_path: str, 
+    plot_config: dict = {},
+    create_plot = True
+    ):
+
+    # add required metrics
+    metrics_config = add_required_metrics(metrics_config)
+
     # evaluate provided trained policies' checkpoints
     experiment_to_eval_results_map = {}
-    for experiment_name, experiment_dir in experiment_training_outputs.items():
+    for experiment_name, experiment_dir in experiment_training_output_paths.items():
         checkpoint_paths, output_paths = checkpoints_list_from_training_output(experiment_dir, experiment_name=experiment_name)
         metadata = extract_metadata(checkpoint_paths)
         experiment_to_eval_results_map[experiment_name] = {
             "output_paths": output_paths,
             "metadata": metadata
         }
-        run_evaluations(task_config_path, experiemnt_config_path, checkpoint_paths, output_paths)
+        run_evaluations(task_config_path, experiemnt_config_path, metrics_config, checkpoint_paths, output_paths, platfrom_serializer_class, visualize=False)
     
     # create sample complexity plot
-    data = construct_reward_dataframe(experiment_to_eval_results_map)
-    create_sample_complexity_plot(data, plot_output_path)
+    data = construct_dataframe(experiment_to_eval_results_map, metrics_config)
 
-    
-def run_evaluations(task_config_path: str, experiemnt_config_path: str, checkpoint_paths: list, output_paths: list):
+    # TODO: for metric in metric_config: (plot every given metric?)
+    if create_plot:
+        create_sample_complexity_plot(data, plot_output_path, **plot_config)
+
+    return data
+
+
+def run_evaluations(
+    task_config_path: str, 
+    experiemnt_config_path: str, 
+    metrics_config: dict, 
+    checkpoint_paths: list, 
+    output_paths: list, 
+    platfrom_serializer_class: PlatformSerializer,
+    visualize: bool = False
+    ):
+
     # run sequence of evaluation
     for i in range(0, len(checkpoint_paths)):
         # run evaluation episodes
         try:
-            evaluate(task_config_path, checkpoint_paths[i], output_paths[i], experiemnt_config_path)
+            evaluate(task_config_path, checkpoint_paths[i], output_paths[i], experiemnt_config_path, platfrom_serializer_class)
         except SystemExit:
             print(sys.exc_info()[0])
+
         # generate evaluation metrics
-        generate_metrics(output_paths[i])
-        # generate visualizations
-        visualize(output_paths[i])
+        generate_metrics(output_paths[i], metrics_config)
+
+        if visualize:
+            # generate visualizations
+            visualize(output_paths[i])
 
 
 def extract_metadata(checkpoint_paths):
@@ -62,18 +95,39 @@ def extract_metadata(checkpoint_paths):
     return training_meta_data
 
 
-def construct_reward_dataframe(results: dict):
+def parse_metrics_config(metrics_config: dict):
+    # collect metric names
+    metrics_names = {}
+    if 'world' in metrics_config:
+        metrics_names['world'] = []
+        for world_metric in metrics_config["world"]:
+            metrics_names['world'].append(world_metric['name'])
+
+    if 'agent' in metrics_config:
+        # TODO: support agent-specific metrics
+        metrics_names['agent'] = {}
+        if '__default__' in metrics_config['agent']:
+            metrics_names['agent']['__default__'] = []
+            for agent_metric in metrics_config["agent"]["__default__"]:
+                metrics_names['agent']['__default__'].append(agent_metric['name'])
+
+    return metrics_names
+
+
+def construct_dataframe(results: dict, metrics_config: dict):
     """
     function to parse reward data from evaluation results. returns a pandas.DataFrame
     """
+    metric_names = parse_metrics_config(metrics_config)
+    columns = ['experiment', 'iterations', 'num_episodes', 'num_interactions', 'episode ID']
+
     # need to parse each metrics.pkl file + construct DataFrame
     data = []
-    rewards = {}
     for experiment_name in results.keys():
         output_paths = results[experiment_name]['output_paths']
         training_metadata = results[experiment_name]['metadata']
 
-        # collect reward info per experiment
+        # collect metric values per experiment
         for i in range(0, len(output_paths)):
         
             # extract amouunt of training policy had before eval
@@ -81,44 +135,44 @@ def construct_reward_dataframe(results: dict):
             num_episodes = training_metadata[i]["num_episodes"]
             num_iterations = training_metadata[i]["iterations"]
 
-            # collect reward info per ckpt
+            # collect agent metrics per ckpt
             metrics_file = open(output_paths[i] + "/metrics.pkl", 'rb')
             metrics = pickle.load(metrics_file)
-            episode_events = list(metrics.participants.values())[0].events  # assumes single agent environment
-
-            # episode_artifacts = []
-            # episode_rewards = []
-            # episode_initial_parameters = []
+            episode_events = list(metrics.participants.values())[0].events  # TODO: remove single agent env assumption
 
             index = 0
             for event in episode_events:
-                # collect reward on each trial in eval
-                episode_artifact = event.data
-                parameters = episode_artifact.parameter_values
-                reward = event.metrics['TotalReward'].value
+                # aggregate trial data (single dataframe entry)
+                row = [experiment_name, num_iterations, num_episodes, num_env_interactions]
 
-                # episode_artifacts.append(episode_artifact)
-                # episode_rewards.append(parameters)
-                # episode_initial_parameters.append(reward)
-                
+                # track trial number / ID
                 episode_id = index
                 index += 1
+                row.append(episode_id)
+
+                # collect agent's metric values on each trial in eval
+                for metric_name in metric_names['agent']['__default__']:
+                    assert metric_name in event.metrics, "{} not an available metric!".format(metric_name)
+                    # add metric value to row
+                    row.append(event.metrics[metric_name].value)
+                    # add metric name to columns
+                    if metric_name not in columns:
+                        columns.append(metric_name)
                 
-                # add row to dataset (experiment name, iteration, num_episodes, num_interactions, episode ID/trial, param values, reward)
-                row = [experiment_name, num_iterations, num_episodes, num_env_interactions, episode_id, reward]
+                # add row to dataset (experiment name, iteration, num_episodes, num_interactions, episode ID/trial, **custom_metrics)
                 data.append(row)
 
-    # convert data into DataFrame
-    dataframe = pd.DataFrame(data, columns=['experiment', 'iterations', 'num_episodes', 'num_interactions', 'episode ID', 'reward'])
+            # collect world metrics per ckpt
+            ...
 
-    file = open('/media/john/HDD/AFRL/test_dataframe.df', 'wb')
-    pickle.dump(dataframe, file)
+    # convert data into DataFrame
+    dataframe = pd.DataFrame(data, columns=columns)
 
     return dataframe
 
 
-def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xaxis='num_interactions', yaxis='reward', hue='experiment', ci='sd', xmax=None, ylim=None, **kwargs):
-    # format plot
+def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xaxis='num_interactions', yaxis='TotalReward', hue='experiment', ci='sd', xmax=None, ylim=None, **kwargs):
+    # create seaborn plot
     # TODO: upgrade seaborn to 0.12.0 and swap depricated 'ci' for 'errorbar' kwarg: errorbar=('sd', 1) or (''ci', 95)
     # TODO: add smooth kwarg
 
@@ -127,7 +181,7 @@ def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xax
     # feed Dataframe to seaborn to create labelled plot
     plot = sns.lineplot(data=data, x=xaxis, y=yaxis, hue=hue, ci=ci, **kwargs)
 
-    # more format plot
+    # format plot
 
     plt.legend(loc='best').set_draggable(True)
     # plt.legend(loc='upper center', ncol=3, handlelength=1,
@@ -169,18 +223,10 @@ def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xax
     return plot
 
 
-# sample script:
-
-# define list of experiments + their paths
-# result_path = run_ablation_study(**args)
-# create_sample_complexity_plot(result_path)
-
-# IDEA: put all eval results in one dir, then walk that dir for DataFrame creation**
-#       experiment names must be coupled w their output paths -> expr names become sub dirs of ablation 'result' output dir
-
 
 
 ### Example Useage
+from corl.evaluation.serialize_platforms import serialize_Docking_1d
 
 # define vars
 expr_config = "../corl/config/experiments/docking_1d.yml"
@@ -190,8 +236,122 @@ training_output_dirs = {
     'b': '/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_41448_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-11-29_12-21-26'
 }
 plot_ouput = '/media/john/HDD/AFRL/test_sample_complexity_plot.png'
+plot_config = {
+    "y_axis": "CustomMetricName",
+    "x_axis": "num_episodes"
+}
+
+# metrics_config = {
+#         "world": [
+#             {
+#                 "name": "WallTime(Sec)",
+#                 "functor": "corl.evaluation.metrics.generators.meta.runtime.Runtime",
+#                 "config": {
+#                     "description": "calculated runtime of test case rollout"
+#                 }
+#             },
+#             {
+#                 "name": "AverageWallTime",
+#                 "functor": "corl.evaluation.metrics.aggregators.average.Average",
+#                 "config": {
+#                     "description": "calculated average wall time over all test case rollouts",
+#                     "metrics_to_use": "WallTime(Sec)",
+#                     "scope": None  #null
+#                 }
+#             },
+#             {
+#                 "name": "EpisodeLength(Steps)",
+#                 "functor": "corl.evaluation.metrics.generators.meta.episode_length.EpisodeLength_Steps",
+#                 "config": {
+#                     "description": "episode length of test case rollout in number of steps"
+#                 }
+#             },
+#             {
+#                 "name": "rate_of_runs_lt_5steps",
+#                 "functor": "corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate",
+#                 "config": {
+#                     "description": "alert metric to see if any episode length is less than 5 steps",
+#                     "metrics_to_use": "EpisodeLength(Steps)",
+#                     "scope": {
+#                         "type": "corl.evaluation.metrics.scopes.from_string", "config": {
+#                             "name": "evaluation"
+#                         }
+#                     },
+#                     "condition": {
+#                         "operator": '<', "lhs": 5
+#                     }
+#                 }
+#             },
+#         ],
+#         "agent": {
+#             "__default__": [
+#                 {
+#                     "name": "Result",
+#                     "functor": "corl.evaluation.metrics.generators.dones.StatusCode",
+#                     "config": {
+#                         "description": "was docking performed successfully or not", "done_condition": "DockingDoneFunction"
+#                     }
+#                 },
+#                 {
+#                     "name": "Dones",
+#                     "functor": "corl.evaluation.metrics.generators.dones.DonesVec",
+#                     "config": {
+#                         "description": "dones triggered at end of each rollout"
+#                     }
+#                 },
+#                 {
+#                     "name": "TotalReward",
+#                     "functor": "corl.evaluation.metrics.generators.rewards.TotalReward",
+#                     "config": {
+#                         "description": "total reward calculated from test case rollout"
+#                     }
+#                 },
+#                 {
+#                     "name": "CompletionRate",
+#                     "functor": "corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate",
+#                     "config": {
+#                         "description": "out of the number of test case rollouts how many resulted in successful docking",
+#                         "metrics_to_use": "Result",
+#                         "scope": None,  #null
+#                         "condition": {
+#                             "operator": "==",
+#                             "lhs": {
+#                                 "functor": "corl.dones.done_func_base.DoneStatusCodes",
+#                                 "config": {
+#                                     "value": 1
+#                                 }  # 1 is win
+#                             }
+#                         }
+#                     }
+#                 },
+#             ]
+#         }
+#     }
+
+metrics_config = {
+    # "world": [],
+    "agent": {
+        "__default__": [
+            # {
+            #     "name": "Result",
+            #     "functor": "corl.evaluation.metrics.generators.dones.StatusCode",
+            #     "config": {
+            #         "description": "was docking performed successfully or not", "done_condition": "DockingDoneFunction"
+            #     }
+            # },
+            {
+                "name": "TotalReward",
+                "functor": "corl.evaluation.metrics.generators.rewards.TotalReward",
+                "config": {
+                    "description": "total reward calculated from test case rollout"
+                }
+            },
+        ]
+    }
+}
+
 
 # begin ablation study pipeline (training outputs -> sample complexity plot)
-run_ablation_study(training_output_dirs, task_config_path, expr_config, plot_output_path=plot_ouput)
+run_ablation_study(training_output_dirs, task_config_path, expr_config, metrics_config, serialize_Docking_1d, plot_output_path=plot_ouput)
 
 
