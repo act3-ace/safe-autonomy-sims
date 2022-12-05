@@ -22,9 +22,24 @@ from corl.evaluation.runners.section_factories.task import Task
 from corl.evaluation.runners.section_factories.teams import Agent, Platform, Teams
 from corl.evaluation.runners.section_factories.test_cases.pandas import Pandas
 from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
-from corl.evaluation.serialize_platforms import serialize_Docking_1d
 from corl.evaluation.visualization.print import Print
 from corl.parsers.yaml_loader import load_file
+
+# test_case_manager_config = {
+#     "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.tabular_strategy.TabularStrategy",
+#     "config": {
+#         "data": "../corl/config/evaluation/test_cases_config/docking1d_tests.yml",
+#         "source_form": Pandas.SourceForm.FILE_YAML_CONFIGURATION,
+#         "randomize": False,
+#         "separator": '.'
+#     }
+# }
+default_test_case_manager_config = {
+    "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
+    "config": {
+        "num_test_cases": 3
+    }
+}
 
 
 def evaluate(
@@ -32,37 +47,19 @@ def evaluate(
     checkpoint_path: str,
     output_path: str,
     experiment_config_path: str,
-    serialize_platforms_class: PlatformSerializer = serialize_Docking_1d
+    platform_serializer_class: PlatformSerializer,
+    test_case_manager_config: dict = default_test_case_manager_config
 ):
-    # TODO: remove PlatformSerializer default
-    # construct constructor args
+    # construct teams map and test_cases for evaluation
 
     team_participant_map = construct_teams_map_from_experiment_config(experiment_config_path, checkpoint_path)
 
-    test_case_strategy_config = {
-        "data": "../corl/config/evaluation/test_cases_config/docking1d_tests.yml",
-        "source_form": Pandas.SourceForm.FILE_YAML_CONFIGURATION,
-        "randomize": False,
-        "separator": '.'
-    }
-    test_case_manager_config = {
-        "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.tabular_strategy.TabularStrategy",
-        "config": test_case_strategy_config
-    }
-    # test_case_strategy_config = {
-    #     "num_test_cases": 5
-    # }
-    # test_case_manager_config = {
-    #     "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
-    #     "config": test_case_strategy_config
-    # }
-
-    ## plugins
-    platform_serialization_obj = serialize_platforms_class()
+    # plugins
+    platform_serialization_obj = platform_serializer_class()
     plugins_args = {"platform_serialization": platform_serialization_obj}
     eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), isntead of objects
 
-    ## engine
+    # engine
     rllib_engine_args = {"callbacks": [], "workers": 0}
 
     # recorders
@@ -95,101 +92,15 @@ def evaluate(
     launch_evaluate.main(namespace)
 
 
-def generate_metrics(evaluate_output_path: str):
-    # construct constructor args
-
+def generate_metrics(evaluate_output_path: str, metrics_config: dict):
+    """
+    metrics_config can either be path to metrics config file OR dict of 'name','functor', 'config' dicts. see user guide/ example for format
+    """
+    # define constructor args
     location = FolderRecord(absolute_path=evaluate_output_path)
 
-    # alerts_config = None    # TODO: enable evaluation without alertsssssss
+    # TODO: enable evaluation without alerts
     alerts_config_path = "../corl/config/evaluation/alerts/base_alerts.yml"
-
-    # Note: could also point to metrics config
-    metrics_config = {
-        "world": [
-            {
-                "name": "WallTime(Sec)",
-                "functor": "corl.evaluation.metrics.generators.meta.runtime.Runtime",
-                "config": {
-                    "description": "calculated runtime of test case rollout"
-                }
-            },
-            {
-                "name": "AverageWallTime",
-                "functor": "corl.evaluation.metrics.aggregators.average.Average",
-                "config": {
-                    "description": "calculated average wall time over all test case rollouts",
-                    "metrics_to_use": "WallTime(Sec)",
-                    "scope": None  #null
-                }
-            },
-            {
-                "name": "EpisodeLength(Steps)",
-                "functor": "corl.evaluation.metrics.generators.meta.episode_length.EpisodeLength_Steps",
-                "config": {
-                    "description": "episode length of test case rollout in number of steps"
-                }
-            },
-            {
-                "name": "rate_of_runs_lt_5steps",
-                "functor": "corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate",
-                "config": {
-                    "description": "alert metric to see if any episode length is less than 5 steps",
-                    "metrics_to_use": "EpisodeLength(Steps)",
-                    "scope": {
-                        "type": "corl.evaluation.metrics.scopes.from_string", "config": {
-                            "name": "evaluation"
-                        }
-                    },
-                    "condition": {
-                        "operator": '<', "lhs": 5
-                    }
-                }
-            },
-        ],
-        "agent": {
-            "__default__": [
-                {
-                    "name": "Result",
-                    "functor": "corl.evaluation.metrics.generators.dones.StatusCode",
-                    "config": {
-                        "description": "was docking performed successfully or not", "done_condition": "DockingDoneFunction"
-                    }
-                },
-                {
-                    "name": "Dones",
-                    "functor": "corl.evaluation.metrics.generators.dones.DonesVec",
-                    "config": {
-                        "description": "dones triggered at end of each rollout"
-                    }
-                },
-                {
-                    "name": "TotalReward",
-                    "functor": "corl.evaluation.metrics.generators.rewards.TotalReward",
-                    "config": {
-                        "description": "total reward calculated from test case rollout"
-                    }
-                },
-                {
-                    "name": "CompletionRate",
-                    "functor": "corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate",
-                    "config": {
-                        "description": "out of the number of test case rollouts how many resulted in successful docking",
-                        "metrics_to_use": "Result",
-                        "scope": None,  #null
-                        "condition": {
-                            "operator": "==",
-                            "lhs": {
-                                "functor": "corl.dones.done_func_base.DoneStatusCodes",
-                                "config": {
-                                    "value": 1
-                                }  # 1 is win
-                            }
-                        }
-                    }
-                },
-            ]
-        }
-    }
 
     raise_error_on_alert = True
 
@@ -276,16 +187,52 @@ def checkpoints_list_from_training_output(
     return ckpt_dirs, output_dir_paths  # TODO: need ckpt nums for tracking iterations / training interactions?
 
 
-# # define variables
+def add_required_metrics(metrics_config: dict):
+    # add required metrics to metrics_config
+    episode_length_metric = {
+        "name": "EpisodeLength(Steps)",
+        "functor": "corl.evaluation.metrics.generators.meta.episode_length.EpisodeLength_Steps",
+        "config": {
+            "description": "episode length of test case rollout in number of steps"
+        }
+    }
+    episode_length_alert_metric = {
+        "name": "rate_of_runs_lt_5steps",
+        "functor": "corl.evaluation.metrics.aggregators.criteria_rate.CriteriaRate",
+        "config": {
+            "description": "alert metric to see if any episode length is less than 5 steps",
+            "metrics_to_use": "EpisodeLength(Steps)",
+            "scope": {
+                "type": "corl.evaluation.metrics.scopes.from_string", "config": {
+                    "name": "evaluation"
+                }
+            },
+            "condition": {
+                "operator": '<', "lhs": 5
+            }
+        }
+    }
+
+    if 'world' in metrics_config:
+        assert isinstance(metrics_config['world'], list), "'world' metrics in metrics_config must be list of dicts"
+        metrics_config['world'].append(episode_length_metric)
+        metrics_config['world'].append(episode_length_alert_metric)
+    else:
+        metrics_config['world'] = [episode_length_metric, episode_length_alert_metric]
+
+    return metrics_config
+
+
+# import PlatformSerialization
+from corl.evaluation.serialize_platforms import serialize_Docking_1d
+
+# define variables
 output_path = "/tmp/output_1"
 expr_config = "../corl/config/experiments/docking_1d.yml"
 task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
 checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
 
-evaluate(task_config_path, checkpoint_path, output_path, expr_config)
+evaluate(task_config_path, checkpoint_path, output_path, expr_config, serialize_Docking_1d)
 
 # stage  3
 # visualize(output_path)
-
-# # test ckpt getter
-# checkpoints_list_from_training_output("/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/")
