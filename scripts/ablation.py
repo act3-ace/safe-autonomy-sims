@@ -1,6 +1,4 @@
 """
-
-
 This module leverages CoRL's evaluation framework's python API to streamline visualization and analysis of comparative RL test assays.
 
 Author: John McCarroll
@@ -193,7 +191,7 @@ def create_sample_complexity_plot(data: pd.DataFrame, plot_output_file: str, xax
         plt.xlabel('Episodes')
     if xaxis == 'iterations':
         plt.xlabel('Iterations')
-    if yaxis == 'reward':
+    if yaxis == 'TotalReward':
       plt.ylabel('Average Reward')
     # if yaxis == 'AverageTestEpRet' or yaxis == 'AverageAltTestEpRet':
     #     plt.ylabel('Average Return')
