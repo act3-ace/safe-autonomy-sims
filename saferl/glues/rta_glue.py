@@ -151,10 +151,10 @@ class RTAGlue(BaseMultiWrapperGlue):
         raise NotImplementedError
 
     def observation_space(self):
-        return None
+        return gym.spaces.dict.Dict({"intervening": gym.spaces.discrete.Discrete(2)})
 
     def get_observation(self):
-        return None
+        return {"intervening": int(self.rta.intervening)}
 
     def get_info_dict(self):
         return {
