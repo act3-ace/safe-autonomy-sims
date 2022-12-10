@@ -100,7 +100,20 @@ def generate_metrics(evaluate_output_path: str, metrics_config: dict):
     location = FolderRecord(absolute_path=evaluate_output_path)
 
     # TODO: enable evaluation without alerts
-    alerts_config_path = "../corl/config/evaluation/alerts/base_alerts.yml"
+    alerts_config = {
+        "world": [
+            {
+                "name": "Short Episodes",
+                "metric": "rate_of_runs_lt_5steps",
+                "scope": "evaluation",
+                "thresholds": [{
+                    "type": "warning", "condition": {
+                        "operator": ">", "lhs": 0
+                    }
+                }]
+            }
+        ]
+    }
 
     raise_error_on_alert = True
 
@@ -113,7 +126,7 @@ def generate_metrics(evaluate_output_path: str, metrics_config: dict):
         "artifact_evaluation_outcome": outcome,
         "artifact_metrics": metrics,
         "metrics_config": metrics_config,
-        "alerts_config": alerts_config_path,
+        "alerts_config": alerts_config,
         "raise_on_error_alert": raise_error_on_alert
     }
 
@@ -148,10 +161,25 @@ def construct_teams_map_from_experiment_config(experiment_config_path: str, chec
         agent_name, platform_name, agent_config_path, policy_config_path = agents_config[i]  # assumes policy_id == agent_name!!!
         platform_name, platform_config_path = platforms_config[i]
 
-        # handle relative paths (join w cwd)
-        agent_config_path = os.path.join(os.getcwd(), agent_config_path)
-        platform_config_path = os.path.join(os.getcwd(), platform_config_path)
-        policy_config_path = os.path.join(os.getcwd(), policy_config_path)
+        # handle relative paths from experiment config
+        # assume experiment_config_path absolute
+
+        ## identify if experiment config from corl or sas
+
+        is_corl_experiment = 'corl' in experiment_config_path.split('/')
+        is_sas_experiment = 'safe-autonomy-sims' in experiment_config_path.split('/')
+        if is_corl_experiment:
+            # assumes corl root is cwd
+            path_to_assumed_root = experiment_config_path.split('corl')[0] + 'corl/'
+        elif is_sas_experiment:
+            # assumes safe-autonomy-sims root is cwd
+            path_to_assumed_root = experiment_config_path.split('safe-autonomy-sims')[0] + 'safe-autonomy-sims/'
+        else:
+            raise ValueError("Experiment config {} does not reside in corl or safe-autonomy-sims repositories".format())
+
+        agent_config_path = os.path.join(path_to_assumed_root, agent_config_path)
+        platform_config_path = os.path.join(path_to_assumed_root, platform_config_path)
+        policy_config_path = os.path.join(path_to_assumed_root, policy_config_path)
 
         agent_loader = CheckpointFile(checkpoint_filename=checkpoint_path, policy_id=agent_name)
 
@@ -223,16 +251,16 @@ def add_required_metrics(metrics_config: dict):
     return metrics_config
 
 
-# import PlatformSerialization
-from corl.evaluation.serialize_platforms import serialize_Docking_1d
+# # import PlatformSerialization
+# from corl.evaluation.serialize_platforms import serialize_Docking_1d
 
-# define variables
-output_path = "/tmp/output_1"
-expr_config = "../corl/config/experiments/docking_1d.yml"
-task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
-checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
+# # define variables
+# output_path = "/tmp/output_1"
+# expr_config = "../corl/config/experiments/docking_1d.yml"
+# task_config_path = "../corl/config/tasks/docking_1d/docking1d_task.yml"
+# checkpoint_path = "/media/john/HDD/AFRL/Docking-1D-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_cbccc_00000_0_num_gpus=0,num_workers=4,rollout_fragment_length=_2022-06-22_11-41-34/checkpoint_000150/checkpoint-150"
 
-evaluate(task_config_path, checkpoint_path, output_path, expr_config, serialize_Docking_1d)
+# evaluate(task_config_path, checkpoint_path, output_path, expr_config, serialize_Docking_1d)
 
-# stage  3
-# visualize(output_path)
+# # stage  3
+# # visualize(output_path)
