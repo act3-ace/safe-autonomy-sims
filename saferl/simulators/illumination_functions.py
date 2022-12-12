@@ -21,7 +21,7 @@ from matplotlib.patches import Circle
 ########################################################## ILLUMINATION ##########################################################
 
 
-def get_sun_position(current_time, dt, angular_velocity, initial_theta, r_avg):
+def get_sun_position(current_time, angular_velocity, initial_theta, r_avg):
     """
     Returns current sun position based on initial sun position and elapsed time
 
@@ -43,14 +43,14 @@ def get_sun_position(current_time, dt, angular_velocity, initial_theta, r_avg):
     sun_position: array
         array of sun position in meters (CWH coordinates)
     """
-    d_theta = angular_velocity * dt
+    d_theta = angular_velocity
     current_theta = d_theta * current_time + initial_theta
     sun_position = [r_avg * (math.cos(current_theta)), -r_avg * (math.sin(current_theta)), 0]
 
     return sun_position
 
 
-def get_sun_angle(current_time, dt, angular_velocity, initial_theta):
+def get_sun_angle(current_time, angular_velocity, initial_theta):
     """
     Return current sun angle based on initial sun position and time elapsed
 
@@ -70,7 +70,7 @@ def get_sun_angle(current_time, dt, angular_velocity, initial_theta):
     current_theta: float
         angle of sun with respect to chief in radians
     """
-    d_theta = angular_velocity * dt
+    d_theta = angular_velocity
     current_theta = d_theta * current_time + initial_theta
 
     return current_theta
