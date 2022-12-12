@@ -79,7 +79,7 @@ class RTAInterveningReward(RewardFuncBase):
 
         reward = RewardDict()
         value = 0.
-        if observation[self.config.agent_name]['RTAModule']['intervening']:
+        if next_observation[self.config.agent_name]['RTAModule']['intervening']:
             value = self.config.scale
 
         reward[self.config.agent_name] = value
