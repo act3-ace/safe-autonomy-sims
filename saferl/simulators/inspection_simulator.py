@@ -203,7 +203,6 @@ class InspectionSimulator(SafeRLSimulator):
                     current_time = self.clock
                     sun_position = illum.get_sun_position(
                         current_time,
-                        self.config.step_size,
                         self.config.illumination_params.mean_motion,
                         self.config.illumination_params.sun_angle,
                         self.config.illumination_params.avg_rad_Earth2Sun
@@ -270,7 +269,6 @@ class InspectionSimulator(SafeRLSimulator):
                         light_properties = self.config.illumination_params.light_properties
                         current_theta = illum.get_sun_angle(
                             self.clock,
-                            self.config.step_size,
                             self.config.illumination_params.mean_motion,
                             self.config.illumination_params.sun_angle
                         )
