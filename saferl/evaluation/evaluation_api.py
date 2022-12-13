@@ -270,7 +270,7 @@ def checkpoints_list_from_training_output(training_output_path: str, output_dir:
 
     Returns
     -------
-    ckpt_dirs: list
+    checkpoint_paths: list
         A list of absolute paths to each checkpoint file fouund in the provided training_output_path
     output_dir_paths: list
         A list of absolute paths used to determine where to save Evaluation Episode data for each checkpoint
@@ -279,16 +279,17 @@ def checkpoints_list_from_training_output(training_output_path: str, output_dir:
     # assume training_output path absolute
     ckpt_dirs = sorted(glob(training_output_path + "/checkpoint_*"), key=lambda path: int(path.split("/")[-1].split("_")[-1]))
     output_dir_paths = []
+    checkpoint_paths = []
     # add checkpoint files
     for ckpt_dir in ckpt_dirs:
         ckpt_num = str(int(ckpt_dir.split("/")[-1].split("_")[-1]))
-        ckpt_dir += "/checkpoint-" + ckpt_num
+        checkpoint_paths.append(ckpt_dir + "/checkpoint-" + ckpt_num)
 
         # add checkpoint to list of outputs
         output_path = output_dir + "/" + experiment_name + "/" + "ckpt_" + ckpt_num
         output_dir_paths.append(output_path)
 
-    return ckpt_dirs, output_dir_paths  # TODO: need ckpt nums for tracking iterations / training interactions?
+    return checkpoint_paths, output_dir_paths
 
 
 def add_required_metrics(metrics_config: dict):
