@@ -351,14 +351,14 @@ def run_ablation_study(
     platfrom_serializer_class: PlatformSerializer,
     plot_output_path: str,
     plot_config: dict = None,
-    create_plot: bool = True,
+    create_plot: bool = False,
     test_case_manager_config: dict = None
 ):
     """
     This function serves as a high level interface for users conducting ablative studies using CoRL. It is
     responsible for processing a collection of CoRL training outputs. This includes iteratively loading policies
     from checkpoints, running those policies in evaluation episodes, collecting data, analyzing data with Metrics,
-    and visualizing calculated Metrics in a plot.
+    and optionally visualizing calculated Metrics in a plot.
 
     Parameters
     ----------
@@ -634,7 +634,7 @@ def create_sample_complexity_plot(
     xaxis='num_interactions',
     yaxis='TotalReward',
     hue='experiment',
-    ci='sd',
+    ci=95,
     xmax=None,
     ylim=None,
     **kwargs
