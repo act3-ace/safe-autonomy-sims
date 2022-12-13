@@ -106,3 +106,36 @@ PluginLibrary.AddClassToGroup(
         "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
+
+
+class InspectedPointsSensor(CWHSensor):
+    """
+    Implementation of a sensor to give number of points at any time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.InspectedPointProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - num_inspected_points.
+
+        Returns
+        -------
+        int
+            Number of inspected points.
+        """
+        return self.parent_platform.num_inspected_points
+
+
+PluginLibrary.AddClassToGroup(
+    InspectedPointsSensor, "Sensor_InspectedPoints", {
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    InspectedPointsSensor, "Sensor_InspectedPoints", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
