@@ -349,7 +349,7 @@ def run_ablation_study(
     experiemnt_config_path: str,
     metrics_config: dict,
     platfrom_serializer_class: PlatformSerializer,
-    plot_output_path: str,
+    plot_output_path: str = None,
     plot_config: dict = None,
     create_plot: bool = False,
     test_case_manager_config: dict = None
@@ -426,6 +426,7 @@ def run_ablation_study(
 
     # TODO: for metric in metric_config: (plot every given metric?)
     if create_plot:
+        assert plot_output_path is not None, "'plot_output_path' must be defined in oder to save created plot"
         create_sample_complexity_plot(data, plot_output_path, **plot_config)
 
     return data
