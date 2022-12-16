@@ -402,24 +402,37 @@ def run_ablation_study(
     # add required metrics
     metrics_config = add_required_metrics(metrics_config)
 
-    evaluation_ouput_dir = '/tmp/ablation_results/'
+    evaluation_ouput_dir = '/tmp/ablation_results'
 
     # evaluate provided trained policies' checkpoints
     experiment_to_eval_results_map = {}
-    for experiment_name, experiment_dir in experiment_training_output_paths.items():
-        checkpoint_paths, output_paths = checkpoints_list_from_training_output(experiment_dir, evaluation_ouput_dir, experiment_name)
-        metadata = extract_metadata(checkpoint_paths)
-        experiment_to_eval_results_map[experiment_name] = {"output_paths": output_paths, "metadata": metadata}
-        run_evaluations(
-            task_config_path,
-            experiemnt_config_path,
-            metrics_config,
-            checkpoint_paths,
-            output_paths,
-            platfrom_serializer_class,
-            test_case_manager_config=test_case_manager_config,
-            visualize_metrics=False
-        )
+    for experiment_name, experiment_dirs in experiment_training_output_paths.items():
+
+        # if single training output provided, wrap in list
+        experiment_dirs = [experiment_dirs] if not isinstance(experiment_dirs, list) else experiment_dirs
+        for index, experiment_dir in enumerate(experiment_dirs):
+
+            # append index to evaluation_output path
+            experiment_indexed_name = experiment_name + "__{}".format(index)
+
+            checkpoint_paths, output_paths = checkpoints_list_from_training_output(
+                experiment_dir,
+                evaluation_ouput_dir,
+                experiment_indexed_name
+            )
+            metadata = extract_metadata(checkpoint_paths)
+            # temporarily index experiemnts listed under same name
+            experiment_to_eval_results_map[experiment_name + '__{}'.format(index)] = {"output_paths": output_paths, "metadata": metadata}
+            run_evaluations(
+                task_config_path,
+                experiemnt_config_path,
+                metrics_config,
+                checkpoint_paths,
+                output_paths,
+                platfrom_serializer_class,
+                test_case_manager_config=test_case_manager_config,
+                visualize_metrics=False
+            )
 
     # create sample complexity plot
     data = construct_dataframe(experiment_to_eval_results_map, metrics_config)
@@ -577,7 +590,7 @@ def construct_dataframe(results: dict, metrics_config: dict):
         A DataFrame containing Metric values collected for each checkpoint of each experiment by row
     """
     metric_names = parse_metrics_config(metrics_config)
-    columns = ['experiment', 'iterations', 'num_episodes', 'num_interactions', 'episode ID']
+    columns = ['experiment', 'experiment_index', 'evaluation_trial_index', 'iterations', 'num_episodes', 'num_interactions']
 
     # need to parse each metrics.pkl file + construct DataFrame
     data = []
@@ -598,15 +611,11 @@ def construct_dataframe(results: dict, metrics_config: dict):
                 metrics = pickle.load(metrics_file)
             episode_events = list(metrics.participants.values())[0].events  # TODO: remove single agent env assumption
 
-            index = 0
-            for event in episode_events:
-                # aggregate trial data (single dataframe entry)
-                row = [experiment_name, num_iterations, num_episodes, num_env_interactions]
+            expr_name, expr_index = experiment_name.split("__")  # separate appended indexing from experiment name
 
-                # track trial number / ID
-                episode_id = index
-                index += 1
-                row.append(episode_id)
+            for eval_trial_index, event in enumerate(episode_events):
+                # aggregate trial data (single dataframe entry)
+                row = [expr_name, expr_index, eval_trial_index, num_iterations, num_episodes, num_env_interactions]
 
                 # collect agent's metric values on each trial in eval
                 for metric_name in metric_names['agent']['__default__']:  # type: ignore
