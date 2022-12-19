@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.6.0...v0.6.1) (2022-12-12)
+
+
+### Bug Fixes
+
+* remove dt from illumination functions ([2fde8d0](https://github.com/act3-ace/safe-autonomy-sims/commit/2fde8d0cbfcb58729a236b81cc8f84f8508daefc))
+
 # [0.6.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.5.1...v0.6.0) (2022-12-01)
 
 
