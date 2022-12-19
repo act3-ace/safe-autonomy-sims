@@ -6,3 +6,4 @@ safe-autonomy-dynamics==0.4.0
 factory-boy==3.2.1
 jsonlines
 tqdm
+seaborn==0.11.2
