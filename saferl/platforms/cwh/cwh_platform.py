@@ -58,6 +58,7 @@ class CWHPlatform(BaseSafeRLPlatform):
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._platform = self.config.platform
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
+        self.inspected_points = 0
 
     @property
     def get_validator(self) -> typing.Type[CWHPlatformValidator]:
@@ -123,6 +124,25 @@ class CWHPlatform(BaseSafeRLPlatform):
             The velocity vector of the platform.
         """
         return self._platform.velocity
+
+    @property
+    def num_inspected_points(self):
+        """
+        Number of points on sphere inspected.
+
+        Returns
+        -------
+        np.ndarray
+            Number of points on sphere inspected.
+        """
+        return np.array([self.inspected_points])
+
+    @num_inspected_points.setter
+    def num_inspected_points(self, val: int):
+        """
+        Set number of points inspected.
+        """
+        self.inspected_points = val
 
     @property
     def operable(self):
