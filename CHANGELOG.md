@@ -1,3 +1,15 @@
+# [0.7.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.6.1...v0.7.0) (2022-12-21)
+
+
+### Bug Fixes
+
+* **rta_rewards:** use next observation ([a27dc11](https://github.com/act3-ace/safe-autonomy-sims/commit/a27dc113ffe39e28f23f26ee288d52f41faa8281))
+
+
+### Features
+
+* add inspection points sensor ([3947163](https://github.com/act3-ace/safe-autonomy-sims/commit/394716327335bc4c56179e52f49b4cdb34c4cd1e)), closes [#187](https://github.com/act3-ace/safe-autonomy-sims/issues/187)
+
 ## [0.6.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.6.0...v0.6.1) (2022-12-12)
 
 
