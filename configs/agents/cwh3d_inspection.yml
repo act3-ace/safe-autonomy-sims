@@ -15,7 +15,8 @@
         {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
         {"part": "Controller_Thrust", "config": {"name": "Z Thrust", "axis": 2, properties: {name: "z_thrust"}}},
         {"part": "Sensor_Position"},
-        {"part": "Sensor_Velocity"}
+        {"part": "Sensor_Velocity"},
+        {"part": "Sensor_InspectedPoints"}
     ],
     "episode_parameter_provider": {
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -149,6 +150,15 @@
                   "mu": 0.0,
                   "sigma": [0.5, 0.5, 0.5],
               }
+            },
+          },
+        },
+        {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_InspectedPoints",
+              "normalization": {
+                  "enabled": False
             },
           },
         },
