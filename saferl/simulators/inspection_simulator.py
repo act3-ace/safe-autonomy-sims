@@ -194,8 +194,13 @@ class InspectionSimulator(SafeRLSimulator):
 
     def _step_update_sim_statuses(self, step_size: float):
         # update points
-        for _, entity in self.agent_sim_entities.items():
+        for platform in self._state.sim_platforms:
+            agent_id = platform.name
+            entity = self.sim_entities[agent_id]
             self._update_points(entity.position)
+
+            # update the observation space with number of inspected points
+            platform.num_inspected_points = illum.num_inspected_points(self._state.points)
 
             if self.illum_flag:
                 # Render scene every m simulation seconds
@@ -268,9 +273,7 @@ class InspectionSimulator(SafeRLSimulator):
                         chief_properties = self.config.illumination_params.chief_properties
                         light_properties = self.config.illumination_params.light_properties
                         current_theta = illum.get_sun_angle(
-                            self.clock,
-                            self.config.illumination_params.mean_motion,
-                            self.config.illumination_params.sun_angle
+                            self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle
                         )
                         if self.config.illumination_params.bin_ray_flag:
                             self._state.points[point] = illum.check_illum(point, current_theta, r_avg, r)

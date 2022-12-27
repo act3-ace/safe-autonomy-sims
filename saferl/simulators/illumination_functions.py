@@ -118,6 +118,18 @@ def check_illum(point, sun_angle, r_avg, radius):
     return bool_val
 
 
+def num_inspected_points(points):
+    """
+    Returns number of inspected points
+    """
+    pts = 0
+    for point in points:
+        if points[point]:
+            pts += 1
+
+    return pts
+
+
 def evaluate_RGB(RGB):
     """
     Receive RGB array
