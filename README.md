@@ -21,7 +21,7 @@ or [conda](https://docs.conda.io/projects/conda/en/latest/index.html) environmen
 ### Normal installation
 
 1. Navigate to the 
-[install.sh](https://github.com/act3-ace/safe-autonomy-sims/-/blob/174-create-install-script/install.sh)
+[install.sh](https://github.com/act3-ace/safe-autonomy-sims/-/blob/main/install.sh)
 file in the browser and click the download button located above 
 the top right of the file contents.
 2. Generate a GitLab [personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
