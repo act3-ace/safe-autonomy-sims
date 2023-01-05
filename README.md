@@ -11,83 +11,79 @@ safe-autonomy-dynamics, and run-time-assurance libraries.
 ## Installation
 The following instructions detail how to install 
 the safe-autonomy-sims library and its dependencies on your local system.
-It is recommended to install the python modules within 
+This repository provides a helper installation script `install.sh`
+which allows users to install the safe-autonomy-sims package and
+its dependencies onto a local machine from the secure ACT3
+GitLab instance. It is recommended to run `install.sh` within 
 a [virtualenv](https://virtualenv.pypa.io/en/stable/#)
 or [conda](https://docs.conda.io/projects/conda/en/latest/index.html) environment.
 
-### Installing CoRL
-Clone a copy of the CoRL source code onto
-your local machine via SSH:
-```shell
-git clone git@github.com/act3-ace:act3-rl/corl.git
+### Normal installation
+
+1. Navigate to the 
+[install.sh](https://github.com/act3-ace/safe-autonomy-sims/-/blob/174-create-install-script/install.sh)
+file in the browser and click the download button located above 
+the top right of the file contents.
+2. Generate a GitLab [personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
+with at least `read_api` access if you don't already have one (save this token!).
+3. Make your local copy of `install.sh` executable:
+```bash
+# Replace path/to/install.sh with the actual path
+chmod +x path/to/install.sh
 ```
-or HTTPS:
-```shell
-git clone https://github.com/act3-ace/act3-rl/corl.git
+4. **(Recommended)** Activate your desired environment:
+```bash
+# Example using conda environment named myenv
+conda activate myenv
+```
+5. Run `install.sh`, passing in a personal access token:
+```bash
+# Replace path/to/install.sh with the actual path
+# Replace <my-access-token> with your personal access token
+path/to/install.sh -p <my-access-token>
 ```
 
-Install the CoRL module into your 
-environment using `pip`:
-```shell
-pip install path/to/corl/
-```
+This should install the safe-autonomy-sims python package and its
+dependencies into your local activated environment.
 
-### Installing run-time-assurance
-Clone a copy of the run-time-assurance source code onto
-your local machine via SSH:
-```shell
-git clone git@github.com/act3-ace:rta/safe-autonomy-stack/run-time-assurance.git
-```
-or HTTPS:
-```shell
-git clone https://github.com/act3-ace/run-time-assurance.git
-```
+### Developer installation
+The following instructions are for active developers of safe-autonomy-sims.
+These instructions will guide you through creating an editable
+local installation of this repository.
 
-Install the run-time-assurance module into your 
-environment using `pip`:
-```shell
-pip install path/to/run-time-assurance/
-```
-
-### Installing safe-autonomy-dynamics
-Clone a copy of the safe-autonomy-dynamics source code onto
-your local machine via SSH:
-```shell
-git clone git@github.com/act3-ace:rta/safe-autonomy-stack/safe-autonomy-dynamics.git
-```
-or HTTPS:
-```shell
-git clone https://github.com/act3-ace/safe-autonomy-dynamics.git
-```
-
-Install the safe-autonomy-dynamics module into your 
-environment using `pip`:
-```shell
-pip install path/to/safe-autonomy-dynamics/
-```
-
-### Installing safe-autonomy-sims
-Clone a copy of the safe-autonomy-sims source code 
-onto your local machine via SSH:
-```shell
+1. Clone the safe-autonomy-sims repository
+```bash
+# via SSH (recommended)
 git clone git@github.com/act3-ace:rta/safe-autonomy-stack/safe-autonomy-sims.git
 ```
-or HTTPS:
-```shell
+```bash
+# via HTTPS
 git clone https://github.com/act3-ace/safe-autonomy-sims.git
 ```
-
-Install the safe-autonomy-sims module into your 
-environment using `pip`:
-```shell
-pip install path/to/safe-autonomy-sims/
+2. Generate a GitLab [personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token)
+with at least `read_api` access if you don't already have one (save this token!).
+3. Make your local copy of `install.sh` executable:
+```bash
+# Replace path/to/install.sh with the actual path
+chmod +x path/to/install.sh
+```
+4. **(Recommended)** Activate your desired environment:
+```bash
+# Example using conda environment named myenv
+conda activate myenv
+```
+5. Run `install.sh` with the developer `-d` option inside the root of the repository,
+passing in a personal access token:
+```bash
+# Run inside safe-autonomy-sims root
+# Replace <my-access-token> with your personal access token
+./install.sh -p <my-access-token> -d
 ```
 
-For a local development version, please install 
-using the `-e, --editable` option:
-```shell
-pip install -e path/to/safe-autonomy-sims/
-```
+This should install the safe-autonomy-sims package as an
+editable pip installation in your local activated environment.
+Any changes you make in the repository should be reflected live in
+your environment.
 
 ## Local Documentation
 
