@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import ray.tune as tune
 from corl.evaluation.default_config_updates import DoNothingConfigUpdate
 from corl.evaluation.evaluation_artifacts import (
     EvaluationArtifact_EvaluationOutcome,
@@ -723,3 +724,114 @@ def create_sample_complexity_plot(
     plot.get_figure().savefig(plot_output_file)
 
     return plot
+
+
+# def checkpoints_list_from_experiment_state(experiment_state_path: str, output_dir: str):
+#     """
+#     This function is responsible for compiling a list of paths to each checkpoint in a training output directory.
+#     This acts as a helper function for when users want to evaluate a series of checkpoints from a single training job.
+
+#     Parameters
+#     ----------
+#     training_output_path: str
+#         The absolute path to the directory containing saved checkpoints and results from a training job
+#     output_dir: str
+#         The absolute path to the directory that will hold the results from Evaluation Episodes
+#     experiment_name: str
+#         The name of the experiment under evaluation
+
+#     Returns
+#     -------
+#     checkpoint_paths: list
+#         A list of absolute paths to each checkpoint file fouund in the provided training_output_path
+#     output_dir_paths: list
+#         A list of absolute paths used to determine where to save Evaluation Episode data for each checkpoint
+#     """
+
+#     # create ExperimentAnalysis object to handle Trial Checkpoints
+#     expr_analysis = tune.analysis.experiment_analysis.ExperimentAnalysis(experiment_state_path)
+
+
+
+#     # assume training_output path absolute
+#     ckpt_dirs = sorted(glob(training_output_path + "/checkpoint_*"), key=lambda path: int(path.split("/")[-1].split("_")[-1]))
+#     output_dir_paths = []
+#     checkpoint_paths = []
+#     # add checkpoint files
+#     for ckpt_dir in ckpt_dirs:
+#         ckpt_num = str(int(ckpt_dir.split("/")[-1].split("_")[-1]))
+#         checkpoint_paths.append(ckpt_dir + "/checkpoint-" + ckpt_num)
+
+#         # add checkpoint to list of outputs
+#         output_path = output_dir + "/" + experiment_name + "/" + "ckpt_" + ckpt_num
+#         output_dir_paths.append(output_path)
+
+#     return checkpoint_paths, output_dir_paths
+
+
+
+from ray.air.checkpoint import Checkpoint
+# test Expr Analysis for ckpt handling
+# path = '/tmp/safe_autonomy/ray_results/ACT3-RLLIB-AGENTS/CWH-3D-INSPECTION-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_918fa_00000_0_num_gpus=0,num_workers=6,rollout_fragment__2023-01-10_14-18-31'
+path = '/media/john/HDD/AFRL/ACT3-RLLIB-AGENTS/experiment_state-2023-01-10_20-32-16.json'
+expr_analysis = tune.analysis.experiment_analysis.ExperimentAnalysis(path)
+ckpt_paths = expr_analysis.get_trial_checkpoints_paths(expr_analysis._get_trial_paths()[0])
+trialrunner = expr_analysis.runner_data()
+ckpt = Checkpoint.from_directory(ckpt_paths[0][0])
+
+
+
+1+1
+
+
+#test
+from saferl.evaluation.evaluation_api import run_ablation_study, create_sample_complexity_plot
+
+# import our serializer for CWH platforms
+from saferl.evaluation.launch.serialize_cwh3d import SerializeCWH3D
+
+# Define variables
+
+training_output_dirs = {
+    'experiment_name1': '/media/john/HDD/AFRL/inspection/CWH-3D-INSPECTION-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_3a14c_00000_0_num_gpus=0,num_workers=6,rollout_fragment__2023-01-06_15-46-43',
+}
+expr_config = '/home/john/AFRL/ACT3/safe-autonomy-sims/configs/experiments/inspection/inspection_3d.yml'
+task_config_path = '/home/john/AFRL/ACT3/safe-autonomy-sims/configs/tasks/cwh3d_inspection/cwh3d_task.yml'
+
+metrics_config = {
+    "agent": {
+        "__default__": [
+            {
+                "name": "TotalReward",
+                "functor": "corl.evaluation.metrics.generators.rewards.TotalReward",
+                "config": {
+                    "description": "total reward calculated from test case rollout"
+                }
+            },
+        ]
+    }
+}
+
+default_test_case_manager_config = {
+    "test_case_strategy_class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
+    "config": {
+        "num_test_cases": 3
+    }
+}
+
+# launch ablation study pipeline
+dataframe = run_ablation_study(training_output_dirs, task_config_path, expr_config, metrics_config, SerializeCWH3D, test_case_manager_config=default_test_case_manager_config)
+
+# create sample complexity plot
+# plot_ouput = '/absolute/path/to/desired/plot/save/location.png'
+plot_ouput = '/media/john/HDD/AFRL/test_plot.png'
+
+plot_config = {
+    "yaxis": "TotalReward",
+    "xaxis": "num_interactions"
+}
+
+axis = create_sample_complexity_plot(dataframe, plot_ouput, **plot_config)
+
+# Note: the two asterisks in front of the plot_config convert the items in the plot_config dict into keyword arguments
+#       ex. my_function( **{'x_axis': 'episodes'} ) -> my_function(x_axis='episodes')
