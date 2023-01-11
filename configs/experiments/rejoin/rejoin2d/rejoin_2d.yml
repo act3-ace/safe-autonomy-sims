@@ -9,24 +9,16 @@
 #---------------------------------------------------------------------------
 "config": "configs/tasks/dubins2d/dubins2d_task.yml"
 "platform_config":
-  - [
-      "blue0",
-      "configs/platforms/dubins2d_platform.yml",
-    ]
-  - [
-      "red0",
-      "configs/platforms/dubins2d_platform.yml",
-    ]
+  - name: "blue0"
+    config: "configs/platforms/dubins2d_platform.yml"
+  - name: "red0"
+    config: "configs/platforms/dubins2d_platform.yml"
 "agent_config":
-  - [
-      "blue0",
-      "blue0",
-      "configs/agents/dubins/dubins2d/dubins2d_rejoin.yml",
-      "configs/policy/ppo/default_config.yml",
-    ]
-  - [
-      "red0",
-      "red0",
-      "configs/agents/dubins/dubins2d/dubins2d_rejoin_noop.yml",
-      "configs/policy/rejoin/scripted_lead_2d.yml",
-    ]
+  - name: "blue0_ctrl"
+    platofrms: ["blue0"]
+    config: "configs/agents/dubins/dubins2d/dubins2d_rejoin.yml"
+    policy: "configs/policy/ppo/default_config.yml"
+  - name: "red0_ctrl"
+    platforms: ["red0"]
+    config: "configs/agents/dubins/dubins2d/dubins2d_rejoin_noop.yml"
+    policy: "configs/policy/rejoin/scripted_lead_2d.yml"
