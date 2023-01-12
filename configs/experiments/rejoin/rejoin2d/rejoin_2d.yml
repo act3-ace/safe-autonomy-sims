@@ -7,6 +7,7 @@
 #The use, dissemination or disclosure of data in this file is subject to
 #limitation or restriction. See accompanying README and LICENSE for details.
 #---------------------------------------------------------------------------
+
 "config": "configs/tasks/dubins2d/dubins2d_task.yml"
 "platform_config":
   - name: "blue0"
@@ -15,7 +16,7 @@
     config: "configs/platforms/dubins2d_platform.yml"
 "agent_config":
   - name: "blue0_ctrl"
-    platofrms: ["blue0"]
+    platforms: ["blue0"]
     config: "configs/agents/dubins/dubins2d/dubins2d_rejoin.yml"
     policy: "configs/policy/ppo/default_config.yml"
   - name: "red0_ctrl"
