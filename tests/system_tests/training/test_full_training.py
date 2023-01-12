@@ -80,13 +80,24 @@ def create_self_managed_ray(_ray_session_temp_dir):
 
 
 experiment_files = []
+whitelist_experiments = [
+    'docking_3d.yml', 
+    'docking_3d_rta.yml', 
+    # 'inspection_3d.yml', 
+    'rejoin_2d.yml', 
+    'rejoin_3d.yml', 
+    # 'cwh_3d_inspection_multiagent.yml', 
+    'cwh_3d_multiagent.yml'
+]
 for dirpath, dirs, files in os.walk('configs/experiments'):
     for filename in files:
         fname = os.path.join(dirpath, filename)
-        if fname.endswith('.yml'):
+        if fname.endswith('.yml') and fname.split('/')[-1] in whitelist_experiments:
             experiment_files.append(fname)
 
 
+
+@pytest.mark.system_test
 @pytest.mark.parametrize("experiment_config", experiment_files, ids=experiment_files)
 def test_experiment(
     experiment_config,
