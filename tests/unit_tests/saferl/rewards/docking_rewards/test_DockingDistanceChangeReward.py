@@ -63,7 +63,7 @@ def fixture_scale(request):
 
 
 @pytest.fixture(name='cut')
-def fixture_cut(cut_name, agent_name, scale):
+def fixture_cut(cut_name, agent_name, platform_name, scale):
     """
     A fixture that instantiates a DockingDistanceChangeReward Function and returns it.
 
@@ -81,7 +81,7 @@ def fixture_cut(cut_name, agent_name, scale):
     DockingDistanceChangeReward
         An instantiated component under test
     """
-    return DockingDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name)
+    return DockingDistanceChangeReward(name=cut_name, scale=scale, agent_name=agent_name, platform_names=[platform_name])
 
 
 @pytest.fixture(name='call_results')

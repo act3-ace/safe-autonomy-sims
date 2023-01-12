@@ -224,15 +224,15 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
         done = DoneDict()
 
-        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+        wingman_agent_platform = get_platform_by_name(next_state, self.config.agent_name)
         lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
-        done[self.agent] = dist > self.config.max_distance
+        done[self.config.platform_name] = dist > self.config.max_distance
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
 
         self._set_all_done(done)
         return done
@@ -325,15 +325,15 @@ class CrashDoneFunction(DoneFuncBase):
 
         done = DoneDict()
 
-        wingman_agent_platform = get_platform_by_name(next_state, self.agent)
+        wingman_agent_platform = get_platform_by_name(next_state, self.config.agent_name)
         lead_aircraft_platform = get_platform_by_name(next_state, self.config.lead)
 
         dist = np.linalg.norm(wingman_agent_platform.position - lead_aircraft_platform.position)
 
-        done[self.agent] = dist <= self.config.safety_margin
+        done[self.config.platform_name] = dist <= self.config.safety_margin
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
 
         self._set_all_done(done)
         return done

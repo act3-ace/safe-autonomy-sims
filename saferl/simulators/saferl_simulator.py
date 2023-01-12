@@ -17,9 +17,9 @@ import abc
 import typing
 
 import numpy as np
-from corl.libraries.state_dict import StateDict
 from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
+from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, PyObject
 from safe_autonomy_dynamics.base_models import BaseEntity
 
@@ -103,8 +103,9 @@ class SafeRLSimulator(BaseSimulator):
         self.additional_sim_entities: typing.Dict[str, BaseEntity] = {}
         self.platform_map = self._construct_platform_map()
         self.sim_entities = self._construct_sim_entities()
-        self._state = StateDict()
         self.clock = 0.0
+
+        self._state: BaseSimulatorState = None
 
     def reset(self, config):
         config = self.get_reset_validator(**config)
@@ -112,10 +113,11 @@ class SafeRLSimulator(BaseSimulator):
             # if an initializer defined, pass agent reset configs through it
             initializer = config.initializer.functor(config=config.initializer.config)
             config.platforms = initializer(config.platforms)
-        self._state.clear()
+
         self.clock = 0.0
         self.sim_entities = self._construct_sim_entities(config)
-        self._state.sim_platforms = self.construct_platforms()
+        sim_platforms = self.construct_platforms()
+        self._state = BaseSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock)
         self.update_sensor_measurements()
         return self._state
 
@@ -207,7 +209,7 @@ class SafeRLSimulator(BaseSimulator):
 
         return entities
 
-    def construct_platforms(self) -> tuple:
+    def construct_platforms(self) -> dict:
         """
         Gets the platform object associated with each simulation entity.
 
@@ -216,20 +218,20 @@ class SafeRLSimulator(BaseSimulator):
         tuple
             Collection of platforms associated with each simulation entity.
         """
-        sim_platforms = []
-        for agent_id, entity in self.agent_sim_entities.items():
-            agent_config = self.config.agent_configs[agent_id]
+        sim_platforms = {}
+        for platform_id, entity in self.agent_sim_entities.items():
+            agent_config = self.config.agent_configs[platform_id]
             platform_config = agent_config.platform_config
             platform_class = self.platform_map[platform_config.get('platform', 'default')][1]
-            sim_platforms.append(platform_class(platform_name=agent_id, platform=entity, parts_list=agent_config.parts_list))
-        return tuple(sim_platforms)
+            sim_platforms[platform_id] = platform_class(platform_name=platform_id, platform=entity, parts_list=agent_config.parts_list)
+        return sim_platforms
 
     def update_sensor_measurements(self):
         """
         Update and cache all the measurements of all the sensors on each platform.
         """
-        for plat in self._state.sim_platforms:
-            for sensor in plat.sensors:
+        for plat in self._state.sim_platforms.values():
+            for sensor in plat.sensors.values():
                 sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
 
     def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict):
@@ -262,16 +264,16 @@ class SafeRLSimulator(BaseSimulator):
 
     def _step_get_entity_actions(self, step_size: float) -> typing.Dict:  # pylint: disable = unused-argument
         entity_actions = {}
-        for platform in self._state.sim_platforms:
-            agent_id = platform.name
+        for platform in self._state.sim_platforms.values():
+            platform_id = platform.name
             action = np.array(platform.get_applied_action(), dtype=np.float32)
-            entity_actions[agent_id] = action
+            entity_actions[platform_id] = action
 
         return entity_actions
 
     def _step_update_time(self, step_size: float):
         self.clock += step_size
-        for platform in self._state.sim_platforms:
+        for platform in self._state.sim_platforms.values():
             platform.sim_time = self.clock
 
     def _step_update_sim_statuses(self, step_size: float):

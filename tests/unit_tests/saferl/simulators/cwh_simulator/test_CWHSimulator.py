@@ -16,7 +16,7 @@ Author: Jamie Cunningham
 import os
 
 import pytest
-from corl.libraries.state_dict import StateDict
+from corl.simulators.base_simulator_state import BaseSimulatorState
 
 from saferl.simulators.cwh_simulator import CWHSimulator
 from tests.conftest import delimiter, read_test_cases
@@ -54,16 +54,15 @@ def fixture_reset_config(request):
 @pytest.fixture(name='expected_state')
 def fixture_expected_state(expected_sim_platforms):
     """Returns valid expected state dict build from test assay settings"""
-    state = StateDict({
-        "sim_platforms": expected_sim_platforms,
-    })
+    clock = 0.0
+    state = BaseSimulatorState(sim_platforms=expected_sim_platforms, sim_time=clock)
     return state
 
 
 @pytest.fixture(name='expected_sim_entities')
 def fixture_expected_sim_entities(expected_sim_platforms):
     """Returns dict of valid sim entities built from test assay platforms"""
-    entities = {plat.name: plat._platform for plat in expected_sim_platforms}  # pylint: disable=W0212
+    entities = {name: plat._platform for name, plat in expected_sim_platforms.items()}  # pylint: disable=W0212
     return entities
 
 
@@ -76,7 +75,7 @@ def fixture_expected_platform_configs(request):
 @pytest.fixture(name='expected_sim_platforms')
 def fixture_expected_sim_platforms(expected_platform_configs):
     """Returns iterable of expected platforms built from test assay platform configs"""
-    platforms = tuple([CWHPlatformFactory(**(expected_platform_configs[0]))])
+    platforms = {expected_platform_configs[0]["platform_name"]: CWHPlatformFactory(**(expected_platform_configs[0]))}
     return platforms
 
 

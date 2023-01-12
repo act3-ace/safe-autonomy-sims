@@ -84,13 +84,13 @@ class TimeoutDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # get sim time
-        platform = get_platform_by_name(next_state, self.agent)
+        platform = get_platform_by_name(next_state, self.config.agent_name)
         sim_time = platform.sim_time
 
-        done[self.agent] = sim_time >= self.config.max_sim_time
+        done[self.config.platform_name] = sim_time >= self.config.max_sim_time
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
 
         self._set_all_done(done)
         return done
@@ -174,34 +174,36 @@ class CollisionDoneFunction(SharedDoneFuncBase):
     ) -> DoneDict:
 
         # get list of spacecrafts
-        agent_names = list(local_dones.keys())
+        platform_names = list(local_dones.keys())
         try:
-            agent_names.remove("__all__")
-        except ValueError as err:
-            print(err)
+            platform_names.remove("__all__")
+        except ValueError:
+            # TODO: remove try catch, if not necessary
+            # print(err)
+            pass
 
         # populate DoneDict
         done = DoneDict()
         for name in local_dones.keys():
             done[name] = False
 
-        # check if any spacecraft violates boundaries of other spacecrafts
-        while len(agent_names) > 1:
-            agent_name = agent_names.pop()
-            agent_platform = get_platform_by_name(next_state, agent_name)
-            agent_position = agent_platform.position
+        # check if any platform violates boundaries of other platforms
+        while len(platform_names) > 1:
+            name = platform_names.pop()
+            platform = get_platform_by_name(next_state, name)
+            position = platform.position
 
-            for other_agent_name in agent_names:
+            for other_platform_name in platform_names:
 
-                if local_dones[other_agent_name]:
+                if local_dones[other_platform_name]:
                     # skip if other_agent is done
                     continue
 
-                # check location against location of other agents for boundary violation
-                other_agent_platform = get_platform_by_name(next_state, other_agent_name)
-                other_agent_position = other_agent_platform.position
+                # check location against location of other platforms for boundary violation
+                other_platform = get_platform_by_name(next_state, other_platform_name)
+                other_platform_position = other_platform.position
 
-                radial_distance = np.linalg.norm(np.array(agent_position) - np.array(other_agent_position))
+                radial_distance = np.linalg.norm(np.array(position) - np.array(other_platform_position))
 
                 if radial_distance < self.config.safety_constraint:
                     # collision detected. stop loop and end episode
@@ -295,10 +297,10 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         for name in local_dones.keys():
             done[name] = False
 
-        for agent_name in local_done_info.keys():
-            if self.config.success_function_name in next_state.episode_state[agent_name]:
+        for platform_name in local_done_info.keys():
+            if self.config.success_function_name in next_state.episode_state[platform_name]:
                 # docking kvp exists
-                if next_state.episode_state[agent_name][self.config.success_function_name] != DoneStatusCodes.WIN:
+                if next_state.episode_state[platform_name][self.config.success_function_name] != DoneStatusCodes.WIN:
                     # agent failed to reach WIN condition
                     return done
             else:

@@ -91,9 +91,9 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
                 all_inspected = False
                 break
 
-        done[self.agent] = bool(all_inspected)
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+        done[self.config.platform_name] = bool(all_inspected)
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
         return done
 

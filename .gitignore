@@ -138,3 +138,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 site/
+
+# ssh
+*.ssh
+
+# vscode devcontainer
+*.devcontainer
