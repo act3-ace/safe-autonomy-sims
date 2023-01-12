@@ -180,6 +180,7 @@ def fixture_next_state(agent_name, cut_name):
 def fixture_cut(
     cut_name,
     agent_name,
+    platform_name,
     timeout,
     timeout_reward,
     distance_reward,
@@ -210,6 +211,7 @@ def fixture_cut(
     return DockingFailureReward(
         name=cut_name,
         agent_name=agent_name,
+        platform_names=[platform_name],
         timeout=timeout,
         timeout_reward=timeout_reward,
         distance_reward=distance_reward,

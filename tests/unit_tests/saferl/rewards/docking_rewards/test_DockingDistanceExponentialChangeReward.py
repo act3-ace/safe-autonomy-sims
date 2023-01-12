@@ -95,7 +95,7 @@ def fixture_pivot_ratio(request):
 
 
 @pytest.fixture(name='cut')
-def fixture_cut(cut_name, agent_name, scale, c, a, pivot, pivot_ratio):
+def fixture_cut(cut_name, agent_name, platform_name, scale, c, a, pivot, pivot_ratio):
     """
     A fixture that instantiates a DockingDistanceExponentialChangeReward Function and returns it.
 
@@ -122,7 +122,7 @@ def fixture_cut(cut_name, agent_name, scale, c, a, pivot, pivot_ratio):
         An instantiated component under test
     """
     return DockingDistanceExponentialChangeReward(
-        name=cut_name, scale=scale, c=c, a=a, pivot=pivot, pivot_ratio=pivot_ratio, agent_name=agent_name
+        name=cut_name, scale=scale, c=c, a=a, pivot=pivot, pivot_ratio=pivot_ratio, agent_name=agent_name, platform_names=[platform_name]
     )
 
 

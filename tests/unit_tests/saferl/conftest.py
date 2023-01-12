@@ -155,6 +155,19 @@ def fixture_agent_name():
     return "blue0"
 
 
+@pytest.fixture(name='platform_name')
+def fixture_platform_name():
+    """
+    Fixture to define a common platform name for tests.
+
+    Returns
+    -------
+    str
+        The common platform name
+    """
+    return "blue0_ctrl"
+
+
 @pytest.fixture(name='cut_name')
 def fixture_cut_name():
     """
