@@ -37,7 +37,7 @@ from corl.parsers.yaml_loader import apply_patches
 from corl.policies.base_policy import BasePolicyValidator
 from pydantic import BaseModel, PyObject, validator
 from ray import tune
-from ray.rllib.agents.callbacks import MultiCallbacks
+from ray.rllib.algorithms.callbacks import MultiCallbacks
 from ray.rllib.env.env_context import EnvContext
 from ray.tune.registry import get_trainable_cls
 
