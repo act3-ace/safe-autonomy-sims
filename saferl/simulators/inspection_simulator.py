@@ -17,6 +17,7 @@ import typing
 import matplotlib.pyplot as plt
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
+from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, validator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 
@@ -56,6 +57,17 @@ class IlluminationValidator(BaseModel):
     bin_ray_flag: bool
     render_flag_3d: bool
     render_flag_subplots: bool
+
+
+class InspectionSimulatorState(BaseSimulatorState):
+    """
+    The basemodel for the state of the InspectionSimulator.
+
+    points: dict
+        The dictionary containing the points the agent needs to inspect.
+        Keys: (x,y,z) tuple. Values: True if inspected, False otherwise.
+    """
+    points: typing.Dict
 
 
 def points_on_sphere_fibonacci(num_points: int, radius: float) -> list:
@@ -173,7 +185,7 @@ class InspectionSimulator(SafeRLSimulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._state.points = self._add_points()
+        self.points = self._add_points()
         self.illum_flag = False
         if self.config.illumination_params is not None:
             self.illum_flag = True
@@ -188,15 +200,15 @@ class InspectionSimulator(SafeRLSimulator):
 
     def reset(self, config):
         super().reset(config)
-        # self._state.clear()
-        self._state.points = self._add_points()
+        self.points = self._add_points()
+        self._state = InspectionSimulatorState(sim_platforms=self._state.sim_platforms, points=self.points, sim_time=self.clock)
         return self._state
 
     def _step_update_sim_statuses(self, step_size: float):
         # update points
-        for platform in self._state.sim_platforms:
-            agent_id = platform.name
-            entity = self.sim_entities[agent_id]
+        for platform in self._state.sim_platforms.values():
+            platform_id = platform.name
+            entity = self.sim_entities[platform_id]
             self._update_points(entity.position)
 
             # update the observation space with number of inspected points
