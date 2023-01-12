@@ -135,10 +135,10 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        done[self.agent] = bool(in_docking and not violated)
+        done[self.config.platform_name] = bool(in_docking and not violated)
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
         return done
 
@@ -244,9 +244,9 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        done[self.agent] = violated
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        done[self.config.platform_name] = violated
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
         return done
 
@@ -352,9 +352,9 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        done[self.agent] = violated
+        done[self.config.platform_name] = violated
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
         return done

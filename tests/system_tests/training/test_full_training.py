@@ -20,7 +20,7 @@ import pytest
 import ray
 from corl.experiments.base_experiment import ExperimentParse
 from corl.parsers.yaml_loader import load_file
-from corl.train_rl import MainUtilACT3Core
+from corl.train_rl import parse_corl_args
 
 from saferl.experiments.rllib_api_experiment import RllibAPIExperiment
 from scripts.base_rta_test import RTAExperiment
@@ -107,7 +107,7 @@ def test_experiment(
     """Test a configuration file
     """
     print(self_managed_ray)
-    args = MainUtilACT3Core.parse_args(["--cfg", experiment_config])
+    args = parse_corl_args(["--cfg", experiment_config])
     config = load_file(config_filename=args.config)
 
     experiment_parse = ExperimentParse(**config)

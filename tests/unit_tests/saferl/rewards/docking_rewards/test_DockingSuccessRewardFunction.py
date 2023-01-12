@@ -138,6 +138,7 @@ def fixture_cut(
     cut_name,
     scale,
     agent_name,
+    platform_name,
     timeout,
     docking_region_radius,
     velocity_threshold,
@@ -164,6 +165,7 @@ def fixture_cut(
     return DockingSuccessReward(
         name=cut_name,
         agent_name=agent_name,
+        platform_names=[platform_name],
         scale=scale,
         timeout=timeout,
         docking_region_radius=docking_region_radius,

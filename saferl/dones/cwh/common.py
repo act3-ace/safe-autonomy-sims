@@ -107,10 +107,10 @@ class MaxDistanceOriginDoneFunction(DoneFuncBase):
         # compute distance to origin
         dist = np.linalg.norm(np.array(position))
 
-        done[self.agent] = dist > self.config.max_distance
+        done[self.config.platform_name] = dist > self.config.max_distance
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
         return done
 
@@ -200,7 +200,7 @@ class CrashOriginDoneFunction(DoneFuncBase):
         position = deputy.position
         in_crash_region = np.linalg.norm(np.array(position)) <= self.config.crash_region_radius
 
-        done[self.agent] = in_crash_region
+        done[self.config.platform_name] = in_crash_region
 
         if self.config.velocity_constraint is not None:
             # check velocity constraint
@@ -214,9 +214,9 @@ class CrashOriginDoneFunction(DoneFuncBase):
                 slope=self.config.velocity_constraint.slope
             )
 
-            done[self.agent] = done[self.agent] and violated
+            done[self.config.platform_name] = done[self.config.platform_name] and violated
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.LOSE
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
         return done
