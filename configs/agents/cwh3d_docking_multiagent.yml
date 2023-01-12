@@ -150,7 +150,7 @@
         {
             "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
             "config":{
-                "max_distance": 40000,
+                "max_distance": 10000,
             },
         },
 #        {
