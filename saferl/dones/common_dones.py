@@ -177,7 +177,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         platform_names = list(local_dones.keys())
         try:
             platform_names.remove("__all__")
-        except ValueError as err:
+        except ValueError:
             # TODO: remove try catch, if not necessary
             # print(err)
             pass
