@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.0.0...v1.1.0) (2023-01-24)
+
+
+### Features
+
+* updated eval API for corl 2.4.1 ([4542d5f](https://github.com/act3-ace/safe-autonomy-sims/commit/4542d5f984b15d4513615c7d2e68f29924019021))
+
 # [1.0.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v0.7.0...v1.0.0) (2023-01-24)
 
 
