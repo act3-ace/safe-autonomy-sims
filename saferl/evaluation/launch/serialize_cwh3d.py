@@ -42,11 +42,11 @@ class SerializeCWH3D(PlatformSerializer):
         }
 
         dictionary["controllers"] = {}
-        for controller in platform.controllers:
+        for controller in platform.controllers.values():
             dictionary["controllers"][controller.name] = {"applied_controls": controller.get_applied_control()}
 
         dictionary["sensors"] = {}
-        for sensor in platform.sensors:
+        for sensor in platform.sensors.values():
             dictionary["sensors"][sensor.name] = {"measurement": sensor.get_measurement()}
 
         return dictionary
