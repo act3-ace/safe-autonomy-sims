@@ -81,7 +81,10 @@
             "functor": "saferl.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
             "config": {
               "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"],
-              "enabled": False,
+              "enabled": False, #set to True to turn RTA on
+              # No constraints listed defaults to all constraints active
+              # Constraint options: "chief_collision", "rel_vel", "sun", "r_max", "PSM", "x_vel", "y_vel", "z_vel"
+              # More details here: https://github.com/act3-ace/run-time-assurance/-/blob/main/run_time_assurance/zoo/cwh/inspection_1v1.py
               "constraints": ["chief_collision", "rel_vel"],
           },
           "references": {
