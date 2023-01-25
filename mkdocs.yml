@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 #Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-#Reinforcement Learning (RL) Core  Extension.
+#Reinforcement Learning (RL) Core Extension.
 #
 #This is a US Government Work not subject to copyright protection in the US.
 #
@@ -187,3 +187,4 @@ nav:
           - "saferl simulator":
               - reference/simulators/saferl_simulator.md
       - "utils": reference/utils.md
+  - "Working in ACE Hub at AFRL": working_in_acehub.md

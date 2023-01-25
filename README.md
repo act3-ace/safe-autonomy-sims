@@ -159,7 +159,8 @@ Static 1N thrusters in $\pm x, \pm y, \pm z$.
 
 ## Team
 Jamie Cunningham,
-Vardaan Gangal,
 Umberto Ravaioli,
 John McCarroll,
+Kyle Dunlap,
+Nate Hamilton,
 Kerianne Hobbs
