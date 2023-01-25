@@ -14,7 +14,11 @@
 experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
-    #num_workers: 0
+    model: 
+        fcnet_hiddens: [64, 64]
+        fcnet_activation: relu
+    num_workers: 2
+
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
