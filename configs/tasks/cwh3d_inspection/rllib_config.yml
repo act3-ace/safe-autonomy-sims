@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 #Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-#Reinforcement Learning (RL) Core  Extension.
+#Reinforcement Learning (RL) Core Extension.
 #
 #This is a US Government Work not subject to copyright protection in the US.
 #
@@ -9,7 +9,7 @@
 #---------------------------------------------------------------------------
 
 # === Environment ===
-horizon: 10000
+horizon: 11040 # episode length (number of steps); note 11040 is two 92 minute orbits in seconds
 
 # === Execution ===
 rollout_fragment_length: 200
@@ -18,14 +18,14 @@ sgd_minibatch_size: 1200
 batch_mode: complete_episodes
 
 # === Resources ===
-num_workers: 6
+num_workers: 2 #assuming 4 CPUs in ACE Hub, but can increase this to two less than the number of cores 
 num_cpus_per_worker: 1
 num_gpus_per_worker: 0
 num_envs_per_worker: 1
 
 custom_resources_per_worker: {}
 
-num_cpus_for_driver: 2
+num_cpus_for_driver: 1
 num_gpus: 0
 
 # === PPO ===
