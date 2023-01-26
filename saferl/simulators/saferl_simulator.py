@@ -273,6 +273,7 @@ class SafeRLSimulator(BaseSimulator):
 
     def _step_update_time(self, step_size: float):
         self.clock += step_size
+        self._state.sim_time = self.clock
         for platform in self._state.sim_platforms.values():
             platform.sim_time = self.clock
 
