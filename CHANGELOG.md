@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.1.0...v1.1.1) (2023-01-26)
+
+
+### Bug Fixes
+
+* Simulator state sim time ([2bd954d](https://github.com/act3-ace/safe-autonomy-sims/commit/2bd954d74c9d1fcfce0a10e6b2061803c58f3cb6))
+
 # [1.1.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.0.0...v1.1.0) (2023-01-24)
 
 
