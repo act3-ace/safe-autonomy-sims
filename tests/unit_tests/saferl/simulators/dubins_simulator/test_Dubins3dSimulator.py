@@ -139,8 +139,12 @@ test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_
 
 @pytest.mark.unit_test
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
-def test_step(cut, reset_config, expected_state):
+def test_step(cut, reset_config, expected_state, step_size):
     """Tests the step method of the Dubins3dSimulator"""
+
+    # set the expected state sim time to match the time elapsed during steps
+    expected_state.sim_time = step_size
+
     cut.reset(reset_config)
     state = cut.step()
     assert state == expected_state
