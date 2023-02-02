@@ -14,7 +14,7 @@ docs_dir: "docs"
 site_url: https://github.com/act3-ace/
 edit_uri: blob/main/docs/
 site_dir: site
-site_description: "The following python project creates a python interface for training Deep RL - provides the base RL functionality and APIs to enable rapid ablation testing and setup"
+site_description: "The following python project contains RL training environments for research into safe autonomous control in the air and space domain."
 
 plugins:
   - search
