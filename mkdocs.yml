@@ -187,4 +187,5 @@ nav:
           - "saferl simulator":
               - reference/simulators/saferl_simulator.md
       - "utils": reference/utils.md
+  - "Experiments": experiments.md
   - "Working in ACE Hub at AFRL": working_in_acehub.md
