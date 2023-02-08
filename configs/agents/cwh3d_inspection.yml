@@ -161,7 +161,11 @@
             "config": {
               "sensor": "Sensor_InspectedPoints",
               "normalization": {
-                  "enabled": False
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [100.0],
+              },
             },
           },
         },
@@ -242,20 +246,20 @@
             "crash_region_radius": "collision_radius",
           },
         },
-        {
-          "name": "InspectionVelocityConstraintReward",
-          "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
-          "config": {
-            "scale": -0.01,
-            "bias": -0.01,
-            "lower_bound": False,
-          },
-          "references": {
-            "velocity_threshold": "velocity_threshold",
-            "threshold_distance": "collision_radius",
-            "mean_motion": "mean_motion",
-          },
-        },
+        # {
+        #   "name": "InspectionVelocityConstraintReward",
+        #   "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
+        #   "config": {
+        #     "scale": -0.01,
+        #     "bias": -0.01,
+        #     "lower_bound": False,
+        #   },
+        #   "references": {
+        #     "velocity_threshold": "velocity_threshold",
+        #     "threshold_distance": "collision_radius",
+        #     "mean_motion": "mean_motion",
+        #   },
+        # },
         {
           # reward = scale (if RTA is intervening)
           "name": "InspectionRTAReward",

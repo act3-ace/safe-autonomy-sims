@@ -4,6 +4,6 @@
   "vel_limit_slope": 2,
   "velocity_threshold": 0.2,
   "max_distance": 500,
-  "step_size": 1,
+  "step_size": 10,
   "num_points": 100,
 }
