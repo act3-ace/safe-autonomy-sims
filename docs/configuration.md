@@ -17,7 +17,7 @@ The agent configuration file contains two top level fields:
     ...
 }
 ```
-- `agent`: agent class of type [BaseAgent](https://act3-rl.github.com/act3-ace/corl/reference/agents/base_agent/#corl.agents.base_agent.BaseAgent)
+- `agent`: agent class of type [BaseAgent]({{corl_docs_url}}/reference/agents/base_agent/#corl.agents.base_agent.BaseAgent)
 - `config`: agent configuration parameters (see below)
 
 ### Agent Config Parameters
@@ -43,7 +43,7 @@ include:
     ]
     ```
 - `episode_parameter_provider`: object which provides agent initialization parameters during an experiment
-  - `type`: class of type [EpisodeParameterProvider](https://act3-rl.github.com/act3-ace/corl/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
+  - `type`: class of type [EpisodeParameterProvider]({{corl_docs_url}}/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
   - `config`: implementation specific initialization parameters for the parameter provider
   - Example:
     ```yaml
@@ -87,7 +87,7 @@ include:
       ```
 
     - Glue entries have two top level fields:
-      - `functor`: a class of type [BaseAgentGlue](https://act3-rl.github.com/act3-ace/corl/reference/glues/base_glue/#corl.glues.base_glue.BaseAgentGlue)
+      - `functor`: a class of type [BaseAgentGlue]({{corl_docs_url}}/reference/glues/base_glue/#corl.glues.base_glue.BaseAgentGlue)
       - `config`: a set of glue-specific configuration arguments
       - Example:
       ```yaml
@@ -122,7 +122,7 @@ include:
       ```
 
     - Done function entries have two top level fields:
-      - `functor`: a class of type [DoneFuncBase](https://act3-rl.github.com/act3-ace/corl/reference/dones/done_func_base/#corl.dones.done_func_base.DoneFuncBase)
+      - `functor`: a class of type [DoneFuncBase]({{corl_docs_url}}/reference/dones/done_func_base/#corl.dones.done_func_base.DoneFuncBase)
       - `config`: a set of function-specific configuration arguments
       - Example:
       ```yaml
@@ -161,7 +161,7 @@ include:
 
     - Reward function entries have three top level fields:
       - `name`: a name for the reward function
-      - `functor`: a class of type [DoneFuncBase](https://act3-rl.github.com/act3-ace/corl/reference/dones/done_func_base/#corl.dones.done_func_base.DoneFuncBase)
+      - `functor`: a class of type [DoneFuncBase]({{corl_docs_url}}/reference/dones/done_func_base/#corl.dones.done_func_base.DoneFuncBase)
       - `config`: a set of function-specific configuration arguments
       - Example:
       ```yaml
@@ -183,7 +183,7 @@ types, specifying paths for various plugins, and defining
 and environment-level episode parameter provider.
 
 - `simulator`: the simulator used to process a single step in the environment and update the state of all objects in the environment during an episode.
-  - `type`: the registered name of a class of type [BaseSimulator](https://act3-rl.github.com/act3-ace/corl/reference/simulators/base_simulator/#corl.simulators.base_simulator.BaseSimulator)
+  - `type`: the registered name of a class of type [BaseSimulator]({{corl_docs_url}}/reference/simulators/base_simulator/#corl.simulators.base_simulator.BaseSimulator)
   - `config`: a simulator-specific set of keyword arguments and values passed to the simulator during initialization
   - Example:
     ```yaml
@@ -208,7 +208,7 @@ and environment-level episode parameter provider.
     ```
 
 - `episode_parameter_provider`: object which provides environment initialization parameters during an experiment
-    - `type`: class of type [EpisodeParameterProvider](https://act3-rl.github.com/act3-ace/corl/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
+    - `type`: class of type [EpisodeParameterProvider]({{corl_docs_url}}/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
     - `config`: implementation specific initialization parameters for the parameter provider
     - Example:
         ```yaml
@@ -246,7 +246,7 @@ The task configuration file defines the experiment class you
 wish to use and overrides any default training parameters
 of your chosen training framework.
 
-- `experiment_class`: a class of type [BaseExperiment](https://act3-rl.github.com/act3-ace/corl/reference/experiments/base_experiment/#corl.experiments.base_experiment.BaseExperiment)
+- `experiment_class`: a class of type [BaseExperiment]({{corl_docs_url}}/reference/experiments/base_experiment/#corl.experiments.base_experiment.BaseExperiment)
   - The experiment class interfaces with your chosen training framework and defines how training is handled.
 - `config`: experiment class specific configuration parameters
 - Example (using Ray RLLib and Tune):

@@ -3,7 +3,7 @@
 Simulators are responsible for coordinating interactions between the various
 objects involved in a Simulation. 
 
-CoRL simulators extending [BaseSimulator](https://act3-rl.github.com/act3-ace/corl/reference/simulators/base_simulator/#corl.simulators.base_simulator.BaseSimulator) act as a communication
+CoRL simulators extending [BaseSimulator]({{corl_docs_url}}/reference/simulators/base_simulator/#corl.simulators.base_simulator.BaseSimulator) act as a communication
 layer between CoRL and any third-party or custom simulator you
 want to use. 
 

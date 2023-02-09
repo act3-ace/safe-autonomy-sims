@@ -25,16 +25,16 @@ In addition to the problem specification, a set of training parameters are chang
 Note: While some will say that the number of hidden layers and size of each layer should be defined based on the function the neural network is trying to approximate, there is no standard way to do this or general heuristics to follow. The choice remains a bit arbitrary as of December 2022, when this was written.
 
 **Linear Activation Function**:
-<!-- ![](images/linear.png) -->
-<img src="images/linear.png" width="200" height="200" />
+![](images/linear.png)
+<!-- <img src="images/linear.png" width="200" height="200" /> -->
 
 **Hyperbolic Tangent (tanh) Activation Function**:
-<!-- ![](images/tanh.png) -->
-<img src="images/tanh.png" width="200" height="200" />
+![](images/tanh.png)
+<!-- <img src="images/tanh.png" width="200" height="200" /> -->
 
 **Rectified Linear Unit (ReLu) Activation Function**:
-<!-- ![](images/relu.png) -->
-<img src="images/relu.png" width="200" height="200" />
+![](images/relu.png)
+<!-- <img src="images/relu.png" width="200" height="200" /> -->
 
 - **Hyperparameters** - Finally, there are several hyperparameters that may be selected depending on the type of reinforcement learning approach, for example:  
     - General Hyperparameters
@@ -56,7 +56,7 @@ Coming soon.
 ### Changing the initial conditions
 There are two places for initial conditions to be added or changed: the _environment config_ and the _agent config_. 
 - **environment config** - contains values that get passed tot he simulator, e.g. simulation state variables (e.g. the location of the chief spacecraft). This is mostly used to be sure that the deputy is not initialized in an unsafe situation where a crash is imminent.
-    - [location](/root/repos/safe-autonomy-sims/configs/environments) /root/repos/safe-autonomy-sims/configs/environments
+    - [location]({{sas_url}}/configs/environments) /root/repos/safe-autonomy-sims/configs/environments
     - example: cwh3d.yml
         - Note this is assuming the docking initializer for the inspection problem, and points the the following initializer: safe-autonomy-sims/saferl/simulators/initializers/docking_initializer.py
         - Defining a "crash" with the chief (to ensure the deputy doesn't initialize in a crash)
@@ -76,9 +76,9 @@ There are two places for initial conditions to be added or changed: the _environ
                 ```shell
                 "mean_motion": 0.001027,
                 ``` 
-    - To change the initialization behavior, go to the initializers folder [safe-autonomy-sims/saferl/simulators/initializers](safe-autonomy-sims/saferl/simulators/initializers/), and extend the base initializer class to implement the ```__call__``` function to assign the initial values to simulator level variables. 
+    - To change the initialization behavior, go to the initializers folder [safe-autonomy-sims/saferl/simulators/initializers]({{sas_url}}/saferl/simulators/initializers/), and extend the base initializer class to implement the ```__call__``` function to assign the initial values to simulator level variables. 
 - **agent config** - platform variables for the entity that is controlled by the RL agent (e.g. position, velocity of the deputy spacecraft).
-    - example: [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml](safe-autonomy-sims/configs/agents/cwh3d_inspection.yml)
+    - example: [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml)
     - initialization here is controlled via ```"simulator_reset_parameters": ```, and there are a number of different variables that can be modified such as: 
         - radius
         - azimuth angle
@@ -102,7 +102,7 @@ There are two places for initial conditions to be added or changed: the _environ
 
 ### Changing the done/termination conditions
 This is done in the agent configuration file. 
-- example: [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml](safe-autonomy-sims/configs/agents/cwh3d_inspection.yml)
+- example: [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml)
 - Look for the ``` "dones": [ ``` line in the code
     - each parameter will have a __functor__ and either a __reference__ or a __config__ where variables are defined for that specific done function defined on the functor path.
         - the functors point to a __subset__ of a full set of done functions defined elsewhere, e.g. safe-autonomy-sims/saferl/dones/cwh/common.py. Note, only the subset of dones listed is applied to that agent for the experiment.
@@ -110,7 +110,7 @@ This is done in the agent configuration file.
         ```shell
         "reference_store": !include ../parameters/inspection_3d.yml
         ```
-        Which is [here](safe-autonomy-sims/configs/parameters/inspection_3d.yml).  
+        Which is [here]({{sas_url}}/configs/parameters/inspection_3d.yml)).  
     - example: the functor points to 
         ```shell
             {
@@ -123,7 +123,7 @@ This is done in the agent configuration file.
         ```
     - In summary, to change the specific value of a done function, such as max distance, go to the parameters file; but to change which dones are active, add or delete from the agent configuration file. 
 ### Changing the rewards
-Rewards are changed from the agent configuration file. For example, [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml](safe-autonomy-sims/configs/agents/cwh3d_inspection.yml). 
+Rewards are changed from the agent configuration file. For example, [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml). 
 - In the agent config, look for ```"rewards": [```. 
 - Each reward has a name, a functor, and a config and/or reference.
 - To add new rewards, add them in the agent configuration file
@@ -142,12 +142,12 @@ Rewards are changed from the agent configuration file. For example, [safe-autono
         },
     ```
     - the penality is defined under config with ```"scale": -1.0```
-    - Only the rewards in the agent config are applied, but additional rewards can be added. The full set of possible rewards implemented so far is found here: [safe-autonomy-sims/saferl/rewards/cwh/inspection_rewards.py](safe-autonomy-sims/saferl/rewards/cwh/inspection_rewards.py)
+    - Only the rewards in the agent config are applied, but additional rewards can be added. The full set of possible rewards implemented so far is found here: [safe-autonomy-sims/saferl/rewards/cwh/inspection_rewards.py]({{sas_url}}/saferl/rewards/cwh/inspection_rewards.py)
 
 ### Changing the state/observation space
-The observation space is in the agent configuration file, e.g. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml](safe-autonomy-sims/configs/agents/cwh3d_inspection.yml).
+The observation space is in the agent configuration file, e.g. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml).
 #### Adding a Sensor (Observation)
-- The sensors are defined in this file: [safe-autonomy-sims/saferl/platforms/cwh/cwh_sensors.py](safe-autonomy-sims/saferl/platforms/cwh/cwh_sensors.py)
+- The sensors are defined in this file: [safe-autonomy-sims/saferl/platforms/cwh/cwh_sensors.py]({{sas_url}}/saferl/platforms/cwh/cwh_sensors.py)
 - Let's look at an example of adding an inspected point sensor. 
     - First, create a new class ```InspectedPointsSensor``` and inherit the ```CWHSensor``` properties. For the advanced user, the real requirement is that it has to inheret from BaseSensor from CoRL (CWHSensor wraps this).
     ```shell
@@ -176,7 +176,7 @@ The observation space is in the agent configuration file, e.g. [safe-autonomy-si
         }
     )
     ```
-- Lastly, this class must be added to the agent config, and the name assinged to the sensor, e.g. "Sensor_InspectedPoints", added the the agent's part list  Within the agent config, go to the config, and then parts. Observations are generated via sensor parts. For example, a spacecraft might have sensors for postion, velocity, and number of inspected points. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml](safe-autonomy-sims/configs/agents/cwh3d_inspection.yml)
+- Lastly, this class must be added to the agent config, and the name assinged to the sensor, e.g. "Sensor_InspectedPoints", added the the agent's part list  Within the agent config, go to the config, and then parts. Observations are generated via sensor parts. For example, a spacecraft might have sensors for postion, velocity, and number of inspected points. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml)
     ```shell
     "parts": [
             {"part": "Sensor_Position"},
@@ -197,7 +197,7 @@ The observation space is in the agent configuration file, e.g. [safe-autonomy-si
           },
     ```
 ### Changing the action space
-The controllers are defined in saferl, platorms. For example [safe-autonomy-sims/saferl/platforms/cwh/cwh_controllers.py](safe-autonomy-sims/saferl/platforms/cwh/cwh_controllers.py). The controllers are defined similarly to observations.
+The controllers are defined in saferl, platorms. For example [safe-autonomy-sims/saferl/platforms/cwh/cwh_controllers.py]({{sas_url}}/saferl/platforms/cwh/cwh_controllers.py). The controllers are defined similarly to observations.
 - Navigating to the controller python file, at a minimum, the controller must inheret from CoRL's BaseController class. This is done for you with the CWHController.
     - The most important aspects are ensuring that apply_control and get_applied_control methods are implemented.
 
@@ -270,7 +270,7 @@ The controllers are defined in saferl, platorms. For example [safe-autonomy-sims
         }
     )
     ```
-- Next, we can add the new or modified controller to the agent configuration file, e.g. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml](safe-autonomy-sims/configs/agents/cwh3d_inspection.yml). Start by looking for parts and adding each controller as in the below example (not the axis number is the index number in the action space array, e.g. X Thrust is the first element of the array):
+- Next, we can add the new or modified controller to the agent configuration file, e.g. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml). Start by looking for parts and adding each controller as in the below example (not the axis number is the index number in the action space array, e.g. X Thrust is the first element of the array):
     ```shell
     "parts": [
             {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
