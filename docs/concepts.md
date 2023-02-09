@@ -2,7 +2,7 @@
 
 The safe-autonomy-sims repo was programmed to depend on the ACT3 CoRL
 framework. An overview of the concepts extended in 'saferl/core' can be
-found [here](https://act3-rl.github.com/act3-ace/corl/concepts/).
+found [here]({{corl_docs_url}}/concepts/).
 
 Concepts unique to safe-autonomy-sims, defined in saferl/backend:
 

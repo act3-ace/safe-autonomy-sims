@@ -33,6 +33,16 @@ plugins:
       media_type: print
       enabled_if_env: ENABLE_PDF_EXPORT
       combined: true
+  - markdownextradata: {}
+
+
+extra:
+  sas_url: https://github.com/act3-ace/safe-autonomy-sims/-/tree/main
+  git_url: https://github.com/act3-ace
+  corl_url: https://github.com/act3-ace/act3-rl
+  git_ssh: git@github.com/act3-ace:rta/safe-autonomy-stack
+  corl_ssh: git@github.com/act3-ace:act3-rl
+  corl_docs_url: https://act3-rl.github.com/act3-ace/corl
 
 
 theme:
@@ -111,9 +121,24 @@ nav:
   - "Configuration": configuration.md
   - "Tasks":
       - tasks/index.md
-      - "2D Dubins Rejoin": tasks/2d_rejoin_task.md
-      - "3D Dubins Rejoin": tasks/3d_rejoin_task.md
-      - "3D CWH Docking": tasks/3d_docking_task.md
+      - "CWH":
+        - tasks/CWH/index.md
+        - "3D Inspection":
+          - tasks/CWH/inspection_3d.md
+        - "3D Inspection - Multiagent":
+          - tasks/CWH/inspection_3d_multiagent.md
+        - "3D Docking":
+          - tasks/CWH/docking_3d.md
+        - "3D Docking - Multiagent":
+          - tasks/CWH/docking_3d_multiagent.md
+      - "Dubins":
+        - tasks/dubins/index.md
+        - "2D Rejoin":
+          - tasks/dubins/rejoin_2d.md
+        - "3D Rejoin":
+          - tasks/dubins/rejoin_3d.md
+        - "3D Rejoin - Multiagent":
+          - tasks/dubins/rejoin_3d_multiagent.md
 #  - "Changelog": change_log.md
 #  - "License": license.md
   - "API":

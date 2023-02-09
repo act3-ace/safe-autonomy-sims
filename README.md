@@ -135,10 +135,34 @@ python path/to/corl/corl train.py --cfg /path/to/safe-autonomy-sims/configs/expe
 
 This library includes the following environments:
 
+- Inspection 3D
+- Inspection 3D - Multiagent
+- Docking 3D
+- Docking 3D - Multiagent
 - Rejoin 2D
 - Rejoin 3D
-- Docking 3D
-  
+- Rejoin 3D - Multiagent
+
+
+### Inspection
+Spacecraft inspection scenario where an agent controlled deputy spacecraft must inspect points on a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching and navigating around the chief to view all points on a sphere, assuming the deputy always points a sensor towards the chief. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors: 
+
+-  **Inspection 3D**
+Static 1N thrusters in $\pm x, \pm y, \pm z$.
+
+-  **Inspection 3D - Multiagent**
+Multiple agent controlled deputy spaceraft. Each controlled by static 1N thrusters in $\pm x, \pm y, \pm z$.
+
+
+### Docking
+Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors: 
+
+-  **Docking 3D**
+Static 1N thrusters in $\pm x, \pm y, \pm z$.
+
+-  **Docking 3D - Multiagent**
+Multiple agent controlled deputy spaceraft. Each controlled by static 1N thrusters in $\pm x, \pm y, \pm z$.
+
 
 ### Rejoin
 Aircraft formation flight rejoin where a wingman aircraft controlled by the agent must join a formation relative to a lead aircraft. The formation is defined by a rejoin region relative to the lead's position and orientation which the wingman must enter and remain within. Comes in the following flavors:
@@ -149,12 +173,8 @@ Throttle and heading control.
 -  **Rejoin 3D**  
 Throttle, heading, flight angle, roll control.  
 
-
-### Docking
-Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors: 
-
--  **Docking 3D**
-Static 1N thrusters in $\pm x, \pm y, \pm z$.
+-  **Rejoin 3D - Multiagent**  
+Multiple agent controlled wingman aircraft. Each controlled by throttle, heading, flight angle, roll control.  
 
 
 ## Team
