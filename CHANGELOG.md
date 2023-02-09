@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.1.1...v1.2.0) (2023-02-09)
+
+
+### Features
+
+* Resolve "Moving to dev branch for CoRL" ([231aca9](https://github.com/act3-ace/safe-autonomy-sims/commit/231aca9cd51a9bfe5099b5154b7ffc69a03cbc36))
+
 ## [1.1.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.1.0...v1.1.1) (2023-01-26)
 
 
