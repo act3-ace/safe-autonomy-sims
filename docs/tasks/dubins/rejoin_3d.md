@@ -1,16 +1,10 @@
-# 3D Dubins Rejoin
+# 3D Rejoin
 
 ## Description
 
-Similar to the 2D Dubins Rejoin task, this task challenges an ML agent to learn to perform a rejoin maneuver,
-flying in formation relative to a lead aircraft for a specified period of time. 
-Again, the default task contains one scripted lead and one ML agent controlled wingman.
-
-The key difference in this task is, as the name suggests, dimensionality.
 This task uses a 3D Dubins flight dynamics model to calculate
 transitions in state based on aircraft velocity and orientation. 
 The ML agent's controls include roll rate, pitch rate, and throttle. 
-
 
 ## Training
 

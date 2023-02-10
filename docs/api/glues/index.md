@@ -15,7 +15,7 @@ environment defines the environment's action space.
 
 Multiple glues may be used in a decorator pattern to 
 reuse common transformation logic. See [CoRL
-documentation](https://act3-rl.github.com/act3-ace/corl/reference/glues/__init__/) for more details!
+documentation]({{corl_docs_url}}/reference/glues/__init__/) for more details!
 
 - [Rejoin region glue](../../reference/glues/rejoin_region_glue.md)
 - [Rta glue](../../reference/glues/rta_glue.md)
