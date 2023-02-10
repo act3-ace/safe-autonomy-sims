@@ -11,6 +11,7 @@ mkdocs-autorefs
 mkdocs-coverage
 mkdocs-gen-files
 mkdocs-section-index
+mkdocs-markdownextradata-plugin
 
 papermill
 Pillow

@@ -7,7 +7,12 @@ seek to replicate real world aerospace maneuvers with a high likelihood of succe
 The current implemented tasks are relatively low fidelity simulations, but higher fidelity tasks 
 will be added in time. The following list contains all currently available tasks:
 
-
-- [2D Dubins Rejoin](2d_rejoin_task.md)
-- [3D Dubins Rejoin](3d_rejoin_task.md)
-- [3D CWH Docking](3d_docking_task.md)
+- [CWH](CWH/index.md)
+    * [3D Inspection](CWH/inspection_3d.md)
+    * [3D Inspection - Multiagent](CWH/inspection_3d_multiagent.md)
+    * [3D Docking](CWH/docking_3d.md)
+    * [3D Docking - Multiagent](CWH/docking_3d_multiagent.md)
+- [Dubins](dubins/index.md)
+    * [2D Rejoin](dubins/rejoin_2d.md)
+    * [3D Rejoin](dubins/rejoin_3d.md)
+    * [3D Rejoin - Multiagent](dubins/rejoin_3d_multiagent.md)
