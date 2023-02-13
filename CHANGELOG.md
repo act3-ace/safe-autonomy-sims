@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.2.0...v1.2.1) (2023-02-13)
+
+
+### Bug Fixes
+
+* Resolve "Evaluation Improvements" ([aa99253](https://github.com/act3-ace/safe-autonomy-sims/commit/aa99253d04947776c15bdfbe74802a8450b14b28))
+
 # [1.2.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.1.1...v1.2.0) (2023-02-09)
 
 
