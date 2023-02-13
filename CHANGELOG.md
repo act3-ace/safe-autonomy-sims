@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.2.1...v1.3.0) (2023-02-13)
+
+
+### Features
+
+* Inspection Animation script + obs/action Metrics + single checkpoint eval function ([a758762](https://github.com/act3-ace/safe-autonomy-sims/commit/a758762fb151db8bd34b5d7202b0d5769cd0144a))
+
 ## [1.2.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.2.0...v1.2.1) (2023-02-13)
 
 
