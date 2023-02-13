@@ -41,6 +41,7 @@ def evaluate(
     checkpoint_path: str,
     output_path: str,
     experiment_config_path: str,
+    launch_dir_of_experiment: str,
     platform_serializer_class: PlatformSerializer,
     test_case_manager_config: dict = None
 ):
@@ -57,6 +58,9 @@ def evaluate(
         The absolute path to the directory in which evaluation episode(s) data will be saved
     experiment_config_path: str
         The absolute path to the experiment config used in training
+    launch_dir_of_experiment: str
+        Paths in the experiment config are relative to the directory the corl.train_rl module is intended to be launched from.
+        This string captures the path to the intended launch location of the experiment under evaluation.
     platform_serializer_class: PlatformSerializer
         The PlatformSerializer subclass capable of saving the state of the Platforms used in the evaluation environment
     test_case_manager_config: dict
@@ -74,12 +78,12 @@ def evaluate(
 
     # construct teams map and test_cases for evaluation
 
-    teams = construct_teams(experiment_config_path, checkpoint_path)
+    teams = construct_teams(experiment_config_path, launch_dir_of_experiment, checkpoint_path)
 
     # plugins
     platform_serialization_obj = platform_serializer_class()
     plugins_args = {"platform_serialization": platform_serialization_obj}
-    eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), isntead of objects
+    eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), instead of objects
 
     # engine
     rllib_engine_args = {"callbacks": [], "workers": 0}
@@ -88,7 +92,6 @@ def evaluate(
     recorder_args = {"dir": output_path, "append_timestamp": False}
 
     # instantiate eval objects
-    # teams = Teams(team_participant_map=team_participant_map)
     task = Task(config_yaml_file=task_config_path)
     test_case_manager = TestCaseManager(**test_case_manager_config)
     plugins = Plugins(**plugins_args)
@@ -164,7 +167,7 @@ def generate_metrics(evaluate_output_path: str, metrics_config: dict):
     launch_generate_metrics.main(namespace)
 
 
-def visualize(output_path: str):
+def visualize(evaluate_output_path: str):
     """
     This function is responsible for instantiating necessary arguments and then launching the third stage of CoRL's Evaluation Framework.
 
@@ -177,8 +180,8 @@ def visualize(output_path: str):
         The nested structure defining the Metrics to be instantiated and calculated from Evaluation Episode data
     """
 
-    artifact_metrics = EvaluationArtifact_Metrics(location=output_path)
-    artifact_visualization = EvaluationArtifact_Visualization(location=output_path)
+    artifact_metrics = EvaluationArtifact_Metrics(location=evaluate_output_path)
+    artifact_visualization = EvaluationArtifact_Visualization(location=evaluate_output_path)
     visualizations = [Print(event_table_print=True)]
 
     namespace = {"artifact_metrics": artifact_metrics, "artifact_visualization": artifact_visualization, "visualizations": visualizations}
@@ -186,7 +189,7 @@ def visualize(output_path: str):
     launch_visualize.main(namespace)
 
 
-def construct_teams(experiment_config_path: str, checkpoint_path: str):
+def construct_teams(experiment_config_path: str, launch_dir_of_experiment: str, checkpoint_path: str):
     """
     This function is responsible for creating the Teams object required by the Evaluation Framework. It uses the experiment
     config file from training to get agent and platform info required by the Teams class. Use of this function assumes the user wishes
@@ -196,8 +199,13 @@ def construct_teams(experiment_config_path: str, checkpoint_path: str):
     ----------
     experiment_config_path: str
         The absolute path to the experiment config used in training
+    launch_dir_of_experiment: str
+        Paths in the experiment config are relative to the directory the corl.train_rl module is intended to be launched from.
+        This string captures the path to the intended launch location of the experiment under evaluation.
     checkpoint_path: str
-        The absolute path to the checkpoint from which each agent's policy will be loaded
+        The absolute path to the checkpoint from which each agent's policy will be loaded.
+        The directory titled the agent's name will be filled in programmatically during this function.
+        An example of the format of this string is: '/path/to/experiment/output/checkpoint_00005/policies/{}/policy_state.pkl'.
 
     Returns
     -------
@@ -224,28 +232,13 @@ def construct_teams(experiment_config_path: str, checkpoint_path: str):
         platform_name = platforms_config[index]["name"]
         platform_config_path = platforms_config[index]["config"]
 
-        # TODO: handle relative paths better
         # handle relative paths from experiment config
-        ## identify if experiment config from corl or sas
+        agent_config_path = os.path.join(launch_dir_of_experiment, agent_config_path)
+        platform_config_path = os.path.join(launch_dir_of_experiment, platform_config_path)
+        policy_config_path = os.path.join(launch_dir_of_experiment, policy_config_path)
 
-        is_corl_experiment = 'corl' in experiment_config_path.split('/')
-        is_sas_experiment = 'safe-autonomy-sims' in experiment_config_path.split('/')
-        if is_corl_experiment:
-            # assumes corl root is cwd
-            path_to_assumed_root = experiment_config_path.split('corl')[0] + 'corl/'
-        elif is_sas_experiment:
-            # assumes safe-autonomy-sims root is cwd
-            path_to_assumed_root = experiment_config_path.split('safe-autonomy-sims')[0] + 'safe-autonomy-sims/'
-        else:
-            raise ValueError(
-                "Experiment config {} does not reside in corl or safe-autonomy-sims repositories".format(experiment_config_path)
-            )
-
-        agent_config_path = os.path.join(path_to_assumed_root, agent_config_path)
-        platform_config_path = os.path.join(path_to_assumed_root, platform_config_path)
-        policy_config_path = os.path.join(path_to_assumed_root, policy_config_path)
-
-        agent_loader = CheckpointFile(checkpoint_filename=checkpoint_path)
+        agent_checkpoint = checkpoint_path.format(agent_name)  # put policy ID in path
+        agent_loader = CheckpointFile(checkpoint_filename=agent_checkpoint)
 
         teams_platforms_config.append(Platform(name=platform_name, config=platform_config_path))
         teams_agents_config.append(
@@ -350,6 +343,7 @@ def run_ablation_study(
     experiment_state_path_map: dict,
     task_config_path: str,
     experiemnt_config_path: str,
+    launch_dir_of_experiment: str,
     metrics_config: dict,
     platfrom_serializer_class: PlatformSerializer,
     plot_output_path: str = None,
@@ -371,6 +365,9 @@ def run_ablation_study(
         The absolute path to the directory in which evaluation episode(s) data will be saved
     experiemnt_config_path: str
         The absolute path to the experiment config used in training
+    launch_dir_of_experiment: str
+        Paths in the experiment config are relative to the directory the corl.train_rl module is intended to be launched from.
+        This string captures the path to the intended launch location of the experiment under evaluation.
     metrics_config: dict
         The nested structure defining the Metrics to be instantiated and calculated from Evaluation Episode data
     platfrom_serializer_class: PlatformSerializer
@@ -432,6 +429,7 @@ def run_ablation_study(
             run_evaluations(
                 task_config_path,
                 experiemnt_config_path,
+                launch_dir_of_experiment,
                 metrics_config,
                 checkpoint_paths,
                 output_paths,
@@ -454,6 +452,7 @@ def run_ablation_study(
 def run_evaluations(
     task_config_path: str,
     experiemnt_config_path: str,
+    launch_dir_of_experiment: str,
     metrics_config: dict,
     checkpoint_paths: list,
     output_paths: list,
@@ -472,6 +471,9 @@ def run_evaluations(
         The absolute path to the directory in which evaluation episode(s) data will be saved
     experiemnt_config_path: str
         The absolute path to the experiment config used in training
+    launch_dir_of_experiment: str
+        Paths in the experiment config are relative to the directory the corl.train_rl module is intended to be launched from.
+        This string captures the path to the intended launch location of the experiment under evaluation.
     metrics_config: dict
         The nested structure defining the Metrics to be instantiated and calculated from Evaluation Episode data
     checkpoint_paths: list
@@ -485,7 +487,7 @@ def run_evaluations(
         The kwargs passed to the TestCaseManager constructor. This must define the TestCaseStrategy class and its config
     visualize_metrics: bool
         A boolean to determine whether or not to run the Evaluation Framework's Visualize stage.
-        If True, visualize is called
+        If True, visualize is called.
     """
 
     kwargs = {}
@@ -496,7 +498,15 @@ def run_evaluations(
     for index, ckpt_path in enumerate(checkpoint_paths):
         # run evaluation episodes
         try:
-            evaluate(task_config_path, ckpt_path, output_paths[index], experiemnt_config_path, platfrom_serializer_class, **kwargs)
+            evaluate(
+                task_config_path,
+                ckpt_path,
+                output_paths[index],
+                experiemnt_config_path,
+                launch_dir_of_experiment,
+                platfrom_serializer_class,
+                **kwargs
+            )
         except SystemExit:
             print(sys.exc_info()[0])
 
@@ -550,7 +560,7 @@ def construct_dataframe(results: dict, metrics_config: dict):
     Parameters
     ----------
     results: dict[str, dict]
-        A collection mapping experiment names to Evaluation result locations and training duration metadata
+        A map of experiment names to Evaluation result locations and training duration metadata
     metrics_config: dict
         The nested structure defining the Metrics to be instantiated and calculated from Evaluation Episode data
 
@@ -560,11 +570,11 @@ def construct_dataframe(results: dict, metrics_config: dict):
         A DataFrame containing Metric values collected for each checkpoint of each experiment by row
     """
     metric_names = parse_metrics_config(metrics_config)
-    columns = ['experiment', 'experiment_index', 'evaluation_trial_index', "training_iteration"]
+    columns = ['experiment', 'experiment_index', 'evaluation_trial_index', "training_iteration", "agent_name", "agent"]
 
     # need to parse each metrics.pkl file + construct DataFrame
     dataframes = []
-    for experiment_name in results.keys():
+    for experiment_name in results.keys():  # pylint: disable=R1702
         data = []
         output_paths = results[experiment_name]['output_paths']
         training_metadata_df = results[experiment_name]['metadata']
@@ -575,30 +585,36 @@ def construct_dataframe(results: dict, metrics_config: dict):
             # collect agent metrics per ckpt
             with open(output_path + "/metrics.pkl", 'rb') as metrics_file:
                 metrics = pickle.load(metrics_file)
-            episode_events = list(metrics.participants.values())[0].events  # TODO: remove single agent env assumption
 
-            expr_name, expr_index = experiment_name.split("__")  # separate appended indexing from experiment name
-            checkpoint_num = int(output_path.split("_")[-1])  # TODO: want better way to get checkpoint num data here
+            for agent_name, participant in metrics.participants.items():
 
-            for eval_trial_index, event in enumerate(episode_events):
-                # aggregate trial data (single dataframe entry)
-                row = [expr_name, expr_index, eval_trial_index, checkpoint_num]
+                episode_events = list(participant.events)
 
-                # collect agent's metric values on each trial in eval
-                for metric_name in metric_names['agent']['__default__']:  # type: ignore
-                    assert metric_name in event.metrics, "{} not an available metric!".format(metric_name)
-                    assert hasattr(event.metrics[metric_name], "value"), "metric {} has no 'value' attribute".format(metric_name)
-                    # add metric value to row
-                    row.append(event.metrics[metric_name].value)
-                    # add metric name to columns
-                    if metric_name not in columns:
-                        columns.append(metric_name)
+                expr_name, expr_index = experiment_name.split("__")  # separate appended indexing from experiment name
+                checkpoint_num = int(output_path.split("_")[-1])  # TODO: want better way to get checkpoint num data here
 
-                # add row to dataset (experiment name, iteration, num_episodes, num_interactions, episode ID/trial, **custom_metrics)
-                data.append(row)
+                expr_agent = expr_name + '_' + agent_name
 
-            # collect world metrics per ckpt
-            ...
+                for eval_trial_index, event in enumerate(episode_events):
+
+                    # aggregate trial data (single dataframe entry)
+                    row = [expr_name, expr_index, eval_trial_index, checkpoint_num, agent_name, expr_agent]
+
+                    # collect agent's metric values on each trial in eval
+                    for metric_name in metric_names['agent']['__default__']:  # type: ignore
+                        assert metric_name in event.metrics, "{} not an available metric!".format(metric_name)
+                        assert hasattr(event.metrics[metric_name], "value"), "metric {} has no 'value' attribute".format(metric_name)
+                        # add metric value to row
+                        row.append(event.metrics[metric_name].value)
+                        # add metric name to columns
+                        if metric_name not in columns:
+                            columns.append(metric_name)
+
+                    # add row to dataset [experiment name, iteration, num_episodes, num_interactions, episode ID/trial, **custom_metrics]
+                    data.append(row)
+
+                # collect world metrics per ckpt
+                ...
 
         # create experiment dataframe
         expr_dataframe = pd.DataFrame(data, columns=columns)
@@ -618,7 +634,7 @@ def create_sample_complexity_plot(
     plot_output_file: str,
     xaxis='timesteps_total',
     yaxis='TotalReward',
-    hue='experiment',
+    hue='agent',
     ci=95,
     xmax=None,
     ylim=None,
@@ -700,9 +716,7 @@ def create_sample_complexity_plot(
     return plot
 
 
-def checkpoints_list_from_experiment_analysis(
-    experiment_analysis: ExperimentAnalysis, output_dir: str, experiment_name: str, agent_name: str = "blue0_ctrl"
-):
+def checkpoints_list_from_experiment_analysis(experiment_analysis: ExperimentAnalysis, output_dir: str, experiment_name: str):
     """
     This function is responsible for compiling a list of paths to each checkpoint in an experiment.
     This acts as a helper function for when users want to evaluate a series of checkpoints from a single training job.
@@ -715,8 +729,6 @@ def checkpoints_list_from_experiment_analysis(
         The absolute path to the directory that will hold the results from Evaluation Episodes
     experiment_name: str
         The name of the experiment under evaluation
-    agent_name: str
-        The policy_id used to retrieve the checkpoint for a specific agent
 
     Returns
     -------
@@ -733,10 +745,9 @@ def checkpoints_list_from_experiment_analysis(
     output_dir_paths = []
     checkpoint_paths = []
     for path, trainig_iteration in ckpt_paths:
-        # TODO: look for a way to eliminate manual parse of subdirs -_-
         # TODO: verify policy_state desired over algorithm_state!
         if os.path.isdir(path):
-            path += "/policies/" + agent_name + "/policy_state.pkl"
+            path += "/policies/{}/policy_state.pkl"
 
         checkpoint_paths.append(path)
         output_path = output_dir + "/" + experiment_name + "/" + "checkpoint_" + str(trainig_iteration)
@@ -765,6 +776,6 @@ def extract_metadata(experiment_analysis: ExperimentAnalysis) -> pd.DataFrame:
     # assumes one trial per training job
     trial = experiment_analysis.trials[0]  # type: ignore
     df = experiment_analysis.trial_dataframes[trial.logdir]
-    metadata_df = df[['training_iteration', 'timesteps_total', 'episodes_total', 'time_total_s']]
+    training_meta_data = df[['training_iteration', 'timesteps_total', 'episodes_total', 'time_total_s']]
 
-    return metadata_df
+    return training_meta_data
