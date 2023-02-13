@@ -518,6 +518,72 @@ def run_evaluations(
             visualize(output_paths[index])
 
 
+def run_one_evaluation(
+    task_config_path: str,
+    experiment_config_path: str,
+    launch_dir_of_experiment: str,
+    metrics_config: dict,
+    checkpoint_path: str,
+    platfrom_serializer_class: PlatformSerializer,
+    test_case_manager_config: dict = None,
+):
+    """
+    This function is responsible for taking a single checkpoint path and running it through
+    each stage of the Evaluation Framework (running Evaluation Episodes, processing results
+    to generate Metrics, and optionally visualizing those Metrics).
+
+    Parameters
+    ----------
+    task_config_path: str
+        The absolute path to the directory in which evaluation episode(s) data will be saved
+    experiment_config_path: str
+        The absolute path to the experiment config used in training
+    launch_dir_of_experiment: str
+        Paths in the experiment config are relative to the directory the corl.train_rl module is intended to be launched from.
+        This string captures the path to the intended launch location of the experiment under evaluation.
+    metrics_config: dict
+        The nested structure defining the Metrics to be instantiated and calculated from Evaluation Episode data
+    checkpoint_path: str
+        Path strings to the checkpoint
+    platfrom_serializer_class: PlatformSerializer
+        The class object capable of storing data specific to the Platform type used in training
+    test_case_manager_config: dict
+        The kwargs passed to the TestCaseManager constructor. This must define the TestCaseStrategy class and its config
+    """
+
+    kwargs = {}
+    if test_case_manager_config is not None:
+        kwargs['test_case_manager_config'] = test_case_manager_config
+
+    metrics_config = add_required_metrics(metrics_config)
+
+    checkpoint_path += "/policies/{}/policy_state.pkl"
+    exp_name = 'single_episode__0'
+    output_path = '/tmp/eval_results/' + exp_name
+
+    # run evaluation episodes
+    try:
+        evaluate(
+            task_config_path,
+            checkpoint_path,
+            output_path,
+            experiment_config_path,
+            launch_dir_of_experiment,
+            platfrom_serializer_class,
+            **kwargs
+        )
+    except SystemExit:
+        print(sys.exc_info()[0])
+
+    # generate evaluation metrics
+    generate_metrics(output_path, metrics_config)
+
+    experiment_to_eval_results_map = {}
+    experiment_to_eval_results_map[exp_name] = {"output_paths": [output_path], "metadata": pd.DataFrame({'training_iteration': [0.]})}
+    data = construct_dataframe(experiment_to_eval_results_map, metrics_config)
+    return data
+
+
 def parse_metrics_config(metrics_config: dict) -> typing.Dict[str, str]:
     """
     This function is responsible for walking the metrics config and creating a dictionary of Metric
@@ -603,9 +669,13 @@ def construct_dataframe(results: dict, metrics_config: dict):
                     # collect agent's metric values on each trial in eval
                     for metric_name in metric_names['agent']['__default__']:  # type: ignore
                         assert metric_name in event.metrics, "{} not an available metric!".format(metric_name)
-                        assert hasattr(event.metrics[metric_name], "value"), "metric {} has no 'value' attribute".format(metric_name)
                         # add metric value to row
-                        row.append(event.metrics[metric_name].value)
+                        if hasattr(event.metrics[metric_name], "value"):
+                            row.append(event.metrics[metric_name].value)
+                        elif hasattr(event.metrics[metric_name], "arr"):
+                            row.append(event.metrics[metric_name].arr)
+                        else:
+                            raise ValueError("Metric must have attribute 'value' or 'arr'")
                         # add metric name to columns
                         if metric_name not in columns:
                             columns.append(metric_name)
