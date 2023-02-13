@@ -9,3 +9,4 @@ tqdm
 seaborn==0.11.2
 torch
 ipykernel
+imageio[ffmpeg]
