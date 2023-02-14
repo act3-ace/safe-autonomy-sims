@@ -46,7 +46,7 @@ class DockingRTAExperiment(RTAExperiment):
 
         obs = env.reset()
 
-        agent = args.agent_config[0][0]
+        agent = args.agent_config[0].name
         data = []
         controller = TestController()
         done = False
@@ -63,8 +63,8 @@ class DockingRTAExperiment(RTAExperiment):
             action = controller.make_action(agent, *u_des)
             obs, rewards, dones, info = env.step(action)
 
-            intervening = info['blue0']['RTAModule']['intervening']
-            control_actual = info['blue0']['RTAModule']['actual control']
+            intervening = info[agent]['RTAModule']['intervening']
+            control_actual = info[agent]['RTAModule']['actual control']
 
             done = dones['__all__']
 

@@ -13,25 +13,47 @@ class Inspection1v1RTAExperiment(RTAExperiment):
 
         obs = env.reset()
 
-        agent = args.agent_config[0][0]
+        agent = args.agent_config[0].name
         data = []
         controller = TestController()
         done = False
         i = 0
+
+        try:
+            obs[agent]["ObserveSensor_Sensor_SunAngle"]["direct_observation"]
+            self.illum = True
+        except KeyError:
+            self.illum = False
+
+        position = obs[agent]["ObserveSensor_Sensor_Position"]["direct_observation"]*100
+        velocity = obs[agent]["ObserveSensor_Sensor_Velocity"]["direct_observation"]*0.5
+        state = np.concatenate((position, velocity))
+        if self.illum:
+            sun = obs[agent]["ObserveSensor_Sensor_SunAngle"]["direct_observation"]
+            state = np.concatenate((state, sun))
+        step_data = {
+            'state': state,
+            'intervening': False,
+            'control': np.array([0, 0, 0]),
+        }
+        data.append(step_data)
 
         while not done:
 
             position = obs[agent]["ObserveSensor_Sensor_Position"]["direct_observation"]*100
             velocity = obs[agent]["ObserveSensor_Sensor_Velocity"]["direct_observation"]*0.5
             state = np.concatenate((position, velocity))
+            if self.illum:
+                sun = obs[agent]["ObserveSensor_Sensor_SunAngle"]["direct_observation"]
+                state = np.concatenate((state, sun))
 
-            u_des = controller.compute_feedback_control(state)
+            u_des = controller.compute_feedback_control(state[0:6])
 
             action = controller.make_action(agent, *u_des)
             obs, rewards, dones, info = env.step(action)
 
-            intervening = info['blue0']['RTAModule']['intervening']
-            control_actual = info['blue0']['RTAModule']['actual control']
+            intervening = info[agent]['RTAModule']['intervening']
+            control_actual = info[agent]['RTAModule']['actual control']
 
             done = dones['__all__']
             if i >= 1000:
@@ -58,7 +80,7 @@ class Inspection1v1RTAExperiment(RTAExperiment):
         vel_limit = 1
         r_max = 1000
 
-        array = np.empty([len(data), 6])
+        array = np.empty([len(data), len(data[0]["state"])])
         control = np.empty([len(data), 3])
         intervening = np.empty([len(data)])
         for i in range(len(data)):
@@ -122,8 +144,11 @@ class Inspection1v1RTAExperiment(RTAExperiment):
         xmax = len(array)*1.1
         h = np.zeros(len(array))
         for j in range(len(array)):
-            # r_s_hat = np.array([np.cos(array[j, 6]), np.sin(array[j, 6]), 0.])
-            r_s_hat = np.array([np.cos(0), np.sin(0), 0.])
+            if self.illum:
+                array[j, 6]
+            else:
+                th = 0
+            r_s_hat = np.array([np.cos(th), -np.sin(th), 0.])
             r_b_hat = -array[j, 0:3]/np.linalg.norm(array[j, 0:3])
             h[j] = np.arccos(np.dot(r_s_hat, r_b_hat))*180/np.pi
         ymax = np.max(h)*1.1

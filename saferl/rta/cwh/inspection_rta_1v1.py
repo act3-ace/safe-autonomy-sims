@@ -146,11 +146,13 @@ class UpdatedInspection1v1RTA(Inspection1v1RTA):
     """Updated RTA module with _get_state"""
 
     def _get_state(self, input_state):
-        if len(input_state) > 6:
+        if len(input_state) == 7:
             input_state = np.array(input_state)
             input_state = np.concatenate((input_state, np.array([0.])))
             theta = input_state[6]
             m = math.floor(abs(theta / (2 * np.pi)))
             theta -= np.sign(theta) * m * 2 * np.pi
             input_state[6] = 2 * np.pi - theta
+        else:
+            input_state = np.concatenate((input_state, np.array([0., 0.])))
         return to_jnp_array_jit(input_state)
