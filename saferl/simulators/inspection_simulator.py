@@ -17,13 +17,15 @@ import typing
 import matplotlib.pyplot as plt
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
+from corl.libraries.units import ValueWithUnits
 from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, validator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
+from sklearn.cluster import KMeans
 
 import saferl.simulators.illumination_functions as illum
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
+from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorResetValidator, SafeRLSimulatorValidator
 
 
 class IlluminationValidator(BaseModel):
@@ -49,7 +51,7 @@ class IlluminationValidator(BaseModel):
 
     mean_motion: float = 0.001027
     avg_rad_Earth2Sun: float = 150000000000
-    sun_angle: float
+    sun_angle: typing.Union[ValueWithUnits, float] = 0.0
     light_properties: dict
     chief_properties: dict
     resolution: list
@@ -57,6 +59,7 @@ class IlluminationValidator(BaseModel):
     bin_ray_flag: bool
     render_flag_3d: bool
     render_flag_subplots: bool
+    save_data_flag: bool
 
 
 class InspectionSimulatorState(BaseSimulatorState):
@@ -168,14 +171,25 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
         return v
 
 
+class InspectionSimulatorResetValidator(SafeRLSimulatorResetValidator):
+    """
+    A validator for the InspectionSimulator reset.
+    """
+    sun_angle: typing.Union[ValueWithUnits, float] = 0.0
+
+
 class InspectionSimulator(SafeRLSimulator):
     """
-    Simulator for CWH Inspection Task. Interfaces CWH platforms with underlying CWH entities in Inspection simulation.
+    Simulator for CWH Inspection Task. Interfaces CWH platforms with underlying CWH entities in inspection simulation.
     """
 
     @property
     def get_simulator_validator(self):
         return InspectionSimulatorValidator
+
+    @property
+    def get_reset_validator(self) -> typing.Type[InspectionSimulatorResetValidator]:
+        return InspectionSimulatorResetValidator
 
     def _construct_platform_map(self) -> dict:
         return {
@@ -186,6 +200,8 @@ class InspectionSimulator(SafeRLSimulator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.points = self._add_points()
+        self.last_points_inspected = 0
+        self.last_cluster = None
         self.illum_flag = False
         if self.config.illumination_params is not None:
             self.illum_flag = True
@@ -197,12 +213,25 @@ class InspectionSimulator(SafeRLSimulator):
                 self.ax_xy = self.fig.add_subplot(2, 2, 2)
                 self.ax_xz = self.fig.add_subplot(2, 2, 3)
                 self.ax_yz = self.fig.add_subplot(2, 2, 4)
+            if self.config.illumination_params.save_data_flag:
+                self.path_to_data = "C:/Users/david/Documents/Documents/Texas_AM/AFRL/safe-autonomy-sims/matlab_animations/temp.csv"
 
     def reset(self, config):
         super().reset(config)
+        if self.config.illumination_params is not None:
+            self._update_initial_sun_angle(config)
         self.points = self._add_points()
+        self.last_points_inspected = 0
+        self.last_cluster = None
         self._state = InspectionSimulatorState(sim_platforms=self._state.sim_platforms, points=self.points, sim_time=self.clock)
         return self._state
+
+    def _update_initial_sun_angle(self, config):
+        assert self.config.illumination_params is not None, "Cannot assign a sun angle without defined illumination parameters"
+        sun_angle = config['sun_angle']
+        if isinstance(sun_angle, ValueWithUnits):
+            sun_angle = sun_angle.value
+        self.config.illumination_params.sun_angle = sun_angle
 
     def _step_update_sim_statuses(self, step_size: float):
         # update points
@@ -213,10 +242,24 @@ class InspectionSimulator(SafeRLSimulator):
 
             # update the observation space with number of inspected points
             platform.num_inspected_points = illum.num_inspected_points(self._state.points)
+            if self.illum_flag:
+                platform.sun_angle = np.array(
+                    [
+                        illum.get_sun_angle(
+                            self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle
+                        )
+                    ]
+                )
+            if platform.num_inspected_points[0] != self.last_points_inspected:
+                platform.cluster_location = self._kmeans_find_nearest(entity.position)
+            self.last_points_inspected = platform.num_inspected_points[0]
 
             if self.illum_flag:
-                # Render scene every m simulation seconds
-                if self.config.illumination_params.render_flag_3d or self.config.illumination_params.render_flag_subplots:
+                # render scene every m simulation seconds
+                if (
+                    self.config.illumination_params.render_flag_3d or self.config.illumination_params.render_flag_subplots
+                    or self.config.illumination_params.save_data_flag
+                ):
                     current_time = self.clock
                     sun_position = illum.get_sun_position(
                         current_time,
@@ -228,9 +271,14 @@ class InspectionSimulator(SafeRLSimulator):
                     if (current_time % (m)) == 0:
                         if self.config.illumination_params.render_flag_3d:
                             illum.render_3d(self.fig, entity.position, sun_position, self.config.radius, current_time, m)
-                        else:
+                        if self.config.illumination_params.render_flag_subplots:
                             axes = [self.ax_3d, self.ax_xy, self.ax_xz, self.ax_yz]
                             illum.render_subplots(self.fig, axes, entity.position, sun_position, self.config.radius, current_time, m)
+                    if self.config.illumination_params.save_data_flag:
+                        action = np.array(platform.get_applied_action(), dtype=np.float32)
+                        illum.save_data(
+                            self._state.points, current_time, entity.position, sun_position, action, entity.velocity, self.path_to_data
+                        )
 
         # return same as parent
         return self._state
@@ -292,6 +340,61 @@ class InspectionSimulator(SafeRLSimulator):
                         else:
                             RGB = illum.compute_illum_pt(point, current_theta, position, r_avg, r, chief_properties, light_properties)
                             self._state.points[point] = illum.evaluate_RGB(RGB)
+
+    def _kmeans_find_nearest(self, position):
+        """Finds nearest cluster of uninspected points using kmeans clustering"""
+        uninspected = []
+        for point, inspected in self._state.points.items():
+            if not inspected:
+                if self.illum_flag:
+                    if self.check_if_illuminated(point, position):
+                        uninspected.append(point)
+                else:
+                    uninspected.append(point)
+        if len(uninspected) == 0:
+            out = np.array([0., 0., 0.])
+        else:
+            n = math.ceil(len(uninspected) / 10)
+            data = np.array(uninspected)
+            if self.last_cluster is None:
+                init = "random"
+            else:
+                if n > self.last_cluster.shape[0]:
+                    idxs = np.random.choice(self.last_cluster.shape[0], size=n - self.last_cluster.shape[0])
+                    new = np.array(uninspected)[idxs, :]
+                    init = np.vstack((self.last_cluster, new))
+                else:
+                    init = self.last_cluster[0:n, :]
+            kmeans = KMeans(
+                init=init,
+                n_clusters=n,
+                n_init=10,
+                max_iter=50,
+            )
+            kmeans.fit(data)
+            self.last_cluster = kmeans.cluster_centers_
+            dist = []
+            for center in self.last_cluster:
+                dist.append(np.linalg.norm(position - center))
+            out = kmeans.cluster_centers_[np.argmin(dist)]
+            out = out / np.linalg.norm(out)
+        return out
+
+    def check_if_illuminated(self, point, position):
+        """Check if points is illuminated"""
+        r = self.config.radius
+        r_avg = self.config.illumination_params.avg_rad_Earth2Sun
+        chief_properties = self.config.illumination_params.chief_properties
+        light_properties = self.config.illumination_params.light_properties
+        current_theta = illum.get_sun_angle(
+            self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle
+        )
+        if self.config.illumination_params.bin_ray_flag:
+            illuminated = illum.check_illum(point, current_theta, r_avg, r)
+        else:
+            RGB = illum.compute_illum_pt(point, current_theta, position, r_avg, r, chief_properties, light_properties)
+            illuminated = illum.evaluate_RGB(RGB)
+        return illuminated
 
 
 PluginLibrary.AddClassToGroup(InspectionSimulator, "InspectionSimulator", {})
