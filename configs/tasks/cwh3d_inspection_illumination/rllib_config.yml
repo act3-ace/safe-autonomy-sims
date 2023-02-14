@@ -9,7 +9,7 @@
 #---------------------------------------------------------------------------
 
 # === Environment ===
-horizon: 12236 # episode length (2 orbits)
+horizon: 12236 # episode length
 
 # === Execution ===
 rollout_fragment_length: 200
@@ -35,6 +35,3 @@ lambda: 0.928544
 
 # === Other ===
 seed: 1
-
-
-

@@ -59,6 +59,8 @@ class CWHPlatform(BaseSafeRLPlatform):
         self._platform = self.config.platform
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
         self.inspected_points = 0
+        self.sun_angle = np.array([0.])
+        self.uninspected_cluster_location = np.array([0., 0., 0.])
 
     @property
     def get_validator(self) -> typing.Type[CWHPlatformValidator]:
@@ -143,6 +145,25 @@ class CWHPlatform(BaseSafeRLPlatform):
         Set number of points inspected.
         """
         self.inspected_points = val
+
+    @property
+    def cluster_location(self):
+        """
+        Cluster location of unispected points.
+
+        Returns
+        -------
+        np.ndarray
+            Cluster location of unispected points.
+        """
+        return self.uninspected_cluster_location
+
+    @cluster_location.setter
+    def cluster_location(self, val: np.ndarray):
+        """
+        Set cluster location of unispected points.
+        """
+        self.uninspected_cluster_location = val
 
     @property
     def operable(self):

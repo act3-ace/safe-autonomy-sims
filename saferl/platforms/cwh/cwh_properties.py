@@ -104,3 +104,45 @@ class InspectedPointProp(DiscreteProp):
     name: str = "inspected_points"
     n: int = 101
     description: str = "Inspected Points Sensor Properties"
+
+
+class SunAngleProp(BoxProp):
+    """
+    Sun angle sensor properties.
+
+    name : str
+        Sensor property name.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "SunAngle"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-10000.]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [10000.]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
+    description: str = "Sun Angle Sensor Properties"
+
+
+class UninspectedPointProp(BoxProp):
+    """
+    Uninspected points cluster location properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "uninspected_points"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    description: str = "Uninspected points cluster location"
