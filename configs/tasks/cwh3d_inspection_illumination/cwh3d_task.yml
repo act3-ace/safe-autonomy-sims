@@ -39,7 +39,6 @@ config:
     local: [!include rllib_config.yml,  *rllib_config_updates]
 
   ray_config: [!include ray_config.yml, *ray_config_updates]
-  #seems okay to use this one
-  env_config: [!include ../../environments/inspection3d_illumination.yml, *env_config_updates]
+  env_config: [!include ../../environments/inspection_illumination3d.yml, *env_config_updates]
   tune_config: [!include tune_config.yml, *tune_config_updates]
 
