@@ -57,9 +57,9 @@ class IlluminationValidator(BaseModel):
     resolution: list
     focal_length: float
     bin_ray_flag: bool
-    render_flag_3d: bool
-    render_flag_subplots: bool
-    save_data_flag: bool
+    render_flag_3d: bool = False
+    render_flag_subplots: bool = False
+    save_data_flag: bool = False
 
 
 class InspectionSimulatorState(BaseSimulatorState):
