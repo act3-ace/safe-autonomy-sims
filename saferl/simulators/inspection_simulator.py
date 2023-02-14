@@ -214,7 +214,7 @@ class InspectionSimulator(SafeRLSimulator):
                 self.ax_xz = self.fig.add_subplot(2, 2, 3)
                 self.ax_yz = self.fig.add_subplot(2, 2, 4)
             if self.config.illumination_params.save_data_flag:
-                self.path_to_data = "C:/Users/david/Documents/Documents/Texas_AM/AFRL/safe-autonomy-sims/matlab_animations/temp.csv"
+                self.path_to_data = "/tmp/safe-autonomy/illum_data.csv"
 
     def reset(self, config):
         super().reset(config)
