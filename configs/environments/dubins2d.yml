@@ -13,7 +13,7 @@
     "type": "Dubins2dSimulator",
     "config": {
       "lead": "red0",
-      "step_size": 1
+      "frame_rate": 1
     },
   },
   "simulator_reset_parameters": {
