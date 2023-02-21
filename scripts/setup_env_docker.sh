@@ -9,7 +9,8 @@
 #
 # The use, dissemination or disclosure of data in this file is subject to
 # limitation or restriction. See accompanying README and LICENSE for details.
-# -------------------------------------------------------------------------------# #######################################################################################
+# -------------------------------------------------------------------------------# 
+#######################################################################################
 # Author: Benjamin Heiner
 # Purpose: Sets up the docker environment file for build process
 # #######################################################################################
@@ -21,7 +22,7 @@ set -o errexit -o pipefail -o noclobber -o nounset
 DOCKER_CONTAINER=""
 VDL_USER=""
 CONTAINER_USER="act3rl"
-="2.8.0"
+_VERSION="2.8.0"
 BRANCH="master"
 DOCKER_ONLY=0
 DATE="$(date +"%m-%d-%y:%H%M")"
@@ -80,7 +81,7 @@ ENV_FILE="$CODE_PATH"/.env
   echo "COMPOSE_DOCKER_CLI_BUILD=1"
   echo "DOCKER_BUILDKIT=1"
   echo "DOCKER_CLI_EXPERIMENTAL=enabled"
-  echo "=${}"
+  echo "_VERSION=${_VERSION}"
   echo "OCI_REGISTRY=${USE_OCI_REGISTRY}"
   echo "ACT3_OCI_REGISTRY=${USE_ACT3_OCI_REGISTRY}"
 } >| "${ENV_FILE}"
