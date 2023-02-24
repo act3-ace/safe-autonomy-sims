@@ -89,6 +89,11 @@ class SafeRLSimulator(BaseSimulator):
         return SafeRLSimulatorResetValidator
 
     @property
+    def step_size(self) -> float:
+        """Simulator step size in seconds"""
+        return 1 / self.frame_rate
+
+    @property
     def sim_time(self) -> float:
         return self.clock
 
