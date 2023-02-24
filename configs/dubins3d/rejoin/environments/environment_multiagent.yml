@@ -17,7 +17,7 @@
     "type": "Dubins3dSimulator",
     "config": {
       "lead": "red0",
-      "frame_rate": 1
+      "step_size": 1
     },
   },
   "platforms": "DubinsSimulator_Platforms",
