@@ -16,7 +16,7 @@
   "simulator": {
     "type": "CWHSimulator",
     "config": {
-      "frame_rate": 1
+      "step_size": 1
     },
   },
   "platforms": "CWHSimulator_Platforms",

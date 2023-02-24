@@ -147,7 +147,11 @@ def points_on_sphere_cmu(num_points: int, radius: float) -> list:
 class InspectionSimulatorValidator(SafeRLSimulatorValidator):
     """
     A validator for the InspectionSimulator config.
+
+    step_size: float
+        A float representing how many simulated seconds pass each time the simulator updates.
     """
+    step_size: float
     num_points: int
     radius: float
     points_algorithm: str = "cmu"
