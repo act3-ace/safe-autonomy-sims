@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.0...v1.3.1) (2023-02-24)
+
+
+### Bug Fixes
+
+* use frame_rate to update step_size ([95ce866](https://github.com/act3-ace/safe-autonomy-sims/commit/95ce8668c55f9591c1631fdb46524215feee6f4f)), closes [#224](https://github.com/act3-ace/safe-autonomy-sims/issues/224)
+
 # [1.3.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.2.1...v1.3.0) (2023-02-13)
 
 
