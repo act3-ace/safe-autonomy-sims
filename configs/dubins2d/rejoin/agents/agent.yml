@@ -192,34 +192,31 @@
     ],
     "dones": [
         {
-            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
-            "config":{
-                "max_sim_time": 1000,
-            },
-        },
-        {
             "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
-            "config":{
-                "max_distance": 40000,
-                "lead": "red0",
-            },
+            "config":{},
+            "references": {
+              "max_distance": "max_distance",
+              "lead": "lead",
+            }
         },
         {
             "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
-            "config":{
-                "safety_margin": 10,
-                "lead": "red0",
-            },
+            "config":{},
+            "references": {
+              "safety_margin": "safety_margin",
+              "lead": "lead",
+            }
         },
         {
             "functor": "saferl.dones.rejoin_dones.RejoinSuccessDone",
-            "config":{
-                "radius": 150,
-                "offset": [500, 500],
-                "lead": "red0",
-                "step_size": 1,
-                "success_time": 20,
-            },
+            "config":{},
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+              "step_size": "step_size",
+              "success_time": "success_time",
+            }
         },
     ],
     "rewards": [
@@ -227,9 +224,11 @@
             "name": "RejoinDistanceExponentialChangeReward",
             "functor": "saferl.rewards.rejoin_rewards.RejoinDistanceExponentialChangeReward",
             "config": {
-                "offset": [ 500, 500 ],
-                "lead": "red0",
                 "pivot": 5000.0,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
             }
         },
         {
@@ -238,9 +237,11 @@
             "config": {
                 "reward": 0.1,
                 "refund": True,
-                "radius": 150,
-                "offset": [ 500, 500 ],
-                "lead": "red0",
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
             }
         },
         {
@@ -248,9 +249,11 @@
             "functor": "saferl.rewards.rejoin_rewards.RejoinFirstTimeReward",
             "config": {
                 "reward": 0.25,
-                "radius": 150,
-                "offset": [ 500, 500 ],
-                "lead": "red0",
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
             }
         },
         {
@@ -258,11 +261,13 @@
             "functor": "saferl.rewards.rejoin_rewards.RejoinSuccessReward",
             "config": {
                 "reward": 1,
-                "radius": 150,
-                "offset": [ 500, 500 ],
-                "lead": "red0",
-                "step_size": 1,
-                "success_time": 20,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+              "step_size": "step_size",
+              "success_time": "success_time",
             }
         },
         {
@@ -273,13 +278,16 @@
                 "distance_reward": -1,
                 "timeout_reward": -1,
                 "leave_rejoin_reward": 0,
-                "radius": 150,
-                "offset": [ 500, 500 ],
-                "lead": "red0",
                 "max_time": 1000,
-                "max_distance": 40000,
-                "safety_margin": 100,
+            },
+            "references": {
+              "safety_margin": "safety_margin",
+              "max_distance": "max_distance",
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
             }
         },
     ],
+    "reference_store": !include ../parameters/parameters.yml
 }
