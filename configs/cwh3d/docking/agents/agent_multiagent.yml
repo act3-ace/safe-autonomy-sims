@@ -133,24 +133,28 @@
             "config":
               {
                 "sensor": "Sensor_Position",
-                "velocity_threshold": 0.2,
-                "threshold_distance": 0.5,
-                "mean_motion": 0.001027,
                 "slope": 2.0,
-              }
+              },
+            "references": {
+              "velocity_threshold": "velocity_threshold",
+              "threshold_distance": "threshold_distance",
+              "mean_motion": "mean_motion",
+            },
         },
     ],
     "dones": [
         {
             "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
-            "config":{
-                "max_sim_time": 10000,
+            "config":{},
+            "references":{
+              "max_sim_time": "timeout",
             },
         },
         {
             "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
-            "config":{
-                "max_distance": 10000,
+            "config":{},
+            "references":{
+              "max_distance": "max_distance",
             },
         },
 #        {
@@ -165,22 +169,25 @@
         {
             "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
             "config":{
-              "crash_region_radius": 0.5,
               "velocity_constraint": {
                 "velocity_threshold": 0.2,
                 "threshold_distance": 0.5,
-              },
+              }
             },
+            "references": {
+              "crash_region_radius": "docking_region_radius",
+            }
         },
         {
             "functor": "saferl.dones.cwh.docking_dones.SuccessfulDockingDoneFunction",
-            "config":{
-              "docking_region_radius": 0.5,
-              "velocity_threshold": 0.2,
-              "threshold_distance": 0.5,
-              "mean_motion": 0.001027,
-              "lower_bound": False,
-            },
+            "config":{},
+            "references": {
+              "docking_region_radius": "docking_region_radius",
+              "velocity_threshold": "velocity_threshold",
+              "threshold_distance": "threshold_distance",
+              "mean_motion": "mean_motion",
+              "lower_bound": "lower_bound",
+            }
         },
     ],
     "rewards": [
@@ -206,10 +213,12 @@
         "config": {
           "scale": -0.01,
           "bias": -0.01,
-          "velocity_threshold": 0.2,
-          "threshold_distance": 0.5,
-          "mean_motion": 0.001027,
-          "lower_bound": False,
+        },
+        "references": {
+          "velocity_threshold": "velocity_threshold",
+          "threshold_distance": "threshold_distance",
+          "mean_motion": "mean_motion",
+          "lower_bound": "lower_bound",
         }
       },
         {
@@ -217,12 +226,14 @@
           "functor": "saferl.rewards.cwh.docking_rewards.DockingSuccessReward",
           "config": {
             "scale": 1.0,
-            "timeout": 2000,
-            "docking_region_radius": 0.5,
-            "velocity_threshold": 0.2,
-            "threshold_distance": 0.5,
-            "mean_motion": 0.001027,
-            "lower_bound": False,
+          },
+          "references": {
+            "timeout": "timeout",
+            "docking_region_radius": "docking_region_radius",
+            "velocity_threshold": "velocity_threshold",
+            "threshold_distance": "threshold_distance",
+            "mean_motion": "mean_motion",
+            "lower_bound": "lower_bound",
           }
         },
       {
@@ -232,14 +243,17 @@
           "timeout_reward": -1.0,
           "distance_reward": -1.0,
           "crash_reward": -1.0,
-          "timeout": 2000,
-          "max_goal_distance": 40000,
-          "docking_region_radius": 0.5,
-          "velocity_threshold": 0.2,
-          "threshold_distance": 0.5,
-          "mean_motion": 0.001027,
-          "lower_bound": False,
+        },
+        "references": {
+          "timeout": "timeout",
+          "max_goal_distance": "max_distance",
+          "docking_region_radius": "docking_region_radius",
+          "velocity_threshold": "velocity_threshold",
+          "threshold_distance": "threshold_distance",
+          "mean_motion": "mean_motion",
+          "lower_bound": "lower_bound",
         }
       },
     ],
+    "reference_store": !include ../parameters/parameters.yml
 }

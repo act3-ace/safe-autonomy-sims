@@ -70,10 +70,13 @@
             "functor": "saferl.rewards.rejoin_rewards.RejoinReward",
             "config": {
                 "reward": 0,
-                "radius": 150,
-                "offset": [ 500, 500 ],
-                "lead": "red0",
+            },
+            "references": {
+                "radius": "radius",
+                "offset": "offset",
+                "lead": "lead",
             }
         },
     ],
+    "reference_store": !include ../parameters/parameters.yml
 }

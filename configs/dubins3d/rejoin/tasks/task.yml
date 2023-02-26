@@ -15,6 +15,7 @@ experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
     num_workers: 6
+    horizon: 2000
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates

@@ -6,4 +6,5 @@
   "max_distance": 500,
   "step_size": 10,
   "num_points": 100,
+  "lower_bound": False,
 }
