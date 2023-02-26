@@ -249,34 +249,31 @@
     ],
     "dones": [
         {
-            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
-            "config":{
-                "max_sim_time": 2000,
-            },
-        },
-        {
             "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
-            "config":{
-                "max_distance": 100000,
-                "lead": "red0",
-            },
+            "config":{},
+            "references": {
+              "lead": "lead",
+              "max_distance": "max_distance",
+            }
         },
         {
             "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
-            "config":{
-                "safety_margin": 100,
-                "lead": "red0",
-            },
+            "config":{},
+            "references": {
+              "lead": "lead",
+              "safety_margin": "safety_margin",
+            }
         },
         {
             "functor": "saferl.dones.rejoin_dones.RejoinSuccessDone",
-            "config":{
-                "radius": 150,
-                "offset": [ 1000, 0, 0 ],
-                "lead": "red0",
-                "step_size": 1,
-                "success_time": 20,
-            },
+            "config":{},
+            "references": {
+              "lead": "lead",
+              "offset": "offset_1",
+              "radius": "radius",
+              "step_size": "step_size",
+              "success_time": "success_time"
+            }
         },
     ],
     "rewards": [
@@ -284,9 +281,11 @@
             "name": "RejoinDistanceExponentialChangeReward",
             "functor": "saferl.rewards.rejoin_rewards.RejoinDistanceExponentialChangeReward",
             "config": {
-                "offset": [ 1000, 0, 0 ],
-                "lead": "red0",
                 "pivot": 5000.0,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset_1",
             }
         },
         {
@@ -295,9 +294,11 @@
             "config": {
                 "reward": 0.1,
                 "refund": True,
-                "radius": 150,
-                "offset": [ 1000, 0, 0 ],
-                "lead": "red0",
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset_1",
+              "radius": "radius",
             }
         },
         {
@@ -305,9 +306,11 @@
             "functor": "saferl.rewards.rejoin_rewards.RejoinFirstTimeReward",
             "config": {
                 "reward": 0.25,
-                "radius": 150,
-                "offset": [ 1000, 0, 0 ],
-                "lead": "red0",
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset_1",
+              "radius": "radius",
             }
         },
         {
@@ -315,11 +318,13 @@
             "functor": "saferl.rewards.rejoin_rewards.RejoinSuccessReward",
             "config": {
                 "reward": 1,
-                "radius": 150,
-                "offset": [ 1000, 0, 0 ],
-                "lead": "red0",
-                "step_size": 1,
-                "success_time": 20,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset_1",
+              "radius": "radius",
+              "step_size": "step_size",
+              "success_time": "success_time"
             }
         },
         {
@@ -330,13 +335,16 @@
                 "distance_reward": -1,
                 "timeout_reward": -1,
                 "leave_rejoin_reward": 0,
-                "radius": 150,
-                "offset": [ 1000, 0, 0 ],
-                "lead": "red0",
                 "max_time": 2000,
-                "max_distance": 100000,
-                "safety_margin": 100,
+            },
+            "references": {
+              "safety_margin": "safety_margin",
+              "max_distance": "max_distance",
+              "lead": "lead",
+              "offset": "offset_1",
+              "radius": "radius",
             }
         },
     ],
+    "reference_store": !include ../parameters/parameters.yml
 }
