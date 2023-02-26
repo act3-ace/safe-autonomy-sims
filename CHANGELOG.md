@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.1...v1.3.2) (2023-02-26)
+
+
+### Bug Fixes
+
+* fixed agent vs platform ID issue in RejoinSuccessReward, leveraged CoRL reference store in agent configs, resolved config variable discrepancies ([ffe46df](https://github.com/act3-ace/safe-autonomy-sims/commit/ffe46df250df80599e06cd6ef6a8b300c9d72587))
+
 ## [1.3.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.0...v1.3.1) (2023-02-24)
 
 

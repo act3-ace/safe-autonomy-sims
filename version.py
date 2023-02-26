@@ -2,4 +2,4 @@
 
 act3 package for all other libraries
 """
-__version__ = "1.3.1"
+__version__ = "1.3.2"
