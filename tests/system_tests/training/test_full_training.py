@@ -23,7 +23,6 @@ from corl.parsers.yaml_loader import load_file
 from corl.train_rl import parse_corl_args
 
 from saferl.experiments.rllib_api_experiment import RllibAPIExperiment
-from scripts.base_rta_test import RTAExperiment
 
 
 @pytest.fixture(name="_ray_session_temp_dir", scope="session", autouse=True)
@@ -150,7 +149,9 @@ def test_experiment(
     args.compute_platform = "local"
     experiment_class.run_experiment(args)
 
-    if not isinstance(experiment_class, RTAExperiment):
-        # Determine filename of the checkpoint
-        checkpoint_glob = list(tmp_path.glob('training/**/checkpoint-1'))
-        assert len(checkpoint_glob) == 1
+
+    # if not isinstance(experiment_class, RTAExperiment):
+
+    # Determine filename of the checkpoint
+    checkpoint_glob = list(tmp_path.glob('training/**/checkpoint-1'))
+    assert len(checkpoint_glob) == 1
