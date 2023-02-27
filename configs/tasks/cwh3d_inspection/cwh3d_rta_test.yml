@@ -11,7 +11,7 @@
 ####################################################################
 # Override values used by the setup
 ####################################################################
-experiment_class: scripts.inspection.test_inspection_rta_1v1.Inspection1v1RTAExperiment
+experiment_class: scripts.test_inspection_rta_1v1.Inspection1v1RTAExperiment
 config:
   rllib_config_updates: &rllib_config_updates
     #num_workers: 0
