@@ -1,0 +1,37 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+{
+  "simulator": {
+    "type": "InspectionSimulator",
+    "config": {
+      "frame_rate": 0.1,  # Hz
+      "num_points": 100,
+      "radius" : 10,
+    },
+  },
+  "simulator_reset_parameters": {
+    "initializer": {
+      "functor": "saferl.simulators.initializers.cwh_initializer.CWH3DRadialInitializer",
+      "config": {
+          "threshold_distance": 0,
+          "velocity_threshold": 0.2,
+          "mean_motion": 0.001027,
+          "slope": 2.0,
+      }
+    }
+  },
+  "platforms": "CWHSimulator_Platforms",
+  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
+  "episode_parameter_provider": {
+    "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+  },
+}
+

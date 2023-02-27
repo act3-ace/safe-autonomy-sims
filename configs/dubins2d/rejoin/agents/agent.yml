@@ -1,0 +1,293 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core  Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
+"config": {
+    "parts": [
+        {"part": "Controller_YawRate", "config": {"axis": 0}},
+        {"part": "Controller_Acceleration", "config": { "axis": 1 }},
+        {"part": "Sensor_Relative_Position", "config": {"oriented": True}},
+        {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [500, 500]}},
+        {"part": "Sensor_Velocity", "config": {"oriented": True}},
+        {"part": "Sensor_Partner_Velocity", "config": {"oriented": True}},
+    ],
+    "episode_parameter_provider": {
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
+    "simulator_reset_parameters": {
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "heading": 0,
+      "v": 200
+    },
+    "glues": [
+        {
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
+            "config": {
+                "controller": "Controller_Acceleration",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                    "enabled": False,
+                }
+            },
+        },
+        {
+            "functor": "corl.glues.common.controller_glue.ControllerGlue",
+            "config":{
+                "controller": "Controller_YawRate",
+                "training_export_behavior": "EXCLUDE",
+                "normalization": {
+                  "enabled": False,
+                }
+            }
+        },
+        {
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          "config": {
+            "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": 1000.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": "Sensor_Relative_Position",
+              },
+          },
+        },
+        {
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "normalization": {
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1],
+              }
+            }
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": "Sensor_Relative_Position",
+              },
+          },
+        },
+        {
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          "config": {
+            "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": 1000.0,
+              },
+            },
+          },
+          "wrapped": {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config":{
+              "sensor": "Sensor_Relative_Rejoin_Position",
+            },
+          },
+        },
+        {
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "normalization": {
+              "config": {
+                 "mu": 0.0,
+                 "sigma": [1, 1],
+               }
+             },
+           },
+           "wrapped": {
+               "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+               "config":{
+                 "sensor": "Sensor_Relative_Rejoin_Position",
+               },
+           },
+        },
+        {
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          "config": {
+            "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": 400.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Velocity,
+              },
+          },
+        },
+        {
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "normalization": {
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1],
+              }
+            }
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Velocity,
+              },
+          },
+        },
+        {
+          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          "config": {
+            "normalization": {
+              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+              "config": {
+                "mu": 0.0,
+                "sigma": 400.0,
+              },
+            },
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Partner_Velocity,
+              },
+          },
+        },
+        {
+          "functor": "corl.glues.common.unit_vector_glue.UnitVectorGlue",
+          "config": {
+            "normalization": {
+              "config": {
+                "mu": 0.0,
+                "sigma": [1, 1],
+              }
+            }
+          },
+          "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config":{
+                  "sensor": Sensor_Partner_Velocity,
+              },
+          },
+        },
+    ],
+    "dones": [
+        {
+            "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
+            "config":{},
+            "references": {
+              "max_distance": "max_distance",
+              "lead": "lead",
+            }
+        },
+        {
+            "functor": "saferl.dones.rejoin_dones.CrashDoneFunction",
+            "config":{},
+            "references": {
+              "safety_margin": "safety_margin",
+              "lead": "lead",
+            }
+        },
+        {
+            "functor": "saferl.dones.rejoin_dones.RejoinSuccessDone",
+            "config":{},
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+              "step_size": "step_size",
+              "success_time": "success_time",
+            }
+        },
+    ],
+    "rewards": [
+        {
+            "name": "RejoinDistanceExponentialChangeReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinDistanceExponentialChangeReward",
+            "config": {
+                "pivot": 5000.0,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+            }
+        },
+        {
+            "name": "RejoinReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinReward",
+            "config": {
+                "reward": 0.1,
+                "refund": True,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+            }
+        },
+        {
+            "name": "RejoinFirstTimeReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinFirstTimeReward",
+            "config": {
+                "reward": 0.25,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+            }
+        },
+        {
+            "name": "RejoinSuccessReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinSuccessReward",
+            "config": {
+                "reward": 1,
+            },
+            "references": {
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+              "step_size": "step_size",
+              "success_time": "success_time",
+            }
+        },
+        {
+            "name": "RejoinFailureReward",
+            "functor": "saferl.rewards.rejoin_rewards.RejoinFailureReward",
+            "config": {
+                "crash_reward": -1,
+                "distance_reward": -1,
+                "timeout_reward": -1,
+                "leave_rejoin_reward": 0,
+                "max_time": 1000,
+            },
+            "references": {
+              "safety_margin": "safety_margin",
+              "max_distance": "max_distance",
+              "lead": "lead",
+              "offset": "offset",
+              "radius": "radius",
+            }
+        },
+    ],
+    "reference_store": !include ../parameters/parameters.yml
+}
