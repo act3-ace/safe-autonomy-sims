@@ -128,10 +128,10 @@ class RejoinSuccessDone(DoneFuncBase):
 
         self._update_rejoin_time(next_state)
 
-        done[self.agent] = self.rejoin_time > self.config.success_time
+        done[self.config.platform_name] = self.rejoin_time > self.config.success_time
 
-        if done[self.agent]:
-            next_state.episode_state[self.agent][self.name] = DoneStatusCodes.WIN
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
 
         self._set_all_done(done)
         return done

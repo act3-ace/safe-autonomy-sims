@@ -1,0 +1,49 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+{
+  "simulator": {
+    "type": "InspectionSimulator",
+    "config": {
+      "frame_rate": 1,
+      "num_points": 100,
+      "radius" : 10,
+      "illumination_params":{
+          "mean_motion" : 0.001027,
+          "avg_rad_Earth2Sun": 150000000000,
+          "sun_angle" : 0,
+          "light_properties" : {'ambient': [1, 1, 1], 'diffuse': [1, 1, 1], 'specular': [1, 1, 1]},
+          "chief_properties" : {'ambient': [.1, 0, 0], 'diffuse': [0.7, 0, 0], 'specular': [1, 1, 1], 'shininess': 100, 'reflection': 0.5}, # [.1, 0, 0] = red, [0.753, 0.753, 0.753] = silver
+          "resolution" : [200, 200],
+          "focal_length" : 1,
+          "bin_ray_flag": False,
+          "render_flag_3d": False,
+          "render_flag_subplots": True,
+      },
+    },
+  },
+  "simulator_reset_parameters": {
+    "initializer": {
+      "functor": "saferl.simulators.initializers.cwh_initializer.CWH3DRadialInitializer",
+      "config": {
+          "threshold_distance": 0,
+          "velocity_threshold": 0.2,
+          "mean_motion": 0.001027,
+          "slope": 2.0,
+      }
+    }
+  },
+  "platforms": "CWHSimulator_Platforms",
+  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
+  "episode_parameter_provider": {
+    "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+  },
+}
+

@@ -1,0 +1,25 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+"config": "configs/dubins2d/rejoin/tasks/task.yml"
+"platform_config":
+  - name: "blue0"
+    config: "configs/dubins2d/platform.yml"
+  - name: "red0"
+    config: "configs/dubins2d/platform.yml"
+"agent_config":
+  - name: "blue0_ctrl"
+    platforms: ["blue0"]
+    config: "configs/dubins2d/rejoin/agents/agent.yml"
+    policy: "configs/common/policies/ppo.yml"
+  - name: "red0_ctrl"
+    platforms: ["red0"]
+    config: "configs/dubins2d/rejoin/agents/noop.yml"
+    policy: "configs/dubins2d/rejoin/policies/scripted_lead.yml"
