@@ -9,7 +9,7 @@
 #---------------------------------------------------------------------------
 
 # === Environment ===
-horizon: 11040 # episode length (2 orbits)
+horizon: 11040 # episode length (number of steps); note 11040 is two 92 minute orbits in seconds
 
 # === Execution ===
 rollout_fragment_length: 200
