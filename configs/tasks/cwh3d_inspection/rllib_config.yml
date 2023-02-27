@@ -9,12 +9,12 @@
 #---------------------------------------------------------------------------
 
 # === Environment ===
-horizon: 12236 # episode length (2 orbits)
+horizon: 11040 # episode length (2 orbits)
 
 # === Execution ===
 rollout_fragment_length: 200
-train_batch_size: 400  # set to num_workers * rollout_fragment_length
-sgd_minibatch_size: 400
+train_batch_size: 1200  # set to num_workers * rollout_fragment_length
+sgd_minibatch_size: 1200
 batch_mode: complete_episodes
 
 # === Resources ===
