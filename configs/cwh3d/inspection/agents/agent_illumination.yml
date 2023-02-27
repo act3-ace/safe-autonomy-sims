@@ -314,5 +314,5 @@
           }
         },
     ],
-    "reference_store": !include ../parameters/inspection_3d.yml
+    "reference_store": !include ../parameters/parameters.yml
 }

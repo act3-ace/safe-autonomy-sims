@@ -14,7 +14,7 @@
 experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
-    #num_workers: 0
+    horizon: 12236 # episode length (2 orbits)
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
@@ -35,10 +35,9 @@ config:
   # Note that items are patched from the update section
   ###################################################################
   rllib_configs:
-    default: [!include rllib_config.yml, *rllib_config_updates]
-    local: [!include rllib_config.yml,  *rllib_config_updates]
+    default: [!include ../../../common/ray/rllib.yml, *rllib_config_updates]
+    local: [!include ../../../common/ray/rllib.yml,  *rllib_config_updates]
 
-  ray_config: [!include ray_config.yml, *ray_config_updates]
-  env_config: [!include ../../environments/inspection_illumination3d.yml, *env_config_updates]
-  tune_config: [!include tune_config.yml, *tune_config_updates]
-
+  ray_config: [!include ../../../common/ray/ray.yml, *ray_config_updates]
+  env_config: [!include ../environments/environment_illumination.yml, *env_config_updates]
+  tune_config: [!include ../../../common/ray/tune.yml, *tune_config_updates]
