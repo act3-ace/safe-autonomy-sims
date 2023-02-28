@@ -3,7 +3,7 @@
   "mean_motion": 0.001027,
   "vel_limit_slope": 2,
   "velocity_threshold": 0.2,
-  "max_distance": 500,
+  "max_distance": 800,
   "step_size": 10,
   "num_points": 100,
   "lower_bound": False,

@@ -11,10 +11,13 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 """
+import math
 from collections import OrderedDict
 from typing import Union
 
+import numpy as np
 from run_time_assurance.rta import RTAModule
+from run_time_assurance.utils import to_jnp_array_jit
 from run_time_assurance.zoo.cwh.inspection_1v1 import (
     CHIEF_RADIUS_DEFAULT,
     DEPUTY_RADIUS_DEFAULT,
@@ -119,7 +122,7 @@ class RTAGlueCWHInspection1v1(RTAGlue):
         return rta_module
 
     def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        return Inspection1v1RTA(**kwargs)
+        return UpdatedInspection1v1RTA(**kwargs)
 
     def _get_rta_args(self) -> dict:
         return {
@@ -137,3 +140,19 @@ class RTAGlueCWHInspection1v1(RTAGlue):
             "control_bounds_high": self.config.control_bounds_high,
             "control_bounds_low": self.config.control_bounds_low,
         }
+
+
+class UpdatedInspection1v1RTA(Inspection1v1RTA):
+    """Updated RTA module with _get_state"""
+
+    def _get_state(self, input_state):
+        if len(input_state) == 7:
+            input_state = np.array(input_state)
+            input_state = np.concatenate((input_state, np.array([0.])))
+            theta = input_state[6]
+            m = math.floor(abs(theta / (2 * np.pi)))
+            theta -= np.sign(theta) * m * 2 * np.pi
+            input_state[6] = 2 * np.pi - theta
+        else:
+            input_state = np.concatenate((input_state, np.array([0., 0.])))
+        return to_jnp_array_jit(input_state)

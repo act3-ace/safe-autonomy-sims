@@ -13,6 +13,7 @@ This module contains custom illumination functions utilized in the CWH inspectio
 """
 
 import math
+from csv import writer
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,7 +31,7 @@ def get_sun_position(current_time, angular_velocity, initial_theta, r_avg):
     current_time: int
         current simulation time in seconds
     dt: float
-        radius of the sphere in meters
+        step size in seconds
     angular_velocity: float
         mean motion of sun in meters per second
     initial_theta: float
@@ -59,7 +60,7 @@ def get_sun_angle(current_time, angular_velocity, initial_theta):
     current_time: int
         current simulation time in seconds
     dt: float
-        radius of the sphere in meters
+        step size in seconds
     angular_velocity: float
         mean motion of sun in meters per second
     initial_theta: float
@@ -128,6 +129,27 @@ def num_inspected_points(points):
             pts += 1
 
     return pts
+
+
+def save_data(points, current_time, position, sun_position, action, velocity, path):
+    """
+    Saves data
+
+    No returns
+    """
+    points_bool = []
+    for point in points:
+        if not points[point]:
+            points_bool.append(0)
+        else:
+            points_bool.append(1)
+
+    # Write to csv
+    temp = [current_time, position, points_bool, sun_position, action, velocity]
+    with open(path, 'a') as f_object:
+        writer_object = writer(f_object)
+        writer_object.writerow(temp)
+        f_object.close()
 
 
 def evaluate_RGB(RGB):

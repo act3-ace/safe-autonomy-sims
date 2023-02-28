@@ -139,3 +139,69 @@ PluginLibrary.AddClassToGroup(
         "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
+
+
+class SunAngleSensor(CWHSensor):
+    """
+    Implementation of a sensor to give the sun angle
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.SunAngleProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - sun angle.
+
+        Returns
+        -------
+        float
+            sun angle
+        """
+        return self.parent_platform.sun_angle
+
+
+PluginLibrary.AddClassToGroup(
+    SunAngleSensor, "Sensor_SunAngle", {
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    SunAngleSensor, "Sensor_SunAngle", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+
+class UninspectedPointsSensor(CWHSensor):
+    """
+    Implementation of a sensor to give location of cluster of uninspected points.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.UninspectedPointProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - cluster_location.
+
+        Returns
+        -------
+        np.ndarray
+            Cluster location of the uninspected points.
+        """
+        return self.parent_platform.cluster_location
+
+
+PluginLibrary.AddClassToGroup(
+    UninspectedPointsSensor, "Sensor_UninspectedPoints", {
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    UninspectedPointsSensor, "Sensor_UninspectedPoints", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
