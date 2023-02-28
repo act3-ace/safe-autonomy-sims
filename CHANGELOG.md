@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.3...v1.4.0) (2023-02-28)
+
+
+### Features
+
+* add inspection illumination environment ([15999f3](https://github.com/act3-ace/safe-autonomy-sims/commit/15999f320bf6c065619a688e69ee318980fb93c4)), closes [#217](https://github.com/act3-ace/safe-autonomy-sims/issues/217)
+
 ## [1.3.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.2...v1.3.3) (2023-02-28)
 
 
