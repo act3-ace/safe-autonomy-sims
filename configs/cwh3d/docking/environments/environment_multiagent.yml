@@ -15,9 +15,7 @@
 {
   "simulator": {
     "type": "CWHSimulator",
-    "config": {
-      "frame_rate": 1
-    },
+    "config": {},
   },
   "platforms": "CWHSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
