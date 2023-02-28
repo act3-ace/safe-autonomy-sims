@@ -108,6 +108,106 @@ class ObservedPointsReward(RewardFuncBase):
         return reward
 
 
+class ChiefDistanceRewardValidator(RewardFuncBaseValidator):
+    """
+    Configuration validator for ChiefDistanceReward.
+
+    scale : float
+        A scalar value applied to reward.
+    punishment_reward : float
+        Negative scalar associated with the distance done condition.
+    max_dist : float
+        Maximum allowable distance to chief to recieve reward.
+    threshold_dist : float
+        Threshold distance
+    """
+
+    scale: float
+    punishment_reward: float
+    threshold_dist: float
+    max_dist: float
+
+
+class ChiefDistanceReward(RewardFuncBase):
+    """
+    Calculates reward based on the distance from chief.
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+    Parameters
+    ----------
+    observation : OrderedDict
+        The observations available to the agent from the previous state.
+    action : np.ndarray
+        The last action performed by the agent.
+    next_observation : OrderedDict
+        The observations available to the agent from the current state.
+    state : StateDict
+        The previous state of the simulation.
+    next_state : StateDict
+        The current state of the simulation.
+    observation_space : StateDict
+        The agent's observation space.
+    observation_units : StateDict
+        The units corresponding to keys in the observation_space.
+
+    Returns
+    -------
+    reward : RewardDict
+        The agent's reward for the number of new points inspected.
+    """
+
+    def __init__(self, **kwargs):
+        self.config: ChiefDistanceRewardValidator
+        super().__init__(**kwargs)
+        self.dist_prev = 0.
+
+    @property
+    def get_validator(self):
+        """
+        Method to return class's Validator.
+        """
+        return ChiefDistanceRewardValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+        reward = RewardDict()
+        value = 0.
+
+        deputy = get_platform_by_name(next_state, self.config.agent_name)
+        position = deputy.position
+        dist = np.linalg.norm(np.array(position))
+
+        # Soft constraint
+        if dist >= self.config.threshold_dist:
+            value = -self.config.scale * (np.sign(dist - self.dist_prev))
+
+        if dist >= self.config.max_dist:
+            value = self.config.punishment_reward
+
+        self.dist_prev = dist
+        reward[self.config.agent_name] = value
+        return reward
+
+
 class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the DockingDeltaVReward Reward Function.
@@ -120,11 +220,17 @@ class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
         Size of a single simulation step.
     mass : float
         The mass (kg) of the agent's spacecraft.
+    mode : str
+        Type of delta-v penalty, either "scale" or "linear_increasing"
+    rate : float
+        rate at which penalty increases for linear_increasing
     """
     scale: float
     bias: float = 0.0
     step_size: float = 1.0
     mass: float
+    mode: str = 'scale'
+    rate: float = 0.1
 
 
 class InspectionDeltaVReward(RewardFuncBase):
@@ -176,6 +282,8 @@ class InspectionDeltaVReward(RewardFuncBase):
         self.scale = self.config.scale
         self.mass = self.config.mass
         self.step_size = self.config.step_size
+        self.mode = self.config.mode
+        self.rate = self.config.rate
 
     def delta_v(self, state):
         """
@@ -196,6 +304,13 @@ class InspectionDeltaVReward(RewardFuncBase):
         d_v = np.sum(np.abs(control_vec)) / self.mass * self.step_size
         return d_v
 
+    def linear_scalar(self, time):
+        """
+        Delta-v penalty increases linearly with training iteration
+        """
+        inc_scalar = time * self.rate * self.scale
+        return inc_scalar
+
     @property
     def get_validator(self):
         """
@@ -214,7 +329,12 @@ class InspectionDeltaVReward(RewardFuncBase):
         observation_units: StateDict,
     ) -> RewardDict:
         reward = RewardDict()
-        val = self.scale * self.delta_v(next_state) + self.bias
+        if self.mode == "scale":
+            val = self.scale * self.delta_v(next_state) + self.bias
+        elif self.mode == "linear_increasing":
+            val = self.linear_scalar(state.total_steps) * self.delta_v(next_state) + self.bias
+        else:
+            raise ValueError('mode must be either "scale" or "linear_increasing"')
         reward[self.config.agent_name] = val
         return reward
 
