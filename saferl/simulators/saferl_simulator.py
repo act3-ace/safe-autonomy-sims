@@ -31,11 +31,8 @@ class SafeRLSimulatorValidator(
 ):
     """
     A validator for the SafeRLSimulator config.
-
-    step_size: float
-        A float representing how many simulated seconds pass each time the simulator updates.
     """
-    step_size: float
+    ...
 
 
 class InitializerResetValidator(BaseModel):
@@ -253,7 +250,7 @@ class SafeRLSimulator(BaseSimulator):
         pass
 
     def step(self):
-        step_size = self.config.step_size
+        step_size = self.step_size
         self._step_entity_state(step_size=step_size)
         self._step_update_time(step_size=step_size)
         self._step_update_sim_statuses(step_size=step_size)
