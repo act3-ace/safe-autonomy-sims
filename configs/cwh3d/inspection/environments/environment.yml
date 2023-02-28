@@ -12,7 +12,6 @@
   "simulator": {
     "type": "InspectionSimulator",
     "config": {
-      "frame_rate": 0.1,  # Hz
       "num_points": 100,
       "radius" : 10,
     },
