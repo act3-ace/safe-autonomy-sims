@@ -15,6 +15,7 @@
 
 "agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
+    "frame_rate": 1,  # Hz
     "parts": [
         {"part": "Controller_Thrust", "config": {"name": "X Thrust", "axis": 0, properties: {name: "x_thrust"}}},
         {"part": "Controller_Thrust", "config": {"name": "Y Thrust", "axis": 1, properties: {name: "y_thrust"}}},
