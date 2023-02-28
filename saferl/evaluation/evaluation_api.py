@@ -747,6 +747,8 @@ def create_sample_complexity_plot(
     # TODO: upgrade seaborn to 0.12.0 and swap depricated 'ci' for 'errorbar' kwarg: errorbar=('sd', 1) or (''ci', 95)
     # TODO: add smooth kwarg
 
+    plt.clf()
+
     sns.set(style="darkgrid", font_scale=1.5)
 
     # feed Dataframe to seaborn to create labelled plot
