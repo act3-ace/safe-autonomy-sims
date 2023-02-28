@@ -11,14 +11,12 @@ limitation or restriction. See accompanying README and LICENSE for details.
 """
 import typing
 
+import numpy as np
 from corl.evaluation.episode_artifact import EpisodeArtifact
 from corl.evaluation.metrics.generator import MetricGeneratorTerminalEventScope
 from corl.evaluation.metrics.metric import Metric
-from corl.evaluation.metrics.types.nonterminals.dict import Dict
-from corl.evaluation.metrics.types.nonterminals.vector import Vector
 from corl.evaluation.metrics.types.terminals.real import Real
 from corl.evaluation.metrics.types.terminals.void import Void
-import numpy as np
 
 
 class DeltaV(MetricGeneratorTerminalEventScope):
@@ -47,7 +45,7 @@ class DeltaV(MetricGeneratorTerminalEventScope):
                 continue
             # Create a non terminal metric (Dict) that is comprised of the terminal (Real) actions
             real_dict: typing.Dict[str, Metric] = {key: Real(map_act[key]) for key in map_act.keys()}
-            arr += np.sum([abs(c.value[0]) for c in real_dict.values()])/12*10 # TODO: HARDCODED
+            arr += np.sum([abs(c.value[0]) for c in real_dict.values()]) / 12 * 10  # TODO: HARDCODED
 
         return Real(arr)
 
@@ -77,7 +75,9 @@ class InspectedPoints(MetricGeneratorTerminalEventScope):
         if last_step_with_platform_data.agents[agent_id] is None:
             raise RuntimeError("Non Op")
 
-        return Real(int(last_step_with_platform_data.agents[agent_id].observations['ObserveSensor_Sensor_InspectedPoints']['direct_observation']))
+        return Real(
+            int(last_step_with_platform_data.agents[agent_id].observations['ObserveSensor_Sensor_InspectedPoints']['direct_observation'])
+        )
 
 
 class EpisodeLength(MetricGeneratorTerminalEventScope):
