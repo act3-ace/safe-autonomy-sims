@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.2...v1.3.3) (2023-02-28)
+
+
+### Bug Fixes
+
+* use agent frame rates to set sim frame rate ([241f159](https://github.com/act3-ace/safe-autonomy-sims/commit/241f1593ba15b78b9cf1fe2e5f1068bd909c4f29)), closes [#226](https://github.com/act3-ace/safe-autonomy-sims/issues/226)
+
 ## [1.3.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.1...v1.3.2) (2023-02-26)
 
 

@@ -10,6 +10,7 @@
 
 "agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
+    "frame_rate": 1,  # Hz
     "parts": [
         {"part": "Controller_YawRate", "config": {"axis": 0}},
         {"part": "Controller_Acceleration", "config": { "axis": 1 }},
