@@ -6,6 +6,8 @@ streamline visualization and analysis of comparative RL test assays.
 Author: John McCarroll
 """
 
+# pylint: disable=E0401
+
 import os
 import pickle
 import sys
@@ -405,38 +407,45 @@ def run_ablation_study(
     evaluation_ouput_dir = '/tmp/ablation_results'
 
     # evaluate provided trained policies' checkpoints
+
+    # construct keys by appending experiment group name, experiment index, and trial index together
     experiment_to_eval_results_map = {}
+
     for experiment_name, experiment_state in experiment_state_path_map.items():
 
         # if single training output provided, wrap in list
         experiment_states = [experiment_state] if not isinstance(experiment_state, list) else experiment_state
-        for index, experiment_state_path in enumerate(experiment_states):
+        for experiment_index, experiment_state_path in enumerate(experiment_states):
 
             # append index to evaluation_output path
-            experiment_indexed_name = experiment_name + f"__{index}"  # TODO: add info from experiment_state
             experiment_analysis = ExperimentAnalysis(experiment_state_path)
-            assert len(experiment_analysis.trials) == 1, f"more than one Trial in experiment_state {experiment_state_path}"  # type: ignore
 
-            checkpoint_paths, output_paths = checkpoints_list_from_experiment_analysis(
-                experiment_analysis,
-                evaluation_ouput_dir,
-                experiment_indexed_name
-            )
-            metadata = extract_metadata(experiment_analysis)
+            for trial_index in range(0, len(experiment_analysis.trials)):  # type: ignore
 
-            # temporarily index experiemnts listed under same name
-            experiment_to_eval_results_map[experiment_name + f'__{index}'] = {"output_paths": output_paths, "metadata": metadata}
-            run_evaluations(
-                task_config_path,
-                experiemnt_config_path,
-                launch_dir_of_experiment,
-                metrics_config,
-                checkpoint_paths,
-                output_paths,
-                platfrom_serializer_class,
-                test_case_manager_config=test_case_manager_config,
-                visualize_metrics=False
-            )
+                # create trial key
+                trial_key = f"{experiment_name}__{experiment_index}__{trial_index}"
+
+                checkpoint_paths, output_paths = checkpoints_list_from_experiment_analysis(
+                    experiment_analysis,
+                    evaluation_ouput_dir,
+                    trial_key,
+                    trial_index=trial_index
+                )
+                metadata = extract_metadata(experiment_analysis, trial_index=trial_index)
+
+                # temporarily index experiemnts listed under same name
+                experiment_to_eval_results_map[trial_key] = {"output_paths": output_paths, "metadata": metadata}
+                run_evaluations(
+                    task_config_path,
+                    experiemnt_config_path,
+                    launch_dir_of_experiment,
+                    metrics_config,
+                    checkpoint_paths,
+                    output_paths,
+                    platfrom_serializer_class,
+                    test_case_manager_config=test_case_manager_config,
+                    visualize_metrics=False
+                )
 
     # create sample complexity plot
     data = construct_dataframe(experiment_to_eval_results_map, metrics_config)
@@ -617,7 +626,7 @@ def parse_metrics_config(metrics_config: dict) -> typing.Dict[str, str]:
     return metrics_names
 
 
-def construct_dataframe(results: dict, metrics_config: dict):
+def construct_dataframe(results: dict, metrics_config: dict):  # pylint: disable=R0914
     """
     This function is responsible for parsing Metric data from the results of Evaluation Episodes.
     It collects values from all Metrics included in the metrics_config into a single pandas.DataFrame,
@@ -636,14 +645,14 @@ def construct_dataframe(results: dict, metrics_config: dict):
         A DataFrame containing Metric values collected for each checkpoint of each experiment by row
     """
     metric_names = parse_metrics_config(metrics_config)
-    columns = ['experiment', 'experiment_index', 'evaluation_trial_index', "training_iteration", "agent_name", "agent"]
+    columns = ['experiment', 'experiment_index', 'evaluation_episode_index', "training_iteration", "agent_name", "agent"]
 
     # need to parse each metrics.pkl file + construct DataFrame
     dataframes = []
-    for experiment_name in results.keys():  # pylint: disable=R1702
+    for trial_id in results.keys():  # pylint: disable=R1702
         data = []
-        output_paths = results[experiment_name]['output_paths']
-        training_metadata_df = results[experiment_name]['metadata']
+        output_paths = results[trial_id]['output_paths']
+        training_metadata_df = results[trial_id]['metadata']
 
         # collect metric values per experiment
         for output_path in output_paths:
@@ -656,15 +665,15 @@ def construct_dataframe(results: dict, metrics_config: dict):
 
                 episode_events = list(participant.events)
 
-                expr_name, expr_index = experiment_name.split("__")  # separate appended indexing from experiment name
+                experiment_name, experiment_index, _ = trial_id.split("__")
                 checkpoint_num = int(output_path.split("_")[-1])  # TODO: want better way to get checkpoint num data here
 
-                expr_agent = expr_name + '_' + agent_name
+                experiment_agent = experiment_name + '_' + agent_name
 
-                for eval_trial_index, event in enumerate(episode_events):
+                for evaluation_episode_index, event in enumerate(episode_events):
 
                     # aggregate trial data (single dataframe entry)
-                    row = [expr_name, expr_index, eval_trial_index, checkpoint_num, agent_name, expr_agent]
+                    row = [experiment_name, experiment_index, evaluation_episode_index, checkpoint_num, agent_name, experiment_agent]
 
                     # collect agent's metric values on each trial in eval
                     for metric_name in metric_names['agent']['__default__']:  # type: ignore
@@ -788,7 +797,9 @@ def create_sample_complexity_plot(
     return plot
 
 
-def checkpoints_list_from_experiment_analysis(experiment_analysis: ExperimentAnalysis, output_dir: str, experiment_name: str):
+def checkpoints_list_from_experiment_analysis(
+    experiment_analysis: ExperimentAnalysis, output_dir: str, experiment_name: str, trial_index: int = 0
+):
     """
     This function is responsible for compiling a list of paths to each checkpoint in an experiment.
     This acts as a helper function for when users want to evaluate a series of checkpoints from a single training job.
@@ -811,7 +822,7 @@ def checkpoints_list_from_experiment_analysis(experiment_analysis: ExperimentAna
     """
 
     # create ExperimentAnalysis object to handle Trial Checkpoints
-    trial = experiment_analysis.trials[0]  # type: ignore
+    trial = experiment_analysis.trials[trial_index]  # type: ignore
     ckpt_paths = experiment_analysis.get_trial_checkpoints_paths(trial, "training_iteration")
 
     output_dir_paths = []
@@ -828,7 +839,7 @@ def checkpoints_list_from_experiment_analysis(experiment_analysis: ExperimentAna
     return checkpoint_paths, output_dir_paths
 
 
-def extract_metadata(experiment_analysis: ExperimentAnalysis) -> pd.DataFrame:
+def extract_metadata(experiment_analysis: ExperimentAnalysis, trial_index: int = 0) -> pd.DataFrame:
     """
     This function is responsible for collecting training duration information from the ExperimentAnalysis object.
     This function currently collects the number of training iterations, Episodes, environment interactions, and
@@ -846,8 +857,10 @@ def extract_metadata(experiment_analysis: ExperimentAnalysis) -> pd.DataFrame:
     """
 
     # assumes one trial per training job
-    trial = experiment_analysis.trials[0]  # type: ignore
+    trial = experiment_analysis.trials[trial_index]  # type: ignore
     df = experiment_analysis.trial_dataframes[trial.logdir]
     training_meta_data = df[['training_iteration', 'timesteps_total', 'episodes_total', 'time_total_s']]
+    # add trial index
+    training_meta_data['trial_index'] = [trial_index] * training_meta_data.shape[0]
 
     return training_meta_data
