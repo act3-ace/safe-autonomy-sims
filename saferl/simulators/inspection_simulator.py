@@ -60,6 +60,7 @@ class IlluminationValidator(BaseModel):
     render_flag_3d: bool = False
     render_flag_subplots: bool = False
     save_data_flag: bool = False
+    pixel_pitch: float
 
 
 class InspectionSimulatorState(BaseSimulatorState):
