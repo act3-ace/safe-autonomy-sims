@@ -226,7 +226,7 @@ def save_image_test_delete(color):
     plt.imsave('figs_results/' + string, image)
 
 
-def compute_illum(deputy_position, sun_position, resolution, radius, focal_length, chief_properties, light_properties):
+def compute_illum(deputy_position, sun_position, resolution, radius, focal_length, chief_properties, light_properties, pixel_pitch):
     # pylint: disable-msg=too-many-locals
     """
     Renders the full scene using backwards ray tracing and returns a full RGB image
@@ -248,8 +248,9 @@ def compute_illum(deputy_position, sun_position, resolution, radius, focal_lengt
 
     norm2 = cross2(sensor_dir, norm1)
     # Used for x,y,z pixel locations - there will be resolution[0] * resolution[1] pixels
-    norm1_range = 1
-    norm2_range = 1 / ratio
+    x_width = np.tan((pixel_pitch/focal_length)/2) * 2 * focal_length
+    norm1_range = x_width
+    norm2_range = x_width / ratio
     step_norm1 = norm1_range / (resolution[0])
     step_norm2 = norm2_range / (resolution[1])
     # 3D matrix (ie. height-by-width matrix with each entry being an array of size 3) which creates an image

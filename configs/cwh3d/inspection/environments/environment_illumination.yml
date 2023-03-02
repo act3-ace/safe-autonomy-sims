@@ -21,7 +21,8 @@
           "light_properties" : {'ambient': [1, 1, 1], 'diffuse': [1, 1, 1], 'specular': [1, 1, 1]},
           "chief_properties" : {'ambient': [.1, 0, 0], 'diffuse': [0.7, 0, 0], 'specular': [1, 1, 1], 'shininess': 100, 'reflection': 0.5}, # [.1, 0, 0] = red, [0.753, 0.753, 0.753] = silver
           "resolution" : [200, 200],
-          "focal_length" : 1,
+          "focal_length" : 9.6e-3,
+          "pixel_pitch" : 5.6e-3,
           "bin_ray_flag": False,
           "render_flag_3d": False,
           "render_flag_subplots": False,
