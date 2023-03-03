@@ -193,6 +193,13 @@
     ],
     "dones": [
         {
+            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
+            "config":{},
+            "references":{
+              "max_sim_time": "max_sim_time",
+            },
+        },
+        {
             "functor": "saferl.dones.rejoin_dones.MaxDistanceDoneFunction",
             "config":{},
             "references": {
@@ -279,7 +286,6 @@
                 "distance_reward": -1,
                 "timeout_reward": -1,
                 "leave_rejoin_reward": 0,
-                "max_time": 1000,
             },
             "references": {
               "safety_margin": "safety_margin",
@@ -287,6 +293,7 @@
               "lead": "lead",
               "offset": "offset",
               "radius": "radius",
+              "max_time": "max_sim_time",
             }
         },
     ],
