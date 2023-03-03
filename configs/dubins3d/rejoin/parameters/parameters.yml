@@ -1,7 +1,7 @@
 {
   "safety_margin": 100,
   "max_distance": 100000,
-  "max_sim_time": 1000,
+  "max_sim_time": 2000,
   "lead": "red0",
   "offset_0": [ 500, 500, 0 ],
   "offset_1": [ 1000, 0, 0 ],
