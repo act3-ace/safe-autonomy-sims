@@ -351,7 +351,8 @@ def run_ablation_study(
     plot_output_path: str = None,
     plot_config: dict = None,
     create_plot: bool = False,
-    test_case_manager_config: dict = None
+    test_case_manager_config: dict = None,
+    trial_indices: list = None,
 ):
     """
     This function serves as a high level interface for users conducting ablative studies using CoRL. It is
@@ -420,7 +421,10 @@ def run_ablation_study(
             # append index to evaluation_output path
             experiment_analysis = ExperimentAnalysis(experiment_state_path)
 
-            for trial_index in range(0, len(experiment_analysis.trials)):  # type: ignore
+            if trial_indices is None:
+                trial_indices = list(range(0, len(experiment_analysis.trials)))
+
+            for trial_index in trial_indices:  # type: ignore
 
                 # create trial key
                 trial_key = f"{experiment_name}__{experiment_index}__{trial_index}"
@@ -567,7 +571,7 @@ def run_one_evaluation(
     metrics_config = add_required_metrics(metrics_config)
 
     checkpoint_path += "/policies/{}/policy_state.pkl"
-    exp_name = 'single_episode__0'
+    exp_name = 'single_episode__0__0'
     output_path = '/tmp/eval_results/' + exp_name
 
     # run evaluation episodes
