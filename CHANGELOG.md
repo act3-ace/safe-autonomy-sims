@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.4.0...v1.4.1) (2023-03-06)
+
+
+### Bug Fixes
+
+* Add Eval trial indices ([6c0eb38](https://github.com/act3-ace/safe-autonomy-sims/commit/6c0eb386bdcb5ad2baa44fd0c4bfff8c8e6711a0))
+
 # [1.4.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.3.3...v1.4.0) (2023-02-28)
 
 
