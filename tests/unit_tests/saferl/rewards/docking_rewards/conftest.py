@@ -67,7 +67,7 @@ def fixture_platform_position():
 
 
 @pytest.fixture(name='platform')
-def fixture_platform(mocker, platform_position, platform_velocity, sim_time, agent_name):
+def fixture_platform(platform_position, platform_velocity, sim_time, agent_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -85,7 +85,7 @@ def fixture_platform(mocker, platform_position, platform_velocity, sim_time, age
     test_platform : MagicMock
         A mock of a platform with a position property
     """
-    test_platform = mocker.MagicMock(name=agent_name)
+    test_platform = mock.MagicMock(name=agent_name)
     test_platform.position = platform_position
     test_platform.velocity = platform_velocity
     test_platform.sim_time = sim_time

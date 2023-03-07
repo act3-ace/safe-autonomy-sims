@@ -58,7 +58,7 @@ def fixture_target_position():
 
 
 @pytest.fixture(name='target')
-def fixture_target(mocker, target_position, target_velocity, target_name):
+def fixture_target(target_position, target_velocity, target_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -78,7 +78,7 @@ def fixture_target(mocker, target_position, target_velocity, target_name):
     test_target_platform : MagicMock
         A mock of a platform with a position property
     """
-    test_target_platform = mocker.MagicMock(name=target_name)
+    test_target_platform = mock.MagicMock(name=target_name)
     test_target_platform.position = target_position
     test_target_platform.velocity = target_velocity
     return test_target_platform
