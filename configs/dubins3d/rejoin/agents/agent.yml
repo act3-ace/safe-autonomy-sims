@@ -12,9 +12,36 @@
 "config": {
     "frame_rate": 1,  # Hz
     "parts": [
-        {"part": "Controller_RollRate", "config": {"axis": 0}},
-        {"part": "Controller_PitchRate", "config": {"axis": 1}},
-        {"part": "Controller_Acceleration", "config": {"axis": 2}},
+        # {"part": "Controller_RollRate", "config": {"axis": 0}},
+        {
+          "part": "RateController", 
+          "config": {
+            "name": "RollRate", 
+            "axis": 0, 
+            "property_class": "saferl.platforms.dubins.dubins_properties.RollRateProp", 
+            properties: {name: "roll_rate"}
+          }
+        },
+        # {"part": "Controller_PitchRate", "config": {"axis": 1}},
+        {
+          "part": "RateController", 
+          "config": {
+            "name": "PitchRate", 
+            "axis": 1, 
+            "property_class": "saferl.platforms.dubins.dubins_properties.PitchRateProp", 
+            properties: {name: "pitch_rate"}
+          }
+        },
+        # {"part": "Controller_Acceleration", "config": {"axis": 2}},
+        {
+          "part": "RateController", 
+          "config": {
+            "name": "Acceleration", 
+            "axis": 2, 
+            "property_class": "saferl.platforms.dubins.dubins_properties.AccelerationProp", 
+            properties: {name: "acceleration"}
+          }
+        },
         {"part": "Sensor_Relative_Position", "config": {"oriented": True}},
         {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [500, 500, 0]}},
         {"part": "Sensor_Velocity", "config": {"oriented": True}},
@@ -38,7 +65,7 @@
         {
             "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config": {
-                "controller": "Controller_Acceleration",
+                "controller": "Acceleration",
                 "training_export_behavior": "EXCLUDE",
                 "normalization": {
                   "enabled": False,
@@ -48,7 +75,7 @@
         {
             "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_PitchRate",
+                "controller": "PitchRate",
                 "training_export_behavior": "EXCLUDE",
                 "normalization": {
                   "enabled": False,
@@ -58,7 +85,7 @@
         {
             "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_RollRate",
+                "controller": "RollRate",
                 "training_export_behavior": "EXCLUDE",
                 "normalization": {
                   "enabled": False,

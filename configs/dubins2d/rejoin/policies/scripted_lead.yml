@@ -13,8 +13,8 @@
 
     "config": {
         "controllers": [
-            ['Controller_Acceleration_Acceleration', 'acceleration'],
-            ['Controller_YawRate_Yaw_rate', 'yaw_rate'],
+            ['Acceleration_Acceleration', 'acceleration'],
+            ['YawRate_Yaw_rate', 'yaw_rate'],
         ],
 
         "time_extractor": {
