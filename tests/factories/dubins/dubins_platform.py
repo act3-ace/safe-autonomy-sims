@@ -16,7 +16,7 @@ import saferl.platforms.dubins.dubins_platform as p
 from tests.factories.dubins.dubins_entity import Dubins2dAircraftFactory, Dubins3dAircraftFactory
 from tests.factories.base_factories.platform import BasePlatformFactory
 import saferl.platforms.dubins.sensors.dubins_sensors as s
-import saferl.platforms.dubins.dubins_controllers as c
+import saferl.platforms.common.controllers as c
 
 
 class Dubins2dPlatformFactory(BasePlatformFactory):
@@ -30,8 +30,8 @@ class Dubins2dPlatformFactory(BasePlatformFactory):
     )
 
     parts_list = [
-        (c.AccelerationController, {'axis': 0}),
-        (c.YawRateController, {'axis': 1}),
+        (c.RateController, {'name': 'Acceleration', 'axis': 0, "property_class": "saferl.platforms.dubins.dubins_properties.AccelerationProp"}),
+        (c.RateController, {'name': 'YawRate', 'axis': 1, "property_class": "saferl.platforms.dubins.dubins_properties.YawRateProp"}),
         (s.PositionSensor, {}),
         (s.VelocitySensor, {}),
         (s.HeadingSensor, {})
@@ -45,8 +45,8 @@ class Dubins3dPlatformFactory(BasePlatformFactory):
     platform = factory.SubFactory(Dubins3dAircraftFactory)
     platform_name = factory.Faker('first_name_nonbinary')
     parts_list = [
-        (c.AccelerationController, {'axis': 0}),
-        (c.YawRateController, {'axis': 1}),
+        (c.RateController, {'name': 'Acceleration', 'axis': 0, "property_class": "saferl.platforms.dubins.dubins_properties.AccelerationProp"}),
+        (c.RateController, {'name': 'YawRate', 'axis': 1, "property_class": "saferl.platforms.dubins.dubins_properties.YawRateProp"}),
         (s.PositionSensor, {}),
         (s.VelocitySensor, {}),
         (s.HeadingSensor, {}),
