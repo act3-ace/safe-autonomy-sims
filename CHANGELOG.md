@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.4.1...v1.5.0) (2023-03-07)
+
+
+### Features
+
+* Resolve "Consolidate Thrust and Dubins controllers" ([f4d761f](https://github.com/act3-ace/safe-autonomy-sims/commit/f4d761fa3511fda217ed36492fc36ca085422bd9))
+
 ## [1.4.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.4.0...v1.4.1) (2023-03-06)
 
 
