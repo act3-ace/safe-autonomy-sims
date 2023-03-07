@@ -14,6 +14,8 @@ This module holds fixtures common to the saferl package tests.
 Author: John McCarroll
 """
 
+from unittest import mock
+
 import numpy as np
 import pytest
 from corl.libraries.state_dict import StateDict
@@ -221,7 +223,7 @@ def fixture_sim_time():
 
 
 @pytest.fixture(name='platform')
-def fixture_platform(mocker, platform_position, platform_velocity, sim_time, agent_name):
+def fixture_platform(platform_position, platform_velocity, sim_time, agent_name):
     """
     A fixture to create a mock platform with a position property and velocity property
 
@@ -243,7 +245,7 @@ def fixture_platform(mocker, platform_position, platform_velocity, sim_time, age
     test_platform : MagicMock
         A mock of a platform with a position property
     """
-    test_platform = mocker.MagicMock(name=agent_name)
+    test_platform = mock.MagicMock(name=agent_name)
     test_platform.position = platform_position
     test_platform.velocity = platform_velocity
     test_platform.sim_time = sim_time

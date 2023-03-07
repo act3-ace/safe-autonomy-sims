@@ -22,7 +22,7 @@ from scipy.spatial.transform import Rotation
 
 
 @pytest.fixture(name='lead')
-def fixture_lead(mocker, lead_position, lead_orientation, lead_name):
+def fixture_lead(lead_position, lead_orientation, lead_name):
     """
     A fixture to create a mock platform with a position property
 
@@ -42,7 +42,7 @@ def fixture_lead(mocker, lead_position, lead_orientation, lead_name):
     test_lead_platform : MagicMock
         A mock of a platform with a position property
     """
-    test_lead_platform = mocker.MagicMock(name=lead_name)
+    test_lead_platform = mock.MagicMock(name=lead_name)
     test_lead_platform.position = lead_position
     test_lead_platform.orientation = lead_orientation
     return test_lead_platform

@@ -12,8 +12,26 @@
 "config": {
     "frame_rate": 1,  # Hz
     "parts": [
-        {"part": "Controller_YawRate", "config": {"axis": 0}},
-        {"part": "Controller_Acceleration", "config": { "axis": 1 }},
+        # {"part": "RateController", "Controller_YawRate", "config": {"axis": 0}},
+        {
+          "part": "RateController", 
+          "config": {
+            "name": "YawRate", 
+            "axis": 0, 
+            "property_class": "saferl.platforms.dubins.dubins_properties.YawRateProp", 
+            properties: {name: "yaw_rate"}
+          }
+        },
+        # {"part": "Controller_Acceleration", "config": { "axis": 1 }},
+        {
+          "part": "RateController", 
+          "config": {
+            "name": "Acceleration", 
+            "axis": 1, 
+            "property_class": "saferl.platforms.dubins.dubins_properties.AccelerationProp", 
+            properties: {name: "acceleration"}
+          }
+        },
         {"part": "Sensor_Relative_Position", "config": {"oriented": True}},
         {"part": "Sensor_Relative_Rejoin_Position", "config": {"oriented": True, "offset": [500, 500]}},
         {"part": "Sensor_Velocity", "config": {"oriented": True}},
@@ -33,7 +51,7 @@
         {
             "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config": {
-                "controller": "Controller_Acceleration",
+                "controller": "Acceleration",
                 "training_export_behavior": "EXCLUDE",
                 "normalization": {
                     "enabled": False,
@@ -43,7 +61,7 @@
         {
             "functor": "corl.glues.common.controller_glue.ControllerGlue",
             "config":{
-                "controller": "Controller_YawRate",
+                "controller": "YawRate",
                 "training_export_behavior": "EXCLUDE",
                 "normalization": {
                   "enabled": False,
