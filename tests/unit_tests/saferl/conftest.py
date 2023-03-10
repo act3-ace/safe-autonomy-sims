@@ -13,6 +13,7 @@ This module holds fixtures common to the saferl package tests.
 
 Author: John McCarroll
 """
+from unittest import mock
 
 from unittest import mock
 
@@ -229,7 +230,7 @@ def fixture_platform(platform_position, platform_velocity, sim_time, agent_name)
 
     Parameters
     ----------
-    mocker : fixture
+    mock : fixture
         A pytest-mock fixture which exposes unittest.mock functions
     platform_position : numpy.ndarray
         The platform's 3D positional vector

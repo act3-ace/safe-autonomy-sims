@@ -164,14 +164,17 @@ def fixture_call_results(
         The resulting RewardDict from calling the MaxDistanceDoneFunction
     """
     with mock.patch("saferl.rewards.cwh.docking_rewards.get_platform_by_name") as func:
-        platform.position = platform_position1
-        func.return_value = platform
-        _ = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
+        with mock.patch("saferl.rewards.cwh.docking_rewards.get_relative_position") as func1:
+            platform.position = platform_position1
+            func.return_value = platform
+            func1.return_value = platform_position1
+            _ = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
 
-        platform.position = platform_position2
-        func.return_value = platform
-        results2 = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
-        return results2
+            platform.position = platform_position2
+            func.return_value = platform
+            func1.return_value = platform_position2
+            results2 = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
+            return results2
 
 
 @pytest.mark.unit_test
