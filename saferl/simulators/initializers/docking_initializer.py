@@ -11,34 +11,7 @@ import numpy as np
 from pydantic import BaseModel
 
 from saferl.simulators.initializers.initializer import BaseInitializer
-
-
-def velocity_limit(position, velocity_threshold, threshold_distance, mean_motion=0.001027, slope=2.0):
-    """
-    Get the velocity limit from the agent's current position, assuming the chief is at the origin.
-
-    Parameters
-    ----------
-    velocity_threshold: float
-        The maximum tolerated velocity within docking region without crashing.
-    threshold_distance: float
-        The radius of the docking region.
-    mean_motion: float
-        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
-    slope: float
-        The slope of the linear velocity limit as a function of distance from docking region.
-
-    Returns
-    -------
-    float
-        The velocity limit given the agent's position.
-    """
-    position_values = [elem.value for elem in position]
-    dist = np.linalg.norm(position_values)
-    vel_limit = velocity_threshold
-    if dist > threshold_distance:
-        vel_limit += slope * mean_motion * (dist - threshold_distance)
-    return vel_limit
+from saferl.utils import velocity_limit
 
 
 class Docking3DInitializerValidator(BaseModel):
@@ -120,13 +93,14 @@ class Docking3DInitializer(BaseInitializer):
             if "x" not in agent_reset_config or "y" not in agent_reset_config or "z" not in agent_reset_config:
                 raise ValueError("{} agent_reset_config missing one or more positional keys".format(agent_name))
 
+            # TODO: get position relative to chief/reference entity!
+            # assumes that the docking region is at origin
+            relative_position = np.array([agent_reset_config["x"].value, agent_reset_config["y"].value, agent_reset_config["z"].value])
+            distance = np.linalg.norm(relative_position)
+
             # constrained rng velocity
             vel_limit = velocity_limit(
-                [agent_reset_config["x"], agent_reset_config["y"], agent_reset_config["z"]],
-                self.config.velocity_threshold,
-                self.config.threshold_distance,
-                self.config.mean_motion,
-                self.config.slope
+                distance, self.config.velocity_threshold, self.config.threshold_distance, self.config.mean_motion, self.config.slope
             )
 
             # find magnitude of x,y,z components of max vel limit given position

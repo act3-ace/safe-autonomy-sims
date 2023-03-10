@@ -73,7 +73,7 @@ def fixture_platform(platform_position, platform_velocity, sim_time, agent_name)
 
     Parameters
     ----------
-    mocker : fixture
+    mock : fixture
         A pytest-mock fixture which exposes unittest.mock functions
     platform_position : numpy.ndarray
         The platform's 3D position
@@ -135,7 +135,9 @@ def fixture_call_results(
     """
     with mock.patch("saferl.rewards.cwh.docking_rewards.get_platform_by_name") as func:
         with mock.patch("saferl.utils.get_platform_by_name") as func1:
-            func.return_value = platform
-            func1.return_value = platform
-            results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
-            return results
+            with mock.patch("saferl.rewards.cwh.docking_rewards.get_relative_position") as func2:
+                func.return_value = platform
+                func1.return_value = platform
+                func2.return_value = platform.position
+                results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
+                return results

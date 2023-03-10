@@ -28,7 +28,7 @@ def fixture_lead(lead_position, lead_orientation, lead_name):
 
     Parameters
     ----------
-    mocker : fixture
+    mock : fixture
         A pytest-mock fixture which exposes unittest.mock functions
     lead_position : numpy.ndarray
         The platform's 3D positional vector

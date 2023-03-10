@@ -19,7 +19,7 @@ from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneS
 from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 
-from saferl.utils import max_vel_violation
+from saferl.utils import get_relative_position, max_vel_violation
 
 
 class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
@@ -47,12 +47,12 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     mean_motion: float = 0.001027
     lower_bound: bool = False
     slope: float = 2.0
+    reference_position_sensor_name: str = "reference_position"
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
     A done function that determines if the deputy has successfully docked with the chief.
-
 
     def __call__(
         self,
@@ -115,19 +115,18 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
         # eventually will include velocity constraint
         done = DoneDict()
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
 
-        position = deputy.position
+        # Get relatative position + velocity between platform and docking region
+        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
+        distance = np.linalg.norm(relative_position)
+        platform = get_platform_by_name(next_state, self.config.platform_name)
+        relative_velocity = platform.velocity  # docking region assumed stationary
 
-        origin = np.array([0, 0, 0])
-        docking_region_radius = self.config.docking_region_radius
-
-        radial_distance = np.linalg.norm(np.array(position) - origin)
-        in_docking = radial_distance <= docking_region_radius
+        in_docking = distance <= self.config.docking_region_radius
 
         violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
+            relative_position,
+            relative_velocity,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
@@ -165,6 +164,7 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     mean_motion: float = 0.001027
     lower_bound: bool = False
     slope: float = 2.0
+    reference_position_sensor_name: str = "reference_position"
 
 
 class DockingVelocityLimitDoneFunction(DoneFuncBase):
@@ -234,14 +234,19 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
         done = DoneDict()
 
+        # Get relatative position + velocity between platform and docking region
+        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_name)
+        relative_velocity = platform.velocity  # docking region assumed stationary
+
         violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
+            relative_position,
+            relative_velocity,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
             self.config.lower_bound,
-            slope=self.config.slope
+            slope=self.config.slope,
         )
 
         done[self.config.platform_name] = violated
@@ -271,6 +276,7 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
     mean_motion: float = 0.001027
     lower_bound: bool = False
     slope: float = 2.0
+    reference_position_sensor_name: str = "reference_position"
 
 
 # needs a reference object
@@ -342,14 +348,19 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         # eventually will include velocity constraint
         done = DoneDict()
 
+        # Get relatative position + velocity between platform and docking region
+        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_name)
+        relative_velocity = platform.velocity  # docking region assumed stationary
+
         violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
+            relative_position,
+            relative_velocity,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
             self.config.lower_bound,
-            slope=self.config.slope
+            slope=self.config.slope,
         )
 
         done[self.config.platform_name] = violated

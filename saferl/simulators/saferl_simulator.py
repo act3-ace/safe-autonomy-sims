@@ -69,6 +69,17 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     additional_entities: typing.Dict[str, typing.Dict] = {}
 
 
+class SafeRLSimulatorState(BaseSimulatorState):
+    """
+    The basemodel for the state of the InspectionSimulator.
+
+    points: dict
+        The dictionary containing the points the agent needs to inspect.
+        Keys: (x,y,z) tuple. Values: True if inspected, False otherwise.
+    """
+    sim_entities: typing.Dict
+
+
 class SafeRLSimulator(BaseSimulator):
     """
     The base simulator class used by the CWH and Dubins simulators. SafeRLSimulator is responsible for
@@ -107,7 +118,7 @@ class SafeRLSimulator(BaseSimulator):
         self.sim_entities = self._construct_sim_entities()
         self.clock = 0.0
 
-        self._state: BaseSimulatorState = None
+        self._state: SafeRLSimulatorState = None
 
     def reset(self, config):
         config = self.get_reset_validator(**config)
@@ -119,7 +130,7 @@ class SafeRLSimulator(BaseSimulator):
         self.clock = 0.0
         self.sim_entities = self._construct_sim_entities(config)
         sim_platforms = self.construct_platforms()
-        self._state = BaseSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock)
+        self._state = SafeRLSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock, sim_entities=self.sim_entities)
         self.update_sensor_measurements()
         return self._state
 
@@ -206,8 +217,8 @@ class SafeRLSimulator(BaseSimulator):
         for entity_name, entity_config in reset_config.additional_entities.items():
             if entity_name in entities:
                 KeyCollisionError(entity_name, f"additional entity name collision: '{entity_name}' is used twice")
-            entity_class = self.platform_map[entity_config.get('entity')][0]
-            entities[entity_name] = entity_class(entity_config['config'])
+            entity_class = self.platform_map[entity_config.get('platform', 'default')][0]
+            entities[entity_name] = entity_class(name=entity_name, **entity_config['config'])
 
         return entities
 
@@ -234,7 +245,8 @@ class SafeRLSimulator(BaseSimulator):
         """
         for plat in self._state.sim_platforms.values():
             for sensor in plat.sensors.values():
-                sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
+                # sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
+                sensor.calculate_and_cache_measurement(state=self._state)
 
     def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict):
         """
@@ -275,7 +287,7 @@ class SafeRLSimulator(BaseSimulator):
 
     def _step_update_time(self, step_size: float):
         self.clock += step_size
-        self._state.sim_time = self.clock
+        self._state.sim_time = self.clock  # pylint: disable=W0201
         for platform in self._state.sim_platforms.values():
             platform.sim_time = self.clock
 
