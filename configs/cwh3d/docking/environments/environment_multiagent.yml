@@ -17,6 +17,21 @@
     "type": "CWHSimulator",
     "config": {},
   },
+  "simulator_reset_parameters": {
+    "additional_entities": {
+      "chief": { 
+        "platform": "cwh",
+        "config":{
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "x_dot": 0,
+          "y_dot": 0,
+          "z_dot": 0,
+        }
+      }
+    }
+  },
   "platforms": "CWHSimulator_Platforms",
   "plugin_paths": ["saferl.platforms", "saferl.simulators"],
   "episode_parameter_provider": {

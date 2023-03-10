@@ -16,9 +16,9 @@ Author: Jamie Cunningham
 import os
 
 import pytest
-from corl.simulators.base_simulator_state import BaseSimulatorState
 
 from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.saferl_simulator import SafeRLSimulatorState
 from tests.conftest import delimiter, read_test_cases
 from tests.factories.cwh.cwh_platform import CWHPlatformFactory
 
@@ -52,10 +52,10 @@ def fixture_reset_config(request):
 
 
 @pytest.fixture(name='expected_state')
-def fixture_expected_state(expected_sim_platforms):
+def fixture_expected_state(expected_sim_platforms, expected_sim_entities):
     """Returns valid expected state dict build from test assay settings"""
     clock = 0.0
-    state = BaseSimulatorState(sim_platforms=expected_sim_platforms, sim_time=clock)
+    state = SafeRLSimulatorState(sim_platforms=expected_sim_platforms, sim_time=clock, sim_entities=expected_sim_entities)
     return state
 
 

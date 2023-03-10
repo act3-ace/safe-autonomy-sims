@@ -6,4 +6,5 @@
   "threshold_distance": 0.5,
   "mean_motion": 0.001027,
   "lower_bound": False,
+  "reference_position_sensor_name": "reference_position"
 }
