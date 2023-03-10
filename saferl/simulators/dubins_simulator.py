@@ -15,10 +15,9 @@ import abc
 
 import safe_autonomy_dynamics.dubins as bp
 from corl.libraries.plugin_library import PluginLibrary
-from corl.simulators.base_simulator_state import BaseSimulatorState
 
 from saferl.platforms.dubins.dubins_platform import Dubins2dPlatform, Dubins3dPlatform
-from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorValidator
+from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorState, SafeRLSimulatorValidator
 
 
 class DubinsSimulatorValidator(SafeRLSimulatorValidator):
@@ -50,7 +49,7 @@ class DubinsSimulator(SafeRLSimulator):
         self.sim_entities = self._construct_sim_entities(config)
         self.register_lead()
         sim_platforms = self.construct_platforms()
-        self._state = BaseSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock)
+        self._state = SafeRLSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock, sim_entities=self.sim_entities)
         self.update_sensor_measurements()
         return self._state
 

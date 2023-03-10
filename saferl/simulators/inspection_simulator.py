@@ -18,14 +18,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
 from corl.libraries.units import ValueWithUnits
-from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, validator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 from sklearn.cluster import KMeans
 
 import saferl.simulators.illumination_functions as illum
 from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorResetValidator, SafeRLSimulatorValidator
+from saferl.simulators.saferl_simulator import (
+    SafeRLSimulator,
+    SafeRLSimulatorResetValidator,
+    SafeRLSimulatorState,
+    SafeRLSimulatorValidator,
+)
 
 
 class IlluminationValidator(BaseModel):
@@ -63,7 +67,7 @@ class IlluminationValidator(BaseModel):
     pixel_pitch: float
 
 
-class InspectionSimulatorState(BaseSimulatorState):
+class InspectionSimulatorState(SafeRLSimulatorState):
     """
     The basemodel for the state of the InspectionSimulator.
 
@@ -220,7 +224,9 @@ class InspectionSimulator(SafeRLSimulator):
         self.points = self._add_points()
         self.last_points_inspected = 0
         self.last_cluster = None
-        self._state = InspectionSimulatorState(sim_platforms=self._state.sim_platforms, points=self.points, sim_time=self.clock)
+        self._state = InspectionSimulatorState(
+            sim_platforms=self._state.sim_platforms, points=self.points, sim_time=self.clock, sim_entities=self.sim_entities
+        )
         return self._state
 
     def _update_initial_sun_angle(self, config):

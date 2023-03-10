@@ -21,7 +21,7 @@ from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidato
 from corl.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
-from saferl.utils import max_vel_violation
+from saferl.utils import get_relative_position, max_vel_violation
 
 
 class DockingTimeRewardValidator(RewardFuncBaseValidator):
@@ -116,6 +116,7 @@ class DockingDistanceChangeRewardValidator(RewardFuncBaseValidator):
         Scalar value to adjust magnitude of the reward.
     """
     scale: float
+    reference_position_sensor_name: str = "reference_position"
 
 
 class DockingDistanceChangeReward(RewardFuncBase):
@@ -186,10 +187,11 @@ class DockingDistanceChangeReward(RewardFuncBase):
         reward = RewardDict()
         val = 0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-        position = deputy.position
+        # get relative dist
+        # Assumes one platfrom per agent!
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        distance = np.linalg.norm(relative_position)
 
-        distance = np.linalg.norm(position)
         self._dist_buffer.append(distance)
 
         # TODO intialize distance buffer from initial state
@@ -221,6 +223,7 @@ class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     pivot: float = math.inf
     pivot_ratio: float = 2.0
     scale: float = 1.0
+    reference_position_sensor_name: str = "reference_position"
 
 
 class DockingDistanceExponentialChangeReward(RewardFuncBase):
@@ -343,10 +346,11 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         reward = RewardDict()
         val = 0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-        position = deputy.position
+        # get relative dist
+        # assumes one platform per agent!
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        distance = np.linalg.norm(relative_position)
 
-        distance = np.linalg.norm(position)
         self.update_dist(distance)
 
         # TODO initialize distance buffer from initial state
@@ -441,7 +445,7 @@ class DockingDeltaVReward(RewardFuncBase):
         d_v: float
             The agent's change in velocity
         """
-        deputy = get_platform_by_name(state, self.config.agent_name)
+        deputy = get_platform_by_name(state, self.config.platform_names[0])
         control_vec = deputy.get_applied_action()
         d_v = np.sum(np.abs(control_vec)) / self.mass * self.step_size
         return d_v
@@ -500,6 +504,7 @@ class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     slope: float = 2.0
     mean_motion: float = 0.001027
     lower_bound: bool = False
+    reference_position_sensor_name: str = "reference_position"
 
 
 class DockingVelocityConstraintReward(RewardFuncBase):
@@ -578,14 +583,20 @@ class DockingVelocityConstraintReward(RewardFuncBase):
     ) -> RewardDict:
         reward = RewardDict()
 
+        # Get relative position and velocity
+        # Assumes one platfrom per agent!
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_names[0])
+        relative_velocity = platform.velocity  # docking region assumed stationary
+
         violated, violation = max_vel_violation(
-            next_state,
-            self.config.agent_name,
+            relative_position,
+            relative_velocity,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
             self.config.lower_bound,
-            slope=self.config.slope
+            slope=self.config.slope,
         )
 
         if violated:
@@ -625,6 +636,7 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     slope: float = 2.0
     mean_motion: float = 0.001027
     lower_bound: bool = False
+    reference_position_sensor_name: str = "reference_position"
 
 
 class DockingSuccessReward(RewardFuncBase):
@@ -693,25 +705,25 @@ class DockingSuccessReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
+        platform = get_platform_by_name(next_state, self.config.platform_names[0])
+        relative_velocity = platform.velocity  # docking region assumed stationary
+        sim_time = platform.sim_time
 
-        position = deputy.position
-        sim_time = deputy.sim_time
+        # Get relative position and velocity
+        # Assumes one platfrom per agent!
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        distance = np.linalg.norm(relative_position)
 
-        origin = np.array([0, 0, 0])
-        docking_region_radius = self.config.docking_region_radius
-
-        radial_distance = np.linalg.norm(np.array(position) - origin)
-        in_docking = radial_distance <= docking_region_radius
+        in_docking = distance <= self.config.docking_region_radius
 
         violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
+            relative_position,
+            relative_velocity,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
             self.config.lower_bound,
-            slope=self.config.slope
+            slope=self.config.slope,
         )
 
         if in_docking and not violated:
@@ -762,6 +774,7 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
     slope: float = 2.0
     mean_motion: float = 0.001027
     lower_bound: bool = False
+    reference_position_sensor_name: str = "reference_position"
 
 
 class DockingFailureReward(RewardFuncBase):
@@ -830,30 +843,32 @@ class DockingFailureReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-
-        position = deputy.position
-        sim_time = deputy.sim_time
+        platform = get_platform_by_name(next_state, self.config.platform_names[0])
+        sim_time = platform.sim_time
 
         # TODO: update to chief location when multiple platforms enabled
-        origin = np.array([0, 0, 0])
-        radial_distance = np.linalg.norm(np.array(position) - origin)
-        in_docking = radial_distance <= self.config.docking_region_radius
+        # Get relative position and velocity
+        # Assumes one platfrom per agent!
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        distance = np.linalg.norm(relative_position)
+        relative_velocity = platform.velocity  # docking region assumed stationary
+
+        in_docking = distance <= self.config.docking_region_radius
 
         violated, _ = max_vel_violation(
-            next_state,
-            self.config.agent_name,
+            relative_position,
+            relative_velocity,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
             self.config.lower_bound,
-            slope=self.config.slope
+            slope=self.config.slope,
         )
 
         if sim_time >= self.config.timeout:
             # episode reached max time
             value = self.config.timeout_reward
-        elif radial_distance >= self.config.max_goal_distance:
+        elif distance >= self.config.max_goal_distance:
             # agent exceeded max distance from goal
             value = self.config.distance_reward
         elif in_docking and violated:
