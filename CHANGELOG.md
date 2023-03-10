@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.5.0...v1.6.0) (2023-03-10)
+
+
+### Features
+
+* Resolve "Make chief separate entity" ([88d2806](https://github.com/act3-ace/safe-autonomy-sims/commit/88d28067f6af30e82f4b98d61d7482be47c3ffec))
+
 # [1.5.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.4.1...v1.5.0) (2023-03-07)
 
 
