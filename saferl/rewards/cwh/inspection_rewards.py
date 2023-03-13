@@ -19,6 +19,8 @@ from corl.libraries.state_dict import StateDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 from corl.simulators.common_platform_utils import get_platform_by_name
 
+from saferl.utils import get_relative_position
+
 
 class ObservedPointsRewardValidator(RewardFuncBaseValidator):
     """
@@ -126,6 +128,7 @@ class ChiefDistanceRewardValidator(RewardFuncBaseValidator):
     punishment_reward: float
     threshold_dist: float
     max_dist: float
+    reference_position_sensor_name: str = "reference_position"
 
 
 class ChiefDistanceReward(RewardFuncBase):
@@ -192,9 +195,8 @@ class ChiefDistanceReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-        position = deputy.position
-        dist = np.linalg.norm(np.array(position))
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        dist = np.linalg.norm(relative_position)
 
         # Soft constraint
         if dist >= self.config.threshold_dist:
@@ -424,7 +426,7 @@ class InspectionSuccessReward(RewardFuncBase):
         return reward
 
 
-class InspectionCrashOriginRewardValidator(RewardFuncBaseValidator):
+class InspectionCrashRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the InspectionCollisionRewardValidator Reward Function.
 
@@ -435,9 +437,10 @@ class InspectionCrashOriginRewardValidator(RewardFuncBaseValidator):
     """
     scale: float
     crash_region_radius: float
+    reference_position_sensor_name: str = "reference_position"
 
 
-class InspectionCrashOriginReward(RewardFuncBase):
+class InspectionCrashReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a collision.
 
@@ -479,7 +482,7 @@ class InspectionCrashOriginReward(RewardFuncBase):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.config: InspectionCrashOriginRewardValidator
+        self.config: InspectionCrashRewardValidator
         super().__init__(**kwargs)
 
     @property
@@ -487,7 +490,7 @@ class InspectionCrashOriginReward(RewardFuncBase):
         """
         Method to return class's Validator.
         """
-        return InspectionCrashOriginRewardValidator
+        return InspectionCrashRewardValidator
 
     def __call__(
         self,
@@ -503,9 +506,11 @@ class InspectionCrashOriginReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.0
 
-        deputy = get_platform_by_name(next_state, self.config.agent_name)
-        position = deputy.position
-        in_crash_region = np.linalg.norm(np.array(position)) <= self.config.crash_region_radius
+        # Get relatative position + velocity between platform and docking region
+        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        distance = np.linalg.norm(relative_position)
+
+        in_crash_region = distance <= self.config.crash_region_radius
 
         if in_crash_region:
             value = self.config.scale
