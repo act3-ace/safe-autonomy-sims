@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.6.0...v1.6.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* added chief entity to inspection environments ([d3637ac](https://github.com/act3-ace/safe-autonomy-sims/commit/d3637ac23375bf5932836417892ddfec74298def))
+
 # [1.6.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.5.0...v1.6.0) (2023-03-10)
 
 
