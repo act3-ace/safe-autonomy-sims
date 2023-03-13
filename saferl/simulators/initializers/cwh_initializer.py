@@ -102,8 +102,12 @@ class CWH3DRadialInitializer(BaseInitializer):
         )
         z = ConstantParameter(value=radius.value * np.sin(elevation_angle.value), units=radius.units.value[1][0])
 
+        # assumes that the docking region is at origin
+        relative_position = [x.get_value(0, None).value, y.get_value(0, None).value, z.get_value(0, None).value]
+        distance = np.linalg.norm(relative_position)
+
         vel_limit = velocity_limit(
-            [x.get_value(0, None), y.get_value(0, None), z.get_value(0, None)],
+            distance,
             self.config.velocity_threshold,
             self.config.threshold_distance,
             self.config.mean_motion,
