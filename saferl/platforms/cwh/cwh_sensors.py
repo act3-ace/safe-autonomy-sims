@@ -252,6 +252,12 @@ PluginLibrary.AddClassToGroup(
     }
 )
 
+PluginLibrary.AddClassToGroup(
+    EntityPositionSensor, "Sensor_EntityPosition", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
 
 class OriginPositionSensor(CWHSensor):
     """

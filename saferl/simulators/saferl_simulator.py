@@ -245,7 +245,6 @@ class SafeRLSimulator(BaseSimulator):
         """
         for plat in self._state.sim_platforms.values():
             for sensor in plat.sensors.values():
-                # sensor.calculate_and_cache_measurement(state=self._state.sim_platforms)
                 sensor.calculate_and_cache_measurement(state=self._state)
 
     def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict):
