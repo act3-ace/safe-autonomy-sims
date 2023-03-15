@@ -210,11 +210,12 @@ class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     c : float
         Scale factor of exponential distance function
     a : float
-        Exponential coefficient of exponential distance function. Do not specify if `pivot` is defined.
+        Exponential coefficient of exponential distance function. Do not specify if `pivot` is specified.
     pivot : float
-        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+        Divisor of the exponential coefficient setting the scale of input values. Do not specify if `a` is specified.
     pivot_ratio : float
-        Exponential scaling coefficient of exponential distance function. Do not specify if `a` is defined.
+        logarithmic scale of exponential scaling coefficient. Do not specify if `a` is specified.
+        determines portion of cumulative reward between distances <pivot and >pivot.
     scale : float
         Reward scaling value.
     """
@@ -230,8 +231,15 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
     """
     Calculates an exponential reward based on the change in distance of the agent.
     Reward is based on the multiplicative scale factor to the exponential potential function:
-        reward = ce^(ln(pivot_ratio)/pivot * x)
+        reward = psi(||r(t+1)||) - psi(||r(t)||)
+        where psi(x) = ce^(-a*x)
 
+    We choose a to be
+        a = ln(pivot_ratio)/pivot
+    This means that the reward accumulated going from distance r=pivot to r=0 is R=c(1 - 1/pivot_ratio)
+        and the reward accumulated going from distance r=inf to r=pivot is c(1/pivot_ratio)
+
+    Alternatively a can be set directly instead of using pivot and pivot ratio
 
     def __call__(
         self,
