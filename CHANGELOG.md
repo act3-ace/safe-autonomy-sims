@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.6.1...v1.7.0) (2023-03-15)
+
+
+### Features
+
+* CoRL update to 2.8.0 and Update agent actions based on frame rate ([01663b2](https://github.com/act3-ace/safe-autonomy-sims/commit/01663b2eb9b885454e1b20088c72c39d65e9eaab))
+
 ## [1.6.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.6.0...v1.6.1) (2023-03-13)
 
 
