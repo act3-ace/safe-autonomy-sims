@@ -117,6 +117,7 @@ class SafeRLSimulator(BaseSimulator):
         self.platform_map = self._construct_platform_map()
         self.sim_entities = self._construct_sim_entities()
         self.clock = 0.0
+        self.last_entity_actions = {}
 
         self._state: SafeRLSimulatorState = None
 
@@ -128,6 +129,7 @@ class SafeRLSimulator(BaseSimulator):
             config.platforms = initializer(config.platforms)
 
         self.clock = 0.0
+        self.last_entity_actions = {}
         self.sim_entities = self._construct_sim_entities(config)
         sim_platforms = self.construct_platforms()
         self._state = SafeRLSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock, sim_entities=self.sim_entities)
@@ -260,28 +262,35 @@ class SafeRLSimulator(BaseSimulator):
     def save_episode_information(self, dones, rewards, observations):
         pass
 
-    def step(self):
+    def step(self, platforms_to_action):
         step_size = self.step_size
-        self._step_entity_state(step_size=step_size)
+        self._step_entity_state(step_size=step_size, platforms_to_action=platforms_to_action)
         self._step_update_time(step_size=step_size)
         self._step_update_sim_statuses(step_size=step_size)
         self.update_sensor_measurements()
         return self._state
 
-    def _step_entity_state(self, step_size: float):
-        entity_actions = self._step_get_entity_actions(step_size=step_size)
+    def _step_entity_state(self, step_size: float, platforms_to_action: typing.Set[str]):
+        entity_actions = self._step_get_entity_actions(step_size=step_size, platforms_to_action=platforms_to_action)
 
         for entity_name, entity in self.sim_entities.items():
             action = entity_actions.get(entity_name, None)
             entity.step(action=action, step_size=step_size)
 
-    def _step_get_entity_actions(self, step_size: float) -> typing.Dict:  # pylint: disable = unused-argument
+    def _step_get_entity_actions(
+        self,
+        step_size: float,  # pylint: disable = unused-argument
+        platforms_to_action: typing.Set[str]
+    ) -> typing.Dict:
         entity_actions = {}
         for platform in self._state.sim_platforms.values():
             platform_id = platform.name
-            action = np.array(platform.get_applied_action(), dtype=np.float32)
-            entity_actions[platform_id] = action
-
+            if platform_id in platforms_to_action:
+                action = np.array(platform.get_applied_action(), dtype=np.float32)
+                entity_actions[platform_id] = action
+                self.last_entity_actions[platform_id] = action
+            else:
+                entity_actions[platform_id] = self.last_entity_actions[platform_id]
         return entity_actions
 
     def _step_update_time(self, step_size: float):

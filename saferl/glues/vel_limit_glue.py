@@ -67,8 +67,8 @@ class VelocityLimitGlue(ObserveSensor):
         d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low, high, shape=(1, ), dtype=np.float32)
         return d
 
-    def get_observation(self, other_obs: OrderedDict):
-        pos_obs = super().get_observation(other_obs)[self.Fields.DIRECT_OBSERVATION]
+    def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
+        pos_obs = super().get_observation(other_obs, obs_space, obs_units)[self.Fields.DIRECT_OBSERVATION]
         d = OrderedDict()
         d[self.Fields.DIRECT_OBSERVATION] = np.array([self._vel_limit(np.linalg.norm(pos_obs))], dtype=np.float32)
         return d

@@ -46,8 +46,8 @@ class InRejoinGlue(ObserveSensor):
     def get_validator(self):
         return InRejoinGlueValidator
 
-    def get_observation(self, other_obs: OrderedDict) -> OrderedDict:
-        sensor_obs = super().get_observation(other_obs)
+    def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict) -> OrderedDict:
+        sensor_obs = super().get_observation(other_obs, obs_space, obs_units)
         rel_position = sensor_obs[self.Fields.DIRECT_OBSERVATION]
 
         d = OrderedDict()

@@ -95,17 +95,24 @@ class RTAGlue(BaseMultiWrapperGlue):
         action_spaces = [controller_glue.action_space() for controller_glue in self.controller_glues]
         return action_spaces
 
-    def apply_action(self, action: typing.Union[np.ndarray, typing.Tuple, typing.Dict], observation: typing.Dict) -> None:
+    def apply_action(
+        self,
+        action: typing.Union[np.ndarray, typing.Tuple, typing.Dict],
+        observation: typing.Dict,
+        action_space: OrderedDict,
+        obs_space: OrderedDict,
+        obs_units: OrderedDict
+    ) -> None:
         assert isinstance(action, tuple)
 
         for i in range(len(self.glues())):
-            self.glues()[i].apply_action(action[i], observation)
+            self.glues()[i].apply_action(action[i], observation, action_space, obs_space, obs_units)
 
         desired_action = self._get_stored_action()
         filtered_action = self._filter_action(desired_action, observation)
 
         for controller_glue, controller_filtered_action in zip(self.controller_glues, filtered_action):
-            controller_glue.apply_action(controller_filtered_action, observation)
+            controller_glue.apply_action(controller_filtered_action, observation, action_space, obs_space, obs_units)
 
     def _filter_action(self, desired_action: tuple, observation: typing.Dict) -> tuple:
         rta_state_vector = self._get_rta_state_vector(observation)
@@ -153,7 +160,7 @@ class RTAGlue(BaseMultiWrapperGlue):
     def observation_space(self):
         return gym.spaces.dict.Dict({"intervening": gym.spaces.discrete.Discrete(2)})
 
-    def get_observation(self, other_obs: OrderedDict):
+    def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
         return {"intervening": int(self.rta.intervening)}
 
     def get_info_dict(self):

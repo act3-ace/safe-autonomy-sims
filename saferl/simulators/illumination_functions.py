@@ -248,7 +248,7 @@ def compute_illum(deputy_position, sun_position, resolution, radius, focal_lengt
 
     norm2 = cross2(sensor_dir, norm1)
     # Used for x,y,z pixel locations - there will be resolution[0] * resolution[1] pixels
-    x_width = np.tan((pixel_pitch/focal_length)/2) * 2 * focal_length
+    x_width = np.tan((pixel_pitch / focal_length) / 2) * 2 * focal_length
     norm1_range = x_width
     norm2_range = x_width / ratio
     step_norm1 = norm1_range / (resolution[0])
