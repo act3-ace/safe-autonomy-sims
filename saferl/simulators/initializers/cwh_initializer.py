@@ -42,9 +42,6 @@ class CWH3DRadialInitializer(BaseInitializer):
         The modified reset config of agent name to initialization values KVPs.
     """
 
-    def __init__(self, config):
-        self.config = self.get_validator(**config)
-
     @property
     def get_validator(self):
         """
@@ -107,11 +104,7 @@ class CWH3DRadialInitializer(BaseInitializer):
         distance = np.linalg.norm(relative_position)
 
         vel_limit = velocity_limit(
-            distance,
-            self.config.velocity_threshold,
-            self.config.threshold_distance,
-            self.config.mean_motion,
-            self.config.slope
+            distance, self.config.velocity_threshold, self.config.threshold_distance, self.config.mean_motion, self.config.slope
         )
 
         vel_mag = vel_max_ratio.value * vel_limit
@@ -161,9 +154,6 @@ class CWH3DENMTInitializer(BaseInitializer):
     reset_config: dict
         The modified reset config of agent name to initialization values KVPs.
     """
-
-    def __init__(self, config):
-        self.config = self.get_validator(**config)
 
     @property
     def get_validator(self):
