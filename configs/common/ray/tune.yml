@@ -22,7 +22,7 @@ stop:
   episode_reward_mean: 9.223372e+18
   # total time in seconds to train for
   time_total_s: 9.223372e+18
-  timesteps_total: 9.223372e+18
+  timesteps_total: 10.0e+6
 
 # number of samples for population based training
 num_samples: 1

@@ -18,6 +18,7 @@ import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
+from pydantic import PyObject
 
 from saferl.utils import VelocityConstraintValidator, get_relative_position, max_vel_violation
 
@@ -219,6 +220,88 @@ class CrashDoneFunction(DoneFuncBase):
 
             done[self.config.platform_name] = done[self.config.platform_name] and violated
 
+        if done[self.config.platform_name]:
+            next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
+        self._set_all_done(done)
+        return done
+
+
+class TerminalRewardSaturationDoneFunctionValidator(DoneFuncBaseValidator):
+    """Validator for TerminalRewardSaturationDoneFunction
+
+    limit : float
+        cumulative reward value limit. Done triggers when this limit value is reached
+    bound: string
+        One of 'upper' or 'lower'. Defines whether the limit value should be an upper bound or a lower bound
+    reward_functor: string
+        Python path to reward function class. Is resolved into a PyObject
+    reward_config: dict
+        configuration args for the reward function
+    """
+    limit: float
+    bound: typing.Literal["upper", "lower"]
+    reward_functor: PyObject
+    reward_config: typing.Dict
+
+
+class TerminalRewardSaturationDoneFunction(DoneFuncBase):
+    """Triggers done condition when wrapped cumulative reward limit reached"""
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.config: TerminalRewardSaturationDoneFunctionValidator
+
+        self.reward_total = 0
+        self.reward_function = self.config.reward_functor(
+            **self.config.reward_config, agent_name=self.config.agent_name, platform_names=[self.config.platform_name]
+        )
+
+    def reset(self):
+        self.reward_total = 0
+        self.reward_function.reset()
+
+    @property
+    def get_validator(self):
+        """
+        Parameters
+        ----------
+        cls : constructor function
+
+        Returns
+        -------
+        DockingRelativeVelocityConstraintDoneFunctionValidator : DoneFunctionValidator
+        """
+
+        return TerminalRewardSaturationDoneFunctionValidator
+
+    def __call__(
+        self,
+        observation,
+        action,
+        next_observation,
+        next_state,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
+
+        reward_dict = self.reward_function(
+            observation, action, next_observation, next_state, next_state, observation_space, observation_units
+        )
+
+        reward_val = reward_dict[self.config.agent_name]
+
+        self.reward_total += reward_val
+
+        done = DoneDict()
+
+        if self.config.bound == 'upper' and self.reward_total >= self.config.limit:
+            limit_reached = True
+        elif self.config.bound == 'lower' and self.reward_total <= self.config.limit:
+            limit_reached = True
+        else:
+            limit_reached = False
+
+        done[self.config.platform_name] = limit_reached
         if done[self.config.platform_name]:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
         self._set_all_done(done)
