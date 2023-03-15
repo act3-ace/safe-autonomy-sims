@@ -138,5 +138,5 @@ def test_step(cut, reset_config, expected_state, step_size):
     expected_state.sim_time = step_size
 
     cut.reset(reset_config)
-    state = cut.step()
+    state = cut.step(platforms_to_action=set(reset_config['platforms'].keys()))
     assert state == expected_state
