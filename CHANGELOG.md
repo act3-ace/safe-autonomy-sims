@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.7.0...v1.7.1) (2023-03-15)
+
+
+### Bug Fixes
+
+* cwh3d docking performance fixed ([c14e46d](https://github.com/act3-ace/safe-autonomy-sims/commit/c14e46de6c6e594269899d5d7a907691c2707353))
+
 # [1.7.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.6.1...v1.7.0) (2023-03-15)
 
 
