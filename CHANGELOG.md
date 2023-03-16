@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.7.1...v1.8.0) (2023-03-16)
+
+
+### Features
+
+* added fast and performance training tests ([5512f47](https://github.com/act3-ace/safe-autonomy-sims/commit/5512f477be8fa4494c339a4f8f5177031dc347d5))
+
 ## [1.7.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.7.0...v1.7.1) (2023-03-15)
 
 
