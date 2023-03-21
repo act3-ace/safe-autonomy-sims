@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.8.0...v1.9.0) (2023-03-21)
+
+
+### Features
+
+* remove dubins environments ([9b4b56b](https://github.com/act3-ace/safe-autonomy-sims/commit/9b4b56b4277acf40eb33b94cc5db0ba72ba12d03))
+
 # [1.8.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.7.1...v1.8.0) (2023-03-16)
 
 
