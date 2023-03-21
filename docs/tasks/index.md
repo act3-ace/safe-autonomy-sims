@@ -12,7 +12,3 @@ will be added in time. The following list contains all currently available tasks
     * [3D Inspection - Multiagent](CWH/inspection_3d_multiagent.md)
     * [3D Docking](CWH/docking_3d.md)
     * [3D Docking - Multiagent](CWH/docking_3d_multiagent.md)
-- [Dubins](dubins/index.md)
-    * [2D Rejoin](dubins/rejoin_2d.md)
-    * [3D Rejoin](dubins/rejoin_3d.md)
-    * [3D Rejoin - Multiagent](dubins/rejoin_3d_multiagent.md)

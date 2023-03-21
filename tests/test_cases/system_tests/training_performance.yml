@@ -29,21 +29,3 @@
 #   max_training_iteration: 1
 #   success_mean_metric: agent_done_status/blue0_ctrl/DoneStatusCodes.WIN_mean
 #   expected_success_rate: 1.0
-- ID: Dubins Rejoin 3D
-  experiment_config: configs/dubins3d/rejoin/experiments/experiment.yml
-  seed: 1
-  max_training_iteration: 100
-  success_mean_metric: done_results/blue0/RejoinSuccessDone_mean
-  expected_success_rate: 0.9
-# - ID: Dubins Rejoin 3D Multiagent
-#   experiment_config: configs/dubins3d/rejoin/experiments/experiment_multiagent.yml
-#   seed: 1
-#   max_training_iteration: 1
-#   success_mean_metric: done_status/blue0/DoneStatusCodes.WIN_mean
-  # expected_success_rate: 1.0
-- ID: Dubins Rejoin 2D
-  experiment_config: configs/dubins2d/rejoin/experiments/experiment.yml
-  seed: 1
-  max_training_iteration: 100
-  success_mean_metric: done_results/blue0/RejoinSuccessDone_mean
-  expected_success_rate: 0.9
