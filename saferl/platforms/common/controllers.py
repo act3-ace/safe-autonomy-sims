@@ -18,9 +18,7 @@ from corl.simulators.base_parts import BaseController, BasePlatformPartValidator
 from pydantic import BaseModel, PyObject
 
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
-from saferl.platforms.dubins.dubins_available_platforms import DubinsAvailablePlatformTypes
 from saferl.simulators.cwh_simulator import CWHSimulator
-from saferl.simulators.dubins_simulator import Dubins2dSimulator, Dubins3dSimulator
 from saferl.simulators.inspection_simulator import InspectionSimulator
 
 
@@ -111,19 +109,3 @@ PluginLibrary.AddClassToGroup(
 )
 
 PluginLibrary.AddClassToGroup(RateController, "RateController", {"simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH})
-
-PluginLibrary.AddClassToGroup(
-    RateController,
-    "RateController",
-    {
-        "simulator": Dubins2dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS2D
-    },
-)
-
-PluginLibrary.AddClassToGroup(
-    RateController,
-    "RateController",
-    {
-        "simulator": Dubins3dSimulator, "platform_type": DubinsAvailablePlatformTypes.DUBINS3D
-    },
-)
