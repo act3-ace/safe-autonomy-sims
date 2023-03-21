@@ -12,5 +12,4 @@ environment interactions with respect to implemented dynamics models. They also 
 execution of DoneFunctions to terminate training episodes appropriately.
 
 - [cwh simulator](../../reference/simulators/cwh_simulator.md)
-- [dubins simulator](../../reference/simulators/dubins_simulator.md)
 - [saferl simulator](../../reference/simulators/saferl_simulator.md)

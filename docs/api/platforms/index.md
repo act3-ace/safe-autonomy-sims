@@ -10,4 +10,3 @@ parts used in a physical system.
 
 - [common](../../reference/platforms/common/sensors.md)
 - [cwh](cwh/index.md)
-- [dubins](dubins/index.md)
