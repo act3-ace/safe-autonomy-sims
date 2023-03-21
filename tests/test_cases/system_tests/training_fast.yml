@@ -9,9 +9,3 @@
   experiment_config: configs/cwh3d/inspection/experiments/experiment_multiagent.yml
 # - ID: CWH Inspection 3D Illumination
 #   experiment_config: configs/cwh3d/inspection/experiments/experiment_illumination.yml
-- ID: Dubins Rejoin 3D
-  experiment_config: configs/dubins3d/rejoin/experiments/experiment.yml
-# - ID: Dubins Rejoin 3D Multiagent
-#   experiment_config: configs/dubins3d/rejoin/experiments/experiment_multiagent.yml
-- ID: Dubins Rejoin 2D
-  experiment_config: configs/dubins2d/rejoin/experiments/experiment.yml

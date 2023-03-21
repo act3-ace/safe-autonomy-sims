@@ -164,19 +164,6 @@ Static 1N thrusters in $\pm x, \pm y, \pm z$.
 Multiple agent controlled deputy spaceraft. Each controlled by static 1N thrusters in $\pm x, \pm y, \pm z$.
 
 
-### Rejoin
-Aircraft formation flight rejoin where a wingman aircraft controlled by the agent must join a formation relative to a lead aircraft. The formation is defined by a rejoin region relative to the lead's position and orientation which the wingman must enter and remain within. Comes in the following flavors:
-
--  **Rejoin 2D**  
-Throttle and heading control.  
-
--  **Rejoin 3D**  
-Throttle, heading, flight angle, roll control.  
-
--  **Rejoin 3D - Multiagent**  
-Multiple agent controlled wingman aircraft. Each controlled by throttle, heading, flight angle, roll control.  
-
-
 ## Team
 Jamie Cunningham,
 Umberto Ravaioli,
