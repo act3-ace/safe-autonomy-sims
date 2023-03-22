@@ -11,7 +11,7 @@ from tests.system_tests.training.constants import DEFAULT_SUCCESS_THRESHOLD, DEF
 
 
 class SuccessCriteria(Stopper):
-    def __init__(self, success_mean_metric, success_threshold=DEFAULT_SUCCESS_THRESHOLD, max_iterations=DEFAULT_MAX_ITERATIONS, ):
+    def __init__(self, success_mean_metric, success_threshold=DEFAULT_SUCCESS_THRESHOLD, max_iterations=DEFAULT_MAX_ITERATIONS):
         super().__init__()
         self.success_mean_metric = success_mean_metric
         self.success_threshold = success_threshold
