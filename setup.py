@@ -38,7 +38,6 @@ if __name__ == '__main__':
     docs_require = parse_requirements("extra_requirements/requirements-docs.txt")
     torch_require = parse_requirements("extra_requirements/requirements-torch.txt")
     tf_require = parse_requirements("extra_requirements/requirements-tf.txt")
-    viz_require = parse_requirements("extra_requirements/requirements-viz.txt")
     dev_require = parse_requirements("extra_requirements/requirements-dev.txt")
 
     setup(
@@ -81,7 +80,6 @@ if __name__ == '__main__':
             "torch": torch_require,
             "tf": tf_require,
             "dev": dev_require,
-            "viz": viz_require
         },
         python_requires='>=3.8',
     )

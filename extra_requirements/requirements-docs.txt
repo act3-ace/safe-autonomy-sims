@@ -17,3 +17,6 @@ mkdocs-markdownextradata-plugin
 papermill
 Pillow
 pymdown-extensions
+
+ipykernel  # used for jupyter notebooks and animation
+imageio[ffmpeg]  # used for animation
