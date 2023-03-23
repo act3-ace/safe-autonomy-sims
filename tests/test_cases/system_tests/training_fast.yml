@@ -1,11 +1,7 @@
 # Test each task
 - ID: CWH Docking 3D
   experiment_config: configs/cwh3d/docking/experiments/experiment.yml
-- ID: CWH Docking 3D Multiagent
-  experiment_config: configs/cwh3d/docking/experiments/experiment_multiagent.yml
 - ID: CWH Inspection 3D
   experiment_config: configs/cwh3d/inspection/experiments/experiment.yml
 - ID: CWH Inspection 3D Multiagent
   experiment_config: configs/cwh3d/inspection/experiments/experiment_multiagent.yml
-# - ID: CWH Inspection 3D Illumination
-#   experiment_config: configs/cwh3d/inspection/experiments/experiment_illumination.yml
