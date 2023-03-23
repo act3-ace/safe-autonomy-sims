@@ -1,5 +1,5 @@
 # testing requirements
-
+jsonlines
 pytest
 pytest-mock
 pytest-cov
