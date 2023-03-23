@@ -40,42 +40,72 @@
           }
         },
         {"part": "Sensor_Position"},
-        {"part": "Sensor_Velocity"}
+        {"part": "Sensor_Velocity"},
+        {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
     ],
     "episode_parameter_provider": {
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "x": {
+      # "initializer": {
+      #   "functor": "saferl.simulators.initializers.docking_initializer.Docking3DInitializer",
+      #   "config": {
+
+      #   }
+      # },
+      "radius": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
-          "name": "x",
+          "name": "radius",
           "units": "meters",
-          "low": -100,
-          "high": 100,
+          "low": 100,
+          "high": 150,
         }
       },
-      "y": {
+      "azimuth_angle": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
-          "name": "x",
-          "units": "meters",
-          "low": -100,
-          "high": 100,
+          "name": "azimuth_angle",
+          "units": "radians",
+          "low": 0,
+          "high": 6.283,
         }
       },
-      "z": {
+      "elevation_angle": {
         "type": "corl.libraries.parameters.UniformParameter",
         "config": {
-          "name": "x",
-          "units": "meters",
-          "low": -100,
-          "high": 100,
+          "name": "elevation_angle",
+          "units": "radians",
+          "low": -1.57,
+          "high": 1.57,
         }
       },
-      "xdot": 0,
-      "ydot": 0,
-      "zdot": 0,
+      "vel_max_ratio": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "vel_max_ratio",
+          "low": 0,
+          "high": 0.8,
+        }
+      },
+      "vel_azimuth_angle": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "vel_azimuth_angle",
+          "units": "radians",
+          "low": 0,
+          "high": 6.283,
+        }
+      },
+      "vel_elevation_angle": {
+        "type": "corl.libraries.parameters.UniformParameter",
+        "config": {
+          "name": "vel_elevation_angle",
+          "units": "radians",
+          "low": -1.57,
+          "high": 1.57,
+        }
+      },
     },
     "glues": [
         {
@@ -125,6 +155,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Velocity",
+              "output_units": ["m/s", "m/s", "m/s"],
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -145,6 +176,7 @@
                 "functor": "corl.glues.common.observe_sensor.ObserveSensor",
                 "config":{
                     "sensor": Sensor_Velocity,
+                    "output_units": ["m/s", "m/s", "m/s"],
                 },
             },
         },
@@ -166,15 +198,16 @@
         {
             "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
             "config":{},
-            "references":{
+            "references": {
               "max_sim_time": "timeout",
             },
         },
         {
-            "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
+            "functor": "saferl.dones.cwh.common.MaxDistanceDoneFunction",
             "config":{},
-            "references":{
+            "references": {
               "max_distance": "max_distance",
+              "reference_position_sensor_name": "reference_position_sensor_name"
             },
         },
 #        {
@@ -187,7 +220,7 @@
 #            },
 #        },
         {
-            "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
+            "functor": "saferl.dones.cwh.common.CrashDoneFunction",
             "config":{
               "velocity_constraint": {
                 "velocity_threshold": 0.2,
@@ -196,6 +229,7 @@
             },
             "references": {
               "crash_region_radius": "docking_region_radius",
+              "reference_position_sensor_name": "reference_position_sensor_name"
             }
         },
         {
@@ -207,7 +241,25 @@
               "threshold_distance": "threshold_distance",
               "mean_motion": "mean_motion",
               "lower_bound": "lower_bound",
+              "reference_position_sensor_name": "reference_position_sensor_name"
             }
+        },
+        {
+            "name": DockingVelocityLimitSaturationDone,
+            "functor": "saferl.dones.cwh.common.TerminalRewardSaturationDoneFunction",
+            "config":{
+              "limit": -5,
+              "bound": "lower",
+              "reward_functor": saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward,
+              "reward_config": {
+                "scale": -0.01,
+                "bias": -0.01,
+                "velocity_threshold": 0.2,
+                "threshold_distance": 0.5,
+                "mean_motion": 0.001027,
+                "lower_bound": False,
+              }
+            },
         },
     ],
     "rewards": [
@@ -239,6 +291,7 @@
           "threshold_distance": "threshold_distance",
           "mean_motion": "mean_motion",
           "lower_bound": "lower_bound",
+          "reference_position_sensor_name": "reference_position_sensor_name"
         }
       },
         {
@@ -254,6 +307,7 @@
             "threshold_distance": "threshold_distance",
             "mean_motion": "mean_motion",
             "lower_bound": "lower_bound",
+            "reference_position_sensor_name": "reference_position_sensor_name"
           }
         },
       {
@@ -272,6 +326,7 @@
           "threshold_distance": "threshold_distance",
           "mean_motion": "mean_motion",
           "lower_bound": "lower_bound",
+          "reference_position_sensor_name": "reference_position_sensor_name"
         }
       },
     ],

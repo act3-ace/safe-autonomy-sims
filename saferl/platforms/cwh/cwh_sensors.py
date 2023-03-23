@@ -11,9 +11,11 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 Contains implementations of sensors that can be used in junction with the CWH platform.
 """
+import typing
 
+import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
-from corl.simulators.base_parts import BaseSensor
+from corl.simulators.base_parts import BasePlatformPartValidator, BaseSensor
 
 import saferl.platforms.cwh.cwh_properties as cwh_props
 from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
@@ -205,3 +207,113 @@ PluginLibrary.AddClassToGroup(
         "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
     }
 )
+
+# entity position sensors
+
+
+class EntitySensorValidator(BasePlatformPartValidator):
+    """
+    Validator for the EntitySensors
+    """
+    entity_name: str
+
+
+class EntityPositionSensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the position at any time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.PositionProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[EntitySensorValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return EntitySensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        return state.sim_entities[self.config.entity_name].position
+
+
+PluginLibrary.AddClassToGroup(
+    EntityPositionSensor, "Sensor_EntityPosition", {
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    EntityPositionSensor, "Sensor_EntityPosition", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+
+class OriginPositionSensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the position at any time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.PositionProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        return np.array([0, 0, 0])
+
+
+PluginLibrary.AddClassToGroup(
+    OriginPositionSensor, "Sensor_OriginPosition", {
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+# class EntityVelocitySensor(CWHSensor):
+#     """
+#     Implementation of a sensor designed to give the position at any time.
+#     """
+
+#     def __init__(self, parent_platform, config, property_class=cwh_props.VelocityProp):
+#         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+#     @property
+#     def get_validator(self) -> typing.Type[EntitySensorValidator]:
+#         """
+#         return the validator that will be used on the configuration
+#         of this part
+#         """
+#         return EntitySensorValidator
+
+#     def _calculate_measurement(self, state):
+#         """
+#         Calculate the measurement - position.
+
+#         Returns
+#         -------
+#         list of floats
+#             Position of spacecraft.
+#         """
+#         return state.sim_entities[self.config.entity_name].velocity
+
+# PluginLibrary.AddClassToGroup(
+#     EntityVelocitySensor, "Sensor_EntityVelocity", {
+#         "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+#     }
+# )
