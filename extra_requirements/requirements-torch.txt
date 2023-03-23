@@ -1,0 +1,3 @@
+# requirements for installing extra pytorch dependency
+
+torch  # TODO: pin version

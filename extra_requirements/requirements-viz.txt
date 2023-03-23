@@ -1,0 +1,5 @@
+# requirements for extra visualization notebooks/scripts
+
+seaborn==0.11.2  # used for example eval api
+ipykernel  # used for jupyter notebooks and animation
+imageio[ffmpeg]  # used for animation
