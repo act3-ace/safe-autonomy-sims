@@ -6,4 +6,3 @@ return a RewardDict, allocating an appropriate reward (or penalty)
 to an agent based on its behavior and the simulation state.
 
 - [docking rewards](../../reference/rewards/docking_rewards.md)
-- [rejoin rewards](../../reference/rewards/rejoin_rewards.md)

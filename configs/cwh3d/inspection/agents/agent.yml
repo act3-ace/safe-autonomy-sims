@@ -41,7 +41,8 @@
         },
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
-        {"part": "Sensor_InspectedPoints"}
+        {"part": "Sensor_InspectedPoints"},
+        {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
     ],
     "episode_parameter_provider": {
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -225,16 +226,18 @@
     "dones": [
         {
             # Max distance from origin
-            "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
+            "functor": "saferl.dones.cwh.common.MaxDistanceDoneFunction",
             "references": {
               "max_distance": "max_distance",
+              "reference_position_sensor_name": "reference_position_sensor_name"
             },
         },
         {
             # Crash into origin (exceeded velocity constraint within crashing region)
-            "functor": "saferl.dones.cwh.common.CrashOriginDoneFunction",
+            "functor": "saferl.dones.cwh.common.CrashDoneFunction",
             "references": {
               "crash_region_radius": "collision_radius",
+              "reference_position_sensor_name": "reference_position_sensor_name"
             },
         },
         {
@@ -262,13 +265,14 @@
         },
         {
           # reward = scale (if crash occurs)
-          "name": "InspectionCrashOriginReward",
-          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashOriginReward",
+          "name": "InspectionCrashReward",
+          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashReward",
           "config": {
             "scale": -1.0,
           },
           "references": {
             "crash_region_radius": "collision_radius",
+            "reference_position_sensor_name": "reference_position_sensor_name"
           },
         },
         # {

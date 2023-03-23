@@ -25,6 +25,19 @@
           "mean_motion": 0.001027,
           "slope": 2.0,
       }
+    },
+    "additional_entities": {
+      "chief": { 
+        "platform": "cwh",
+        "config":{
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "x_dot": 0,
+          "y_dot": 0,
+          "z_dot": 0,
+        }
+      }
     }
   },
   "platforms": "CWHSimulator_Platforms",

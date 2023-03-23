@@ -84,8 +84,8 @@ def evaluate(
 
     # plugins
     platform_serialization_obj = platform_serializer_class()
-    plugins_args = {"platform_serialization": platform_serialization_obj}
     eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), instead of objects
+    plugins_args = {"platform_serialization": platform_serialization_obj, 'eval_config_update': eval_config_updates}
 
     # engine
     rllib_engine_args = {"callbacks": [], "workers": 0}
@@ -112,7 +112,8 @@ def evaluate(
         "engine": {
             "rllib": engine
         },
-        "recorders": [recorder]
+        "recorders": [recorder],
+        "tmpdir_base": '/tmp/'
     }
 
     # call main

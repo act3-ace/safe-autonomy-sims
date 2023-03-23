@@ -42,9 +42,6 @@ class CWH3DRadialInitializer(BaseInitializer):
         The modified reset config of agent name to initialization values KVPs.
     """
 
-    def __init__(self, config):
-        self.config = self.get_validator(**config)
-
     @property
     def get_validator(self):
         """
@@ -102,12 +99,12 @@ class CWH3DRadialInitializer(BaseInitializer):
         )
         z = ConstantParameter(value=radius.value * np.sin(elevation_angle.value), units=radius.units.value[1][0])
 
+        # assumes that the docking region is at origin
+        relative_position = [x.get_value(0, None).value, y.get_value(0, None).value, z.get_value(0, None).value]
+        distance = np.linalg.norm(relative_position)
+
         vel_limit = velocity_limit(
-            [x.get_value(0, None), y.get_value(0, None), z.get_value(0, None)],
-            self.config.velocity_threshold,
-            self.config.threshold_distance,
-            self.config.mean_motion,
-            self.config.slope
+            distance, self.config.velocity_threshold, self.config.threshold_distance, self.config.mean_motion, self.config.slope
         )
 
         vel_mag = vel_max_ratio.value * vel_limit
@@ -157,9 +154,6 @@ class CWH3DENMTInitializer(BaseInitializer):
     reset_config: dict
         The modified reset config of agent name to initialization values KVPs.
     """
-
-    def __init__(self, config):
-        self.config = self.get_validator(**config)
 
     @property
     def get_validator(self):

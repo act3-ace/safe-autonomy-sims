@@ -14,8 +14,12 @@
 experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
-    horizon: 3000
-    num_workers: 1
+    num_workers: 6
+    train_batch_size: 36000  # set to num_workers * rollout_fragment_length
+    sgd_minibatch_size: 3600
+    gamma: 0.968559
+    lambda: 0.928544
+
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates

@@ -9,7 +9,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # -------------------------------------------------------------------------------
 
-This module holds unit tests and fixtures for the SuccessfulDockingDoneFunction.
+This module holds unit tests and fixtures for the CrashDoneFunction.
 
 Author: John McCarroll
 """
@@ -18,12 +18,12 @@ import os
 
 import pytest
 
-from saferl.dones.cwh.common import CrashOriginDoneFunction
+from saferl.dones.cwh.common import CrashDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
 test_cases_file_path = os.path.join(
-    os.path.split(__file__)[0], "../../../../../test_cases/dones/cwh/docking/common/CrashOriginDoneFunction_test_cases.yaml"
+    os.path.split(__file__)[0], "../../../../../test_cases/dones/cwh/docking/common/CrashDoneFunction_test_cases.yaml"
 )
 parameterized_fixture_keywords = [
     "platform_position",
@@ -69,7 +69,7 @@ def fixture_platform_velocity(request):
 @pytest.fixture(name='crash_region_radius')
 def fixture_crash_region_radius(request):
     """
-    Parameterized fixture for returning the crash_region_radius passed to the CrashOriginDoneFunction's constructor,
+    Parameterized fixture for returning the crash_region_radius passed to the CrashDoneFunction's constructor,
     as defined in test_configs.
 
     Returns
@@ -141,9 +141,9 @@ def fixture_cut(
     agent_name : str
         The name of the agent
     crash_region_radius : int
-        The radius of the crash region passed to the CrashOriginDoneFunction constructor
+        The radius of the crash region passed to the CrashDoneFunction constructor
     velocity_limit : int
-        The velocity limit passed to the CrashOriginDoneFunction constructor
+        The velocity limit passed to the CrashDoneFunction constructor
 
     Returns
     -------
@@ -163,7 +163,7 @@ def fixture_cut(
             "lower_bound": lower_bound,
         }
     }
-    return CrashOriginDoneFunction(**kwargs)
+    return CrashDoneFunction(**kwargs)
 
 
 @pytest.mark.unit_test

@@ -8,4 +8,3 @@ and output a DoneDict. The DoneDict maps agent names to DoneStatuses.
 
 - [common dones](../../reference/dones/common_dones.md)
 - [docking dones](../../reference/dones/docking_dones.md)
-- [rejoin dones](../../reference/dones/rejoin_dones.md)

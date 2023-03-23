@@ -1,3 +1,45 @@
+# [1.9.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.8.0...v1.9.0) (2023-03-21)
+
+
+### Features
+
+* remove dubins environments ([9b4b56b](https://github.com/act3-ace/safe-autonomy-sims/commit/9b4b56b4277acf40eb33b94cc5db0ba72ba12d03))
+
+# [1.8.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.7.1...v1.8.0) (2023-03-16)
+
+
+### Features
+
+* added fast and performance training tests ([5512f47](https://github.com/act3-ace/safe-autonomy-sims/commit/5512f477be8fa4494c339a4f8f5177031dc347d5))
+
+## [1.7.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.7.0...v1.7.1) (2023-03-15)
+
+
+### Bug Fixes
+
+* cwh3d docking performance fixed ([c14e46d](https://github.com/act3-ace/safe-autonomy-sims/commit/c14e46de6c6e594269899d5d7a907691c2707353))
+
+# [1.7.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.6.1...v1.7.0) (2023-03-15)
+
+
+### Features
+
+* CoRL update to 2.8.0 and Update agent actions based on frame rate ([01663b2](https://github.com/act3-ace/safe-autonomy-sims/commit/01663b2eb9b885454e1b20088c72c39d65e9eaab))
+
+## [1.6.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.6.0...v1.6.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* added chief entity to inspection environments ([d3637ac](https://github.com/act3-ace/safe-autonomy-sims/commit/d3637ac23375bf5932836417892ddfec74298def))
+
+# [1.6.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.5.0...v1.6.0) (2023-03-10)
+
+
+### Features
+
+* Resolve "Make chief separate entity" ([88d2806](https://github.com/act3-ace/safe-autonomy-sims/commit/88d28067f6af30e82f4b98d61d7482be47c3ffec))
+
 # [1.5.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.4.1...v1.5.0) (2023-03-07)
 
 
