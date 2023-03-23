@@ -34,9 +34,11 @@ with open(os.path.join(base_dir, 'version.py')) as fp:
      exec(fp.read(), version)
 
 if __name__ == '__main__':
-    tests_require = parse_requirements("tests-requirements.txt")
-
-    docs_require = parse_requirements("mkdocs-requirements.txt")
+    tests_require = parse_requirements("extra_requirements/requirements-test.txt")
+    docs_require = parse_requirements("extra_requirements/requirements-docs.txt")
+    torch_require = parse_requirements("extra_requirements/requirements-torch.txt")
+    tf_require = parse_requirements("extra_requirements/requirements-tf.txt")
+    dev_require = parse_requirements("extra_requirements/requirements-dev.txt")
 
     setup(
         name="safe-autonomy-sims",
@@ -73,8 +75,11 @@ if __name__ == '__main__':
         install_requires=reqs,
 
         extras_require={
-            "testing":  tests_require,
+            "test":  tests_require,
             "docs":  docs_require,
+            "torch": torch_require,
+            "tf": tf_require,
+            "dev": dev_require,
         },
         python_requires='>=3.8',
     )
