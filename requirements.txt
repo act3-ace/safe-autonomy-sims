@@ -5,3 +5,4 @@ safe-autonomy-dynamics==0.4.0
 tqdm  # pin version
 scikit-learn  # pin version
 seaborn==0.11.2  # used for example eval api (should be factored out)
+torch==1.13.0  # required by rllib (this is a bug in rllib)
