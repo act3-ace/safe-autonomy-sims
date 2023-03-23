@@ -1,0 +1,7 @@
+# testing requirements
+jsonlines
+pytest
+pytest-mock
+pytest-cov
+pytest-order
+factory-boy==3.2.1

@@ -79,12 +79,6 @@ repos:
         types: [ shell ]
         args: [ "--ignore=E003,E006,E040" ]
         verbose: false
-#       - id: detect-secrets
-#         name: detect-secrets
-#         description: An enterprise friendly way of detecting and preventing secrets in code.
-#         entry: detect-secrets
-#         language: system
-#         args: [ "audit", ".secrets.baseline" ]
       - id: blacken-docs
         name: blacken-docs
         description: Run `black` on python code blocks in documentation files

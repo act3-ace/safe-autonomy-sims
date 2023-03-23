@@ -1,0 +1,21 @@
+# developer requirements
+
+# formatters and linters
+flake8
+mypy
+mypy-extensions
+mypy-protobuf
+pylint==2.8.3
+yapf
+isort
+pre-commit
+pre-commit-hooks
+blacken-docs
+bashate
+velin
+# rope
+# fish
+# watchdog
+# speedscope
+# pandas-profiling
+# detect-secrets

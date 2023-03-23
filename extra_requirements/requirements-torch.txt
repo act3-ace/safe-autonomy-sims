@@ -1,0 +1,3 @@
+# requirements for installing extra pytorch dependency
+
+torch==1.13.0 
