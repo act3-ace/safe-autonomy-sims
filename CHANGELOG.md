@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.9.1...v1.9.2) (2023-03-30)
+
+
+### Bug Fixes
+
+* update seaborn to version 0.12 ([f4e4417](https://github.com/act3-ace/safe-autonomy-sims/commit/f4e44173f37a5a22f72689591a3d8ed01503a198)), closes [#242](https://github.com/act3-ace/safe-autonomy-sims/issues/242)
+
 ## [1.9.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.9.0...v1.9.1) (2023-03-30)
 
 
