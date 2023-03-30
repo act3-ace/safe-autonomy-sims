@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.9.0...v1.9.1) (2023-03-30)
+
+
+### Bug Fixes
+
+* reduce corl version restriction ([61137e0](https://github.com/act3-ace/safe-autonomy-sims/commit/61137e091670913a51a0698148beab03934970e9)), closes [#241](https://github.com/act3-ace/safe-autonomy-sims/issues/241)
+
 # [1.9.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.8.0...v1.9.0) (2023-03-21)
 
 
