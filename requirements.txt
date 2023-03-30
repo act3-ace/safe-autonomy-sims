@@ -1,4 +1,4 @@
-corl==2.8.3
+corl>=2.8.3
 numpy==1.22.2
 run-time-assurance==1.3.0
 safe-autonomy-dynamics==0.4.0
