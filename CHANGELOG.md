@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.10.0...v1.11.0) (2023-04-03)
+
+
+### Features
+
+* inspection environment updated with delta-v reward scheduler, unobserved points observation, and updated parameters ([cb560f0](https://github.com/act3-ace/safe-autonomy-sims/commit/cb560f05aea8df24f857b76570879a0ab04cd6eb))
+
 # [1.10.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.9.2...v1.10.0) (2023-04-03)
 
 
