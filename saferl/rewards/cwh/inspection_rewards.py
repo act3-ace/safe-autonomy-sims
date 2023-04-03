@@ -11,6 +11,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module implements the Reward Functions and Reward Validators specific to the inspection task.
 """
+import typing
 from collections import OrderedDict
 
 import numpy as np
@@ -214,8 +215,6 @@ class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
     """
     Validator for the DockingDeltaVReward Reward Function.
 
-    scale : float
-        A scalar value applied to reward.
     bias : float
         A bias value added to the reward.
     step_size : float
@@ -226,13 +225,16 @@ class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
         Type of delta-v penalty, either "scale" or "linear_increasing"
     rate : float
         rate at which penalty increases for linear_increasing
+    constant_scale : float
+        scalar penalty multiplied by delta-v.
+        If None, increasing scale value is taken from simulator
     """
-    scale: float
     bias: float = 0.0
-    step_size: float = 1.0
+    step_size: float
     mass: float
     mode: str = 'scale'
-    rate: float = 0.1
+    rate: float = 0.0005
+    constant_scale: typing.Union[None, float] = None
 
 
 class InspectionDeltaVReward(RewardFuncBase):
@@ -281,11 +283,12 @@ class InspectionDeltaVReward(RewardFuncBase):
         self.config: InspectionDeltaVRewardValidator
         super().__init__(**kwargs)
         self.bias = self.config.bias
-        self.scale = self.config.scale
         self.mass = self.config.mass
         self.step_size = self.config.step_size
         self.mode = self.config.mode
         self.rate = self.config.rate
+        self.constant_scale = self.config.constant_scale
+        self.scale = 0.0
 
     def delta_v(self, state):
         """
@@ -330,11 +333,15 @@ class InspectionDeltaVReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> RewardDict:
+        if self.constant_scale is None:
+            self.scale = state.delta_v_scale
+        else:
+            self.scale = self.constant_scale
         reward = RewardDict()
         if self.mode == "scale":
             val = self.scale * self.delta_v(next_state) + self.bias
         elif self.mode == "linear_increasing":
-            val = self.linear_scalar(state.total_steps) * self.delta_v(next_state) + self.bias
+            val = self.linear_scalar(state.sim_time) * self.delta_v(next_state) + self.bias
         else:
             raise ValueError('mode must be either "scale" or "linear_increasing"')
         reward[self.config.agent_name] = val

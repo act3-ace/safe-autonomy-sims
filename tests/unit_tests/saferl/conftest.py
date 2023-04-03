@@ -15,8 +15,6 @@ Author: John McCarroll
 """
 from unittest import mock
 
-from unittest import mock
-
 import numpy as np
 import pytest
 from corl.libraries.state_dict import StateDict
