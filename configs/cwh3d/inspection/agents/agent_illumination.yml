@@ -23,28 +23,11 @@
         {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
     ],
     "episode_parameter_provider": {
-        "type": "corl.episode_parameter_providers.adr.AdrParameterProvider",
-        "config":
-          {
-            "buffer_size": 1,
-            "reward_lower_threshold": 0.8,
-            "reward_upper_threshold": 0.9,
-            "reward_metric": "rewards_cumulative/blue0_ctrl/ObservedPointsReward_mean",
-            "reward_custom_metric": True,
-            "warmup_value": 0,
-            "warmup_metric": "blue0_ctrl/env/sim_period_mean",
-            "warmup_custom_metric": True,
-          },
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
       "initializer": {
-        "functor": "saferl.simulators.initializers.cwh.Docking3DRadialInitializer",
-        "config": {
-            "threshold_distance": 0,
-            "velocity_threshold": 0.2,
-            "mean_motion": 0.001027,
-            "slope": 2.0,
-        }
+        "functor": "saferl.simulators.initializers.cwh.CWH3DRadialInitializer",
       },
       "config": {
         "radius": {
@@ -74,12 +57,13 @@
             "high": 1.57,
           }
         },
-        "vel_max_ratio": {
+        "vel_mag": {
           "type": "corl.libraries.parameters.UniformParameter",
           "config": {
-            "name": "vel_max_ratio",
+            "name": "vel_mag",
+            "units": "m/s",
             "low": 0,
-            "high": 0.8,
+            "high": 0.3,
           }
         },
         "vel_azimuth_angle": {
@@ -106,6 +90,7 @@
         {
             "functor": "saferl.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
             "config": {
+              "training_export_behavior": "EXCLUDE",
               "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity", "ObserveSensor_Sensor_SunAngle"],
               "enabled": False, #set to True to turn RTA on
               # No constraints listed defaults to all constraints active
@@ -216,6 +201,7 @@
         {
           "functor": "corl.glues.common.magnitude.MagnitudeGlue",
             "config": {
+              "training_export_behavior": "EXCLUDE",
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer"
               },
@@ -231,6 +217,7 @@
             "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
             "config":
               {
+                "training_export_behavior": "EXCLUDE",
                 "sensor": "Sensor_Position",
               },
             "references": {
@@ -239,6 +226,14 @@
               "mean_motion": "mean_motion",
               "slope": "vel_limit_slope",
             },
+        },
+        {
+            "functor": "saferl.glues.delta_v_glue.DeltaVGlue",
+            "config":
+              {
+                "sensor": "Sensor_Position",
+                "training_export_behavior": "EXCLUDE",
+              }
         },
     ],
     "dones": [
@@ -251,7 +246,7 @@
             },
         },
         {
-            # Crash into chief (exceeded velocity constraint within crashing region)
+            # Crash into chief entity
             "functor": "saferl.dones.cwh.common.CrashDoneFunction",
             "references": {
               "crash_region_radius": "collision_radius",
@@ -295,30 +290,14 @@
         },
         {
           "name": "InspectionDeltaVReward",
+          # See delta-v reward scale parameters in env config
           "functor": "saferl.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
           "config": {
-            "bias": 0.0,
-            "rate": 0.0005,
-            "exp_scale": 0.5,
-            "step_size": 10,
-            "mass": 12.0,
             "mode": "scale",
-            "scale": {
-              "type": "corl.libraries.parameters.ConstantParameter",
-              "config": {
-                "value": -0.001,
-                "update": {
-                  "value": {
-                    "type": "corl.libraries.parameters.BoundStepUpdater",
-                    "config": {
-                      "bound": -0.1,
-                      "step": -0.0001,
-                      "bound_type": "min",
-                    },
-                  },
-                },
-              },
-            },
+          },
+          "references": {
+            "step_size": "step_size",
+            "mass": "mass",
           },
         },
         {
@@ -326,7 +305,7 @@
           "name": "InspectionRTAReward",
           "functor": "saferl.rewards.rta_rewards.RTAInterveningReward",
           "config": {
-            "scale": -0.01,
+            "scale": -0.001,
           }
         },
     ],
