@@ -13,7 +13,11 @@
     "type": "InspectionSimulator",
     "config": {
       "num_points": 100,
-      "radius" : 10
+      "radius" : 10,
+      "steps_until_update": 1500,  # Steps between updates to delta-v reward scale
+      "delta_v_scale_bounds": [-0.1, -0.001],  # Lower and upper bounds for delta-v reward scale
+      "delta_v_scale_step": -0.00005,  # Step value for delta-v reward scale
+      "inspected_points_update_bounds": [0.8, 0.9],  # Bounds to increase/decrease delta-v reward scale by step
     },
   },
   "simulator_reset_parameters": {
@@ -40,7 +44,7 @@
     "shared": [
       {
         "functor": "saferl.dones.common_dones.CollisionDoneFunction",
-        "config": { spacecraft_safety_constraint: 0.5 },
+        "config": { safety_constraint: 10 },
       },
       {
         "functor": "saferl.dones.common_dones.MultiagentSuccessDoneFunction",

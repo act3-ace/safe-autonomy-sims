@@ -434,7 +434,6 @@ class AnimationFromCheckpoint(BaseAnimation):
         self.time_step = time_step
 
     def get_data(self, data_path):
-        self.bool_array_locations = False
         positions = np.zeros((1, 3))
         velocities = np.zeros((1, 3))
         sun_vectors = np.zeros((1, 3))
@@ -450,9 +449,14 @@ class AnimationFromCheckpoint(BaseAnimation):
                 th = 0.
             sun = np.array([np.cos(th), np.sin(th), 0])
             sun_vectors = np.append(sun_vectors, [sun], axis=0)
-            ins_pts = int(state.data['ObserveSensor_Sensor_InspectedPoints'].value['direct_observation'])
-            new_bool = np.zeros(99)
-            new_bool[0:ins_pts] = 1
+            try:
+                new_bool = state.data['ObserveSensor_Sensor_BoolArray'].value['direct_observation']
+                self.bool_array_locations = True
+            except KeyError:
+                ins_pts = int(state.data['ObserveSensor_Sensor_InspectedPoints'].value['direct_observation'])
+                new_bool = np.zeros(99)
+                new_bool[0:ins_pts] = 1
+                self.bool_array_locations = False
             bool_arrays = np.append(bool_arrays, [new_bool], axis=0)
         positions = np.delete(positions, 0, axis=0)
         velocities = np.delete(velocities, 0, axis=0)
@@ -463,9 +467,9 @@ class AnimationFromCheckpoint(BaseAnimation):
 
         control_vectors = np.zeros((1, 3))
         for control in data_path["ControlVector"][0]:
-            Fx = control.data["RTAModule.x_thrust"].value
-            Fy = control.data["RTAModule.y_thrust"].value
-            Fz = control.data["RTAModule.z_thrust"].value
+            Fx = control.data[list(control.data.keys())[0]].value
+            Fy = control.data[list(control.data.keys())[1]].value
+            Fz = control.data[list(control.data.keys())[2]].value
             control_vectors = np.append(control_vectors, [np.concatenate((Fx, Fy, Fz))], axis=0)
         control_vectors = np.delete(control_vectors, 0, axis=0)
 

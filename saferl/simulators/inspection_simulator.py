@@ -74,8 +74,19 @@ class InspectionSimulatorState(SafeRLSimulatorState):
     points: dict
         The dictionary containing the points the agent needs to inspect.
         Keys: (x,y,z) tuple. Values: True if inspected, False otherwise.
+    total_steps: int
+        The total number of steps simulated since the simulator was initialized
+    inspected_points_percentage: float
+        The percentage of points inspected, averaged over completed episodes during a specified period
+    delta_v_scale: float
+        The scale of the delta_v reward. This value is updated over time, based on the value of inspected_points_percentage.
+        See saferl/rewards/cwh/inspection_rewards for more details.
+        Note that this feature is experimental, and currently does not synchronize between workers.
     """
     points: typing.Dict
+    total_steps: int
+    inspected_points_percentage: float
+    delta_v_scale: float
 
 
 def points_on_sphere_fibonacci(num_points: int, radius: float) -> list:
@@ -155,11 +166,34 @@ def points_on_sphere_cmu(num_points: int, radius: float) -> list:
 class InspectionSimulatorValidator(SafeRLSimulatorValidator):
     """
     A validator for the InspectionSimulator config.
+
+    num_points: int
+        number of points to be inspected
+    radius: float
+        radius of the sphere of points
+    points_algorithm: str = "cmu"
+        algorithm to define how points are allocated on the sphere
+    illumination_params: typing.Union[IlluminationValidator, None] = None
+        dict of illumination parameters, described above
+    steps_until_update: int
+        Number of steps between updates to the delta_v_scale
+    delta_v_scale_bounds: list
+        lower and upper bounds for the value of delta_v_scale
+    delta_v_scale_step: float
+        The amount to advance/retract the delta_v_scale by at each update
+    inspected_points_update_bounds: list
+        bounds for when to update the delta_v_scale.
+        if inspected_points_percentage >= inspected_points_update_bounds[1], delta_v_scale is advanced by delta_v_scale_step
+        if inspected_points_percentage <= inspected_points_update_bounds[0], delta_v_scale is retracted by delta_v_scale_step
     """
     num_points: int
     radius: float
     points_algorithm: str = "cmu"
     illumination_params: typing.Union[IlluminationValidator, None] = None
+    steps_until_update: int
+    delta_v_scale_bounds: list
+    delta_v_scale_step: float
+    inspected_points_update_bounds: list
 
     @validator("points_algorithm")
     def valid_algorithm(cls, v):
@@ -216,16 +250,42 @@ class InspectionSimulator(SafeRLSimulator):
                 self.ax_yz = self.fig.add_subplot(2, 2, 4)
             if self.config.illumination_params.save_data_flag:
                 self.path_to_data = "/tmp/safe-autonomy/illum_data.csv"
+        self.total_steps = 0
+        self.inspected_points_percentage = 0
+        self.inspected_points_list = []
+        self.update_step_current = 0
+        self.delta_v_scale = 0
+        self.steps_until_update = self.config.steps_until_update
+        self.delta_v_scale_bounds = self.config.delta_v_scale_bounds
+        self.delta_v_scale_step = self.config.delta_v_scale_step
+        self.inspected_points_update_bounds = self.config.inspected_points_update_bounds
 
     def reset(self, config):
         super().reset(config)
         if self.config.illumination_params is not None:
             self._update_initial_sun_angle(config)
+        if self.last_points_inspected != 0:
+            self.inspected_points_list.append(self.last_points_inspected / len(self.points))
+        if self.total_steps >= self.update_step_current:
+            self.update_step_current += self.steps_until_update
+            self.inspected_points_percentage = np.mean(self.inspected_points_list)
+            self.inspected_points_list = []
+            if self.inspected_points_percentage >= self.inspected_points_update_bounds[1]:
+                self.delta_v_scale += self.delta_v_scale_step
+            if self.inspected_points_percentage <= self.inspected_points_update_bounds[0]:
+                self.delta_v_scale -= self.delta_v_scale_step
+        self.delta_v_scale = np.clip(self.delta_v_scale, self.delta_v_scale_bounds[0], self.delta_v_scale_bounds[1])
         self.points = self._add_points()
         self.last_points_inspected = 0
         self.last_cluster = None
         self._state = InspectionSimulatorState(
-            sim_platforms=self._state.sim_platforms, points=self.points, sim_time=self.clock, sim_entities=self.sim_entities
+            sim_platforms=self._state.sim_platforms,
+            points=self.points,
+            sim_time=self.clock,
+            sim_entities=self.sim_entities,
+            total_steps=self.total_steps,
+            inspected_points_percentage=self.inspected_points_percentage,
+            delta_v_scale=self.delta_v_scale,
         )
         return self._state
 
@@ -237,6 +297,8 @@ class InspectionSimulator(SafeRLSimulator):
         self.config.illumination_params.sun_angle = sun_angle
 
     def _step_update_sim_statuses(self, step_size: float):
+        self.total_steps += 1
+        self._state.total_steps = self.total_steps
         # update points
         for platform in self._state.sim_platforms.values():
             platform_id = platform.name
@@ -245,6 +307,9 @@ class InspectionSimulator(SafeRLSimulator):
 
             # update the observation space with number of inspected points
             platform.num_inspected_points = illum.num_inspected_points(self._state.points)
+            platform.bool_array = np.array([float(a) for a in self._state.points.values()])
+            platform.delta_v_scale = self.delta_v_scale
+            platform.total_steps_counter = self.total_steps
             if self.illum_flag:
                 platform.sun_angle = np.array(
                     [
