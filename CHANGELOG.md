@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.9.2...v1.10.0) (2023-04-03)
+
+
+### Features
+
+* per entity initializers with unit handling via pint ([cde0198](https://github.com/act3-ace/safe-autonomy-sims/commit/cde019811487f32cd3496af806473f701268acf6))
+
 ## [1.9.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.9.1...v1.9.2) (2023-03-30)
 
 
