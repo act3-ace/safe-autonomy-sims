@@ -48,59 +48,70 @@
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     "simulator_reset_parameters": {
-      "radius": {
-        "type": "corl.libraries.parameters.UniformParameter",
+      "initializer": {
+        "functor": "saferl.simulators.initializers.cwh.Docking3DRadialInitializer",
         "config": {
-          "name": "radius",
-          "units": "meters",
-          "low": 50,
-          "high": 100,
+            "threshold_distance": 0,
+            "velocity_threshold": 0.2,
+            "mean_motion": 0.001027,
+            "slope": 2.0,
         }
       },
-      "azimuth_angle": {
-        "type": "corl.libraries.parameters.UniformParameter",
-        "config": {
-          "name": "azimuth_angle",
-          "units": "radians",
-          "low": 0,
-          "high": 6.283,
-        }
-      },
-      "elevation_angle": {
-        "type": "corl.libraries.parameters.UniformParameter",
-        "config": {
-          "name": "elevation_angle",
-          "units": "radians",
-          "low": -1.57,
-          "high": 1.57,
-        }
-      },
-      "vel_max_ratio": {
-        "type": "corl.libraries.parameters.UniformParameter",
-        "config": {
-          "name": "vel_max_ratio",
-          "low": 0,
-          "high": 0.8,
-        }
-      },
-      "vel_azimuth_angle": {
-        "type": "corl.libraries.parameters.UniformParameter",
-        "config": {
-          "name": "vel_azimuth_angle",
-          "units": "radians",
-          "low": 0,
-          "high": 6.283,
-        }
-      },
-      "vel_elevation_angle": {
-        "type": "corl.libraries.parameters.UniformParameter",
-        "config": {
-          "name": "vel_elevation_angle",
-          "units": "radians",
-          "low": -1.57,
-          "high": 1.57,
-        }
-      },
+      "config": {
+        "radius": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "radius",
+            "units": "meters",
+            "low": 50,
+            "high": 100,
+          }
+        },
+        "azimuth_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "azimuth_angle",
+            "units": "radians",
+            "low": 0,
+            "high": 6.283,
+          }
+        },
+        "elevation_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "elevation_angle",
+            "units": "radians",
+            "low": -1.57,
+            "high": 1.57,
+          }
+        },
+        "vel_max_ratio": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "vel_max_ratio",
+            "low": 0,
+            "high": 0.8,
+          }
+        },
+        "vel_azimuth_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "vel_azimuth_angle",
+            "units": "radians",
+            "low": 0,
+            "high": 6.283,
+          }
+        },
+        "vel_elevation_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "vel_elevation_angle",
+            "units": "radians",
+            "low": -1.57,
+            "high": 1.57,
+          }
+        },
+      }
     },
     "glues": [
         {

@@ -18,7 +18,7 @@ import os
 import pytest
 
 from saferl.simulators.cwh_simulator import CWHSimulator
-from saferl.simulators.saferl_simulator import SafeRLSimulatorState
+from saferl.simulators.saferl_simulator import SafeRLSimulatorResetValidator, SafeRLSimulatorState
 from tests.conftest import delimiter, read_test_cases
 from tests.factories.cwh.cwh_platform import CWHPlatformFactory
 
@@ -107,7 +107,9 @@ test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_construct_sim_entities(cut, expected_sim_entities):
     """Tests the construct_sim_entities method of the CWHSimulator"""
-    sim_entities = cut._construct_sim_entities()  # pylint: disable=protected-access
+    reset_config = SafeRLSimulatorResetValidator()
+    entity_init_map = cut._construct_entity_init_map(reset_config)  # pylint: disable=protected-access
+    sim_entities = cut._construct_sim_entities(reset_config, entity_init_map)  # pylint: disable=protected-access
     assert sim_entities == expected_sim_entities
 
 
@@ -120,6 +122,7 @@ test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
 def test_construct_platforms(cut, expected_sim_platforms):
     """Tests the construct_platforms method of the CWHSimulator"""
+    cut.reset({})
     sim_platforms = cut.construct_platforms()
     assert sim_platforms == expected_sim_platforms
 
