@@ -61,6 +61,9 @@ class CWHPlatform(BaseSafeRLPlatform):
         self.inspected_points = 0
         self.sun_angle = np.array([0.])
         self.uninspected_cluster_location = np.array([0., 0., 0.])
+        self.delta_v_scale = 0
+        self.total_steps_counter = 0
+        self.bool_array = np.zeros(99)
 
     @property
     def get_validator(self) -> typing.Type[CWHPlatformValidator]:

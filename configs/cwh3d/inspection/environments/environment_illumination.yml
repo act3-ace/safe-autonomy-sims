@@ -23,10 +23,14 @@
           "resolution" : [200, 200],
           "focal_length" : 9.6e-3,
           "pixel_pitch" : 5.6e-3,
-          "bin_ray_flag": False,
+          "bin_ray_flag": True,
           "render_flag_3d": False,
           "render_flag_subplots": False,
       },
+      "steps_until_update": 1500,  # Steps between updates to delta-v reward scale
+      "delta_v_scale_bounds": [-0.1, -0.001],  # Lower and upper bounds for delta-v reward scale
+      "delta_v_scale_step": -0.00005,  # Step value for delta-v reward scale
+      "inspected_points_update_bounds": [0.8, 0.9],  # Bounds to increase/decrease delta-v reward scale by step
     },
   },
   "simulator_reset_parameters": {
@@ -59,4 +63,3 @@
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
 }
-

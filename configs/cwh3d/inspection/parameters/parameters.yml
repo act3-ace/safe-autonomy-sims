@@ -7,5 +7,6 @@
   "step_size": 10,
   "num_points": 100,
   "lower_bound": False,
-  "reference_position_sensor_name": "reference_position"
+  "reference_position_sensor_name": "reference_position",
+  "mass": 12,
 }

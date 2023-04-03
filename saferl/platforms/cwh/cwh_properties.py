@@ -146,3 +146,27 @@ class UninspectedPointProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
     description: str = "Uninspected points cluster location"
+
+
+class BoolArrayProp(BoxProp):
+    """
+    bool array properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "bool_array"
+    num_points: int = 99
+    low: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [0.0] * num_points
+    high: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [1.0] * num_points
+    unit: Annotated[typing.List[StrictStr], Field(min_items=num_points, max_items=num_points)] = ["None"] * num_points
+    description: str = "Boolean array"

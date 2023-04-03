@@ -317,3 +317,36 @@ PluginLibrary.AddClassToGroup(
 #         "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
 #     }
 # )
+
+
+class BoolArraySensor(CWHSensor):
+    """
+    Implementation of a sensor to give boolean array for all inspected/uninspected points
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.BoolArrayProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - bool_array.
+
+        Returns
+        -------
+        np.ndarray
+            Bool array describing inspected/uninspected points.
+        """
+        return self.parent_platform.bool_array
+
+
+PluginLibrary.AddClassToGroup(
+    BoolArraySensor, "Sensor_BoolArray", {
+        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
+
+PluginLibrary.AddClassToGroup(
+    BoolArraySensor, "Sensor_BoolArray", {
+        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
+    }
+)
