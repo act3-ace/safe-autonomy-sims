@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.11.0...v1.12.0) (2023-04-04)
+
+
+### Features
+
+* Support for rl algorithms ([7b8a721](https://github.com/act3-ace/safe-autonomy-sims/commit/7b8a72129a39021a0dc0bff82a0a202c747be3f7))
+
 # [1.11.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.10.0...v1.11.0) (2023-04-03)
 
 
