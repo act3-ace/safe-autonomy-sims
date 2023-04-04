@@ -87,9 +87,6 @@ def evaluate(
     eval_config_updates = [DoNothingConfigUpdate()]  # default creates list of string(s), instead of objects
     plugins_args = {"platform_serialization": platform_serialization_obj, 'eval_config_update': eval_config_updates}
 
-    # engine
-    rllib_engine_args = {"callbacks": [], "workers": 0}
-
     # recorders
     recorder_args = {"dir": output_path, "append_timestamp": False}
 
@@ -98,6 +95,11 @@ def evaluate(
     test_case_manager = TestCaseManager(**test_case_manager_config)
     plugins = Plugins(**plugins_args)
     plugins.eval_config_update = eval_config_updates
+    # get rllib_engine config from task config
+    trainer_cls = task.experiment_parse.config['tune_config'][1].get('run_or_experiment',
+                                                                     None) if task.experiment_parse.config['tune_config'][1] else None
+    trainer_cls = task.experiment_parse.config['tune_config'][0].get('run_or_experiment', 'PPO') if trainer_cls is None else trainer_cls
+    rllib_engine_args = {"callbacks": [], "workers": 0, "trainer_cls": trainer_cls}
     engine = RllibTrainer(**rllib_engine_args)
     recorder = Folder(**recorder_args)
 
