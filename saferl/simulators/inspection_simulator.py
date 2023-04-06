@@ -22,9 +22,9 @@ from pydantic import BaseModel, validator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 from sklearn.cluster import KMeans
 
-import safe_autonomy_sims.simulators.illumination_functions as illum
-from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform
-from safe_autonomy_sims.simulators.saferl_simulator import (
+import saferl.simulators.illumination_functions as illum
+from saferl.platforms.cwh.cwh_platform import CWHPlatform
+from saferl.simulators.saferl_simulator import (
     SafeRLSimulator,
     SafeRLSimulatorResetValidator,
     SafeRLSimulatorState,
@@ -80,7 +80,7 @@ class InspectionSimulatorState(SafeRLSimulatorState):
         The percentage of points inspected, averaged over completed episodes during a specified period
     delta_v_scale: float
         The scale of the delta_v reward. This value is updated over time, based on the value of inspected_points_percentage.
-        See safe_autonomy_sims/rewards/cwh/inspection_rewards for more details.
+        See saferl/rewards/cwh/inspection_rewards for more details.
         Note that this feature is experimental, and currently does not synchronize between workers.
     """
     points: typing.Dict

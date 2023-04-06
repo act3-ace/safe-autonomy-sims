@@ -20,7 +20,7 @@ from corl.libraries.state_dict import StateDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 from corl.simulators.common_platform_utils import get_platform_by_name
 
-from safe_autonomy_sims.utils import get_relative_position
+from saferl.utils import get_relative_position
 
 
 class ObservedPointsRewardValidator(RewardFuncBaseValidator):
