@@ -1,5 +1,5 @@
-from saferl.evaluation.evaluation_api import run_one_evaluation
-from saferl.evaluation.launch.serialize_cwh3d import SerializeCWH3D
+from safe_autonomy_sims.evaluation.evaluation_api import run_one_evaluation
+from safe_autonomy_sims.evaluation.launch.serialize_cwh3d import SerializeCWH3D
 from inspection_animation import AnimationFromCheckpoint
 
 
@@ -9,7 +9,7 @@ if __name__ == '__main__':
     expr_config_path = 'safe-autonomy-sims/configs/experiments/inspection/inspection_3d.yml' # Path to experiment config
     launch_dir_of_experiment = 'safe-autonomy-sims'
     task_config_path = 'safe-autonomy-sims/configs/tasks/cwh3d_inspection/cwh3d_task.yml' # Path to task config
-    save_dir = 'safe-autonomy-sims/saferl/evaluation/' # Path to directory to save png/mp4
+    save_dir = 'safe-autonomy-sims/safe_autonomy_sims/evaluation/' # Path to directory to save png/mp4
     mode = 'operator' # Plotting mode: 'operator', 'obs_act', or '3d_pos'
     last_step = True # True for png of last step, False for mp4
 
@@ -18,14 +18,14 @@ if __name__ == '__main__':
             "__default__": [
                 {
                     "name": "ObservationVector",
-                    "functor": "saferl.evaluation.general_metrics.ObservationVector",
+                    "functor": "safe_autonomy_sims.evaluation.general_metrics.ObservationVector",
                     "config": {
                         "description": "Observations"
                     }
                 },
                 {
                     "name": "ControlVector",
-                    "functor": "saferl.evaluation.general_metrics.ControlVector",
+                    "functor": "safe_autonomy_sims.evaluation.general_metrics.ControlVector",
                     "config": {
                         "description": "Actions"
                     }

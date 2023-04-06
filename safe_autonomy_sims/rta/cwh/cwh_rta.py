@@ -29,7 +29,7 @@ from run_time_assurance.zoo.cwh.docking_3d import (
     Docking3dImplicitSwitchingRTA,
 )
 
-from saferl.glues.rta_glue import RTAGlue, RTAGlueValidator
+from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator
 
 
 class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
