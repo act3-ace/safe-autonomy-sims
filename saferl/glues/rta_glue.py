@@ -21,7 +21,7 @@ from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapper
 from corl.glues.common.controller_glue import ControllerGlue
 from run_time_assurance.rta import RTAModule
 
-# from safe_autonomy_sims.core.rta.cwh.cwh_rta import DockingRTA
+# from saferl.core.rta.cwh.cwh_rta import DockingRTA
 
 
 def flip_rta(control):

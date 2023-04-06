@@ -20,12 +20,12 @@ from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 from pydantic import PyObject
 
-from safe_autonomy_sims.utils import VelocityConstraintValidator, get_relative_position, max_vel_violation
+from saferl.utils import VelocityConstraintValidator, get_relative_position, max_vel_violation
 
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
-    Configuration validator for the MaxDistanceDoneFunction
+    Configuration validator for the MaxDistanceOriginDoneFunction
 
     max_distance: float
         The maximum tolerated relative distance between deputy and origin before episode termination.
@@ -117,7 +117,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
 class CrashDoneValidator(DoneFuncBaseValidator):
     """
-    Configuration validator for CrashDoneFunction
+    Configuration validator for CrashOriginDoneFunction
 
     crash_region_radius : float
         The radius of the crashing region in meters.
