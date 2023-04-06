@@ -36,18 +36,18 @@
     }
   },
   "platforms": "CWHSimulator_Platforms",
-  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
+  "plugin_paths": ["safe_autonomy_sims.platforms", "safe_autonomy_sims.simulators"],
   "episode_parameter_provider": {
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
   "dones": {
     "shared": [
       {
-        "functor": "saferl.dones.common_dones.CollisionDoneFunction",
+        "functor": "safe_autonomy_sims.dones.common_dones.CollisionDoneFunction",
         "config": { safety_constraint: 10 },
       },
       {
-        "functor": "saferl.dones.common_dones.MultiagentSuccessDoneFunction",
+        "functor": "safe_autonomy_sims.dones.common_dones.MultiagentSuccessDoneFunction",
         "config": { "SuccessfulInspectionDoneFunction" },
       }
     ]

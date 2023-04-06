@@ -9,9 +9,9 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module contains the base Simulator class used by the saferl team's CWH and Dubins simulators.
+This module contains the base Simulator class used by the safe_autonomy_sims team's CWH and Dubins simulators.
 """
-# pylint: disable=W0123,W0611
+# pylint: disable=W0123,W0611,W0221
 
 import abc
 import typing
@@ -22,8 +22,8 @@ from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, PyObject, validator
 from safe_autonomy_dynamics.base_models import BaseEntity
 
-from saferl.simulators.initializers.initializer import CorlUnitsToPintInitializer
-from saferl.utils import KeyCollisionError
+from safe_autonomy_sims.simulators.initializers.initializer import CorlUnitsToPintInitializer
+from safe_autonomy_sims.utils import KeyCollisionError
 
 
 class SafeRLSimulatorValidator(
