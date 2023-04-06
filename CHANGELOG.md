@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v2.0.0...v2.0.1) (2023-04-06)
+
+
+### Bug Fixes
+
+* actually do name chnage ([56ffc04](https://github.com/act3-ace/safe-autonomy-sims/commit/56ffc046cfbaf52ece83ea2bf90d0cf4bb8e2706)), closes [#246](https://github.com/act3-ace/safe-autonomy-sims/issues/246)
+
 # [2.0.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.12.0...v2.0.0) (2023-04-06)
 
 
