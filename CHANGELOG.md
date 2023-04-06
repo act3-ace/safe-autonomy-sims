@@ -1,3 +1,19 @@
+# [2.0.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.12.0...v2.0.0) (2023-04-06)
+
+
+### Features
+
+* change package name to safe_autonomy_sims ([dbfcc98](https://github.com/act3-ace/safe-autonomy-sims/commit/dbfcc9880e0a16bb61e4ed52bb2d8c6a359b9694)), closes [#245](https://github.com/act3-ace/safe-autonomy-sims/issues/245)
+
+
+### BREAKING CHANGES
+
+* package name changed to safe_autonomy_sims
+
+Merge branch '245-breaking-change-package-name-to-safe_autonomy_sims' into 'main'
+
+Resolve "BREAKING: change package name to safe_autonomy_sims"
+
 # [1.12.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v1.11.0...v1.12.0) (2023-04-04)
 
 
