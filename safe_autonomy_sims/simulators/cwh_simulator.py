@@ -15,8 +15,8 @@ This module contains the CWH Simulator for interacting with the CWH Docking task
 from corl.libraries.plugin_library import PluginLibrary
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
-from saferl.simulators.saferl_simulator import SafeRLSimulator
+from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform
+from safe_autonomy_sims.simulators.saferl_simulator import SafeRLSimulator
 
 
 class CWHSimulator(SafeRLSimulator):
