@@ -13,7 +13,7 @@ Tests for the CWHAvailablePlatformTypes module
 """
 import pytest
 
-from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
+from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 
 
 @pytest.mark.unit_test

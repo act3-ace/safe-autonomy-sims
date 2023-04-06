@@ -12,9 +12,9 @@
 "config": {
     "frame_rate": 0.1,  # Hz
     "parts": [
-        {"part": "RateController", "config": {"name": "X Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 0, properties: {name: "x_thrust"}}},
-        {"part": "RateController", "config": {"name": "Y Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 1, properties: {name: "y_thrust"}}},
-        {"part": "RateController", "config": {"name": "Z Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 2, properties: {name: "z_thrust"}}},
+        {"part": "RateController", "config": {"name": "X Thrust", "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", "axis": 0, properties: {name: "x_thrust"}}},
+        {"part": "RateController", "config": {"name": "Y Thrust", "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", "axis": 1, properties: {name: "y_thrust"}}},
+        {"part": "RateController", "config": {"name": "Z Thrust", "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", "axis": 2, properties: {name: "z_thrust"}}},
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
         {"part": "Sensor_InspectedPoints"},
@@ -26,7 +26,7 @@
     },
     "simulator_reset_parameters": {
       "initializer": {
-        "functor": "safe_autonomy_sims.simulators.initializers.cwh.CWH3DRadialInitializer",
+        "functor": "saferl.simulators.initializers.cwh.CWH3DRadialInitializer",
       },
       "config": {
         "radius": {
@@ -181,7 +181,7 @@
             },
         },
         {
-            "functor": "safe_autonomy_sims.glues.vel_limit_glue.VelocityLimitGlue",
+            "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
             "config":
               {
                 "training_export_behavior": "EXCLUDE",
@@ -195,7 +195,7 @@
             }
         },
         {
-            "functor": "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
+            "functor": "saferl.glues.delta_v_glue.DeltaVGlue",
             "config":
               {
                 "sensor": "Sensor_Position",
@@ -206,7 +206,7 @@
     "dones": [
         {
             # Max distance from origin
-            "functor": "safe_autonomy_sims.dones.cwh.common.MaxDistanceDoneFunction",
+            "functor": "saferl.dones.cwh.common.MaxDistanceDoneFunction",
             "config": {},
             "references":{
                 "max_distance": "max_distance",
@@ -215,7 +215,7 @@
         },
         {
             # Crash into chief entity
-            "functor": "safe_autonomy_sims.dones.cwh.common.CrashDoneFunction",
+            "functor": "saferl.dones.cwh.common.CrashDoneFunction",
             "config": {},
             "references":{
               "crash_region_radius": "collision_radius",
@@ -224,7 +224,7 @@
         },
       {
         # Success (inspected all points)
-        "functor": "safe_autonomy_sims.dones.cwh.inspection_dones.SuccessfulInspectionDoneFunction",
+        "functor": "saferl.dones.cwh.inspection_dones.SuccessfulInspectionDoneFunction",
         "config": {},
       },
     ],
@@ -232,7 +232,7 @@
         {
             # reward = number of newly observed points
             "name": "ObservedPointsReward",
-            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.ObservedPointsReward",
+            "functor": "saferl.rewards.cwh.inspection_rewards.ObservedPointsReward",
             "config": {
               "scale": 0.01
             }
@@ -240,7 +240,7 @@
         {
             # reward = scale (if all points are inspected)
             "name": "InspectionSuccessReward",
-            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionSuccessReward",
+            "functor": "saferl.rewards.cwh.inspection_rewards.InspectionSuccessReward",
             "config": {
               "scale": 1.0,
             }
@@ -248,7 +248,7 @@
         {
           # reward = scale (if crash occurs)
           "name": "InspectionCrashReward",
-          "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionCrashReward",
+          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashReward",
           "config": {
             "scale": -1.0,
           },
@@ -260,7 +260,7 @@
         # {
         #   "name": "InspectionDeltaVReward",
         #   # See delta-v reward scale parameters in env config
-        #   "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
+        #   "functor": "saferl.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
         #   "config": {
         #     "mode": "scale",
         #   },
