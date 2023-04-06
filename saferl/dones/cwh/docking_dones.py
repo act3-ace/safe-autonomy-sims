@@ -19,7 +19,7 @@ from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneS
 from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 
-from safe_autonomy_sims.utils import get_relative_position, max_vel_violation
+from saferl.utils import get_relative_position, max_vel_violation
 
 
 class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):

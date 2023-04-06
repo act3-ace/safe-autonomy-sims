@@ -110,9 +110,9 @@ def call_results(cut, observation, action, next_observation, next_state, observa
     results : DoneDict
         The resulting DoneDict from calling the DockingVelocityLimitDoneFunction
     """
-    with mock.patch("safe_autonomy_sims.dones.cwh.common.get_platform_by_name") as func:
-        with mock.patch("safe_autonomy_sims.utils.get_platform_by_name") as func1:
-            with mock.patch("safe_autonomy_sims.dones.cwh.common.get_relative_position") as func2:
+    with mock.patch("saferl.dones.cwh.common.get_platform_by_name") as func:
+        with mock.patch("saferl.utils.get_platform_by_name") as func1:
+            with mock.patch("saferl.dones.cwh.common.get_relative_position") as func2:
                 func.return_value = platform
                 func1.return_value = platform
                 func2.return_value = platform.position

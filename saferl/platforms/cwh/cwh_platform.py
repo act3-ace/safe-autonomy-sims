@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module defines the platform used with safe_autonomy_sims CWHSimulator class. It represents a spacecraft
+This module defines the platform used with saferl CWHSimulator class. It represents a spacecraft
 operating under the Clohessy-Wiltshire dynamics model.
 """
 
@@ -19,16 +19,16 @@ import numpy as np
 from corl.simulators.base_platform import BasePlatformValidator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 
-from safe_autonomy_sims.platforms.common.platform import BaseSafeRLPlatform
+from saferl.platforms.common.platform import BaseSafeRLPlatform
 
 
 class CWHPlatformValidator(BasePlatformValidator):
     """
-    CWHPlatformValidator
+    DubinsPlatform2dValidator
 
     Parameters
     ----------
-    platform : CWHSpacecraft
+    platform : Dubins2dAircraft
         underlying dynamics platform
     """
 
@@ -68,10 +68,10 @@ class CWHPlatform(BaseSafeRLPlatform):
     @property
     def get_validator(self) -> typing.Type[CWHPlatformValidator]:
         """
-        get validator for this CWHPlatform
+        get validator for this Dubins2dPlatform
 
         Returns:
-            CWHPlatformValidator -- validator the platform will use to generate a configuration
+            DubinsPlatform2dValidator -- validator the platform will use to generate a configuration
         """
         return CWHPlatformValidator
 
