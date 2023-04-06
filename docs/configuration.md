@@ -72,15 +72,15 @@ include:
       ```yaml
       "glues": [
           {
-              "functor": "saferl.core.dones.common_dones.TimeoutDoneFunction",
+              "functor": "safe_autonomy_sims.core.dones.common_dones.TimeoutDoneFunction",
               "config": { ... },
           },
           {
-              "functor": "saferl.core.dones.docking_dones.MaxDistanceDoneFunction",
+              "functor": "safe_autonomy_sims.core.dones.docking_dones.MaxDistanceDoneFunction",
               "config": { ... },
           },
           {
-              "functor": "saferl.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+              "functor": "safe_autonomy_sims.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
               "config": { ... },
           },
       ]
@@ -115,7 +115,7 @@ include:
               "config": { ... },
           },
           {
-              "functor": "saferl.core.rewards.docking_rewards.DockingDeltaVReward",
+              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
               "config": { ... },
           },
       ]
@@ -126,7 +126,7 @@ include:
       - `config`: a set of function-specific configuration arguments
       - Example:
       ```yaml
-      "functor": "saferl.core.dones.docking_dones.CrashDockingDoneFunction",
+      "functor": "safe_autonomy_sims.core.dones.docking_dones.CrashDockingDoneFunction",
       "config":{
         "docking_region_radius": 0.5,
         "velocity_threshold": 0.2,
@@ -143,17 +143,17 @@ include:
       "rewards": [
           {
               "name": "DockingDistanceExponentialChangeReward",
-              "functor": "saferl.core.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
+              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
               "config": { ... },
           },
           {
               "name": "DockingDeltaVReward",
-              "functor": "saferl.core.rewards.docking_rewards.DockingDeltaVReward",
+              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
               "config": { ... },
           },
           {
               "name": "DockingSuccessReward",
-              "functor": "saferl.core.rewards.docking_rewards.DockingSuccessReward",
+              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingSuccessReward",
               "config": { ... },
           },
       ]
@@ -166,7 +166,7 @@ include:
       - Example:
       ```yaml
       "name": "DockingDeltaVReward",
-      "functor": "saferl.core.rewards.docking_rewards.DockingDeltaVReward",
+      "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
       "config": {
         "scale": -0.01,
         "bias": 0.0,
@@ -204,7 +204,7 @@ and environment-level episode parameter provider.
 - `plugin_paths`: list of module or package paths in which the plugin library should search for CoRL compatible plugins (platforms, platform parts, CoRL simulators)
   - Example:
     ```yaml
-    "plugin_paths": ["saferl.core.platforms", "saferl.core.simulators"],
+    "plugin_paths": ["safe_autonomy_sims.core.platforms", "safe_autonomy_sims.core.simulators"],
     ```
 
 - `episode_parameter_provider`: object which provides environment initialization parameters during an experiment

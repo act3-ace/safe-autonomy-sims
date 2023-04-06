@@ -12,11 +12,11 @@
 
 import factory
 
-import saferl.platforms.cwh.cwh_platform as p
+import safe_autonomy_sims.platforms.cwh.cwh_platform as p
 from tests.factories.cwh.cwh_entity import CWHSpacecraftFactory
 from tests.factories.base_factories.platform import BasePlatformFactory
-import saferl.platforms.cwh.cwh_sensors as s
-import saferl.platforms.common.controllers as c
+import safe_autonomy_sims.platforms.cwh.cwh_sensors as s
+import safe_autonomy_sims.platforms.common.controllers as c
 
 
 class CWHPlatformFactory(BasePlatformFactory):
@@ -30,9 +30,9 @@ class CWHPlatformFactory(BasePlatformFactory):
     )
 
     parts_list = [
-        (c.RateController, {'name': 'x_thrust', "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", 'axis': 0}),
-        (c.RateController, {'name': 'y_thrust', "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", 'axis': 1}),
-        (c.RateController, {'name': 'z_thrust', "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", 'axis': 2}),
+        (c.RateController, {'name': 'x_thrust', "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", 'axis': 0}),
+        (c.RateController, {'name': 'y_thrust', "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", 'axis': 1}),
+        (c.RateController, {'name': 'z_thrust', "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", 'axis': 2}),
         (s.PositionSensor, {}),
         (s.VelocitySensor, {}),
     ]

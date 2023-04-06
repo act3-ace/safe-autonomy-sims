@@ -1,10 +1,10 @@
 # Concepts
 
 The safe-autonomy-sims repo was programmed to depend on the ACT3 CoRL
-framework. An overview of the concepts extended in 'saferl/core' can be
+framework. An overview of the concepts extended in 'safe_autonomy_sims/core' can be
 found [here]({{corl_docs_url}}/concepts/).
 
-Concepts unique to safe-autonomy-sims, defined in saferl/backend:
+Concepts unique to safe-autonomy-sims, defined in safe_autonomy_sims/backend:
 
 ##  Entities
 
