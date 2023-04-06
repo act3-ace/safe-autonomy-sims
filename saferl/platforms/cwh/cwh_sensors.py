@@ -17,10 +17,10 @@ import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
 from corl.simulators.base_parts import BasePlatformPartValidator, BaseSensor
 
-import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
-from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
-from safe_autonomy_sims.simulators.cwh_simulator import CWHSimulator
-from safe_autonomy_sims.simulators.inspection_simulator import InspectionSimulator
+import saferl.platforms.cwh.cwh_properties as cwh_props
+from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
+from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.inspection_simulator import InspectionSimulator
 
 
 class CWHSensor(BaseSensor):

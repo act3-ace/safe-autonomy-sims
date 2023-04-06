@@ -16,8 +16,8 @@ import typing
 
 import numpy as np
 
-from safe_autonomy_sims.simulators.initializers.initializer import InitializerValidator, PintUnitConversionInitializer
-from safe_autonomy_sims.utils import velocity_limit
+from saferl.simulators.initializers.initializer import InitializerValidator, PintUnitConversionInitializer
+from saferl.utils import velocity_limit
 
 
 class CWH3DRadialInitializer(PintUnitConversionInitializer):

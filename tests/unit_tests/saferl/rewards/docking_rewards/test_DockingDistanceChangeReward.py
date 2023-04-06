@@ -17,7 +17,7 @@ from unittest import mock
 
 import pytest
 
-from safe_autonomy_sims.rewards.cwh.docking_rewards import DockingDistanceChangeReward
+from saferl.rewards.cwh.docking_rewards import DockingDistanceChangeReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
@@ -121,8 +121,8 @@ def fixture_call_results(
     results : RewardDict
         The resulting RewardDict from calling the MaxDistanceDoneFunction
     """
-    with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_platform_by_name") as func:
-        with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_relative_position") as func1:
+    with mock.patch("saferl.rewards.cwh.docking_rewards.get_platform_by_name") as func:
+        with mock.patch("saferl.rewards.cwh.docking_rewards.get_relative_position") as func1:
             platform.position = platform_position1
             func.return_value = platform
             func1.return_value = platform_position1

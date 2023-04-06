@@ -58,7 +58,7 @@ There are two places for initial conditions to be added or changed: the _environ
 - **environment config** - contains values that get passed tot he simulator, e.g. simulation state variables (e.g. the location of the chief spacecraft). This is mostly used to be sure that the deputy is not initialized in an unsafe situation where a crash is imminent.
     - [location]({{sas_url}}/configs/environments) /root/repos/safe-autonomy-sims/configs/environments
     - example: cwh3d.yml
-        - Note this is assuming the docking initializer for the inspection problem, and points the the following initializer: safe-autonomy-sims/safe_autonomy_sims/simulators/initializers/docking_initializer.py
+        - Note this is assuming the docking initializer for the inspection problem, and points the the following initializer: safe-autonomy-sims/saferl/simulators/initializers/docking_initializer.py
         - Defining a "crash" with the chief (to ensure the deputy doesn't initialize in a crash)
             - velocity_threshold : float, The maximum tolerated velocity within docking region without crashing.
                 ```shell
@@ -76,7 +76,7 @@ There are two places for initial conditions to be added or changed: the _environ
                 ```shell
                 "mean_motion": 0.001027,
                 ``` 
-    - To change the initialization behavior, go to the initializers folder [safe-autonomy-sims/safe_autonomy_sims/simulators/initializers]({{sas_url}}/safe_autonomy_sims/simulators/initializers/), and extend the base initializer class to implement the ```__call__``` function to assign the initial values to simulator level variables. 
+    - To change the initialization behavior, go to the initializers folder [safe-autonomy-sims/saferl/simulators/initializers]({{sas_url}}/saferl/simulators/initializers/), and extend the base initializer class to implement the ```__call__``` function to assign the initial values to simulator level variables. 
 - **agent config** - platform variables for the entity that is controlled by the RL agent (e.g. position, velocity of the deputy spacecraft).
     - example: [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml)
     - initialization here is controlled via ```"simulator_reset_parameters": ```, and there are a number of different variables that can be modified such as: 
@@ -105,7 +105,7 @@ This is done in the agent configuration file.
 - example: [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml)
 - Look for the ``` "dones": [ ``` line in the code
     - each parameter will have a __functor__ and either a __reference__ or a __config__ where variables are defined for that specific done function defined on the functor path.
-        - the functors point to a __subset__ of a full set of done functions defined elsewhere, e.g. safe-autonomy-sims/safe_autonomy_sims/dones/cwh/common.py. Note, only the subset of dones listed is applied to that agent for the experiment.
+        - the functors point to a __subset__ of a full set of done functions defined elsewhere, e.g. safe-autonomy-sims/saferl/dones/cwh/common.py. Note, only the subset of dones listed is applied to that agent for the experiment.
         - references point to the parameters file, and is defined in the last line of the agent config file 
         ```shell
         "reference_store": !include ../parameters/inspection_3d.yml
@@ -115,7 +115,7 @@ This is done in the agent configuration file.
         ```shell
             {
                 # Max distance from origin
-                "functor": "safe_autonomy_sims.dones.cwh.common.MaxDistanceDoneFunction",
+                "functor": "saferl.dones.cwh.common.MaxDistanceOriginDoneFunction",
                 "references": {
                     "max_distance": "max_distance",
                 },
@@ -131,8 +131,8 @@ Rewards are changed from the agent configuration file. For example, [safe-autono
     ```shell
         {
           # reward = scale (if crash occurs)
-          "name": "InspectionCrashReward",
-          "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionCrashReward",
+          "name": "InspectionCrashOriginReward",
+          "functor": "saferl.rewards.cwh.inspection_rewards.InspectionCrashOriginReward",
           "config": {
             "scale": -1.0,
           },
@@ -142,12 +142,12 @@ Rewards are changed from the agent configuration file. For example, [safe-autono
         },
     ```
     - the penality is defined under config with ```"scale": -1.0```
-    - Only the rewards in the agent config are applied, but additional rewards can be added. The full set of possible rewards implemented so far is found here: [safe-autonomy-sims/safe_autonomy_sims/rewards/cwh/inspection_rewards.py]({{sas_url}}/safe_autonomy_sims/rewards/cwh/inspection_rewards.py)
+    - Only the rewards in the agent config are applied, but additional rewards can be added. The full set of possible rewards implemented so far is found here: [safe-autonomy-sims/saferl/rewards/cwh/inspection_rewards.py]({{sas_url}}/saferl/rewards/cwh/inspection_rewards.py)
 
 ### Changing the state/observation space
 The observation space is in the agent configuration file, e.g. [safe-autonomy-sims/configs/agents/cwh3d_inspection.yml]({{sas_url}}/configs/agents/cwh3d_inspection.yml).
 #### Adding a Sensor (Observation)
-- The sensors are defined in this file: [safe-autonomy-sims/safe_autonomy_sims/platforms/cwh/cwh_sensors.py]({{sas_url}}/safe_autonomy_sims/platforms/cwh/cwh_sensors.py)
+- The sensors are defined in this file: [safe-autonomy-sims/saferl/platforms/cwh/cwh_sensors.py]({{sas_url}}/saferl/platforms/cwh/cwh_sensors.py)
 - Let's look at an example of adding an inspected point sensor. 
     - First, create a new class ```InspectedPointsSensor``` and inherit the ```CWHSensor``` properties. For the advanced user, the real requirement is that it has to inheret from BaseSensor from CoRL (CWHSensor wraps this).
     ```shell
@@ -197,7 +197,7 @@ The observation space is in the agent configuration file, e.g. [safe-autonomy-si
           },
     ```
 ### Changing the action space
-The controllers are defined in safe_autonomy_sims, platorms. For example [safe-autonomy-sims/safe_autonomy_sims/platforms/cwh/cwh_controllers.py]({{sas_url}}/safe_autonomy_sims/platforms/cwh/cwh_controllers.py). The controllers are defined similarly to observations.
+The controllers are defined in saferl, platorms. For example [safe-autonomy-sims/saferl/platforms/cwh/cwh_controllers.py]({{sas_url}}/saferl/platforms/cwh/cwh_controllers.py). The controllers are defined similarly to observations.
 - Navigating to the controller python file, at a minimum, the controller must inheret from CoRL's BaseController class. This is done for you with the CWHController.
     - The most important aspects are ensuring that apply_control and get_applied_control methods are implemented.
 
@@ -299,10 +299,10 @@ The controllers are defined in safe_autonomy_sims, platorms. For example [safe-a
 If the user wants to implement a new dynamics model:
 1. To create the state transistion dynamics, extend BaseDynamics (or BaseODEDynamics if using A,B matrices) from safe-autonomy-dynamics.base_models. The child class must generate A and B matrices in its __init__() method and pass them to its super's constructor. See safe-autonomy-dynamics.cwh.point_model.CWHDynamics for an example.
 2. To create the entity containing the new Dynamics, extend safe-autonomy-dynamics.base_models.BaseEntity and pass an instance of the new Dynamics class to super() constructor inside the Entity's __init__() method. See safe-autonomy-dynamics.cwh.point_model.CWHSpacecraft for an example.
-3. To encapsulate the new dynamics model in a simulator (and link specific Platform types with transition dynamics), extend safe-autonomy-sims.safe_autonomy_sims.simulators.saferl_simulator.SafeRLSimulator and implement _construct_platform_map. This method returns a mapping from Platform to Entity, linking CoRL's Platform classes to unique transition dynamics. See safe-autonomy-sims.safe_autonomy_sims.simulators.inspection_simulator.InspectionSimulator for an example.
+3. To encapsulate the new dynamics model in a simulator (and link specific Platform types with transition dynamics), extend safe-autonomy-sims.saferl.simulators.saferl_simulator.SafeRLSimulator and implement _construct_platform_map. This method returns a mapping from Platform to Entity, linking CoRL's Platform classes to unique transition dynamics. See safe-autonomy-sims.saferl.simulators.inspection_simulator.InspectionSimulator for an example.
 
 If the user wants to use a different simulator with different backend dynamics:
-1. Register the desired simulator with CoRL's PLuginLibrary. See line 285 in safe-autonomy-sims.safe_autonomy_sims.simulators.inspection_simulator for an example.
+1. Register the desired simulator with CoRL's PLuginLibrary. See line 285 in safe-autonomy-sims.saferl.simulators.inspection_simulator for an example.
 2. Next, add a reference to the registered Simulator's name in the environment config. See lines 12-19 in safe-autonomy-sims.configs.environments.inspection3d.yml for an example. Allowed platforms should be listed in the 'platforms' variable (line 31).
     
 ### Changing the RTA (turning safety constraints on or off)
@@ -313,10 +313,10 @@ In the agent_config (located in safe-autonomy-sims.configs.agents), RTAGlues are
 ```
 There are currently 4 options of RTA (exclipit switching, implicit switching, explicit optimization, and implicit optimation). An example in the cwh3d_docking_rta.yml config is:
 ```shell
-#"functor": "safe_autonomy_sims.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitSwitching",
-#"functor": "safe_autonomy_sims.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitSwitching",
-"functor": "safe_autonomy_sims.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
-#"functor": "safe_autonomy_sims.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitOptimization",
+#"functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitSwitching",
+#"functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitSwitching",
+"functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
+#"functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dImplicitOptimization",
 ```
 Note, only one of these 4 above options should be used.
 
@@ -324,7 +324,7 @@ Note, only one of these 4 above options should be used.
 Next, to enable or disable RTA, navigate to the RTAGlue definition (in the agent_config) just below the line you uncommented and change the 'enabled' variable to True or False in the RTAGlue config to enable to disable RTA. The full RTA specification should look like this:
 
 ```shell
-"functor": "safe_autonomy_sims.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
+"functor": "saferl.rta.cwh.cwh_rta.RTAGlueCHWDocking3dExplicitOptimization",
 "config": {
     "step_size": 1,
     "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"],
@@ -430,13 +430,13 @@ How long to run the training is defined in the tune_config.yml file, but should 
 This section is inspired by the addition of illumination to the model. The approach used was to make the illumination model modular and optional. 
 
 ### Creating a new simulation file
-First, a new simulation file was created for illumination in safe-autonomy-sims/safe_autonomy_sims/simulators/illumination_functions.py.
+First, a new simulation file was created for illumination in safe-autonomy-sims/saferl/simulators/illumination_functions.py.
 
 ### Add to the baseline simulator
-Second, to add illumnation to the inspection problem, the file describing that problem (safe-autonomy-sims/safe_autonomy_sims/simulators/inspection_simulator.py) is updated to import the illumination model using the following:
+Second, to add illumnation to the inspection problem, the file describing that problem (safe-autonomy-sims/saferl/simulators/inspection_simulator.py) is updated to import the illumination model using the following:
 
 ```shell
-import safe_autonomy_sims.simulators.illumination_functions as illum
+import saferl.simulators.illumination_functions as illum
 ```
 
 Third, to work with CoRL, the baseline simulator had to be updated for illumination, for example as follows (note this may not be up to date with latest version of the safe-autonomy-sims code, but gives an idea of how to extend the BaseModel code):

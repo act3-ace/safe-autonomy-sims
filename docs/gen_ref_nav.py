@@ -6,7 +6,7 @@ import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
-src="safe_autonomy_sims"
+src="saferl"
 for path in sorted(Path(src).glob("**/*.py")):
     module_path = path.relative_to(src).with_suffix("")
     doc_path = path.relative_to(src).with_suffix(".md")
