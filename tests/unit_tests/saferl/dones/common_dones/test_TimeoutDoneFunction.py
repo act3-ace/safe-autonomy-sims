@@ -18,7 +18,7 @@ import os
 
 import pytest
 
-from safe_autonomy_sims.dones.common_dones import TimeoutDoneFunction
+from saferl.dones.common_dones import TimeoutDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay
