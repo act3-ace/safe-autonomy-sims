@@ -15,7 +15,7 @@ Conftest file for the CWH platform tests
 import pytest
 from safe_autonomy_dynamics.cwh import CWHSpacecraft
 
-from saferl.platforms.cwh.cwh_platform import CWHPlatform
+from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform
 
 
 @pytest.fixture(name='cwh_spacecraft')

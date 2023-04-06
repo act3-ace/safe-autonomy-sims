@@ -21,7 +21,7 @@ from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidato
 from corl.simulators.common_platform_utils import get_platform_by_name
 from numpy_ringbuffer import RingBuffer
 
-from saferl.utils import get_relative_position, max_vel_violation
+from safe_autonomy_sims.utils import get_relative_position, max_vel_violation
 
 
 class DockingTimeRewardValidator(RewardFuncBaseValidator):

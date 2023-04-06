@@ -16,7 +16,7 @@ import os
 
 import pytest
 
-from saferl.rewards.cwh.docking_rewards import DockingSuccessReward
+from safe_autonomy_sims.rewards.cwh.docking_rewards import DockingSuccessReward
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

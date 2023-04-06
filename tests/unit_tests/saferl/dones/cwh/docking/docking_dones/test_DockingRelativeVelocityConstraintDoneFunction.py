@@ -17,7 +17,7 @@ import os
 
 import pytest
 
-from saferl.dones.cwh.docking_dones import DockingRelativeVelocityConstraintDoneFunction
+from safe_autonomy_sims.dones.cwh.docking_dones import DockingRelativeVelocityConstraintDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

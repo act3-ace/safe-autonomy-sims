@@ -18,8 +18,8 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 
-import saferl.platforms.cwh.cwh_properties as cwh_props
-from saferl.platforms.cwh.cwh_sensors import CWHSensor, PositionSensor, VelocitySensor
+import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
+from safe_autonomy_sims.platforms.cwh.cwh_sensors import CWHSensor, PositionSensor, VelocitySensor
 from tests.conftest import delimiter, read_test_cases
 
 
