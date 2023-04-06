@@ -15,8 +15,8 @@ from __future__ import annotations
 from corl.libraries.plugin_library import PluginLibrary
 from corl.simulators.base_available_platforms import BaseAvailablePlatformTypes
 
-from saferl.simulators.cwh_simulator import CWHSimulator
-from saferl.simulators.inspection_simulator import InspectionSimulator
+from safe_autonomy_sims.simulators.cwh_simulator import CWHSimulator
+from safe_autonomy_sims.simulators.inspection_simulator import InspectionSimulator
 
 
 class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
