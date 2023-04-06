@@ -17,9 +17,9 @@ from corl.libraries.plugin_library import PluginLibrary  # pylint: disable=E0401
 from corl.simulators.base_parts import BaseController, BasePlatformPartValidator  # pylint: disable=E0401
 from pydantic import BaseModel, PyObject
 
-from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
-from safe_autonomy_sims.simulators.cwh_simulator import CWHSimulator
-from safe_autonomy_sims.simulators.inspection_simulator import InspectionSimulator
+from saferl.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
+from saferl.simulators.cwh_simulator import CWHSimulator
+from saferl.simulators.inspection_simulator import InspectionSimulator
 
 
 class CommonController(BaseController):

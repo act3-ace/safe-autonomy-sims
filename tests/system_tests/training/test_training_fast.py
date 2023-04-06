@@ -9,7 +9,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # -------------------------------------------------------------------------------
 
-This module holds fixtures common to the safe_autonomy_sims package tests.
+This module holds fixtures common to the saferl package tests.
 
 Author: John McCarroll
 """
@@ -22,7 +22,7 @@ from corl.experiments.base_experiment import ExperimentParse
 from corl.parsers.yaml_loader import load_file
 from corl.train_rl import parse_corl_args
 
-from safe_autonomy_sims.experiments.rllib_api_experiment import RllibAPIExperiment
+from saferl.experiments.rllib_api_experiment import RllibAPIExperiment
 
 
 # Define test assay

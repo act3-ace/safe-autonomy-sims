@@ -133,9 +133,9 @@ def fixture_call_results(
     results : RewardDict
         The resulting RewardDict from calling the DockingSuccessRewardFunction
     """
-    with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_platform_by_name") as func:
-        with mock.patch("safe_autonomy_sims.utils.get_platform_by_name") as func1:
-            with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_relative_position") as func2:
+    with mock.patch("saferl.rewards.cwh.docking_rewards.get_platform_by_name") as func:
+        with mock.patch("saferl.utils.get_platform_by_name") as func1:
+            with mock.patch("saferl.rewards.cwh.docking_rewards.get_relative_position") as func2:
                 func.return_value = platform
                 func1.return_value = platform
                 func2.return_value = platform.position
