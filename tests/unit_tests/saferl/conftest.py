@@ -9,7 +9,7 @@
 # limitation or restriction. See accompanying README and LICENSE for details.
 # -------------------------------------------------------------------------------
 
-This module holds fixtures common to the saferl package tests.
+This module holds fixtures common to the safe_autonomy_sims package tests.
 
 Author: John McCarroll
 """
