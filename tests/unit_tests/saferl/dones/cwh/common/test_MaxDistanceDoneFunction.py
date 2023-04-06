@@ -18,7 +18,7 @@ import os
 
 import pytest
 
-from saferl.dones.cwh.common import MaxDistanceDoneFunction
+from safe_autonomy_sims.dones.cwh.common import MaxDistanceDoneFunction
 from tests.conftest import delimiter, read_test_cases
 
 # Define test assay

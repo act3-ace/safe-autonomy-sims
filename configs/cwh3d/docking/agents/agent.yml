@@ -17,7 +17,7 @@
           "config": {
             "name": "X Thrust", 
             "axis": 0, 
-            "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", 
+            "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", 
             properties: {name: "x_thrust"}
           }
         },
@@ -26,7 +26,7 @@
           "config": {
             "name": "Y Thrust", 
             "axis": 1, 
-            "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", 
+            "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", 
             properties: {name: "y_thrust"}
           }
         },
@@ -35,7 +35,7 @@
           "config": {
             "name": "Z Thrust", 
             "axis": 2, 
-            "property_class": "saferl.platforms.cwh.cwh_properties.ThrustProp", 
+            "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", 
             properties: {name: "z_thrust"}
           }
         },
@@ -48,7 +48,7 @@
     },
     "simulator_reset_parameters": {
       "initializer": {
-        "functor": "saferl.simulators.initializers.cwh.Docking3DRadialInitializer",
+        "functor": "safe_autonomy_sims.simulators.initializers.cwh.Docking3DRadialInitializer",
         "config": {
             "threshold_distance": 0.5,
             "velocity_threshold": 0.2,
@@ -186,7 +186,7 @@
             },
         },
         {
-            "functor": "saferl.glues.vel_limit_glue.VelocityLimitGlue",
+            "functor": "safe_autonomy_sims.glues.vel_limit_glue.VelocityLimitGlue",
             "config":
               {
                 "sensor": "Sensor_Position",
@@ -201,14 +201,14 @@
     ],
     "dones": [
         {
-            "functor": "saferl.dones.common_dones.TimeoutDoneFunction",
+            "functor": "safe_autonomy_sims.dones.common_dones.TimeoutDoneFunction",
             "config":{},
             "references": {
               "max_sim_time": "timeout",
             },
         },
         {
-            "functor": "saferl.dones.cwh.common.MaxDistanceDoneFunction",
+            "functor": "safe_autonomy_sims.dones.cwh.common.MaxDistanceDoneFunction",
             "config":{},
             "references": {
               "max_distance": "max_distance",
@@ -216,7 +216,7 @@
             },
         },
 #        {
-#            "functor": "saferl.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
+#            "functor": "safe_autonomy_sims.dones.docking_dones.DockingRelativeVelocityConstraintDoneFunction",
 #            "config":{
 #              "velocity_threshold": 0.2,
 #              "threshold_distance": 0.5,
@@ -225,7 +225,7 @@
 #            },
 #        },
         {
-            "functor": "saferl.dones.cwh.common.CrashDoneFunction",
+            "functor": "safe_autonomy_sims.dones.cwh.common.CrashDoneFunction",
             "config":{
               "velocity_constraint": {
                 "velocity_threshold": 0.2,
@@ -238,7 +238,7 @@
             }
         },
         {
-            "functor": "saferl.dones.cwh.docking_dones.SuccessfulDockingDoneFunction",
+            "functor": "safe_autonomy_sims.dones.cwh.docking_dones.SuccessfulDockingDoneFunction",
             "config":{},
             "references": {
               "docking_region_radius": "docking_region_radius",
@@ -251,11 +251,11 @@
         },
         {
             "name": DockingVelocityLimitSaturationDone,
-            "functor": "saferl.dones.cwh.common.TerminalRewardSaturationDoneFunction",
+            "functor": "safe_autonomy_sims.dones.cwh.common.TerminalRewardSaturationDoneFunction",
             "config":{
               "limit": -5,
               "bound": "lower",
-              "reward_functor": saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward,
+              "reward_functor": safe_autonomy_sims.rewards.cwh.docking_rewards.DockingVelocityConstraintReward,
               "reward_config": {
                 "scale": -0.01,
                 "bias": -0.01,
@@ -270,14 +270,14 @@
     "rewards": [
         {
             "name": "DockingDistanceExponentialChangeReward",
-            "functor": "saferl.rewards.cwh.docking_rewards.DockingDistanceExponentialChangeReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.docking_rewards.DockingDistanceExponentialChangeReward",
             "config": {
                 "pivot": 100
             }
         },
       {
         "name": "DockingDeltaVReward",
-        "functor": "saferl.rewards.cwh.docking_rewards.DockingDeltaVReward",
+        "functor": "safe_autonomy_sims.rewards.cwh.docking_rewards.DockingDeltaVReward",
         "config": {
           "scale": -0.01,
           "bias": 0.0,
@@ -286,7 +286,7 @@
       },
       {
         "name": "DockingVelocityConstraintReward",
-        "functor": "saferl.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
+        "functor": "safe_autonomy_sims.rewards.cwh.docking_rewards.DockingVelocityConstraintReward",
         "config": {
           "scale": -0.01,
           "bias": -0.01,
@@ -301,7 +301,7 @@
       },
         {
           "name": "DockingSuccessReward",
-          "functor": "saferl.rewards.cwh.docking_rewards.DockingSuccessReward",
+          "functor": "safe_autonomy_sims.rewards.cwh.docking_rewards.DockingSuccessReward",
           "config": {
             "scale": 1.0,
           },
@@ -317,7 +317,7 @@
         },
       {
         "name": "DockingFailureReward",
-        "functor": "saferl.rewards.cwh.docking_rewards.DockingFailureReward",
+        "functor": "safe_autonomy_sims.rewards.cwh.docking_rewards.DockingFailureReward",
         "config": {
           "timeout_reward": -1.0,
           "distance_reward": -1.0,

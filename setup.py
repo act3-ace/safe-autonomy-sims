@@ -62,7 +62,7 @@ if __name__ == '__main__':
         # add in package_data
         include_package_data=True,
         package_data={
-            'saferl': ['*.yml', '*.yaml']
+            'safe_autonomy_sims': ['*.yml', '*.yaml']
         },
 
         packages=find_packages(),
