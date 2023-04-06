@@ -15,7 +15,7 @@
   },
   "simulator_reset_parameters": {
     "initializer": {
-      "functor": "saferl.simulators.initializers.docking_initializer.Docking3DRadialInitializer",
+      "functor": "safe_autonomy_sims.simulators.initializers.docking_initializer.Docking3DRadialInitializer",
       "config": {
           "threshold_distance": 0.5,
           "velocity_threshold": 0.2,
@@ -38,7 +38,7 @@
     }
   },
   "platforms": "CWHSimulator_Platforms",
-  "plugin_paths": ["saferl.platforms", "saferl.simulators"],
+  "plugin_paths": ["safe_autonomy_sims.platforms", "safe_autonomy_sims.simulators"],
   "episode_parameter_provider": {
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
