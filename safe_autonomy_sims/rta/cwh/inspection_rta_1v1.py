@@ -34,7 +34,7 @@ from run_time_assurance.zoo.cwh.inspection_1v1 import (
     Inspection1v1RTA,
 )
 
-from saferl.glues.rta_glue import RTAGlue, RTAGlueValidator
+from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator
 
 
 class CWHInspection1v1RTAGlueValidator(RTAGlueValidator):

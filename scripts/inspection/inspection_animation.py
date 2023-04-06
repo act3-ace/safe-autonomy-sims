@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from saferl.simulators.inspection_simulator import points_on_sphere_cmu
+from safe_autonomy_sims.simulators.inspection_simulator import points_on_sphere_cmu
 
 
 class BaseAnimation(abc.ABC):
