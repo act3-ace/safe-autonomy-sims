@@ -1,3 +1,10 @@
+## 2.0.2 (2023-04-07)
+
+
+### Bug Fixes
+
+* removed repo links from semantic release commit msg 1a9fb77
+
 ## [2.0.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v2.0.0...v2.0.1) (2023-04-06)
 
 
