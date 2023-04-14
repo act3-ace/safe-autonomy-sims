@@ -1,3 +1,10 @@
+## 2.0.3 (2023-04-14)
+
+
+### Bug Fixes
+
+* pint conversions use default application registry. Initializer slow down fixed b3a7ddf
+
 ## 2.0.2 (2023-04-07)
 
 
