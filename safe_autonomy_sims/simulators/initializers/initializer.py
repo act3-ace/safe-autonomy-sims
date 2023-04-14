@@ -170,7 +170,7 @@ class BaseInitializerWithPint(BaseInitializer):
 
     def __init__(self, config):
         super().__init__(config)
-        self.ureg = pint.UnitRegistry()
+        self.ureg: pint.UnitRegistry = pint.get_application_registry()
 
 
 class PassThroughInitializer(BaseInitializer):
@@ -190,10 +190,6 @@ class StripUnitsInitializer(BaseInitializer):
 
 class CorlUnitsToPintInitializer(BaseInitializerWithPint):
     """Initializer to convert all CoRL ValuesWithUnits to pint Quantities"""
-
-    def __init__(self, config):
-        super().__init__(config)
-        self.ureg = pint.UnitRegistry()
 
     def compute(self, **kwargs):
         return corl_values_to_pint_from_dict(kwargs, self.ureg)
