@@ -19,7 +19,7 @@ import gym
 import numpy as np
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
 from corl.glues.common.controller_glue import ControllerGlue
-from run_time_assurance.rta import RTAModule
+from run_time_assurance.rta import ConstraintBasedRTA, RTAModule
 
 # from safe_autonomy_sims.core.rta.cwh.cwh_rta import DockingRTA
 
@@ -118,6 +118,8 @@ class RTAGlue(BaseMultiWrapperGlue):
         rta_state_vector = self._get_rta_state_vector(observation)
         rta_action_vector = self._get_action_vector_from_action(desired_action)
         filtered_action_vector = self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
+        if isinstance(self.rta, ConstraintBasedRTA):
+            self.rta.update_constraint_values(rta_state_vector)
         return self._get_action_from_action_vector(filtered_action_vector)
 
     def _get_rta_state_vector(self, observation: typing.Dict) -> np.ndarray:
@@ -158,10 +160,25 @@ class RTAGlue(BaseMultiWrapperGlue):
         raise NotImplementedError
 
     def observation_space(self):
-        return gym.spaces.dict.Dict({"intervening": gym.spaces.discrete.Discrete(2)})
+        if isinstance(self.rta, ConstraintBasedRTA):
+            box = gym.spaces.Box(-np.inf, np.inf, shape=(1, ), dtype=np.float32)
+            constraint_keys = {k: box for k in self.rta.constraints.keys()}
+            space = gym.spaces.dict.Dict(
+                {
+                    "intervening": gym.spaces.discrete.Discrete(2), "constraints": gym.spaces.dict.Dict(constraint_keys)
+                }
+            )
+        else:
+            space = gym.spaces.dict.Dict({"intervening": gym.spaces.discrete.Discrete(2)})
+        return space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
-        return {"intervening": int(self.rta.intervening)}
+        obs = {"intervening": int(self.rta.intervening)}
+        if isinstance(self.rta, ConstraintBasedRTA):
+            info = self.rta.generate_info()['constraints'].items()
+            n_val = np.array([-1.], dtype=np.float32)
+            obs['constraints'] = {k: np.array([v], dtype=np.float32) if not np.isnan(v) else n_val for k, v in info}
+        return obs
 
     def get_info_dict(self):
         return {

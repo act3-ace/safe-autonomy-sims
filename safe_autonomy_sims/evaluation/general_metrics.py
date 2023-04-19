@@ -13,6 +13,7 @@ General observation and action metrics
 """
 import typing
 
+import numpy as np
 from corl.evaluation.episode_artifact import EpisodeArtifact
 from corl.evaluation.metrics.generator import MetricGeneratorTerminalEventScope
 from corl.evaluation.metrics.metric import Metric
@@ -75,3 +76,31 @@ class ControlVector(MetricGeneratorTerminalEventScope):
             arr.append(Dict(real_dict))
 
         return Vector(arr)
+
+
+class SafetyViolationRatioMetric(MetricGeneratorTerminalEventScope):
+    """Generates single Real indicating percentage of steps where safety is violated.
+    Must use constraint based RTA.
+    """
+
+    def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
+
+        if "agent_id" not in kwargs:
+            raise RuntimeError("Expecting \"agent_id\" to be provided")
+
+        agent_id = kwargs["agent_id"].split('.')[0]
+
+        arr = []
+        for step in params.steps:
+
+            if agent_id not in step.agents or step.agents[agent_id] is None:
+                break
+
+            constraints = step.agents[agent_id].observations['RTAModule']['constraints']
+
+            if constraints is None:
+                continue
+
+            arr.append(int(np.any([v < 0 for v in constraints.values()])))
+
+        return Real(np.mean(arr) * 100)
