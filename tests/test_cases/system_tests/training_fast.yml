@@ -2,6 +2,18 @@
 - ID: CWH Docking 3D
   experiment_config: configs/cwh3d/docking/experiments/experiment.yml
 - ID: CWH Inspection 3D
-  experiment_config: configs/cwh3d/inspection/experiments/experiment.yml
+  experiment_config: configs/cwh3d/inspection/experiments/translational/experiment.yml
 - ID: CWH Inspection 3D Multiagent
-  experiment_config: configs/cwh3d/inspection/experiments/experiment_multiagent.yml
+  experiment_config: configs/cwh3d/inspection/experiments/translational/experiment_multiagent.yml
+- ID: CWH Inspection 3D Illumination
+  experiment_config: configs/cwh3d/inspection/experiments/translational/experiment_illumination.yml
+- ID: CWH Inspection 3D Illumination Multiagent
+  experiment_config: configs/cwh3d/inspection/experiments/translational/experiment_illumination_multiagent.yml
+- ID: CWH Inspection 3D 6DOF
+  experiment_config: configs/cwh3d/inspection/experiments/six_dof/experiment.yml
+- ID: CWH Inspection 3D Multiagent 6DOF
+  experiment_config: configs/cwh3d/inspection/experiments/six_dof/experiment_multiagent.yml
+- ID: CWH Inspection 3D Illumination 6DOF
+  experiment_config: configs/cwh3d/inspection/experiments/six_dof/experiment_illumination.yml
+- ID: CWH Inspection 3D Illumination Multiagent 6DOF
+  experiment_config: configs/cwh3d/inspection/experiments/six_dof/experiment_illumination_multiagent.yml

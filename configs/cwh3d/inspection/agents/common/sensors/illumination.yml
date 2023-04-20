@@ -1,0 +1,11 @@
+[
+  {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_SunAngle",
+        "normalization": {
+            "enabled": False
+      },
+    },
+  },
+]
