@@ -15,5 +15,5 @@
 "agent_config":
   - name: "blue0_ctrl"
     platforms: ["blue0"]
-    config: "configs/cwh3d/inspection/agents/agent.yml"
+    config: "configs/cwh3d/inspection/agents/translational/agent.yml"
     policy: "configs/common/policies/ppo.yml"

@@ -7,26 +7,13 @@
 #The use, dissemination or disclosure of data in this file is subject to
 #limitation or restriction. See accompanying README and LICENSE for details.
 #---------------------------------------------------------------------------
-# This yaml defines the launch config for cwh 3d multiagent in CoRL
 
-"config": "configs/cwh3d/inspection/tasks/task_multiagent.yml"
+"config": "configs/cwh3d/inspection/tasks/task_illumination.yml"
 "platform_config":
   - name: "blue0"
-    config: "configs/cwh3d/platform.yml"
-  - name: "blue1"
-    config: "configs/cwh3d/platform.yml"
-  - name: "blue2"
     config: "configs/cwh3d/platform.yml"
 "agent_config":
   - name: "blue0_ctrl"
     platforms: ["blue0"]
-    config: "configs/cwh3d/inspection/agents/agent_multiagent.yml"
-    policy: "configs/common/policies/ppo.yml"
-  - name: "blue1_ctrl"
-    platforms: ["blue1"]
-    config: "configs/cwh3d/inspection/agents/agent_multiagent.yml"
-    policy: "configs/common/policies/ppo.yml"
-  - name: "blue2_ctrl"
-    platforms: ["blue2"]
-    config: "configs/cwh3d/inspection/agents/agent_multiagent.yml"
+    config: "configs/cwh3d/inspection/agents/translational/agent_illumination.yml"
     policy: "configs/common/policies/ppo.yml"

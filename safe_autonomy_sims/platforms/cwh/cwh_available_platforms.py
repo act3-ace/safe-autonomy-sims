@@ -24,6 +24,7 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
     Enumeration that outlines the platform types that have been implemented.
     """
     CWH = (1, )
+    CWHSixDOF = (2, )
 
     # TODO: Figure out mypy typing error and re-annotate
 
@@ -55,6 +56,8 @@ class CWHAvailablePlatformTypes(BaseAvailablePlatformTypes):
 
         if config["name"] == "CWH":
             return CWHAvailablePlatformTypes.CWH
+        if config["name"] == "CWHSixDOF":
+            return CWHAvailablePlatformTypes.CWHSixDOF
 
         raise RuntimeError(f'name: {config["name"]} did not match a known platform type')
 

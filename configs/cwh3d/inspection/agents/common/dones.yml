@@ -1,0 +1,23 @@
+[
+  {
+      # Max distance from origin
+      "functor": "safe_autonomy_sims.dones.cwh.common.MaxDistanceDoneFunction",
+      "references": {
+        "max_distance": "max_distance",
+        "reference_position_sensor_name": "reference_position_sensor_name"
+      },
+  },
+  {
+      # Crash into chief entity
+      "functor": "safe_autonomy_sims.dones.cwh.common.CrashDoneFunction",
+      "references": {
+        "crash_region_radius": "collision_radius",
+        "reference_position_sensor_name": "reference_position_sensor_name"
+      },
+  },
+  {
+      # Success (inspected all points)
+      "functor": "safe_autonomy_sims.dones.cwh.inspection_dones.SuccessfulInspectionDoneFunction",
+      "config":{},
+  },
+]

@@ -102,10 +102,6 @@ class RateController(CommonController):
         return np.array([self.parent_platform.get_applied_action()[self.config.axis]], dtype=np.float32)
 
 
-PluginLibrary.AddClassToGroup(
-    RateController, "RateController", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(RateController, "RateController", {"simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH})
+for sim in [CWHSimulator, InspectionSimulator]:
+    for platform in [CWHAvailablePlatformTypes.CWH, CWHAvailablePlatformTypes.CWHSixDOF]:
+        PluginLibrary.AddClassToGroup(RateController, "RateController", {"simulator": sim, "platform_type": platform})

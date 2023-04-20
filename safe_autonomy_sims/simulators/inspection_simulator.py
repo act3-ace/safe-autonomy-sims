@@ -19,11 +19,11 @@ import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
 from corl.libraries.units import ValueWithUnits
 from pydantic import BaseModel, validator
-from safe_autonomy_dynamics.cwh import CWHSpacecraft
+from safe_autonomy_dynamics.cwh import CWHSpacecraft, SixDOFSpacecraft
 from sklearn.cluster import KMeans
 
 import safe_autonomy_sims.simulators.illumination_functions as illum
-from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform
+from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform, CWHSixDOFPlatform
 from safe_autonomy_sims.simulators.saferl_simulator import (
     SafeRLSimulator,
     SafeRLSimulatorResetValidator,
@@ -171,6 +171,11 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
         number of points to be inspected
     radius: float
         radius of the sphere of points
+    sensor_fov: float
+        field of view of the sensor (radians). By default pi (180 degrees)
+    initial_sensor_unit_vec: list
+        If using the 6DOF spacecraft model, initial unit vector along sensor boresight.
+        By default [1., 0., 0.]
     points_algorithm: str = "cmu"
         algorithm to define how points are allocated on the sphere
     illumination_params: typing.Union[IlluminationValidator, None] = None
@@ -188,6 +193,8 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
     """
     num_points: int
     radius: float
+    sensor_fov: float = np.pi
+    initial_sensor_unit_vec: list = [1., 0., 0.]
     points_algorithm: str = "cmu"
     illumination_params: typing.Union[IlluminationValidator, None] = None
     steps_until_update: int
@@ -230,6 +237,7 @@ class InspectionSimulator(SafeRLSimulator):
         return {
             'default': (CWHSpacecraft, CWHPlatform),
             'cwh': (CWHSpacecraft, CWHPlatform),
+            'six-dof': (SixDOFSpacecraft, CWHSixDOFPlatform),
         }
 
     def __init__(self, **kwargs):
@@ -303,7 +311,7 @@ class InspectionSimulator(SafeRLSimulator):
         for platform in self._state.sim_platforms.values():
             platform_id = platform.name
             entity = self.sim_entities[platform_id]
-            self._update_points(entity.position)
+            self._update_points(entity)
 
             # update the observation space with number of inspected points
             platform.num_inspected_points = illum.num_inspected_points(self._state.points)
@@ -368,46 +376,58 @@ class InspectionSimulator(SafeRLSimulator):
         points_dict = {point: False for point in points}
         return points_dict
 
-    def _update_points(self, position):
+    def _update_points(self, entity):
         """
-        Update the inspected state of all inspection points given an inspector's position.
+        Update the inspected state of all inspection points given an inspector's position and orientation.
 
         Parameters
         ----------
-        position: tuple or array
-            inspector's position in cartesian coords
+        entity:
+            inspector entity
 
         Returns
         -------
         None
         """
         # calculate h of the spherical cap (inspection zone)
+        position = entity.position
+        if isinstance(entity, SixDOFSpacecraft):
+            r_c = entity.orientation.apply(self.config.initial_sensor_unit_vec)
+        else:
+            r_c = -position
+        r_c = r_c / np.linalg.norm(r_c)
+
         r = self.config.radius
         rt = np.linalg.norm(position)
         h = 2 * r * ((rt - r) / (2 * rt))
 
         p_hat = position / np.linalg.norm(position)  # position unit vector (inspection zone cone axis)
-        for point, inspected in self._state.points.items():
+        for point, inspected in self._state.points.items():  # pylint: disable=too-many-nested-blocks
             # check that point hasn't already been inspected
             if not inspected:
-                # if no illumination params detected
-                if not self.illum_flag:
-                    # project point onto inspection zone axis and check if in inspection zone
-                    self._state.points[point] = np.dot(point, p_hat) >= r - h
-                else:
-                    mag = np.dot(point, p_hat)
-                    if mag >= r - h:
-                        r_avg = self.config.illumination_params.avg_rad_Earth2Sun
-                        chief_properties = self.config.illumination_params.chief_properties
-                        light_properties = self.config.illumination_params.light_properties
-                        current_theta = illum.get_sun_angle(
-                            self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle
-                        )
-                        if self.config.illumination_params.bin_ray_flag:
-                            self._state.points[point] = illum.check_illum(point, current_theta, r_avg, r)
-                        else:
-                            RGB = illum.compute_illum_pt(point, current_theta, position, r_avg, r, chief_properties, light_properties)
-                            self._state.points[point] = illum.evaluate_RGB(RGB)
+                p = point - position
+                p_rc = np.dot(p, r_c) * r_c
+                d = np.linalg.norm(p - p_rc)
+                c_r = np.linalg.norm(p_rc) * np.tan(self.config.sensor_fov / 2)
+                if c_r >= d:
+                    # if no illumination params detected
+                    if not self.illum_flag:
+                        # project point onto inspection zone axis and check if in inspection zone
+                        self._state.points[point] = np.dot(point, p_hat) >= r - h
+                    else:
+                        mag = np.dot(point, p_hat)
+                        if mag >= r - h:
+                            r_avg = self.config.illumination_params.avg_rad_Earth2Sun
+                            chief_properties = self.config.illumination_params.chief_properties
+                            light_properties = self.config.illumination_params.light_properties
+                            current_theta = illum.get_sun_angle(
+                                self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle
+                            )
+                            if self.config.illumination_params.bin_ray_flag:
+                                self._state.points[point] = illum.check_illum(point, current_theta, r_avg, r)
+                            else:
+                                RGB = illum.compute_illum_pt(point, current_theta, position, r_avg, r, chief_properties, light_properties)
+                                self._state.points[point] = illum.evaluate_RGB(RGB)
 
     def _kmeans_find_nearest(self, position):
         """Finds nearest cluster of uninspected points using kmeans clustering"""

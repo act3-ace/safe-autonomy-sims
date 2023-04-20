@@ -15,6 +15,7 @@ This module contains CWH Initializers
 import typing
 
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from safe_autonomy_sims.simulators.initializers.initializer import InitializerValidator, PintUnitConversionInitializer
 from safe_autonomy_sims.utils import velocity_limit
@@ -317,4 +318,101 @@ class Docking3DRadialInitializer(PintUnitConversionInitializer):
             'x_dot': x_dot,
             'y_dot': y_dot,
             'z_dot': z_dot,
+        }
+
+
+class CWHSixDOFRadialInitializer(PintUnitConversionInitializer):
+    """
+    This class handles the initialization of agent reset parameters for the cwh 3D environment.
+    Both position and velocity are initialized radially (with radius and angles) to allow for control over magnitude and direction
+        of the resulting vectors.
+
+    def __call__(self, reset_config):
+
+    Parameters
+    ----------
+    reset_config: dict
+        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
+        are the values
+
+    Returns
+    -------
+    reset_config: dict
+        The modified reset config of agent name to initialization values KVPs.
+    """
+
+    param_units = {
+        'radius': 'meters',
+        'azimuth_angle': 'radians',
+        'elevation_angle': 'radians',
+        'vel_mag': 'meters/second',
+        'vel_azimuth_angle': 'radians',
+        'vel_elevation_angle': 'radians',
+        'wx': 'radians/second',
+        'wy': 'radians/second',
+        'wz': 'radians/second',
+    }
+
+    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
+        return self._compute_with_units(**kwargs_with_stripped_units)
+
+    def _compute_with_units(
+        self,
+        radius: float,
+        azimuth_angle: float,
+        elevation_angle: float,
+        vel_mag: float,
+        vel_azimuth_angle: float,
+        vel_elevation_angle: float,
+        wx: float,
+        wy: float,
+        wz: float,
+    ) -> typing.Dict:
+        """Computes radial initial conditions for cwh 3d
+
+        Parameters
+        ----------
+        radius : float
+            radius from origin. meters
+        azimuth_angle : float
+            location azimuthal angle in spherical coordinates (right hand convention). rad
+        elevation_angle : float
+            location elevation angle from x-y plane. Positive angles = positive z. rad
+        vel_mag : float
+            magnitude of velocity vector. meters/second
+        vel_azimuth_angle : float
+            velocity vector azimuthal angle in spherical coordinates (right hand convention). rad
+        vel_elevation_angle : float
+            velocity vector elevation angle from x-y plane. Positive angles = positive z. rad
+
+        Returns
+        -------
+        typing.Dict
+            initial conditions of platform
+        """
+
+        x = radius * np.cos(azimuth_angle) * np.cos(elevation_angle)
+        y = radius * np.sin(azimuth_angle) * np.cos(elevation_angle)
+        z = radius * np.sin(elevation_angle)
+
+        x_dot = vel_mag * np.cos(vel_azimuth_angle) * np.cos(vel_elevation_angle)
+        y_dot = vel_mag * np.sin(vel_azimuth_angle) * np.cos(vel_elevation_angle)
+        z_dot = vel_mag * np.sin(vel_elevation_angle)
+
+        q = Rotation.random().as_quat()
+
+        return {
+            'x': x,
+            'y': y,
+            'z': z,
+            'x_dot': x_dot,
+            'y_dot': y_dot,
+            'z_dot': z_dot,
+            'q1': q[0],
+            'q2': q[1],
+            'q3': q[2],
+            'q4': q[3],
+            'wx': wx,
+            'wy': wy,
+            'wz': wz,
         }
