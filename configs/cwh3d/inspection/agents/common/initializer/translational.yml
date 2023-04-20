@@ -1,0 +1,61 @@
+{
+  "initializer": {
+    "functor": "safe_autonomy_sims.simulators.initializers.cwh.CWH3DRadialInitializer",
+  },
+  "config": {
+    "radius": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "radius",
+        "units": "meters",
+        "low": 50,
+        "high": 100,
+      }
+    },
+    "azimuth_angle": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "azimuth_angle",
+        "units": "radians",
+        "low": 0,
+        "high": 6.283,
+      }
+    },
+    "elevation_angle": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "elevation_angle",
+        "units": "radians",
+        "low": -1.57,
+        "high": 1.57,
+      }
+    },
+    "vel_mag": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "vel_mag",
+        "units": "m/s",
+        "low": 0,
+        "high": 0.3,
+      }
+    },
+    "vel_azimuth_angle": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "vel_azimuth_angle",
+        "units": "radians",
+        "low": 0,
+        "high": 6.283,
+      }
+    },
+    "vel_elevation_angle": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "vel_elevation_angle",
+        "units": "radians",
+        "low": -1.57,
+        "high": 1.57,
+      }
+    },
+  }
+}

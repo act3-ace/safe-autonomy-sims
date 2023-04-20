@@ -1,0 +1,42 @@
+[
+  {
+      # reward = number of newly observed points
+      "name": "ObservedPointsReward",
+      "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.ObservedPointsReward",
+      "config": {
+        "scale": 0.01
+      }
+  },
+  {
+      # reward = scale (if all points are inspected)
+      "name": "InspectionSuccessReward",
+      "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionSuccessReward",
+      "config": {
+        "scale": 1.0,
+      }
+  },
+  {
+    # reward = scale (if crash occurs)
+    "name": "InspectionCrashReward",
+    "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionCrashReward",
+    "config": {
+      "scale": -1.0,
+    },
+    "references": {
+      "crash_region_radius": "collision_radius",
+      "reference_position_sensor_name": "reference_position_sensor_name"
+    },
+  },
+  {
+    "name": "InspectionDeltaVReward",
+    # See delta-v reward scale parameters in env config
+    "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
+    "config": {
+      "mode": "scale",
+    },
+    "references": {
+      "step_size": "step_size",
+      "mass": "mass",
+    },
+  },
+]
