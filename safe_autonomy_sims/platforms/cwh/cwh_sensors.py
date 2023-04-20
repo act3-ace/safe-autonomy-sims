@@ -40,9 +40,6 @@ class CWHSensor(BaseSensor):
         raise NotImplementedError
 
 
-PluginLibrary.AddClassToGroup(CWHSensor, "Sensor_Generic", {"simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH})
-
-
 class PositionSensor(CWHSensor):
     """
     Implementation of a sensor designed to give the position at any time.
@@ -61,19 +58,6 @@ class PositionSensor(CWHSensor):
             Position of spacecraft.
         """
         return self.parent_platform.position
-
-
-PluginLibrary.AddClassToGroup(
-    PositionSensor, "Sensor_Position", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    PositionSensor, "Sensor_Position", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
 
 
 class VelocitySensor(CWHSensor):
@@ -97,19 +81,6 @@ class VelocitySensor(CWHSensor):
         return self.parent_platform.velocity
 
 
-PluginLibrary.AddClassToGroup(
-    VelocitySensor, "Sensor_Velocity", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    VelocitySensor, "Sensor_Velocity", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-
 class InspectedPointsSensor(CWHSensor):
     """
     Implementation of a sensor to give number of points at any time.
@@ -128,19 +99,6 @@ class InspectedPointsSensor(CWHSensor):
             Number of inspected points.
         """
         return self.parent_platform.num_inspected_points
-
-
-PluginLibrary.AddClassToGroup(
-    InspectedPointsSensor, "Sensor_InspectedPoints", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    InspectedPointsSensor, "Sensor_InspectedPoints", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
 
 
 class SunAngleSensor(CWHSensor):
@@ -163,19 +121,6 @@ class SunAngleSensor(CWHSensor):
         return self.parent_platform.sun_angle
 
 
-PluginLibrary.AddClassToGroup(
-    SunAngleSensor, "Sensor_SunAngle", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    SunAngleSensor, "Sensor_SunAngle", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-
 class UninspectedPointsSensor(CWHSensor):
     """
     Implementation of a sensor to give location of cluster of uninspected points.
@@ -194,21 +139,6 @@ class UninspectedPointsSensor(CWHSensor):
             Cluster location of the uninspected points.
         """
         return self.parent_platform.cluster_location
-
-
-PluginLibrary.AddClassToGroup(
-    UninspectedPointsSensor, "Sensor_UninspectedPoints", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    UninspectedPointsSensor, "Sensor_UninspectedPoints", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-# entity position sensors
 
 
 class EntitySensorValidator(BasePlatformPartValidator):
@@ -246,19 +176,6 @@ class EntityPositionSensor(CWHSensor):
         return state.sim_entities[self.config.entity_name].position
 
 
-PluginLibrary.AddClassToGroup(
-    EntityPositionSensor, "Sensor_EntityPosition", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    EntityPositionSensor, "Sensor_EntityPosition", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-
 class OriginPositionSensor(CWHSensor):
     """
     Implementation of a sensor designed to give the position at any time.
@@ -277,46 +194,6 @@ class OriginPositionSensor(CWHSensor):
             Position of spacecraft.
         """
         return np.array([0, 0, 0])
-
-
-PluginLibrary.AddClassToGroup(
-    OriginPositionSensor, "Sensor_OriginPosition", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-# class EntityVelocitySensor(CWHSensor):
-#     """
-#     Implementation of a sensor designed to give the position at any time.
-#     """
-
-#     def __init__(self, parent_platform, config, property_class=cwh_props.VelocityProp):
-#         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
-
-#     @property
-#     def get_validator(self) -> typing.Type[EntitySensorValidator]:
-#         """
-#         return the validator that will be used on the configuration
-#         of this part
-#         """
-#         return EntitySensorValidator
-
-#     def _calculate_measurement(self, state):
-#         """
-#         Calculate the measurement - position.
-
-#         Returns
-#         -------
-#         list of floats
-#             Position of spacecraft.
-#         """
-#         return state.sim_entities[self.config.entity_name].velocity
-
-# PluginLibrary.AddClassToGroup(
-#     EntityVelocitySensor, "Sensor_EntityVelocity", {
-#         "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-#     }
-# )
 
 
 class BoolArraySensor(CWHSensor):
@@ -339,14 +216,30 @@ class BoolArraySensor(CWHSensor):
         return self.parent_platform.bool_array
 
 
-PluginLibrary.AddClassToGroup(
-    BoolArraySensor, "Sensor_BoolArray", {
-        "simulator": CWHSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
-
-PluginLibrary.AddClassToGroup(
-    BoolArraySensor, "Sensor_BoolArray", {
-        "simulator": InspectionSimulator, "platform_type": CWHAvailablePlatformTypes.CWH
-    }
-)
+for sim in [CWHSimulator, InspectionSimulator]:
+    for platform in [CWHAvailablePlatformTypes.CWH, CWHAvailablePlatformTypes.CWHSixDOF]:
+        for sensor, sensor_name in zip(
+            [
+                CWHSensor,
+                PositionSensor,
+                VelocitySensor,
+                InspectedPointsSensor,
+                SunAngleSensor,
+                UninspectedPointsSensor,
+                EntityPositionSensor,
+                OriginPositionSensor,
+                BoolArraySensor
+            ],
+            [
+                "Sensor_Generic",
+                "Sensor_Position",
+                "Sensor_Velocity",
+                "Sensor_InspectedPoints",
+                "Sensor_SunAngle",
+                "Sensor_UninspectedPoints",
+                "Sensor_EntityPosition",
+                "Sensor_OriginPosition",
+                "Sensor_BoolArray"
+            ]
+        ):
+            PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": platform})

@@ -1,0 +1,10 @@
+[
+  {
+    # reward = scale (if RTA is intervening)
+    "name": "InspectionRTAReward",
+    "functor": "safe_autonomy_sims.rewards.rta_rewards.RTAInterveningReward",
+    "config": {
+      "scale": -0.001,
+    }
+  },
+]

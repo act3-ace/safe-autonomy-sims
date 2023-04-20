@@ -41,6 +41,29 @@ class ThrustProp(BoxProp):
     description: str = "Direct Thrust Control"
 
 
+class MomentProp(BoxProp):
+    """
+    Moment control properties.
+
+    name : str
+        Control property name.
+    low : list[float]
+        Minimum bounds of control input.
+    high : list[float]
+        Maximum bounds of control input.
+    unit : str
+        Unit of measurement for control input.
+    description : str
+        Description of control properties.
+    """
+
+    name: str = "moment"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-0.001]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.001]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["none"]
+    description: str = "Direct Moment Control"
+
+
 class PositionProp(BoxProp):
     """
     Position sensor properties.
@@ -170,3 +193,49 @@ class BoolArrayProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [1.0] * num_points
     unit: Annotated[typing.List[StrictStr], Field(min_items=num_points, max_items=num_points)] = ["None"] * num_points
     description: str = "Boolean array"
+
+
+class QuaternionProp(BoxProp):
+    """
+    Quaternion sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "quaternion"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [-1.0] * 4
+    high: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [1.0] * 4
+    unit: Annotated[typing.List[StrictStr], Field(min_items=4, max_items=4)] = ["N/A"] * 4
+    description: str = "Quaternion Sensor Properties"
+
+
+class AngularVelocityProp(BoxProp):
+    """
+    Angular Velocity sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "angular velocity"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-10.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [10.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["rad/s"] * 3
+    description: str = "Angular Velocity Sensor Properties"

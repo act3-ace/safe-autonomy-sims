@@ -1,0 +1,30 @@
+[{
+    "functor": "corl.glues.common.controller_glue.ControllerGlue",
+    "config":{
+      "controller": "X Moment",
+      "training_export_behavior": "EXCLUDE",
+      "normalization": {
+        "enabled": False,
+      }
+    }
+},
+{
+    "functor": "corl.glues.common.controller_glue.ControllerGlue",
+    "config":{
+      "controller": "Y Moment",
+      "training_export_behavior": "EXCLUDE",
+      "normalization": {
+        "enabled": False,
+      }
+    }
+},
+{
+    "functor": "corl.glues.common.controller_glue.ControllerGlue",
+    "config":{
+      "controller": "Z Moment",
+      "training_export_behavior": "EXCLUDE",
+      "normalization": {
+        "enabled": False,
+      }
+    }
+},]
