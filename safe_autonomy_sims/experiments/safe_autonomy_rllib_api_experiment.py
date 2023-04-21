@@ -248,7 +248,6 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
 
         tune.run(
             config=rllib_config,
-            # progress_reporter=(),
             **self.config.tune_config,
         )
 
