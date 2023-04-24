@@ -40,7 +40,7 @@ conda activate myenv
 ```bash
 # Replace path/to/install.sh with the actual path
 # Replace <my-access-token> with your personal access token
-path/to/install.sh -p <my-access-token>
+path/to/install.sh -p <my-access-token> -u <url to git host>
 ```
 
 This should install the safe-autonomy-sims python package and its
