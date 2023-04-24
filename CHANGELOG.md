@@ -1,3 +1,10 @@
+## 2.3.2 (2023-04-24)
+
+
+### Bug Fixes
+
+* updated install.sh readme instructions b14a714
+
 # 2.3.1 (2023-04-24)
 
 
