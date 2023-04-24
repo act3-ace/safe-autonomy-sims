@@ -1,3 +1,10 @@
+# 2.3.1 (2023-04-24)
+
+
+### Bug Fixes
+
+* Fixed pipeline for clean history 8ce8df9
+
 # 2.3.0 (2023-04-20)
 
 
