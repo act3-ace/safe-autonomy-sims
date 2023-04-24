@@ -1,0 +1,91 @@
+include:
+  - project: devsecops/cicd/pipeline
+    ref: v7.0.23
+    file: 'main.yml'
+
+variables:
+  PIP_INDEX_URL: https://pypi.org/simple/
+  SRC_DIR: safe_autonomy_sims
+
+
+mkdocs:
+  needs: [ "build image" ]
+  image:
+    name: $CI_REGISTRY_IMAGE/cicd:ci-$CI_PIPELINE_ID
+  allow_failure: false
+  variables:
+    ENABLE_PDF_EXPORT: 1
+  script:
+    - pip install -e .[docs]
+    - python -m mkdocs build
+
+
+python unit test:
+  needs: [ "build image" ]
+  variables:
+    UNIT_TEST_DIR: tests
+    KUBERNETES_CPU_REQUEST: 2
+    KUBERNETES_CPU_LIMIT: 5
+    KUBERNETES_MEMORY_REQUEST: 5Gi
+    KUBERNETES_MEMORY_LIMIT: 10Gi
+
+  script:
+    - pip install .[torch]
+    - pip install -e .[test]
+    - echo ${SRC_DIR}
+    - pytest -m unit_test ${UNIT_TEST_DIR} --cov=${SRC_DIR} --cov-report term-missing --cov-report html --junitxml=junit.xml
+    
+    - pytest -m system_test ${UNIT_TEST_DIR}
+
+
+python flake8:
+  needs: [ "build image" ]
+
+python isort:
+  needs: [ "build image" ]
+
+python mypy:
+  needs: [ "build image" ]
+
+python pylint:
+  needs: [ "build image" ]
+
+python yapf:
+  needs: [ "build image" ]
+
+python package-build:
+  needs: [ "build image" ]
+
+pages:
+  script:
+    # create public directory if needed
+    - mkdir -p public
+    # move contents of directory site to directory public
+    - mv site/* public/
+    # if htmlcov exits (made by the pytest-cov) then move the directory htmlcov to inside directory public (eg. public/htmlcov)
+    - if [ -e htmlcov ]; then mv htmlcov/ public/; fi
+
+semantic release:
+  variables:
+    DO_RELEASE: "true"
+
+# image specifications
+build image:
+  variables:
+    TARGET_STAGE: cicd
+    BUILDKIT_FLAGS: $BUILDKIT_FLAGS --opt build-arg:ACT3_OCI_REGISTRY=$ACT3_OCI_REGISTRY --opt build-arg:GIT_URL=$GIT_URL
+
+# release images
+build tagged image:
+  variables:
+    TARGET_STAGE: build
+    DESTINATION_PATH: /releases
+    BUILDKIT_FLAGS: $BUILDKIT_FLAGS --opt build-arg:ACT3_OCI_REGISTRY=$ACT3_OCI_REGISTRY --opt build-arg:GIT_URL=$GIT_URL
+
+package image:
+  stage: Containerize
+  extends: build tagged image
+  variables:
+    TARGET_STAGE: package
+    DESTINATION_PATH: /releases/$TARGET_STAGE
+    BUILDKIT_FLAGS: $BUILDKIT_FLAGS --opt build-arg:ACT3_OCI_REGISTRY=$ACT3_OCI_REGISTRY --opt build-arg:GIT_URL=$GIT_URL
