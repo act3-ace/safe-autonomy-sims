@@ -75,9 +75,7 @@ class InspectedPoints(MetricGeneratorTerminalEventScope):
         if last_step_with_platform_data.agents[agent_id] is None:
             raise RuntimeError("Non Op")
 
-        return Real(
-            int(last_step_with_platform_data.agents[agent_id].observations['ObserveSensor_Sensor_InspectedPoints']['direct_observation'])
-        )
+        return Real(last_step_with_platform_data.platforms[0]['sensors']['Sensor_InspectedPoints']['measurement'][0])
 
 
 class EpisodeLength(MetricGeneratorTerminalEventScope):
