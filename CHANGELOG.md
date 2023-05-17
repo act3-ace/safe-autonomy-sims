@@ -1,3 +1,10 @@
+## 2.3.5 (2023-05-17)
+
+
+### Bug Fixes
+
+* Resolve "measuring inspected points relies on the observation" 9624c68
+
 ## 2.3.4 (2023-05-09)
 
 
