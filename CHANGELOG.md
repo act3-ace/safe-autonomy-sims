@@ -1,3 +1,10 @@
+# 2.4.0 (2023-05-30)
+
+
+### Features
+
+* Add rl algs options to eval api 44a7592
+
 ## 2.3.5 (2023-05-17)
 
 
