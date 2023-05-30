@@ -45,7 +45,8 @@ def evaluate(
     experiment_config_path: str,
     launch_dir_of_experiment: str,
     platform_serializer_class: PlatformSerializer,
-    test_case_manager_config: dict = None
+    test_case_manager_config: dict = None,
+    rl_algorithm_name: str = None
 ):
     """
     This function is responsible for instantiating necessary arguments and then launching the first stage of CoRL's Evaluation Framework.
@@ -95,11 +96,16 @@ def evaluate(
     test_case_manager = TestCaseManager(**test_case_manager_config)
     plugins = Plugins(**plugins_args)
     plugins.eval_config_update = eval_config_updates
+
     # get rllib_engine config from task config
-    trainer_cls = task.experiment_parse.config['tune_config'][1].get('run_or_experiment',
-                                                                     None) if task.experiment_parse.config['tune_config'][1] else None
-    trainer_cls = task.experiment_parse.config['tune_config'][0].get('run_or_experiment', 'PPO') if trainer_cls is None else trainer_cls
+    if rl_algorithm_name:
+        trainer_cls = rl_algorithm_name
+    else:
+        trainer_cls = task.experiment_parse.config['tune_config'][1].get('run_or_experiment',
+                                                                        None) if task.experiment_parse.config['tune_config'][1] else None
+        trainer_cls = task.experiment_parse.config['tune_config'][0].get('run_or_experiment', 'PPO') if trainer_cls is None else trainer_cls
     rllib_engine_args = {"callbacks": [], "workers": 0, "trainer_cls": trainer_cls}
+
     engine = RllibTrainer(**rllib_engine_args)
     recorder = Folder(**recorder_args)
 
@@ -356,7 +362,8 @@ def run_ablation_study(
     create_plot: bool = False,
     test_case_manager_config: dict = None,
     trial_indices: list = None,
-):
+    rl_algorithm_name: str = None
+): # pylint:disable=too-many-locals
     """
     This function serves as a high level interface for users conducting ablative studies using CoRL. It is
     responsible for processing a collection of CoRL training outputs (experiment_state files). This includes iteratively
@@ -451,7 +458,8 @@ def run_ablation_study(
                     output_paths,
                     platfrom_serializer_class,
                     test_case_manager_config=test_case_manager_config,
-                    visualize_metrics=False
+                    visualize_metrics=False,
+                    rl_algorithm_name=rl_algorithm_name
                 )
 
     # create sample complexity plot
@@ -474,7 +482,8 @@ def run_evaluations(
     output_paths: list,
     platfrom_serializer_class: PlatformSerializer,
     test_case_manager_config: dict = None,
-    visualize_metrics: bool = False
+    visualize_metrics: bool = False,
+    rl_algorithm_name: str = None
 ):
     """
     This function is responsible for taking a list of checkpoint paths and iteratively running them through
@@ -507,8 +516,12 @@ def run_evaluations(
     """
 
     kwargs = {}
-    if test_case_manager_config is not None:
+    if test_case_manager_config:
         kwargs['test_case_manager_config'] = test_case_manager_config
+
+    # rl algorithm
+    if rl_algorithm_name:
+        kwargs['rl_algorithm_name'] = rl_algorithm_name
 
     # run sequence of evaluation
     for index, ckpt_path in enumerate(checkpoint_paths):
@@ -542,6 +555,7 @@ def run_one_evaluation(
     checkpoint_path: str,
     platfrom_serializer_class: PlatformSerializer,
     test_case_manager_config: dict = None,
+    rl_algorithm_name: str = None
 ):
     """
     This function is responsible for taking a single checkpoint path and running it through
@@ -568,8 +582,12 @@ def run_one_evaluation(
     """
 
     kwargs = {}
-    if test_case_manager_config is not None:
+    if test_case_manager_config:
         kwargs['test_case_manager_config'] = test_case_manager_config
+
+    # rl algorithm
+    if rl_algorithm_name:
+        kwargs['rl_algorithm_name'] = rl_algorithm_name
 
     metrics_config = add_required_metrics(metrics_config)
 
@@ -721,7 +739,7 @@ def create_sample_complexity_plot(
     xaxis='timesteps_total',
     yaxis='TotalReward',
     hue='agent',
-    ci=95,
+    errorbar=('ci',95),
     xmax=None,
     ylim=None,
     **kwargs
@@ -745,7 +763,7 @@ def create_sample_complexity_plot(
         included in the metrics_config during Evaluation.
     hue: str
         The column of the 'data' DataFrame on which to group data
-    ci: int or str
+    errorbar: tuple
         The confidence interval to be displayed on the plot
     xmax: int
         The maximum value displayed on the x axis
@@ -768,7 +786,7 @@ def create_sample_complexity_plot(
     sns.set(style="darkgrid", font_scale=1.5)
 
     # feed Dataframe to seaborn to create labelled plot
-    plot = sns.lineplot(data=data, x=xaxis, y=yaxis, hue=hue, ci=ci, **kwargs)
+    plot = sns.lineplot(data=data, x=xaxis, y=yaxis, hue=hue, errorbar=errorbar, **kwargs)
 
     # format plot
 
