@@ -1,3 +1,10 @@
+## 2.4.1 (2023-06-08)
+
+
+### Bug Fixes
+
+* Resolve "eval api handle grid search configs" bb0ce8a
+
 # 2.4.0 (2023-05-30)
 
 
