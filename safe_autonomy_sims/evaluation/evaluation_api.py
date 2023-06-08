@@ -106,6 +106,10 @@ def evaluate(
         trainer_cls = task.experiment_parse.config['tune_config'][0].get('run_or_experiment', 'PPO') if trainer_cls is None else trainer_cls
     rllib_engine_args = {"callbacks": [], "workers": 0, "trainer_cls": trainer_cls}
 
+    # handle grid search seeds
+    if isinstance(task.experiment_parse.config['rllib_configs']['local'][0]['seed'], dict):
+        task.experiment_parse.config['rllib_configs']['local'][0]['seed'] = 1
+
     engine = RllibTrainer(**rllib_engine_args)
     recorder = Folder(**recorder_args)
 
