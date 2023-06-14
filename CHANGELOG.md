@@ -1,3 +1,10 @@
+# 2.5.0 (2023-06-14)
+
+
+### Features
+
+* Update constraints for RTA e333ed3
+
 ## 2.4.1 (2023-06-08)
 
 
