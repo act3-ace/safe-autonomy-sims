@@ -12,7 +12,6 @@ limitation or restriction. See accompanying README and LICENSE for details.
 This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 """
 import math
-from collections import OrderedDict
 from typing import Union
 
 import numpy as np
@@ -102,16 +101,6 @@ class RTAGlueCWHInspection1v1(RTAGlue):
         self.config: CWHInspection1v1RTAGlueValidator
         super().__init__(**kwargs)
 
-        if self.config.collision_radius is not None:
-            self.config.chief_radius = self.config.collision_radius / 2
-            self.config.deputy_radius = self.config.collision_radius / 2
-
-        new_constraints = OrderedDict()
-        for k in self.config.constraints:
-            new_constraints[k] = self.rta.constraints[k]
-        if len(new_constraints) != 0:
-            self.rta.constraints = new_constraints
-
     @property
     def get_validator(cls):
         return CWHInspection1v1RTAGlueValidator
@@ -125,6 +114,10 @@ class RTAGlueCWHInspection1v1(RTAGlue):
         return UpdatedInspection1v1RTA(**kwargs)
 
     def _get_rta_args(self) -> dict:
+        if self.config.collision_radius is not None:
+            self.config.chief_radius = self.config.collision_radius / 2
+            self.config.deputy_radius = self.config.collision_radius / 2
+
         return {
             "m": self.config.m,
             "n": self.config.n,
@@ -139,6 +132,7 @@ class RTAGlueCWHInspection1v1(RTAGlue):
             "sun_vel": self.config.sun_vel,
             "control_bounds_high": self.config.control_bounds_high,
             "control_bounds_low": self.config.control_bounds_low,
+            "constraints_to_use": self.config.constraints,
         }
 
 
