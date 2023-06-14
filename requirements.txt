@@ -1,6 +1,6 @@
 corl==2.9.0
 numpy==1.22.2
-run-time-assurance==1.10.6
+run-time-assurance==1.12.0
 safe-autonomy-dynamics==0.11.5
 tqdm  # pin version
 scikit-learn==1.2.1

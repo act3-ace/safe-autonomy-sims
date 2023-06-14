@@ -51,7 +51,9 @@ class RTAGlueValidator(BaseMultiWrapperGlueValidator):
     step_size: float
         duration in seconds that agent's action will be applied
     state_observation_names: list[str]
-    list of keys from observation dict whose direct observation values will be concatenated to form the RTA state vector
+        list of keys from observation dict whose direct observation values will be concatenated to form the RTA state vector
+    enabled: bool
+        True if RTA is enabled
     """
     step_size: float
     state_observation_names: typing.List[str]
