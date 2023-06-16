@@ -536,7 +536,8 @@ def render_3d(fig, deputy_position, sun_position, radius, current_time, step_rat
     Real-time rendering of scene
     TODO: Fix autoscaling problem (need equal axes so sphere looks normal)
     """
-    ax = fig.gca(projection='3d')
+    # ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     line_scalar = 200
     # Initialization
     if current_time == step_rate:

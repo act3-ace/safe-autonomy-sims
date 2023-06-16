@@ -341,10 +341,8 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
                                 rllib_config["env_config"]["git_hash"][env_hash_key] = githash
                                 self._logger.info(f"{module0} hash: {githash}")
                             else:
-                                self._logger.warning((f"module: {module0}, repopath: {repo_path}"
-                                                      "is invalid git repo\n"))
-                                sys.stderr.write((f"module: {module0}, repopath: {repo_path}"
-                                                  "is invalid git repo\n"))
+                                self._logger.warning((f"module: {module0}, repopath: {repo_path}" "is invalid git repo\n"))
+                                sys.stderr.write((f"module: {module0}, repopath: {repo_path}" "is invalid git repo\n"))
         except ValueError:
             warnings.warn("Unable to add the gitlab hash to experiment!!!")
 

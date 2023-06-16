@@ -42,6 +42,7 @@
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
         {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
+        {"part": "Sensor_EntityVelocity", "config": {"name": "reference_velocity", "entity_name": "chief"}}, # Ensure reference velocity sensor name consistent with dones and rewards
     ],
     "episode_parameter_provider": {
         "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -212,7 +213,7 @@
             "config":{},
             "references": {
               "max_distance": "max_distance",
-              "reference_position_sensor_name": "reference_position_sensor_name"
+              "reference_position_sensor_name": "reference_position_sensor_name",
             },
         },
 #        {
@@ -234,7 +235,8 @@
             },
             "references": {
               "crash_region_radius": "docking_region_radius",
-              "reference_position_sensor_name": "reference_position_sensor_name"
+              "reference_position_sensor_name": "reference_position_sensor_name",
+              "reference_velocity_sensor_name": "reference_velocity_sensor_name",
             }
         },
         {
@@ -246,7 +248,8 @@
               "threshold_distance": "threshold_distance",
               "mean_motion": "mean_motion",
               "lower_bound": "lower_bound",
-              "reference_position_sensor_name": "reference_position_sensor_name"
+              "reference_position_sensor_name": "reference_position_sensor_name",
+              "reference_velocity_sensor_name": "reference_velocity_sensor_name",
             }
         },
         {
@@ -296,7 +299,8 @@
           "threshold_distance": "threshold_distance",
           "mean_motion": "mean_motion",
           "lower_bound": "lower_bound",
-          "reference_position_sensor_name": "reference_position_sensor_name"
+          "reference_position_sensor_name": "reference_position_sensor_name",
+          "reference_velocity_sensor_name": "reference_velocity_sensor_name",
         }
       },
         {
@@ -312,7 +316,8 @@
             "threshold_distance": "threshold_distance",
             "mean_motion": "mean_motion",
             "lower_bound": "lower_bound",
-            "reference_position_sensor_name": "reference_position_sensor_name"
+            "reference_position_sensor_name": "reference_position_sensor_name",
+            "reference_velocity_sensor_name": "reference_velocity_sensor_name",
           }
         },
       {
@@ -331,7 +336,8 @@
           "threshold_distance": "threshold_distance",
           "mean_motion": "mean_motion",
           "lower_bound": "lower_bound",
-          "reference_position_sensor_name": "reference_position_sensor_name"
+          "reference_position_sensor_name": "reference_position_sensor_name",
+          "reference_velocity_sensor_name": "reference_velocity_sensor_name",
         }
       },
     ],

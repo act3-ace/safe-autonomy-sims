@@ -25,13 +25,15 @@ class SuccessfulInspectionDoneValidator(DoneFuncBaseValidator):
     This class validates that the config contains the Inspection_region_radius data needed for
     computations in the SuccessfulInspectionDoneFunction.
 
+    inspection_entity_name: str
+        The name of the entity under inspection.
     """
-    ...
+    inspection_entity_name: str = "chief"
 
 
 class SuccessfulInspectionDoneFunction(DoneFuncBase):
     """
-    A done function that determines if the deputy has successfully docked with the chief.
+    A done function that determines if the deputy has successfully inspected the chief.
 
     def __call__(self, observation, action, next_observation, next_state):
 
@@ -85,13 +87,10 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
     ) -> DoneDict:
         done = DoneDict()
 
-        all_inspected = True
-        for _, inspected in next_state.points.items():
-            if not inspected:
-                all_inspected = False
-                break
+        inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
+        all_inspected = all(inspection_points.points_inspected_dict.values())
 
-        done[self.config.platform_name] = bool(all_inspected)
+        done[self.config.platform_name] = all_inspected
         if done[self.config.platform_name]:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
         self._set_all_done(done)
@@ -101,15 +100,17 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
 class MultiagentSuccessfulInspectionDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
     The validator for the MultiagentSuccessfulDockingDoneFunction.
+
+    inspection_entity_name: str
+        The name of the entity under inspection.
     """
-    ...
+    inspection_entity_name: str = "chief"
 
 
 class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
     """
     This done function determines whether every agent in the environment
     has reached a specified successful done condition.
-
 
     def __call__(self, observation, action, next_observation, next_state, local_dones, local_done_info):
 
@@ -147,7 +148,6 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
         -------
         MultiagentSuccessfulDockingDoneFunctionValidator
             done function validator
-
         """
         return MultiagentSuccessfulInspectionDoneFunctionValidator
 
@@ -165,7 +165,8 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
 
         done = DoneDict()
 
-        all_inspected = False not in next_state.points.values()
+        inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
+        all_inspected = all(inspection_points.points_inspected_dict.values())
 
         if all_inspected:
             for k in local_dones.keys():

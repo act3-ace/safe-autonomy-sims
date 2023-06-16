@@ -102,7 +102,7 @@ def fixture_call_results(
     next_state,
     observation_space,
     observation_units,
-    platform,
+    platform
 ):
     """
     A fixture responsible for calling the DockingSuccessRewardFunction and returning the results.
@@ -134,10 +134,10 @@ def fixture_call_results(
         The resulting RewardDict from calling the DockingSuccessRewardFunction
     """
     with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_platform_by_name") as func:
-        with mock.patch("safe_autonomy_sims.utils.get_platform_by_name") as func1:
+        with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_relative_velocity") as func1:
             with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_relative_position") as func2:
                 func.return_value = platform
-                func1.return_value = platform
+                func1.return_value = platform.velocity
                 func2.return_value = platform.position
                 results = cut(observation, action, next_observation, state, next_state, observation_space, observation_units)
                 return results

@@ -19,7 +19,7 @@ from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneS
 from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 
-from safe_autonomy_sims.utils import get_relative_position, max_vel_violation
+from safe_autonomy_sims.utils import get_relative_position, get_relative_velocity, max_vel_violation
 
 
 class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
@@ -39,6 +39,10 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
         Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
+    reference_velocity_sensor_name: str
+        The name of the sensor responsible for returning the relative velocity of a reference entity.
     """
 
     docking_region_radius: float
@@ -48,6 +52,7 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     lower_bound: bool = False
     slope: float = 2.0
     reference_position_sensor_name: str = "reference_position"
+    reference_velocity_sensor_name: str = "reference_velocity"
 
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
@@ -117,10 +122,10 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
-        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
-        distance = np.linalg.norm(relative_position)
         platform = get_platform_by_name(next_state, self.config.platform_name)
-        relative_velocity = platform.velocity  # docking region assumed stationary
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
+        relative_velocity = get_relative_velocity(platform, self.config.reference_velocity_sensor_name)
+        distance = np.linalg.norm(relative_position)
 
         in_docking = distance <= self.config.docking_region_radius
 
@@ -158,6 +163,10 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
         Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
+    reference_velocity_sensor_name: str
+        The name of the sensor responsible for returning the relative velocity of a reference entity.
     """
     velocity_threshold: float
     threshold_distance: float
@@ -165,6 +174,7 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     lower_bound: bool = False
     slope: float = 2.0
     reference_position_sensor_name: str = "reference_position"
+    reference_velocity_sensor_name: str = "reference_velocity"
 
 
 class DockingVelocityLimitDoneFunction(DoneFuncBase):
@@ -235,9 +245,9 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
-        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
         platform = get_platform_by_name(next_state, self.config.platform_name)
-        relative_velocity = platform.velocity  # docking region assumed stationary
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
+        relative_velocity = get_relative_velocity(platform, self.config.reference_velocity_sensor_name)
 
         violated, _ = max_vel_violation(
             relative_position,
@@ -270,6 +280,10 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
         Orbital mean motion of Hill's reference frame's circular orbit in rad/s
     lower_bound : bool
         If True, the function enforces a minimum velocity constraint on the agent's platform.
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
+    reference_velocity_sensor_name: str
+        The name of the sensor responsible for returning the relative velocity of a reference entity.
     """
     velocity_threshold: float
     threshold_distance: float
@@ -277,6 +291,7 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
     lower_bound: bool = False
     slope: float = 2.0
     reference_position_sensor_name: str = "reference_position"
+    reference_velocity_sensor_name: str = "reference_velocity"
 
 
 # needs a reference object
@@ -349,9 +364,9 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
-        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
         platform = get_platform_by_name(next_state, self.config.platform_name)
-        relative_velocity = platform.velocity  # docking region assumed stationary
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
+        relative_velocity = get_relative_velocity(platform, self.config.reference_velocity_sensor_name)
 
         violated, _ = max_vel_violation(
             relative_position,
