@@ -1,3 +1,10 @@
+# 2.7.0 (2023-06-16)
+
+
+### Features
+
+* initializer can access attributes from the sim or other entities cb730be
+
 # 2.6.0 (2023-06-16)
 
 
