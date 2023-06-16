@@ -1,3 +1,10 @@
+# 2.6.0 (2023-06-16)
+
+
+### Features
+
+* support for multiagent inspection environments, velocity reference sensor, unit tests, and bug fixes. 8f0fd25
+
 # 2.5.0 (2023-06-14)
 
 
