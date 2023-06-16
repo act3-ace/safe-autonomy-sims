@@ -19,6 +19,10 @@ import pytest
 import ray
 import tempfile
 import os
+from corl.experiments.base_experiment import ExperimentParse
+from corl.parsers.yaml_loader import load_file
+from corl.train_rl import parse_corl_args
+from safe_autonomy_sims.experiments.rllib_api_experiment import RllibAPIExperiment
 
 
 @pytest.fixture(name="_ray_session_temp_dir", scope="session", autouse=True)
@@ -74,9 +78,95 @@ def create_self_managed_ray(_ray_session_temp_dir):
     return ray_config
 
 
-@pytest.fixture(name="experiment_config")
+@pytest.fixture(name="experiment_config_path")
 def fixture_experiment_config(request):
     """
     parameterized fixture for experiment config path.
     """
     return request.param
+
+
+@pytest.fixture(name="cwd")
+def fixture_change_cwd():
+    # change cwd to repo root
+    # assumes test launch from repo root or 'tests' dir
+    cwd = os.getcwd()
+    parent_dir, current_dir = os.path.split(cwd)
+
+    if current_dir == "tests":
+        repo_root = parent_dir
+    else:
+        repo_root = cwd
+
+    os.chdir(repo_root)
+
+    return cwd
+
+
+@pytest.fixture(name="training_config")
+def fixture_training_config(experiment_config_path):
+    try:
+        args = parse_corl_args(["--cfg", experiment_config_path])
+        config = load_file(config_filename=args.config)
+
+    except Exception as e:
+        print(e)
+
+    return args, config
+
+@pytest.fixture(name="run_training")
+def fixture_run_training(cwd, training_config, tmp_path, self_managed_ray):
+    """
+    Launches an Experiment from a given config file.
+    """
+
+    try:
+        print(self_managed_ray)
+        args, training_config = training_config
+
+        experiment_parse = ExperimentParse(**training_config)
+
+        # RllibAPIExperiment is used for debuging not training
+        if experiment_parse.experiment_class is RllibAPIExperiment:
+            return
+
+        experiment_class = experiment_parse.experiment_class(**experiment_parse.config)
+
+        experiment_class.config.rllib_configs["local"] = {
+            'horizon': 10,
+            'rollout_fragment_length': 10,
+            'train_batch_size': 10,
+            'sgd_minibatch_size': 10,
+            'batch_mode': 'complete_episodes',
+            'num_workers': 1,
+            'num_cpus_per_worker': 1,
+            'num_envs_per_worker': 1,
+            'num_cpus_for_driver': 1,
+            'num_gpus_per_worker': 0,
+            'num_gpus': 0,
+            'num_sgd_iter': 30,
+            'seed': 1,
+        }
+
+        if "model" in experiment_class.config.rllib_configs["local"]:
+            experiment_class.config.rllib_configs["local"]["model"].reset()
+
+        experiment_class.config.ray_config['ignore_reinit_error'] = True
+        if "_temp_dir" in experiment_class.config.ray_config:
+            del experiment_class.config.ray_config["_temp_dir"]
+
+        experiment_class.config.env_config["output_path"] = str(tmp_path / "training")
+
+        experiment_class.config.tune_config['stop']['training_iteration'] = 1
+        experiment_class.config.tune_config['local_dir'] = str(tmp_path / "training")
+        experiment_class.config.tune_config['checkpoint_freq'] = 1
+        experiment_class.config.tune_config['max_failures'] = 1
+        args.compute_platform = "local"
+        experiment_class.run_experiment(args)
+
+    except Exception as e:
+        print(e)
+
+    finally:
+        # change back to previous cwd
+        os.chdir(cwd)

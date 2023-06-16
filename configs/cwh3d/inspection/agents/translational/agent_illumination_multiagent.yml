@@ -17,10 +17,11 @@
         {"part": "RateController", "config": {"name": "Z Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 2, properties: {name: "z_thrust"}}},
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
-        {"part": "Sensor_InspectedPoints"},
         {"part": "Sensor_SunAngle"},
-        {"part": "Sensor_UninspectedPoints"},
+        {"part": "Sensor_InspectedPoints", "config": {"inspector_entity_name": "blue0"}},
+        {"part": "Sensor_UninspectedPoints", "config": {"inspector_entity_name": "blue0", "inspection_entity_name": "chief"}},
         {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
+        {"part": "Sensor_EntityVelocity", "config": {"name": "reference_velocity", "entity_name": "chief"}}, # Ensure reference velocity sensor name consistent with dones and rewards
     ],
     "episode_parameter_provider": {
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"

@@ -12,8 +12,12 @@
   "simulator": {
     "type": "InspectionSimulator",
     "config": {
-      "num_points": 100,
-      "radius" : 10,
+      "inspection_points_map": {
+        "chief": {
+          "num_points": 100,
+          "radius": 10,
+        },
+      },
       "illumination_params":{
           "mean_motion" : 0.001027,
           "avg_rad_Earth2Sun": 150000000000,

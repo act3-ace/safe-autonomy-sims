@@ -81,6 +81,16 @@ class VelocitySensor(CWHSensor):
         return self.parent_platform.velocity
 
 
+class InspectedPointsSensorValidator(BasePlatformPartValidator):
+    """
+    Validator for InspectedPointsSensor
+
+    inspector_entity_name: str
+        The name of the entity performing inspection.
+    """
+    inspector_entity_name: str = ""
+
+
 class InspectedPointsSensor(CWHSensor):
     """
     Implementation of a sensor to give number of points at any time.
@@ -88,6 +98,14 @@ class InspectedPointsSensor(CWHSensor):
 
     def __init__(self, parent_platform, config, property_class=cwh_props.InspectedPointProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return InspectedPointsSensorValidator
 
     def _calculate_measurement(self, state):
         """
@@ -98,7 +116,22 @@ class InspectedPointsSensor(CWHSensor):
         int
             Number of inspected points.
         """
-        return self.parent_platform.num_inspected_points
+        # handle initialization case
+        if self.config.inspector_entity_name not in state.sim_entities:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.inspector_entity_name} not found in simulator state!")
+            return 0
+
+        # get inspector entity object
+        inspector_entity = state.sim_entities[self.config.inspector_entity_name]
+
+        # count total number of points inspected by
+        num_points_inspected = 0
+        for points in state.inspection_points_map.values():
+            num_points_inspected += points.get_num_points_inspected(inspector_entity=inspector_entity)
+
+        return num_points_inspected
 
 
 class SunAngleSensor(CWHSensor):
@@ -118,7 +151,20 @@ class SunAngleSensor(CWHSensor):
         float
             sun angle
         """
-        return self.parent_platform.sun_angle
+        return np.array([state.sun_angle])
+
+
+class UninspectedPointsSensorValidator(BasePlatformPartValidator):
+    """
+    Validator for InspectedPointsSensor
+
+    inspector_entity_name: str
+        The name of the entity performing inspection.
+    inspection_entity_name: str
+        The name of the entity under inspection.
+    """
+    inspector_entity_name: str = ""
+    inspection_entity_name: str = ""
 
 
 class UninspectedPointsSensor(CWHSensor):
@@ -129,6 +175,14 @@ class UninspectedPointsSensor(CWHSensor):
     def __init__(self, parent_platform, config, property_class=cwh_props.UninspectedPointProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return UninspectedPointsSensorValidator
+
     def _calculate_measurement(self, state):
         """
         Calculate the measurement - cluster_location.
@@ -138,9 +192,29 @@ class UninspectedPointsSensor(CWHSensor):
         np.ndarray
             Cluster location of the uninspected points.
         """
-        return self.parent_platform.cluster_location
+        # handle initialization case
+        if (
+            self.config.inspection_entity_name not in state.inspection_points_map
+            or self.config.inspector_entity_name not in state.sim_entities
+        ):
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(
+                    f"{self.config.inspector_entity_name} not found in simulator state \
+                        or {self.config.inspection_entity_name} is not an inspectable entity!"
+                )
+            return [0., 0., 0.]
+
+        # get entities
+        inspector_entity = state.sim_entities[self.config.inspector_entity_name]
+
+        # get inspection points of object under inspection
+        inspector_position = inspector_entity.position
+        inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
+        return inspection_points.kmeans_find_nearest_cluster(inspector_position)
 
 
+# entity position sensors
 class EntitySensorValidator(BasePlatformPartValidator):
     """
     Validator for the EntitySensors
@@ -196,6 +270,44 @@ class OriginPositionSensor(CWHSensor):
         return np.array([0, 0, 0])
 
 
+class EntityVelocitySensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the position at any time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.VelocityProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[EntitySensorValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return EntitySensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        return state.sim_entities[self.config.entity_name].velocity
+
+
+class BoolArraySensorValidator(BasePlatformPartValidator):
+    """
+    Validator for BoolArraySensor.
+
+    inspection_entity_name: str
+        The name of the entity under inspection.
+    """
+    inspection_entity_name: str = ""
+
+
 class BoolArraySensor(CWHSensor):
     """
     Implementation of a sensor to give boolean array for all inspected/uninspected points
@@ -203,6 +315,14 @@ class BoolArraySensor(CWHSensor):
 
     def __init__(self, parent_platform, config, property_class=cwh_props.BoolArrayProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return BoolArraySensorValidator
 
     def _calculate_measurement(self, state):
         """
@@ -213,7 +333,16 @@ class BoolArraySensor(CWHSensor):
         np.ndarray
             Bool array describing inspected/uninspected points.
         """
-        return self.parent_platform.bool_array
+        # handle initialization case
+        if self.config.inspection_entity_name not in state.inspection_points_map:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.inspection_entity_name} is not an inspectable entity!")
+            return np.array([float(False)])
+
+        inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
+        bool_array = np.array([float(bool(a)) for a in inspection_points.points_inspected_dict.values()])
+        return bool_array
 
 
 for sim in [CWHSimulator, InspectionSimulator]:
@@ -226,9 +355,10 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 InspectedPointsSensor,
                 SunAngleSensor,
                 UninspectedPointsSensor,
+                BoolArraySensor,
                 EntityPositionSensor,
+                EntityVelocitySensor,
                 OriginPositionSensor,
-                BoolArraySensor
             ],
             [
                 "Sensor_Generic",
@@ -237,9 +367,10 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 "Sensor_InspectedPoints",
                 "Sensor_SunAngle",
                 "Sensor_UninspectedPoints",
+                "Sensor_BoolArray",
                 "Sensor_EntityPosition",
+                "Sensor_EntityVelocity",
                 "Sensor_OriginPosition",
-                "Sensor_BoolArray"
             ]
         ):
             PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": platform})

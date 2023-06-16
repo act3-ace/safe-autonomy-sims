@@ -20,10 +20,11 @@
         {"part": "RateController", "config": {"name": "Z Moment", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.MomentProp", "axis": 5, properties: {name: "z_moment"}}},
         {"part": "Sensor_Position"},
         {"part": "Sensor_Velocity"},
-        {"part": "Sensor_InspectedPoints"},
+        {"part": "Sensor_InspectedPoints", "config": {"inspector_entity_name": "blue0"}},
+        {"part": "Sensor_UninspectedPoints", "config": {"inspector_entity_name": "blue0", "inspection_entity_name": "chief"}},
         {"part": "Sensor_SunAngle"},
-        {"part": "Sensor_UninspectedPoints"},
         {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
+        {"part": "Sensor_EntityVelocity", "config": {"name": "reference_velocity", "entity_name": "chief"}}, # Ensure reference position sensor name consistent with dones and rewards
         {"part": "Sensor_Quaternion"},
         {"part": "Sensor_AngularVelocity"},
     ],

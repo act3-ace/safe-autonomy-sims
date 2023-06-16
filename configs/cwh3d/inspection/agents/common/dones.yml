@@ -12,7 +12,8 @@
       "functor": "safe_autonomy_sims.dones.cwh.common.CrashDoneFunction",
       "references": {
         "crash_region_radius": "collision_radius",
-        "reference_position_sensor_name": "reference_position_sensor_name"
+        "reference_position_sensor_name": "reference_position_sensor_name",
+        "reference_velocity_sensor_name": "reference_velocity_sensor_name",
       },
   },
   {

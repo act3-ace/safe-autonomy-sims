@@ -31,6 +31,7 @@ class ObservedPointsRewardValidator(RewardFuncBaseValidator):
         A scalar value applied to reward.
     """
     scale: float
+    inspection_entity_name: str = "chief"
 
 
 class ObservedPointsReward(RewardFuncBase):
@@ -75,7 +76,7 @@ class ObservedPointsReward(RewardFuncBase):
     def __init__(self, **kwargs):
         self.config: ObservedPointsRewardValidator
         super().__init__(**kwargs)
-        self.num_points_inspected = 0
+        self.previous_num_points_inspected = 0
 
     @property
     def get_validator(self):
@@ -97,15 +98,10 @@ class ObservedPointsReward(RewardFuncBase):
 
         reward = RewardDict()
 
-        total_points_found = 0
-
-        new_points = next_state.points
-        for point in new_points:
-            if new_points[point]:
-                total_points_found += 1
-        num_new_points = total_points_found - self.num_points_inspected
-
-        self.num_points_inspected += num_new_points
+        inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
+        current_num_points_inspected = inspection_points.get_num_points_inspected()
+        num_new_points = current_num_points_inspected - self.previous_num_points_inspected
+        self.previous_num_points_inspected = current_num_points_inspected
 
         reward[self.config.agent_name] = self.config.scale * num_new_points
         return reward
@@ -123,6 +119,8 @@ class ChiefDistanceRewardValidator(RewardFuncBaseValidator):
         Maximum allowable distance to chief to recieve reward.
     threshold_dist : float
         Threshold distance
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
     """
 
     scale: float
@@ -196,7 +194,8 @@ class ChiefDistanceReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.
 
-        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_names[0])
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
         dist = np.linalg.norm(relative_position)
 
         # Soft constraint
@@ -356,6 +355,7 @@ class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
         Scalar value to adjust magnitude of the reward.
     """
     scale: float
+    inspection_entity_name: str = "chief"
 
 
 class InspectionSuccessReward(RewardFuncBase):
@@ -424,7 +424,8 @@ class InspectionSuccessReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.0
 
-        all_inspected = False not in next_state.points.values()
+        inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
+        all_inspected = all(inspection_points.points_inspected_dict.values())
 
         if all_inspected:
             value = self.config.scale
@@ -441,6 +442,8 @@ class InspectionCrashRewardValidator(RewardFuncBaseValidator):
         Scalar value to adjust magnitude of the reward.
     crash_region_radius : float
         The radius of the crashing region in meters.
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
     """
     scale: float
     crash_region_radius: float
@@ -514,7 +517,8 @@ class InspectionCrashReward(RewardFuncBase):
         value = 0.0
 
         # Get relatative position + velocity between platform and docking region
-        relative_position = get_relative_position(next_state, self.config.platform_names[0], self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_names[0])
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
         distance = np.linalg.norm(relative_position)
 
         in_crash_region = distance <= self.config.crash_region_radius
