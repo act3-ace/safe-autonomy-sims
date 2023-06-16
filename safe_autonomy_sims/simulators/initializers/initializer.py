@@ -230,3 +230,120 @@ class PintUnitConversionInitializer(BaseInitializerWithPint):
             input dictionary composed of raw values after conversion to unit specified in self.param_units
         """
         raise NotImplementedError
+
+
+class Accessor(abc.ABC):
+    """Base interface for accessor objects to accesss arbitrary sim values for entity initilizer parameters"""
+
+    def __init__(self):
+        ...
+
+    @property
+    @abc.abstractmethod
+    def dependencies(self) -> typing.Set:
+        """
+        Returns the set of dependencies of this accessor.
+        Allows initialization process to initialize dependencies before utilizing this accessor.
+
+        Returns
+        -------
+        typing.Set
+            set of dependency names for this accessor (e.g. names of other entities)
+        """
+        ...
+
+    @abc.abstractmethod
+    def access(self, sim, sim_entities: typing.Dict[str, typing.Any]):
+        """_summary_
+
+        Parameters
+        ----------
+        sim
+            reference to partially initialized sim from which values may be accessed
+        sim_entities : typing.Dict[str, typing.Any]
+            dictionary of already initialized entites from which values may be accessed
+        """
+        ...
+
+
+class AttributeAccessor(Accessor):
+    """Base accessor implementation for accessing arbitrary attributes from objects
+
+    Parameters
+    ----------
+    attribute_name: str
+        name of attribute to be queried and returned by accessor. May contain nested attributes chained with "."
+            e.g. "first.second.third" accesses obj.first.second.third
+    """
+
+    def __init__(self, attribute_name):
+        super().__init__()
+        self.attribute_name = attribute_name
+
+    def get_attribute(self, obj):
+        """gets attribute described in constructor from arbitrary input object
+
+        Parameters
+        ----------
+        obj : Any
+            Object from which attribute is accessed
+
+        Returns
+        -------
+        Any
+            accessed attribute
+        """
+        output = None
+        next_obj = obj
+        attribute_name_sections = self.attribute_name.split(".")
+
+        if not attribute_name_sections:
+            raise ValueError("Attribute name is empty")
+
+        for attribure_name_section in attribute_name_sections:
+            output = getattr(next_obj, attribure_name_section)
+            next_obj = output
+
+        return output
+
+
+class SimAttributeAccessor(AttributeAccessor):
+    """Accessor for attributes of parent sim object
+
+    Parameters
+    ----------
+    attribute_name: str
+        name of attribute to be queried and returned by accessor. May contain nested attributes chained with "."
+            e.g. "first.second.third" accesses obj.first.second.third
+    """
+
+    @property
+    def dependencies(self) -> typing.Set:
+        return set()
+
+    def access(self, sim, _):
+        return self.get_attribute(sim)
+
+
+class EntityAttributeAccessor(AttributeAccessor):
+    """Accessor for accessing the attribute of another entity
+
+    Parameters
+    ----------
+    attribute_name: str
+        name of attribute to be queried and returned by accessor. May contain nested attributes chained with "."
+            e.g. "first.second.third" accesses obj.first.second.third
+    entity_name : str
+        name of entity to retrieve attribute from
+    """
+
+    def __init__(self, attribute_name, entity_name):
+        super().__init__(attribute_name)
+        self.entity_name = entity_name
+
+    @property
+    def dependencies(self) -> typing.Set:
+        return set((self.entity_name, ))
+
+    def access(self, _, sim_entities: typing.Dict[str, typing.Any]):
+        return self.get_attribute(sim_entities[self.entity_name])
