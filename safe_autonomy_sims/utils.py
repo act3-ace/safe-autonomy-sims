@@ -16,8 +16,8 @@ Author: Jamie Cunningham
 import typing
 
 import numpy as np
-from corl.simulators.base_simulator_state import BaseSimulatorState
-from corl.simulators.common_platform_utils import get_platform_by_name, get_sensor_by_name
+from corl.simulators.base_platform import BasePlatform
+from corl.simulators.common_platform_utils import get_sensor_by_name
 from pydantic import BaseModel
 
 
@@ -76,7 +76,7 @@ class KeyCollisionError(Exception):
         super().__init__(message)
 
 
-def get_relative_position(state: BaseSimulatorState, platform_name: str, reference_position_sensor_name: str):
+def get_relative_position(platform: BasePlatform, reference_position_sensor_name: str):
     """
     Finds the relative position between a platform and its reference_position Sensor's returned position.
 
@@ -84,7 +84,7 @@ def get_relative_position(state: BaseSimulatorState, platform_name: str, referen
     ----------
     state: BaseSimulatorState
         The current state of the system
-    platform_name: str
+    platform: BasePlatform
         The name of the platform whose relative position will be returned
     reference_position_sensor_name: str
         The name of the sensor on the platform responsible for tracking the absolute position of a reference entity
@@ -95,7 +95,6 @@ def get_relative_position(state: BaseSimulatorState, platform_name: str, referen
         The x,y,z length vector describing the relative position of the platform from the reference entity.
     """
 
-    platform = get_platform_by_name(state, platform_name)
     position = platform.position
     reference_position = get_sensor_by_name(platform, reference_position_sensor_name).get_measurement()
     relative_position = np.array(position) - np.array(reference_position)
@@ -103,30 +102,28 @@ def get_relative_position(state: BaseSimulatorState, platform_name: str, referen
     return relative_position
 
 
-# def get_relative_velocity(state: BaseSimulatorState, platform_name: str, reference_velocity_sensor_name: str):
-#     """
-#     Finds the relative velocity between a platform and its reference_position Sensor's returned velocity.
+def get_relative_velocity(platform: BasePlatform, reference_velocity_sensor_name: str):
+    """
+    Finds the relative velocity between a platform and its reference_position Sensor's returned velocity.
 
-#     Parameters
-#     ----------
-#     state: BaseSimulatorState
-#         The current state of the system
-#     platform_name: str
-#         The name of the platform whose relative position will be returned
-#     reference_velocity_sensor_name: str
-#         The name of the sensor on the platform responsible for tracking the absolute velocity of a reference entity
+    Parameters
+    ----------
+    platform: BasePlatform
+        The name of the platform whose relative position will be returned
+    reference_velocity_sensor_name: str
+        The name of the sensor on the platform responsible for tracking the absolute velocity of a reference entity
 
-#     Returns
-#     -------
-#     relative_velocity: numpy.ndarray
-#         The x,y,z length vector describing the relative velocity of the platform from the reference entity.
-#     """
+    Returns
+    -------
+    relative_velocity: numpy.ndarray
+        The x,y,z length vector describing the relative velocity of the platform from the reference entity.
+    """
 
-#     platform = get_platform_by_name(state, platform_name)
-#     position = platform.position
-#     reference_velocity = get_sensor_by_name(platform, reference_velocity_sensor_name).get_measurement()
+    velocity = platform.velocity
+    reference_velocity = get_sensor_by_name(platform, reference_velocity_sensor_name).get_measurement()
+    relative_velocity = np.array(velocity) - np.array(reference_velocity)
 
-#     return relative_velocity
+    return relative_velocity
 
 
 def velocity_limit(distance, velocity_threshold, threshold_distance, mean_motion, slope=2.0):
@@ -187,7 +184,7 @@ def max_vel_violation(relative_position, relative_velocity, velocity_threshold, 
         The magnitude of the velocity limit violation.
     """
     distance = np.linalg.norm(relative_position)
-    relative_velocity_magnitude = np.linalg.norm(relative_velocity)  # docking region still assumed to have zero velocity
+    relative_velocity_magnitude = np.linalg.norm(relative_velocity)
 
     vel_limit = velocity_limit(distance, velocity_threshold, threshold_distance, mean_motion, slope=slope)
 

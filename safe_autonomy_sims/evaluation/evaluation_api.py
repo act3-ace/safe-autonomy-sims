@@ -102,7 +102,7 @@ def evaluate(
         trainer_cls = rl_algorithm_name
     else:
         trainer_cls = task.experiment_parse.config['tune_config'][1].get('run_or_experiment',
-                                                                        None) if task.experiment_parse.config['tune_config'][1] else None
+                                                                         None) if task.experiment_parse.config['tune_config'][1] else None
         trainer_cls = task.experiment_parse.config['tune_config'][0].get('run_or_experiment', 'PPO') if trainer_cls is None else trainer_cls
     rllib_engine_args = {"callbacks": [], "workers": 0, "trainer_cls": trainer_cls}
 
@@ -367,7 +367,7 @@ def run_ablation_study(
     test_case_manager_config: dict = None,
     trial_indices: list = None,
     rl_algorithm_name: str = None
-): # pylint:disable=too-many-locals
+):  # pylint:disable=too-many-locals
     """
     This function serves as a high level interface for users conducting ablative studies using CoRL. It is
     responsible for processing a collection of CoRL training outputs (experiment_state files). This includes iteratively
@@ -743,7 +743,7 @@ def create_sample_complexity_plot(
     xaxis='timesteps_total',
     yaxis='TotalReward',
     hue='agent',
-    errorbar=('ci',95),
+    errorbar=('ci', 95),
     xmax=None,
     ylim=None,
     **kwargs

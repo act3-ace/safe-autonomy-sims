@@ -58,12 +58,8 @@ class CWHPlatform(BaseSafeRLPlatform):
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._platform = self.config.platform
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
-        self.inspected_points = 0
-        self.sun_angle = np.array([0.])
-        self.uninspected_cluster_location = np.array([0., 0., 0.])
         self.delta_v_scale = 0
         self.total_steps_counter = 0
-        self.bool_array = np.zeros(99)
 
     @property
     def get_validator(self) -> typing.Type[CWHPlatformValidator]:
@@ -129,44 +125,6 @@ class CWHPlatform(BaseSafeRLPlatform):
             The velocity vector of the platform.
         """
         return self._platform.velocity
-
-    @property
-    def num_inspected_points(self):
-        """
-        Number of points on sphere inspected.
-
-        Returns
-        -------
-        np.ndarray
-            Number of points on sphere inspected.
-        """
-        return np.array([self.inspected_points])
-
-    @num_inspected_points.setter
-    def num_inspected_points(self, val: int):
-        """
-        Set number of points inspected.
-        """
-        self.inspected_points = val
-
-    @property
-    def cluster_location(self):
-        """
-        Cluster location of unispected points.
-
-        Returns
-        -------
-        np.ndarray
-            Cluster location of unispected points.
-        """
-        return self.uninspected_cluster_location
-
-    @cluster_location.setter
-    def cluster_location(self, val: np.ndarray):
-        """
-        Set cluster location of unispected points.
-        """
-        self.uninspected_cluster_location = val
 
     @property
     def operable(self):

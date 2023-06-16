@@ -18,7 +18,7 @@ import jsonlines
 import pytest
 
 from tests.conftest import read_test_cases, delimiter
-from tests.system_tests.training.constants import CUSTOM_METRICS
+from tests.system_tests.training.constants import CUSTOM_METRICS, TRAINING_ITERATIONS
 from tests.system_tests.training.success_criteria import SuccessCriteria
 from corl.experiments.base_experiment import ExperimentParse
 from corl.parsers.yaml_loader import load_file
@@ -115,6 +115,12 @@ def fixture_run_training(
         with jsonlines.open(str(list(tmp_path.glob('training/*/*/result.json'))[0])) as results:
             results = [line for line in results]
             success_rate = results[-1][CUSTOM_METRICS][success_mean_metric]
+            num_training_iterations = results[-1][TRAINING_ITERATIONS]
+
+        output_path = "/home/john/AFRL/performance_test_branch_translational_NEW.txt"
+        with open(output_path, 'w') as file:
+            file.write(f"success_rate: {success_rate}\n")
+            file.write(f"num_training_iterations: {num_training_iterations}\n")
 
         # return success rate
         yield success_rate
