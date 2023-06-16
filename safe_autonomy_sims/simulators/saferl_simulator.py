@@ -15,6 +15,7 @@ This module contains the base Simulator class used by the safe_autonomy_sims tea
 
 import abc
 import typing
+from graphlib import CycleError, TopologicalSorter
 
 import numpy as np
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
@@ -22,7 +23,12 @@ from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, PyObject, validator
 from safe_autonomy_dynamics.base_models import BaseEntity
 
-from safe_autonomy_sims.simulators.initializers.initializer import CorlUnitsToPintInitializer
+from safe_autonomy_sims.simulators.initializers.initializer import (
+    Accessor,
+    CorlUnitsToPintInitializer,
+    EntityAttributeAccessor,
+    SimAttributeAccessor,
+)
 from safe_autonomy_sims.utils import KeyCollisionError
 
 
@@ -229,7 +235,52 @@ class SafeRLSimulator(BaseSimulator):
                 'params': entity_config.config,
             }
 
+        entity_init_map = self._construct_entity_accessors(entity_init_map)
+
         return entity_init_map
+
+    def _construct_entity_accessors(self, entity_init_map):
+        for _, entity_map_items in entity_init_map.items():
+            for param_name, param in entity_map_items['params'].items():
+                if isinstance(param, dict) and "accessor" in param:
+                    accessor_key = param["accessor"]
+                    if accessor_key == "entity_attribute":
+                        accessor_obj = EntityAttributeAccessor(**param.get('config', {}))
+                    elif accessor_key == "sim_attribute":
+                        accessor_obj = SimAttributeAccessor(**param.get('config', {}))
+                    else:
+                        raise ValueError(f"Invalid accessor {accessor_key}")
+                    entity_map_items['params'][param_name] = accessor_obj
+
+        return entity_init_map
+
+    def _generate_entity_init_order(self, entity_init_map) -> typing.List[str]:
+
+        # key is node name, value is set of predecessors (i.e. dependencies)
+        dependency_graph: typing.Dict[str, typing.Set] = {entity_name: set() for entity_name in entity_init_map}
+
+        for entity_name, entity_map_items in entity_init_map.items():
+            for _, param in entity_map_items['params'].items():
+                if isinstance(param, Accessor):
+                    dependency_graph[entity_name] = dependency_graph[entity_name].union(param.dependencies)
+
+        try:
+            sorter = TopologicalSorter(graph=dependency_graph)
+            init_order = list(sorter.static_order())
+        except CycleError as e:
+            raise ValueError(
+                "Cycle detected among entity initializer accessors."
+                "Make sure that entities with accessors don't depend on each other"
+            ) from e
+
+        return init_order
+
+    def _resolve_accessors(self, params, sim_entities):
+        for param_name, param in params.items():
+            if isinstance(param, Accessor):
+                params[param_name] = param.access(self, sim_entities)
+
+        return params
 
     @abc.abstractmethod
     def _construct_platform_map(self) -> dict:
@@ -257,9 +308,15 @@ class SafeRLSimulator(BaseSimulator):
         dict[str: sim_entity]
             Dictionary mapping entity id to simulation backend entity.
         """
-        sim_entities = {}
-        for entity_name, entity_init_items in entity_init_map.items():
-            transformed_params = entity_init_items['initializer'](**entity_init_items['params'])
+
+        init_order = self._generate_entity_init_order(entity_init_map)
+
+        sim_entities: typing.Dict[str, typing.Any] = {}
+        for entity_name in init_order:
+            entity_init_items = entity_init_map[entity_name]
+            params = entity_init_items['params']
+            params = self._resolve_accessors(params, sim_entities)
+            transformed_params = entity_init_items['initializer'](**params)
             entity = entity_init_items['class'](name=entity_name, **transformed_params)
             sim_entities[entity_name] = entity
 
