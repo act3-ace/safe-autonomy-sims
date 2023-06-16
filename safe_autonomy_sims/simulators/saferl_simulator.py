@@ -165,6 +165,7 @@ class SafeRLSimulator(BaseSimulator):
         self.sim_entities = {}
         self.clock = 0.0
         self.last_entity_actions = {}
+        self.sim_platforms = self.construct_platforms()
 
         self._state: SafeRLSimulatorState = None
 
@@ -176,9 +177,9 @@ class SafeRLSimulator(BaseSimulator):
 
         entity_init_map = self._construct_entity_init_map(reset_config)
         self.sim_entities = self._construct_sim_entities(reset_config, entity_init_map)
-        sim_platforms = self.construct_platforms()
+        self.sim_platforms = self.construct_platforms()
 
-        self._state = SafeRLSimulatorState(sim_platforms=sim_platforms, sim_time=self.clock, sim_entities=self.sim_entities)
+        self._state = self._construct_simulator_state()
         self.update_sensor_measurements()
         return self._state
 
@@ -233,6 +234,9 @@ class SafeRLSimulator(BaseSimulator):
     @abc.abstractmethod
     def _construct_platform_map(self) -> dict:
         ...
+
+    def _construct_simulator_state(self) -> dict:
+        return SafeRLSimulatorState(sim_platforms=self.sim_platforms, sim_time=self.clock, sim_entities=self.sim_entities)
 
     def _construct_sim_entities(
         self,

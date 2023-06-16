@@ -20,7 +20,7 @@ from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 from pydantic import PyObject
 
-from safe_autonomy_sims.utils import VelocityConstraintValidator, get_relative_position, max_vel_violation
+from safe_autonomy_sims.utils import VelocityConstraintValidator, get_relative_position, get_relative_velocity, max_vel_violation
 
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
@@ -29,6 +29,8 @@ class MaxDistanceDoneValidator(DoneFuncBaseValidator):
 
     max_distance: float
         The maximum tolerated relative distance between deputy and origin before episode termination.
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
     """
 
     max_distance: float
@@ -104,7 +106,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # compute distance to reference entity
-        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_name)
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
         distance = np.linalg.norm(relative_position)
 
         done[self.config.platform_name] = distance > self.config.max_distance
@@ -123,10 +126,15 @@ class CrashDoneValidator(DoneFuncBaseValidator):
         The radius of the crashing region in meters.
     velocity_constraint : VelocityConstraintValidator
         Velocity constraint parameters.
+    reference_position_sensor_name: str
+        The name of the sensor responsible for returning the relative position of a reference entity.
+    reference_velocity_sensor_name: str
+        The name of the sensor responsible for returning the relative velocity of a reference entity.
     """
     crash_region_radius: float
     velocity_constraint: typing.Union[VelocityConstraintValidator, None] = None
     reference_position_sensor_name: str = "reference_position"
+    reference_velocity_sensor_name: str = "reference_velocity"
 
 
 class CrashDoneFunction(DoneFuncBase):
@@ -196,11 +204,11 @@ class CrashDoneFunction(DoneFuncBase):
         done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
-        relative_position = get_relative_position(next_state, self.config.platform_name, self.config.reference_position_sensor_name)
+        platform = get_platform_by_name(next_state, self.config.platform_name)
+        relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
         distance = np.linalg.norm(relative_position)
 
-        platform = get_platform_by_name(next_state, self.config.platform_name)
-        relative_velocity = platform.velocity  # docking region assumed stationary
+        relative_velocity = get_relative_velocity(platform, self.config.reference_velocity_sensor_name)
 
         in_crash_region = distance <= self.config.crash_region_radius
 
