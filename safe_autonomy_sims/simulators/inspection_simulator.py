@@ -287,14 +287,14 @@ class InspectionPoints:
 
         for i in range(num_points):
             y = 1 - (i / float(num_points - 1)) * 2  # y goes from 1 to -1
-            r = radius * math.sqrt(1 - y * y)  # radius at y
+            r = math.sqrt(1 - y * y)  # radius at y
 
             theta = phi * i  # golden angle increment
 
             x = math.cos(theta) * r
             z = math.sin(theta) * r
 
-            points.append(np.array([x, y, z]))
+            points.append(radius * np.array([x, y, z]))
 
         return points
 

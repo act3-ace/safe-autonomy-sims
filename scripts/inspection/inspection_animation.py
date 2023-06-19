@@ -21,14 +21,45 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from safe_autonomy_sims.simulators.inspection_simulator import points_on_sphere_cmu
-
 
 class BaseAnimation(abc.ABC):
     """Base animation module"""
 
     def __init__(self):
         self.bool_array_locations = False
+
+    def points_on_sphere_fibonacci(self, num_points: int, radius: float) -> list:
+        """
+        Generate a set of equidistant points on sphere using the
+        Fibonacci Sphere algorithm: https://arxiv.org/pdf/0912.4540.pdf
+
+        Parameters
+        ----------
+        num_points: int
+            number of points to attempt to place on a sphere
+        radius: float
+            radius of the sphere
+
+        Returns
+        -------
+        points: list
+            Set of equidistant points on sphere in cartesian coordinates
+        """
+        points = []
+        phi = math.pi * (3. - math.sqrt(5.))  # golden angle in radians
+
+        for i in range(num_points):
+            y = 1 - (i / float(num_points - 1)) * 2  # y goes from 1 to -1
+            r = math.sqrt(1 - y * y)  # radius at y
+
+            theta = phi * i  # golden angle increment
+
+            x = math.cos(theta) * r
+            z = math.sin(theta) * r
+
+            points.append(radius * np.array([x, y, z]))
+
+        return points
 
     def make_animation(
         self,
@@ -70,7 +101,7 @@ class BaseAnimation(abc.ABC):
             os.mkdir(tmp_dir)
 
         # Calculate values
-        points = points_on_sphere_cmu(num_points, radius)
+        points = self.points_on_sphere_fibonacci(num_points, radius)
         total_time = times[-1]
         step_size = times[1] - times[0]
         max_pos = []
