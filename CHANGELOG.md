@@ -1,3 +1,10 @@
+## 2.7.1 (2023-06-19)
+
+
+### Bug Fixes
+
+* inspection animation and metric 8071e66
+
 # 2.7.0 (2023-06-16)
 
 
