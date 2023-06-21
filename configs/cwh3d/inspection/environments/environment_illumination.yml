@@ -21,7 +21,6 @@
       "illumination_params":{
           "mean_motion" : 0.001027,
           "avg_rad_Earth2Sun": 150000000000,
-          "sun_angle" : 0,
           "light_properties" : {'ambient': [1, 1, 1], 'diffuse': [1, 1, 1], 'specular': [1, 1, 1]},
           "chief_properties" : {'ambient': [.1, 0, 0], 'diffuse': [0.7, 0, 0], 'specular': [1, 1, 1], 'shininess': 100, 'reflection': 0.5}, # [.1, 0, 0] = red, [0.753, 0.753, 0.753] = silver
           "resolution" : [200, 200],
@@ -38,15 +37,6 @@
     },
   },
   "simulator_reset_parameters": {
-    "sun_angle" : {
-      "type": "corl.libraries.parameters.UniformParameter",
-      "config": {
-        "name": "sun_angle",
-        "units": "radians",
-        "low": 0,
-        "high": 6.283,
-      }
-    },
     "additional_entities": {
       "chief": { 
         "platform": "cwh",
@@ -57,6 +47,20 @@
           "x_dot": 0,
           "y_dot": 0,
           "z_dot": 0,
+        }
+      },
+      "sun": { 
+        "entity_class": "safe_autonomy_dynamics.cwh.sun_model.SunEntity",
+        "config":{
+          "theta": {
+            "type": "corl.libraries.parameters.UniformParameter",
+            "config": {
+              "name": "sun_angle",
+              "units": "radians",
+              "low": 0,
+              "high": 6.283,
+            }
+          },
         }
       }
     }

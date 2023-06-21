@@ -26,12 +26,7 @@ from sklearn.cluster import KMeans
 
 import safe_autonomy_sims.simulators.illumination_functions as illum
 from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform, CWHSixDOFPlatform
-from safe_autonomy_sims.simulators.saferl_simulator import (
-    SafeRLSimulator,
-    SafeRLSimulatorResetValidator,
-    SafeRLSimulatorState,
-    SafeRLSimulatorValidator,
-)
+from safe_autonomy_sims.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorState, SafeRLSimulatorValidator
 
 
 class IlluminationValidator(BaseModel):
@@ -40,8 +35,6 @@ class IlluminationValidator(BaseModel):
         A float representing the mean motion of the spacecraft in Low Earth Orbit (LEO) in [RADIANS/SECOND].
     avg_rad_Earth2Sun: float
         A float representing the average distance between the Earth and the Sun in [METERS].
-    sun_angle: float
-        A float representing the initial relative angle of sun wrt chief in [RADIANS] assuming sun travels in xy plane.
     light_properties: dict
         A dict containing the ambient, specular and diffuse light properties.
     chief_properties: dict
@@ -57,7 +50,6 @@ class IlluminationValidator(BaseModel):
 
     mean_motion: float = 0.001027
     avg_rad_Earth2Sun: float = 150000000000
-    sun_angle: typing.Union[ValueWithUnits, float] = 0.0
     light_properties: dict
     chief_properties: dict
     resolution: list
@@ -470,13 +462,6 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
         arbitrary_types_allowed = True
 
 
-class InspectionSimulatorResetValidator(SafeRLSimulatorResetValidator):
-    """
-    A validator for the InspectionSimulator reset.
-    """
-    sun_angle: typing.Union[ValueWithUnits, float] = 0.0
-
-
 class InspectionSimulator(SafeRLSimulator):
     """
     Simulator for CWH Inspection Task. Interfaces CWH platforms with underlying CWH entities in inspection simulation.
@@ -485,10 +470,6 @@ class InspectionSimulator(SafeRLSimulator):
     @property
     def get_simulator_validator(self):
         return InspectionSimulatorValidator
-
-    @property
-    def get_reset_validator(self) -> typing.Type[InspectionSimulatorResetValidator]:
-        return InspectionSimulatorResetValidator
 
     def _construct_platform_map(self) -> dict:
         return {
@@ -549,14 +530,13 @@ class InspectionSimulator(SafeRLSimulator):
             sim_entities=self.sim_entities,
             total_steps=self.total_steps,
             delta_v_scale=self.delta_v_scale,
-            sun_angle=self.sun_angle if self.config.illumination_params is not None else np.array([0.0])
+            sun_angle=self.sun_angle,
         )
 
     def reset(self, config):
         super().reset(config)
         if self.config.illumination_params is not None:
-            self._update_initial_sun_angle(config)
-            self.sun_angle = self.config.illumination_params.sun_angle
+            self.sun_angle = self.sim_entities['sun'].theta
 
         if self.inspection_points_map:
             # calculate delta_v_scale
@@ -586,9 +566,6 @@ class InspectionSimulator(SafeRLSimulator):
             points.update_points_position()
         # illuminate
         if self.config.illumination_params:
-            self.sun_angle = np.array(
-                [illum.get_sun_angle(self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle)]
-            )
             # pass sun_angle to InspectionPoints objs
             for points in self.inspection_points_map.values():
                 points.set_sun_angle(self.sun_angle)
@@ -599,13 +576,6 @@ class InspectionSimulator(SafeRLSimulator):
 
         self.update_sensor_measurements()
         return self._state
-
-    def _update_initial_sun_angle(self, config):
-        assert self.config.illumination_params is not None, "Cannot assign a sun angle without defined illumination parameters"
-        sun_angle = config['sun_angle']
-        if isinstance(sun_angle, ValueWithUnits):
-            sun_angle = sun_angle.value
-        self.config.illumination_params.sun_angle = sun_angle
 
     def _step_update_sim_statuses(self, step_size: float):
         self.total_steps += 1
@@ -621,9 +591,7 @@ class InspectionSimulator(SafeRLSimulator):
 
         # illuminate
         if self.config.illumination_params:
-            self.sun_angle = np.array(
-                [illum.get_sun_angle(self.clock, self.config.illumination_params.mean_motion, self.config.illumination_params.sun_angle)]
-            )
+            self.sun_angle = self.sim_entities['sun'].theta
             # pass sun_angle to InspectionPoints objs
             for points in self.inspection_points_map.values():
                 points.set_sun_angle(self.sun_angle)
@@ -639,7 +607,7 @@ class InspectionSimulator(SafeRLSimulator):
                 sun_position = illum.get_sun_position(
                     current_time,
                     self.config.illumination_params.mean_motion,
-                    self.config.illumination_params.sun_angle,
+                    self.sun_angle,
                     self.config.illumination_params.avg_rad_Earth2Sun
                 )
                 m = 10
