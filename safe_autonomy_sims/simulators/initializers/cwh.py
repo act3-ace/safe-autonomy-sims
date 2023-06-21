@@ -416,3 +416,104 @@ class CWHSixDOFRadialInitializer(PintUnitConversionInitializer):
             'wy': wy,
             'wz': wz,
         }
+
+
+class CWH3DRadialWithSunInitializer(PintUnitConversionInitializer):
+    """
+    This class handles the initialization of agent reset parameters for the cwh 3D environment.
+    Both position and velocity are initialized radially (with radius and angles) to allow for
+    control over magnitude and direction of the resulting vectors.
+    The sun angle is considered such that the agent is not pointing a sensor towards the sun.
+
+    def __call__(self, reset_config):
+
+    Parameters
+    ----------
+    reset_config: dict
+        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
+        are the values
+
+    Returns
+    -------
+    reset_config: dict
+        The modified reset config of agent name to initialization values KVPs.
+    """
+
+    param_units = {
+        'radius': 'meters',
+        'azimuth_angle': 'radians',
+        'elevation_angle': 'radians',
+        'vel_mag': 'meters/second',
+        'vel_azimuth_angle': 'radians',
+        'vel_elevation_angle': 'radians',
+        'sun_angle': 'radians',
+        'sensor_fov': 'radians',
+    }
+
+    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
+        return self._compute_with_units(**kwargs_with_stripped_units)
+
+    def _compute_with_units(
+        self,
+        radius: float,
+        azimuth_angle: float,
+        elevation_angle: float,
+        vel_mag: float,
+        vel_azimuth_angle: float,
+        vel_elevation_angle: float,
+        sun_angle: float,
+        sensor_fov: float,
+    ) -> typing.Dict:
+        """Computes radial initial conditions for cwh 3d
+
+        Parameters
+        ----------
+        radius : float
+            radius from origin. meters
+        azimuth_angle : float
+            location azimuthal angle in spherical coordinates (right hand convention). rad
+        elevation_angle : float
+            location elevation angle from x-y plane. Positive angles = positive z. rad
+        vel_mag : float
+            magnitude of velocity vector. meters/second
+        vel_azimuth_angle : float
+            velocity vector azimuthal angle in spherical coordinates (right hand convention). rad
+        vel_elevation_angle : float
+            velocity vector elevation angle from x-y plane. Positive angles = positive z. rad
+        sun_angle : float
+            Initial angle of the sun. rad
+        sensor_fov : float
+            Sensor field of view (sun will be kept out of this zone). rad
+            TODO: add buffer?
+
+        Returns
+        -------
+        typing.Dict
+            initial conditions of platform
+        """
+
+        x = radius * np.cos(azimuth_angle) * np.cos(elevation_angle)
+        y = radius * np.sin(azimuth_angle) * np.cos(elevation_angle)
+        z = radius * np.sin(elevation_angle)
+
+        x_dot = vel_mag * np.cos(vel_azimuth_angle) * np.cos(vel_elevation_angle)
+        y_dot = vel_mag * np.sin(vel_azimuth_angle) * np.cos(vel_elevation_angle)
+        z_dot = vel_mag * np.sin(vel_elevation_angle)
+
+        sun_vec = -np.array([(np.cos(sun_angle)), -1 * (np.sin(sun_angle)), 0])
+        pos = np.array([x, y, z])
+        p_hat = pos / np.linalg.norm(pos)
+        c_hat = sun_vec / np.linalg.norm(sun_vec)
+        if np.arccos(np.dot(p_hat, c_hat)) < sensor_fov / 2:
+            x *= -1
+            y *= -1
+            z *= -1
+
+        return {
+            'x': x,
+            'y': y,
+            'z': z,
+            'x_dot': x_dot,
+            'y_dot': y_dot,
+            'z_dot': z_dot,
+        }
