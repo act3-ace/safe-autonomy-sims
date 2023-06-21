@@ -51,32 +51,6 @@ def get_sun_position(current_time, angular_velocity, initial_theta, r_avg):
     return sun_position
 
 
-def get_sun_angle(current_time, angular_velocity, initial_theta):
-    """
-    Return current sun angle based on initial sun position and time elapsed
-
-    Parameters
-    ----------
-    current_time: int
-        current simulation time in seconds
-    dt: float
-        step size in seconds
-    angular_velocity: float
-        mean motion of sun in meters per second
-    initial_theta: float
-        initial angle of sun with respect to chief in radians
-
-    Returns
-    -------
-    current_theta: float
-        angle of sun with respect to chief in radians
-    """
-    d_theta = angular_velocity
-    current_theta = d_theta * current_time + initial_theta
-
-    return current_theta
-
-
 def check_illum(point, sun_angle, r_avg, radius):
     """
     Receive a candidate point as an input

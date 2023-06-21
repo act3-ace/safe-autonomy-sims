@@ -26,7 +26,7 @@
     "episode_parameter_provider": {
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
-    "simulator_reset_parameters": !include-extend ../common/initializer/translational.yml,
+    "simulator_reset_parameters": !include-extend ../common/initializer/translational_illumination.yml,
     "glues": [
         {
             "functor": "safe_autonomy_sims.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
