@@ -20,7 +20,7 @@ from corl.libraries.state_dict import StateDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 from corl.simulators.common_platform_utils import get_platform_by_name
 
-from safe_autonomy_sims.utils import get_relative_position
+from safe_autonomy_sims.utils import get_closest_fft_distance, get_relative_position
 
 
 class ObservedPointsRewardValidator(RewardFuncBaseValidator):
@@ -29,9 +29,14 @@ class ObservedPointsRewardValidator(RewardFuncBaseValidator):
 
     scale : float
         A scalar value applied to reward.
+    inspection_entity_name: str
+        The name of the entity under inspection.
+    weighted_priority : bool
+        True to base reward off of point weights, False to base reward off of number of points
     """
     scale: float
     inspection_entity_name: str = "chief"
+    weighted_priority: bool = False
 
 
 class ObservedPointsReward(RewardFuncBase):
@@ -77,6 +82,8 @@ class ObservedPointsReward(RewardFuncBase):
         self.config: ObservedPointsRewardValidator
         super().__init__(**kwargs)
         self.previous_num_points_inspected = 0
+        if self.config.weighted_priority:
+            self.previous_weight_inspected = 0.
 
     @property
     def get_validator(self):
@@ -103,7 +110,14 @@ class ObservedPointsReward(RewardFuncBase):
         num_new_points = current_num_points_inspected - self.previous_num_points_inspected
         self.previous_num_points_inspected = current_num_points_inspected
 
-        reward[self.config.agent_name] = self.config.scale * num_new_points
+        if self.config.weighted_priority:
+            current_weight_inspected = inspection_points.get_total_weight_inspected()
+            new_weight = current_weight_inspected - self.previous_weight_inspected
+            self.previous_weight_inspected = current_weight_inspected
+            reward[self.config.agent_name] = self.config.scale * new_weight
+        else:
+            reward[self.config.agent_name] = self.config.scale * num_new_points
+
         return reward
 
 
@@ -353,9 +367,15 @@ class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
 
     scale : float
         Scalar value to adjust magnitude of the reward.
+    inspection_entity_name: str
+        The name of the entity under inspection.
+    weight_threshold : float
+        Points score value indicating success.
+        By default None, so success occurs when all points are inspected
     """
     scale: float
     inspection_entity_name: str = "chief"
+    weight_threshold: typing.Union[float, None] = None
 
 
 class InspectionSuccessReward(RewardFuncBase):
@@ -424,11 +444,80 @@ class InspectionSuccessReward(RewardFuncBase):
         reward = RewardDict()
         value = 0.0
 
-        inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
-        all_inspected = all(inspection_points.points_inspected_dict.values())
+        if self.config.weight_threshold is not None:
+            weight = next_state.inspection_points_map[self.config.inspection_entity_name].get_total_weight_inspected()
+            if weight >= self.config.weight_threshold:
+                value = self.config.scale
 
-        if all_inspected:
-            value = self.config.scale
+        else:
+            inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
+            all_inspected = all(inspection_points.points_inspected_dict.values())
+
+            if all_inspected:
+                value = self.config.scale
+
+        reward[self.config.agent_name] = value
+        return reward
+
+
+class SafeInspectionSuccessRewardValidator(InspectionSuccessRewardValidator):
+    """
+    mean_motion : float
+        orbital mean motion in rad/s of current Hill's reference frame
+    crash_region_radius : float
+        The radius of the crashing region in meters.
+    fft_time_step : float
+        Time step to compute the FFT trajectory. FFT is computed for 1 orbit.
+    crash_scale : float
+        Scalar reward value in the event of a future crash
+    """
+    mean_motion: float
+    crash_region_radius: float
+    fft_time_step: float = 1
+    crash_scale: float
+
+
+class SafeInspectionSuccessReward(InspectionSuccessReward):
+    """
+    This Reward Function is responsible for calculating the reward associated with a successful inspection.
+    Considers if a Free Flight Trajectory once the episode ends would result in a collision.
+    """
+
+    def __init__(self, **kwargs) -> None:
+        self.config: SafeInspectionSuccessRewardValidator
+        super().__init__(**kwargs)
+
+    @property
+    def get_validator(self):
+        """
+        Method to return class's Validator.
+        """
+        return SafeInspectionSuccessRewardValidator
+
+    def __call__(
+        self,
+        observation: OrderedDict,
+        action,
+        next_observation: OrderedDict,
+        state: StateDict,
+        next_state: StateDict,
+        observation_space: StateDict,
+        observation_units: StateDict,
+    ) -> RewardDict:
+
+        reward = super().__call__(observation, action, next_observation, state, next_state, observation_space, observation_units)
+
+        value = reward[self.config.agent_name]
+
+        if value != 0.0:
+            pos = observation[self.config.agent_name]['ObserveSensor_Sensor_Position']['direct_observation']
+            vel = observation[self.config.agent_name]['ObserveSensor_Sensor_Velocity']['direct_observation']
+            state = np.concatenate((pos, vel))
+            n = self.config.mean_motion
+            times = np.arange(0, 2 * np.pi / n, self.config.fft_time_step)
+            dist = get_closest_fft_distance(state, self.config.mean_motion, times)
+            if dist < self.config.crash_region_radius:
+                value = self.config.crash_scale
 
         reward[self.config.agent_name] = value
         return reward

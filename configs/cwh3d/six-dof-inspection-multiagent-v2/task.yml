@@ -1,0 +1,52 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+####################################################################
+# Override values used by the setup
+####################################################################
+experiment_class: corl.experiments.rllib_experiment.RllibExperiment
+config:
+  rllib_config_updates: &rllib_config_updates
+    horizon: 1223 # episode length (2 orbits is 12236 sec)
+    rollout_fragment_length: 1500
+    train_batch_size: 1500  # set to num_workers * rollout_fragment_length
+    sgd_minibatch_size: 1500
+    num_workers: 1
+    num_cpus_for_driver: 0.5
+    gamma: 0.99
+    seed: 4900
+
+  # No overrides for ray as there are no changes
+  ray_config_updates: &ray_config_updates
+    local_mode: false
+
+  # Change the default path for saving out the data
+  env_config_updates: &env_config_updates
+    TrialName: SIX-DOF-INSPECTION-MULTIAGENT-V2
+    output_path: ./output/env/
+
+  # Change the default path for saving out the data
+  tune_config_updates: &tune_config_updates
+    keep_checkpoints_num: 1000
+    checkpoint_freq: 50  # FOR EVAL
+    stop:
+      timesteps_total: 5000000
+
+  ####################################################################
+  # Setup the actual keys used by the code
+  # Note that items are patched from the update section
+  ###################################################################
+  rllib_configs:
+    default: [!include ../../common/ray/rllib.yml, *rllib_config_updates]
+    local: [!include ../../common/ray/rllib.yml,  *rllib_config_updates]
+
+  ray_config: [!include ../../common/ray/ray.yml, *ray_config_updates]
+  env_config: [!include environment.yml, *env_config_updates]
+  tune_config: [!include ../../common/ray/tune.yml, *tune_config_updates]
