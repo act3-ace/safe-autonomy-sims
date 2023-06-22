@@ -1,3 +1,10 @@
+# 2.9.0 (2023-06-22)
+
+
+### Features
+
+* inspection environment v2 (point weighting) 6d74ddd
+
 # 2.8.0 (2023-06-21)
 
 
