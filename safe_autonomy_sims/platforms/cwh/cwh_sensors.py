@@ -345,6 +345,79 @@ class BoolArraySensor(CWHSensor):
         return bool_array
 
 
+class PriorityVectorSensor(CWHSensor):
+    """
+    Implementation of a sensor to give the inspected points priority vector
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.PriorityVectorProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - priority vector.
+
+        Returns
+        -------
+        np.ndarray
+            priority vector
+        """
+        return state.priority_vector
+
+
+class InspectedPointsScoreSensorValidator(BasePlatformPartValidator):
+    """
+    Validator for InspectedPointsScoreSensor
+
+    inspection_entity_name: str
+        The name of the entity under inspection.
+    """
+    inspector_entity_name: str = ""
+
+
+class InspectedPointsScoreSensor(CWHSensor):
+    """
+    Implementation of a sensor to give the inspected points score
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.PointsScoreProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return InspectedPointsScoreSensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - inspected points score.
+
+        Returns
+        -------
+        float
+            inspected points score.
+        """
+        # handle initialization case
+        if self.config.inspector_entity_name not in state.sim_entities:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.inspector_entity_name} not found in simulator state!")
+            return np.array([0.])
+
+        # get inspector entity object
+        inspector_entity = state.sim_entities[self.config.inspector_entity_name]
+
+        # count total number of points inspected by
+        weight = 0.
+        for points in state.inspection_points_map.values():
+            weight += points.get_total_weight_inspected(inspector_entity=inspector_entity)
+
+        return np.array([weight])
+
+
 for sim in [CWHSimulator, InspectionSimulator]:
     for platform in [CWHAvailablePlatformTypes.CWH, CWHAvailablePlatformTypes.CWHSixDOF]:
         for sensor, sensor_name in zip(
@@ -359,6 +432,8 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 EntityPositionSensor,
                 EntityVelocitySensor,
                 OriginPositionSensor,
+                PriorityVectorSensor,
+                InspectedPointsScoreSensor,
             ],
             [
                 "Sensor_Generic",
@@ -371,6 +446,8 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 "Sensor_EntityPosition",
                 "Sensor_EntityVelocity",
                 "Sensor_OriginPosition",
+                "Sensor_PriorityVector",
+                "Sensor_InspectedPointsScore",
             ]
         ):
             PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": platform})

@@ -26,7 +26,12 @@ from sklearn.cluster import KMeans
 
 import safe_autonomy_sims.simulators.illumination_functions as illum
 from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform, CWHSixDOFPlatform
-from safe_autonomy_sims.simulators.saferl_simulator import SafeRLSimulator, SafeRLSimulatorState, SafeRLSimulatorValidator
+from safe_autonomy_sims.simulators.saferl_simulator import (
+    SafeRLSimulator,
+    SafeRLSimulatorResetValidator,
+    SafeRLSimulatorState,
+    SafeRLSimulatorValidator,
+)
 
 
 class IlluminationValidator(BaseModel):
@@ -100,12 +105,14 @@ class InspectionPoints:
     A class maintaining the inspection status of an entity.
     """
 
-    def __init__(self, parent_entity: CWHSpacecraft, **kwargs):
+    def __init__(self, parent_entity: CWHSpacecraft, priority_vector: np.ndarray, **kwargs):
         self.config: InspectionPointsValidator = self.get_validator(**kwargs)
         self.sun_angle = 0.0
         self.clock = 0.0
         self.parent_entity = parent_entity
-        self._default_points_position_dict, self.points_position_dict, self.points_inspected_dict = self._add_points()
+        self.priority_vector = priority_vector
+        (self._default_points_position_dict, self.points_position_dict, self.points_inspected_dict,
+         self.points_weights_dict) = self._add_points()
         self.last_points_inspected = 0
         self.last_cluster = None
 
@@ -137,13 +144,21 @@ class InspectionPoints:
         points = points_alg(self.config.num_points, self.config.radius)  # TODO: HANDLE POSITION UNITS*
         points_position_dict = {}
         points_inspected_dict = {}
+        points_weights_dict = {}
         for i, point in enumerate(points):
             points_position_dict[i] = point
             points_inspected_dict[i] = False
+            points_weights_dict[i] = np.arccos(
+                np.dot(-self.priority_vector, point) / (np.linalg.norm(-self.priority_vector) * np.linalg.norm(point))
+            ) / np.pi
+
+        # Normalize weighting
+        total_weight = sum(list(points_weights_dict.values()))
+        points_weights_dict = {k: w / total_weight for k, w in points_weights_dict.items()}
 
         default_points_position = copy.deepcopy(points_position_dict)
 
-        return default_points_position, points_position_dict, points_inspected_dict
+        return default_points_position, points_position_dict, points_inspected_dict, points_weights_dict
 
     # inspected or not
     def update_points_inspection_status(self, inspector_entity):
@@ -390,6 +405,17 @@ class InspectionPoints:
         """Get the location of the nearest cluster of uninspected points"""
         return self._kmeans_find_nearest(inspector_position)
 
+    def get_total_weight_inspected(self, inspector_entity: BaseEntity = None):
+        """Get total weight of points inspected"""
+        weights = 0
+        if inspector_entity:
+            for point_inspector_entity, weight in zip(self.points_inspected_dict.values(), self.points_weights_dict.values()):
+                weights += weight if point_inspector_entity == inspector_entity.name else 0.
+        else:
+            for point_inspector_entity, weight in zip(self.points_inspected_dict.values(), self.points_weights_dict.values()):
+                weights += weight if point_inspector_entity else 0.
+        return weights
+
     def set_sun_angle(self, sun_angle: np.ndarray):
         """Get the current sun angle"""
         self.sun_angle = float(sun_angle)
@@ -404,19 +430,20 @@ class InspectionSimulatorState(SafeRLSimulatorState):
         Keys: point_id int. Values: InspectionPoints objects.
     total_steps: int
         The total number of steps simulated since the simulator was initialized
-    inspected_points_percentage: float
-        The percentage of points inspected, averaged over completed episodes during a specified period
     delta_v_scale: float
-        The scale of the delta_v reward. This value is updated over time, based on the value of inspected_points_percentage.
+        The scale of the delta_v reward. This value is updated over time, based on the value of inspected_points_value.
         See safe_autonomy_sims/rewards/cwh/inspection_rewards for more details.
         Note that this feature is experimental, and currently does not synchronize between workers.
-    sun_angle: float
-        The angle of the sun.
+    sun_angle: typing.Union[ValueWithUnits, float]
+        Angle of the Sun in the x-y plane
+    priority_vector: np.ndarray
+        Vector indicating priority of points to be inspected
     """
     inspection_points_map: typing.Dict[str, InspectionPoints]
     total_steps: int
     delta_v_scale: float
     sun_angle: typing.Union[ValueWithUnits, float] = 0.0
+    priority_vector: np.ndarray
 
     class Config:
         """Allow arbitrary types for Parameter"""
@@ -431,14 +458,17 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
         dict of illumination parameters, described above
     steps_until_update: int
         Number of steps between updates to the delta_v_scale
+    delta_v_updater_criteria: str
+        Criteria for updating the delta-v scale.
+        Either 'score' for total points score, or 'count' for total number of points
     delta_v_scale_bounds: list
         lower and upper bounds for the value of delta_v_scale
     delta_v_scale_step: float
         The amount to advance/retract the delta_v_scale by at each update
     inspected_points_update_bounds: list
         bounds for when to update the delta_v_scale.
-        if inspected_points_percentage >= inspected_points_update_bounds[1], delta_v_scale is advanced by delta_v_scale_step
-        if inspected_points_percentage <= inspected_points_update_bounds[0], delta_v_scale is retracted by delta_v_scale_step
+        if inspected_points_value >= inspected_points_update_bounds[1], delta_v_scale is advanced by delta_v_scale_step
+        if inspected_points_value <= inspected_points_update_bounds[0], delta_v_scale is retracted by delta_v_scale_step
     sensor_fov: float
         field of view of the sensor (radians). By default pi (180 degrees)
     initial_sensor_unit_vec: list
@@ -450,6 +480,7 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
 
     illumination_params: typing.Union[IlluminationValidator, None] = None
     steps_until_update: int
+    delta_v_updater_criteria: str = 'count'
     delta_v_scale_bounds: list
     delta_v_scale_step: float
     inspected_points_update_bounds: list
@@ -462,6 +493,19 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
         arbitrary_types_allowed = True
 
 
+class InspectionSimulatorResetValidator(SafeRLSimulatorResetValidator):
+    """
+    A validator for the InspectionSimulator reset.
+
+    priority_vector_azimuth_angle: typing.Union[ValueWithUnits, float]
+        Azimuth angle of the priority vector for weighting points
+    priority_vector_elevation_angle: typing.Union[ValueWithUnits, float]
+        Elevation angle of the priority vector for weighting points
+    """
+    priority_vector_azimuth_angle: typing.Union[ValueWithUnits, float] = 0.0
+    priority_vector_elevation_angle: typing.Union[ValueWithUnits, float] = 0.0
+
+
 class InspectionSimulator(SafeRLSimulator):
     """
     Simulator for CWH Inspection Task. Interfaces CWH platforms with underlying CWH entities in inspection simulation.
@@ -470,6 +514,10 @@ class InspectionSimulator(SafeRLSimulator):
     @property
     def get_simulator_validator(self):
         return InspectionSimulatorValidator
+
+    @property
+    def get_reset_validator(self) -> typing.Type[InspectionSimulatorResetValidator]:
+        return InspectionSimulatorResetValidator
 
     def _construct_platform_map(self) -> dict:
         return {
@@ -493,14 +541,16 @@ class InspectionSimulator(SafeRLSimulator):
                 self.ax_yz = self.fig.add_subplot(2, 2, 4)
 
         self.total_steps = 0
-        self.inspected_points_percentage_list = []
+        self.inspected_points_value_list = []
         self.update_step_current = 0
         self.delta_v_scale = 0
+        self.delta_v_updater_criteria = self.config.delta_v_updater_criteria
         self.steps_until_update = self.config.steps_until_update
         self.delta_v_scale_bounds = self.config.delta_v_scale_bounds
         self.delta_v_scale_step = self.config.delta_v_scale_step
         self.inspected_points_update_bounds = self.config.inspected_points_update_bounds
         self.sun_angle = 0.
+        self.priority_vector = np.zeros(3)
 
     def create_inspection_points_map(self):
         """
@@ -518,6 +568,7 @@ class InspectionSimulator(SafeRLSimulator):
                 sensor_fov=self.config.sensor_fov,
                 initial_sensor_unit_vec=self.config.initial_sensor_unit_vec,
                 illumination_params=self.config.illumination_params,
+                priority_vector=self.priority_vector,
             )
 
         return points_map
@@ -531,6 +582,7 @@ class InspectionSimulator(SafeRLSimulator):
             total_steps=self.total_steps,
             delta_v_scale=self.delta_v_scale,
             sun_angle=self.sun_angle,
+            priority_vector=self.priority_vector,
         )
 
     def reset(self, config):
@@ -538,19 +590,26 @@ class InspectionSimulator(SafeRLSimulator):
         if self.config.illumination_params is not None:
             self.sun_angle = self.sim_entities['sun'].theta
 
+        self._get_initial_priority_vector(config)
+
         if self.inspection_points_map:
             # calculate delta_v_scale
             # TODO: remove "chief" assumption
             final_num_points_inspected = self.inspection_points_map["chief"].get_num_points_inspected()
             if final_num_points_inspected != 0:
-                self.inspected_points_percentage_list.append(self.inspection_points_map["chief"].get_percentage_of_points_inspected())
+                if self.delta_v_updater_criteria == 'score':
+                    self.inspected_points_value_list.append(self.inspection_points_map["chief"].get_total_weight_inspected())
+                elif self.delta_v_updater_criteria == 'count':
+                    self.inspected_points_value_list.append(self.inspection_points_map["chief"].get_percentage_of_points_inspected())
+                else:
+                    raise ValueError('delta_v_updater_criteria must be either "score" or "count"')
             if self.total_steps >= self.update_step_current:
                 self.update_step_current += self.steps_until_update
-                mean_inspected_points_percentage = np.mean(self.inspected_points_percentage_list)
-                self.inspected_points_percentage_list = []
-                if mean_inspected_points_percentage >= self.inspected_points_update_bounds[1]:
+                mean_inspected_points_value = np.mean(self.inspected_points_value_list)
+                self.inspected_points_value_list = []
+                if mean_inspected_points_value >= self.inspected_points_update_bounds[1]:
                     self.delta_v_scale += self.delta_v_scale_step
-                if mean_inspected_points_percentage <= self.inspected_points_update_bounds[0]:
+                if mean_inspected_points_value <= self.inspected_points_update_bounds[0]:
                     self.delta_v_scale -= self.delta_v_scale_step
 
         self.delta_v_scale = np.clip(self.delta_v_scale, self.delta_v_scale_bounds[0], self.delta_v_scale_bounds[1])
@@ -576,6 +635,19 @@ class InspectionSimulator(SafeRLSimulator):
 
         self.update_sensor_measurements()
         return self._state
+
+    def _get_initial_priority_vector(self, config):
+        """Get the initial priority vector for weighting points"""
+        azi = config["priority_vector_azimuth_angle"]
+        if isinstance(azi, ValueWithUnits):
+            azi = azi.value
+        ele = config["priority_vector_elevation_angle"]
+        if isinstance(ele, ValueWithUnits):
+            ele = ele.value
+
+        self.priority_vector[0] = np.cos(azi) * np.cos(ele)
+        self.priority_vector[1] = np.sin(azi) * np.cos(ele)
+        self.priority_vector[2] = np.sin(ele)
 
     def _step_update_sim_statuses(self, step_size: float):
         self.total_steps += 1

@@ -217,3 +217,33 @@ class VelocityConstraintValidator(BaseModel):
     mean_motion: float = 0.001027
     lower_bound: bool = False
     slope: float = 2.0
+
+
+def get_closest_fft_distance(state: np.ndarray, n: float, time_array: typing.Union[np.ndarray, list]) -> float:
+    """
+    Get the closest Free Flight Trajectory (FFT) distance over a given time horizon.
+    Use closed form CWH dynamics to calculate future states in the absence of control
+
+    Parameters
+    ----------
+    state: np.ndarray
+        Initial state
+    n: float
+        Orbital mean motion of Hill's reference frame's circular orbit in rad/s
+    time_array: Union[np.ndarray, list]
+        Array containing each point in time to check the FFT trajectory
+
+    Returns
+    -------
+    float
+        Closest relative distance to the origin achieved during the FFT
+    """
+
+    distances = []
+    for t in time_array:
+        x = (4 - 3 * np.cos(n * t)) * state[0] + np.sin(n * t) * state[3] / n + 2 / n * (1 - np.cos(n * t)) * state[4]
+        y = 6 * (np.sin(n * t) - n * t) * state[0] + state[1] - 2 / n * (1 - np.cos(n * t)) * state[3] + (4 * np.sin(n * t) -
+                                                                                                          3 * n * t) * state[4] / n
+        z = state[2] * np.cos(n * t) + state[5] / n * np.sin(n * t)
+        distances.append(np.linalg.norm([x, y, z]))
+    return float(min(distances))
