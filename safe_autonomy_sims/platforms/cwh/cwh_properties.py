@@ -188,7 +188,7 @@ class BoolArrayProp(BoxProp):
     """
 
     name: str = "bool_array"
-    num_points: int = 99
+    num_points: int = 100
     low: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [0.0] * num_points
     high: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [1.0] * num_points
     unit: Annotated[typing.List[StrictStr], Field(min_items=num_points, max_items=num_points)] = ["None"] * num_points
@@ -239,3 +239,45 @@ class AngularVelocityProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [10.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["rad/s"] * 3
     description: str = "Angular Velocity Sensor Properties"
+
+
+class PriorityVectorProp(BoxProp):
+    """
+    Priority Vector sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "priority vector"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    description: str = "Priority Vector Sensor Properties"
+
+
+class PointsScoreProp(BoxProp):
+    """
+    Inspected points score sensor properties.
+
+    name : str
+        Sensor property name.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "inspected points score"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
+    description: str = "Inspected Points Score Sensor Properties"

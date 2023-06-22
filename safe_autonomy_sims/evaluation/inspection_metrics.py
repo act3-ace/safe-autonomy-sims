@@ -127,3 +127,31 @@ class Success(MetricGeneratorTerminalEventScope):
             val = 0
 
         return Real(val)
+
+
+class InspectedPointsScore(MetricGeneratorTerminalEventScope):
+    """Generates single Real indicating the score for inspected points score for an event
+
+    Metric: Real
+    Scope: Event
+    """
+
+    def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
+
+        if "agent_id" not in kwargs:
+            raise RuntimeError("Expecting \"agent_id\" to be provided")
+
+        agent_id = kwargs["agent_id"].split('.')[0]
+
+        # Find the last step with observation data from the platform in question
+        # If the platform isn't in the episode at all, return Void
+        steps_with_platform_in_question = [item for item in params.steps if agent_id in item.agents and item.agents[agent_id] is not None]
+        if len(steps_with_platform_in_question) == 0:
+            return Void()
+
+        last_step_with_platform_data = steps_with_platform_in_question[-1]
+
+        if last_step_with_platform_data.agents[agent_id] is None:
+            raise RuntimeError("Non Op")
+
+        return Real(last_step_with_platform_data.platforms[0]['sensors']['Sensor_InspectedPointsScore']['measurement'][0])

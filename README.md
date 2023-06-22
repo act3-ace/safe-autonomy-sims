@@ -135,24 +135,36 @@ python path/to/corl/corl train.py --cfg /path/to/safe-autonomy-sims/configs/expe
 
 This library includes the following environments:
 
-- Inspection 3D
-- Inspection 3D - Multiagent
+- Translational Inspection v0:
+- Translational Inspection v1:
+- Translational Inspection v2:
+- Translational Inspection Multiagent v2:
+- Six DoF Inspection v2:
+- Six DoF Inspection Multiagent v2:
 - Docking 3D
 - Docking 3D - Multiagent
-- Rejoin 2D
-- Rejoin 3D
-- Rejoin 3D - Multiagent
 
 
 ### Inspection
-Spacecraft inspection scenario where an agent controlled deputy spacecraft must inspect points on a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching and navigating around the chief to view all points on a sphere, assuming the deputy always points a sensor towards the chief. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors: 
+Spacecraft inspection scenario where an agent controlled deputy spacecraft must inspect points on a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching and navigating around the chief to view all points on a sphere. Inspection 3D environments assume the deputy always points a sensor towards the chief, while Inspection Six DoF environments allow the deputy to control the orientation of the sensor. The translational motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model, and the Six DoF environments use a quaternion formulation to model attitude. All have static 1N thrusters in $\pm x, \pm y, \pm z$, and Six DoF environments also have moment controllers in $\pm x, \pm y, \pm z$. Comes in the following flavors: 
 
--  **Inspection 3D**
-Static 1N thrusters in $\pm x, \pm y, \pm z$.
+-  **Translational Inspection v0**
+No illumination from sun. Agent can inspect any point at any time.
 
--  **Inspection 3D - Multiagent**
-Multiple agent controlled deputy spaceraft. Each controlled by static 1N thrusters in $\pm x, \pm y, \pm z$.
+-  **Translational Inspection v1**
+Sun illuminates the chief, which is assumed to rotate in the $x-y$ plane. Agent can only inspect illuminated points.
 
+-  **Translational Inspection v2**
+Sun illuminates the chief. Points are prioritizied through a directional unit vector, and are assigned weights/scores based on their angular distance to this vector. Inspected points are rewarded based on score. Success is determined by reaching a score threshold, rather than all points inspected.
+
+-  **Translational Inspection Multiagent v2**
+Same as translational v2 environment, with multiple agent controlled deputy spacecraft.
+
+-  **Six DoF Inspection v2**
+Same as translational v2 environment, but agent can control attitude (does not always point at chief).
+
+-  **Six DoF Inspection Multiagent v2**
+Same as Six DoF v2 environment, with multiple agent controlled deputy spacecraft.
 
 ### Docking
 Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors: 
