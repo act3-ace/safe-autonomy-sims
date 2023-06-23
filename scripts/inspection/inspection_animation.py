@@ -20,6 +20,7 @@ import imageio.v2 as imageio
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from safe_autonomy_sims.simulators.inspection_simulator import InspectionPoints
 
 
 class BaseAnimation(abc.ABC):
@@ -27,39 +28,6 @@ class BaseAnimation(abc.ABC):
 
     def __init__(self):
         self.bool_array_locations = False
-
-    def points_on_sphere_fibonacci(self, num_points: int, radius: float) -> list:
-        """
-        Generate a set of equidistant points on sphere using the
-        Fibonacci Sphere algorithm: https://arxiv.org/pdf/0912.4540.pdf
-
-        Parameters
-        ----------
-        num_points: int
-            number of points to attempt to place on a sphere
-        radius: float
-            radius of the sphere
-
-        Returns
-        -------
-        points: list
-            Set of equidistant points on sphere in cartesian coordinates
-        """
-        points = []
-        phi = math.pi * (3. - math.sqrt(5.))  # golden angle in radians
-
-        for i in range(num_points):
-            y = 1 - (i / float(num_points - 1)) * 2  # y goes from 1 to -1
-            r = math.sqrt(1 - y * y)  # radius at y
-
-            theta = phi * i  # golden angle increment
-
-            x = math.cos(theta) * r
-            z = math.sin(theta) * r
-
-            points.append(radius * np.array([x, y, z]))
-
-        return points
 
     def make_animation(
         self,
@@ -69,7 +37,8 @@ class BaseAnimation(abc.ABC):
         last_step: bool = False,
         radius: float = 10.,
         num_points: int = 100,
-        mass: float = 12
+        mass: float = 12,
+        points_algorithm: str = "cmu",
     ):
         """Function to make and save animation/plots
 
@@ -90,18 +59,25 @@ class BaseAnimation(abc.ABC):
             Number of points on sphere
         mass: float
             Mass of spacecraft (for delta-v calculation)
+        points_algorithm: str
+            points algorithm to use. Either "cmu" or "fibonacci"
         """
 
         tmp_dir = '/tmp/eval_results/animation_plots'
 
         times, positions, bool_arrays, sun_vectors, control_vectors, velocities = self.get_data(data_path)
+        if points_algorithm == "cmu":
+            bool_arrays = np.delete(bool_arrays, -1, 1)  # TODO: fix bool array number of points
 
         # Make temp directory
         if not os.path.exists(tmp_dir) and not last_step:
             os.mkdir(tmp_dir)
 
         # Calculate values
-        points = self.points_on_sphere_fibonacci(num_points, radius)
+        if points_algorithm == "cmu":
+            points = InspectionPoints.points_on_sphere_cmu(InspectionPoints, num_points, radius)
+        elif points_algorithm == "fibonacci":
+            points = InspectionPoints.points_on_sphere_fibonacci(InspectionPoints, num_points, radius)
         total_time = times[-1]
         step_size = times[1] - times[0]
         max_pos = []
@@ -468,7 +444,7 @@ class AnimationFromCheckpoint(BaseAnimation):
         positions = np.zeros((1, 3))
         velocities = np.zeros((1, 3))
         sun_vectors = np.zeros((1, 3))
-        bool_arrays = np.zeros((1, 99))
+        bool_arrays = np.zeros((1, 100))
         for state in data_path["ObservationVector"][0]:
             pos = state.data['ObserveSensor_Sensor_Position'].value['direct_observation']
             positions = np.append(positions, [pos], axis=0)
@@ -485,7 +461,7 @@ class AnimationFromCheckpoint(BaseAnimation):
                 self.bool_array_locations = True
             except KeyError:
                 ins_pts = int(state.data['ObserveSensor_Sensor_InspectedPoints'].value['direct_observation'])
-                new_bool = np.zeros(99)
+                new_bool = np.zeros(100)
                 new_bool[0:ins_pts] = 1
                 self.bool_array_locations = False
             bool_arrays = np.append(bool_arrays, [new_bool], axis=0)
