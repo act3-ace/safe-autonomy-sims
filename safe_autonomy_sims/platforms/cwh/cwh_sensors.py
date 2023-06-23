@@ -342,6 +342,8 @@ class BoolArraySensor(CWHSensor):
 
         inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
         bool_array = np.array([float(bool(a)) for a in inspection_points.points_inspected_dict.values()])
+        if len(bool_array) == 99:  # TODO: Remove hardcoded value
+            bool_array = np.concatenate((bool_array, np.zeros(1)))
         return bool_array
 
 
