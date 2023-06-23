@@ -1,3 +1,10 @@
+## 2.9.1 (2023-06-23)
+
+
+### Bug Fixes
+
+* inspection metric and animation e5614f8
+
 # 2.9.0 (2023-06-22)
 
 
