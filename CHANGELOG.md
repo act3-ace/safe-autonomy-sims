@@ -1,3 +1,10 @@
+# 2.10.0 (2023-07-06)
+
+
+### Features
+
+* Resolve "evaluation api progress bar" 6853886
+
 ## 2.9.1 (2023-06-23)
 
 
