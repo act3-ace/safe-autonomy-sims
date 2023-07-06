@@ -12,6 +12,7 @@ import os
 import pickle
 import sys
 import typing
+import re
 from glob import glob
 
 import matplotlib.pyplot as plt
@@ -109,6 +110,8 @@ def evaluate(
     # handle grid search seeds
     if isinstance(task.experiment_parse.config['rllib_configs']['local'][0]['seed'], dict):
         task.experiment_parse.config['rllib_configs']['local'][0]['seed'] = 1
+
+    print("seed: " + str(task.experiment_parse.config['rllib_configs']['local'][0]['seed']) + '\n')
 
     engine = RllibTrainer(**rllib_engine_args)
     recorder = Folder(**recorder_args)
@@ -463,7 +466,8 @@ def run_ablation_study(
                     platfrom_serializer_class,
                     test_case_manager_config=test_case_manager_config,
                     visualize_metrics=False,
-                    rl_algorithm_name=rl_algorithm_name
+                    rl_algorithm_name=rl_algorithm_name,
+                    experiment_name=experiment_name
                 )
 
     # create sample complexity plot
@@ -487,7 +491,8 @@ def run_evaluations(
     platfrom_serializer_class: PlatformSerializer,
     test_case_manager_config: dict = None,
     visualize_metrics: bool = False,
-    rl_algorithm_name: str = None
+    rl_algorithm_name: str = None,
+    experiment_name: str = "",
 ):
     """
     This function is responsible for taking a list of checkpoint paths and iteratively running them through
@@ -517,6 +522,8 @@ def run_evaluations(
     visualize_metrics: bool
         A boolean to determine whether or not to run the Evaluation Framework's Visualize stage.
         If True, visualize is called.
+    experiment_name: str
+        The name of the experiment. Used for standard output progress updates.
     """
 
     kwargs = {}
@@ -529,6 +536,13 @@ def run_evaluations(
 
     # run sequence of evaluation
     for index, ckpt_path in enumerate(checkpoint_paths):
+        # print progress
+        ckpt_num_regex = re.search(r'(checkpoint_)\w+', ckpt_path)
+        ckpt_num = ckpt_path[ckpt_num_regex.start():ckpt_num_regex.end()]
+        if experiment_name:
+            print("\nExperiment: " + experiment_name)
+        print("Evaluating " + ckpt_num + ". " + str(index + 1) + " of " + str(len(checkpoint_paths)) + " checkpoints.")
+
         # run evaluation episodes
         try:
             evaluate(
