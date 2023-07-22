@@ -235,7 +235,7 @@ class InspectionPoints:
             n = math.ceil(len(uninspected) / 10)
             data = np.array(uninspected)
             if self.last_cluster is None:
-                init = "random"
+                init = np.zeros((n, 3))
             else:
                 if n > self.last_cluster.shape[0]:
                     idxs = np.random.choice(self.last_cluster.shape[0], size=n - self.last_cluster.shape[0])
