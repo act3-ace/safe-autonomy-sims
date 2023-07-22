@@ -1,3 +1,10 @@
+# 2.11.0 (2023-07-22)
+
+
+### Features
+
+* Added num_workers argument to eval api functions to expose multiprocessing option. Found and fixed nondeterministic KMeans cluster function. 5aa395b
+
 # 2.10.0 (2023-07-06)
 
 
