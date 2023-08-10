@@ -1,3 +1,10 @@
+# 2.12.0 (2023-08-10)
+
+
+### Features
+
+* Inspection Animation Updates 95d9eaf
+
 # 2.11.0 (2023-07-22)
 
 
