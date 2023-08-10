@@ -145,3 +145,6 @@ site/
 
 # vscode devcontainer
 *.devcontainer
+
+# animation figures
+safe_autonomy_sims/evaluation/animation/figs/
