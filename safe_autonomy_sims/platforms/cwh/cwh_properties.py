@@ -218,6 +218,29 @@ class QuaternionProp(BoxProp):
     description: str = "Quaternion Sensor Properties"
 
 
+class OrientationVectorProp(BoxProp):
+    """
+    Orientation Unit Vector sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "orientation_unit_vector"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["N/A"] * 3
+    description: str = "Orientation Unit Vector Sensor Properties"
+
+
 class AngularVelocityProp(BoxProp):
     """
     Angular Velocity sensor properties.
