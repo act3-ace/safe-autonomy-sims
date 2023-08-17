@@ -22,6 +22,7 @@ from corl.glues.base_glue import BaseAgentGlueNormalizationValidator
 from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
 from corl.libraries.normalization import StandardNormalNormalizer
 from corl.simulators.common_platform_utils import get_sensor_by_name
+from corl.libraries.units import Convert, GetStrFromUnit, GetUnitFromStr
 
 
 
@@ -40,7 +41,10 @@ class FacingChiefGlueValidator(ObserveSensorValidator):
     normalization: BaseAgentGlueNormalizationValidator
         Default normalization
     """
-    position_sensor = 'Sensor_Position'
+    # key_prefix = 'ObserveSensor_'
+    # position_sensor = 'Sensor_Position'
+    position_obs_name = 'ObserveSensor_Sensor_Position'
+    orientation_obs_name = 'ObserveSensor_Sensor_OrientationUnitVector'
 
 
 class FacingChiefGlue(ObserveSensor):
@@ -51,7 +55,7 @@ class FacingChiefGlue(ObserveSensor):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._position_sensor = get_sensor_by_name(self._platform, self.config.position_sensor)
+        # self._position_sensor = get_sensor_by_name(self._platform, self.config.position_sensor)
 
     @property
     def get_validator(self):
@@ -59,6 +63,12 @@ class FacingChiefGlue(ObserveSensor):
 
     def get_unique_name(self) -> str:
         return super().get_unique_name() + "_FacingChief"
+    
+    def observation_units(self):
+        d = gym.spaces.dict.Dict()
+        # unit = GetUnitFromStr('N/A')
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
+        return d
 
     def observation_space(self):
         d = gym.spaces.dict.Dict()
@@ -66,12 +76,14 @@ class FacingChiefGlue(ObserveSensor):
         return d
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
-        sensed_orientation = self._sensor.get_measurement()
-        sensed_position = self._position_sensor.get_measurement()
+        # sensed_orientation = self._sensor.get_measurement()
+        # sensed_position = self._position_sensor.get_measurement()
+        position_obs = other_obs[self.config.position_obs_name][self.Fields.DIRECT_OBSERVATION]
+        orientation_obs = other_obs[self.config.orientation_obs_name][self.Fields.DIRECT_OBSERVATION]
 
-        deputy_to_chief = -sensed_position / (np.linalg.norm(sensed_position) + 1e-5)
+        deputy_to_chief = -position_obs / (np.linalg.norm(position_obs) + 1e-5)
         
-        facing_chief = np.dot(deputy_to_chief, sensed_orientation)
+        facing_chief = np.dot(deputy_to_chief, orientation_obs)
         facing_chief = np.clip(facing_chief, -1.0, 1.0)
         
         d = OrderedDict()
