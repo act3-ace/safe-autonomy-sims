@@ -407,9 +407,29 @@
             "name": "LiveTimestepReward",
             "functor": "safe_autonomy_sims.rewards.cwh.live_timestep_reward.LiveTimestepReward",
             "config": {
-                "step_reward": 0.01,  # Can also try 1.0 / (max_time_rewarded / step_size)
-                "max_time_rewarded": 400.0  # Earn step_reward for every timestep up until this sim_time
+                "step_reward": 0.001,  # Can also try 1.0 / (max_time_rewarded / step_size)
+                "max_time_rewarded": 4000.0  # Earn step_reward for every timestep up until this sim_time
             }
+        },
+        {
+          "name": "FacingChiefReward",
+          "functor": "safe_autonomy_sims.rewards.cwh.gaussian_decay_from_target_value.GaussianDecayFromTargetValue",
+          "config":
+            {
+              "observation":
+                {
+                  "fields":
+                    [
+                      "ObserveSensor_Sensor_OrientationUnitVector_FacingChief",
+                      "direct_observation",
+                    ],
+                },
+              "eps": .15,
+              "reward_scale": 0.0005,
+              "index": 0, # this is a unit vector not an angle; I believe [1, 0] means pointing @ opponent
+              "target_value": 1.0,
+              "max_diff": 1.0,
+            },
         },
         # {
         #     "name": "InspectionDeltaVReward",
