@@ -9,26 +9,26 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements the Reward Functions and Reward Validators specific to the inspection task.
+This module implements a Reward function that rewards the agent for ever live
+timestep up to some maximum
 """
 import logging
 import typing
-from collections import OrderedDict
-from functools import partial
-
 
 import numpy as np
 from corl.libraries.environment_dict import RewardDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 
+
 class LiveTimestepRewardValidator(RewardFuncBaseValidator):
     """
-    step_reward: the maximum reward value for a given timestep -- rewarded if action matches target
-    target_value: the value with which to take the difference from the wrapped observation value
-    index: the index with which to pull data out of the observation extractor, useful if len(observation) > 1
+    step_reward: the maximum reward value for each timestep
+    max_time_rewarded: the maximum simulation time.  Reward is zero for all 
+                       timesteps for which sim_time > max_time_rewarded [Note 
+                       use of sim_time instead of timestep count!]
     """
     step_reward: float = 0.01
-    max_time_rewarded: float = 400.0
+    max_time_rewarded: float = np.inf
 
 
 class LiveTimestepReward(RewardFuncBase):

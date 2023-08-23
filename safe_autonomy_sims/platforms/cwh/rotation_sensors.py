@@ -64,7 +64,8 @@ class AngularVelocitySensor(CWHSensor):
 
 class OrientationUnitVectorSensor(CWHSensor):
     """
-    Implementation of a sensor designed to give the sensor orientation unit vector at any time.
+    Implementation of a sensor designed to give the sensor orientation unit 
+    vector at any time.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.OrientationVectorProp):
@@ -72,12 +73,13 @@ class OrientationUnitVectorSensor(CWHSensor):
 
     def _calculate_measurement(self, state):
         """
-        Calculate the measurement - quaternion.
+        Calculate the measurement - unit vector.
 
         Returns
         -------
         list of floats
-            quaternion of spacecraft.
+            elements of unit vector that points in direction of spacecraft 
+            sensor.
         """
         quaternion = self.parent_platform.quaternion
         r = R.from_quat(quaternion)
