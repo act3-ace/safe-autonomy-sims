@@ -6,9 +6,9 @@ from inspection_animation import AnimationFromCheckpoint
 if __name__ == '__main__':
     # ****Replace with your paths****
     checkpoint_path = 'example_checkpoint' # Path to checkpoint directory
-    expr_config_path = 'safe-autonomy-sims/configs/experiments/inspection/inspection_3d.yml' # Path to experiment config
+    expr_config_path = '/root/repos/safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/experiment.yml' # Path to experiment config
     launch_dir_of_experiment = 'safe-autonomy-sims'
-    task_config_path = 'safe-autonomy-sims/configs/tasks/cwh3d_inspection/cwh3d_task.yml' # Path to task config
+    task_config_path = '/root/repos/safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/task.yml' # Path to task config
     save_dir = 'safe-autonomy-sims/safe_autonomy_sims/evaluation/' # Path to directory to save png/mp4
     mode = 'operator' # Plotting mode: 'operator', 'obs_act', or '3d_pos'
     last_step = True # True for png of last step, False for mp4
@@ -45,3 +45,35 @@ if __name__ == '__main__':
 
     animation = AnimationFromCheckpoint()
     animation.make_animation(dataframe, save_dir, mode, last_step)
+
+    import os
+    import matplotlib.pyplot as plt
+    import glob
+    import pandas as pd
+    import numpy as np
+
+    metric_list = [
+        'custom_metrics/rewards_cumulative/blue0_ctrl/ObservedPointsReward_mean',
+        'custom_metrics/blue0_ctrl/ObserveSensor_Sensor_Position_DeltaV/delta_v_scale_mean',
+        'episode_len_mean',
+        'episode_reward_mean',
+        'custom_metrics/done_results/blue0/SafeSuccessfulInspectionDoneFunction_mean',
+    ]
+    x_axis: str = 'timesteps_total'
+    training_data_dir = '/root/repos/safe-autonomy-sims/output/tune/ACT3-RLLIB-AGENTS'
+
+    listdir = os.listdir(training_data_dir)
+    for met in metric_list:
+        plt.figure()
+        label = met.split('/')[-1]
+        plt.xlabel(x_axis)
+        plt.ylabel(label)
+        plt.grid(True)
+        for my_file in listdir:
+            t_dir = os.path.join(str(training_data_dir), my_file)
+            if os.path.isdir(t_dir):
+                progress = glob.glob(t_dir + "/*.csv")[0]
+                d_f = pd.read_csv(progress)
+                metric_data = np.array(d_f[met])
+                plt.plot(np.array(d_f[x_axis]), metric_data)
+        plt.savefig(os.path.join(save_dir, label + '.png'))
