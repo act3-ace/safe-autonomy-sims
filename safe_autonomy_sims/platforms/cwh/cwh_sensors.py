@@ -16,6 +16,7 @@ import typing
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
 from corl.simulators.base_parts import BasePlatformPartValidator, BaseSensor
+from scipy.spatial.transform import Rotation as R
 
 import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
 from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
@@ -57,7 +58,9 @@ class PositionSensor(CWHSensor):
         list of floats
             Position of spacecraft.
         """
-        return self.parent_platform.position
+        r = R.from_quat(self.parent_platform.quaternion)
+        chief_relative_position = r.inv().apply(-self.parent_platform.position)
+        return chief_relative_position
 
 
 class VelocitySensor(CWHSensor):
@@ -78,7 +81,9 @@ class VelocitySensor(CWHSensor):
         list of floats
             Velocity of spacecraft.
         """
-        return self.parent_platform.velocity
+        r = R.from_quat(self.parent_platform.quaternion)
+        chief_relative_velocity = r.inv().apply(-self.parent_platform.velocity)
+        return chief_relative_velocity
 
 
 class InspectedPointsSensorValidator(BasePlatformPartValidator):
@@ -139,7 +144,7 @@ class SunAngleSensor(CWHSensor):
     Implementation of a sensor to give the sun angle
     """
 
-    def __init__(self, parent_platform, config, property_class=cwh_props.SunAngleProp):
+    def __init__(self, parent_platform, config, property_class=cwh_props.SunVectorProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
@@ -151,7 +156,9 @@ class SunAngleSensor(CWHSensor):
         float
             sun angle
         """
-        return np.array([state.sun_angle])
+        sun_position = np.array([np.cos(state.sun_angle), -np.sin(state.sun_angle), 0])
+        r = R.from_quat(self.parent_platform.quaternion)
+        return r.inv().apply(sun_position)
 
 
 class UninspectedPointsSensorValidator(BasePlatformPartValidator):
@@ -211,7 +218,9 @@ class UninspectedPointsSensor(CWHSensor):
         # get inspection points of object under inspection
         inspector_position = inspector_entity.position
         inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
-        return inspection_points.kmeans_find_nearest_cluster(inspector_position)
+        cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
+        r = R.from_quat(self.parent_platform.quaternion)
+        return r.inv().apply(cluster)
 
 
 # entity position sensors
@@ -364,7 +373,8 @@ class PriorityVectorSensor(CWHSensor):
         np.ndarray
             priority vector
         """
-        return state.priority_vector
+        r = R.from_quat(self.parent_platform.quaternion)
+        return r.inv().apply(state.priority_vector)
 
 
 class InspectedPointsScoreSensorValidator(BasePlatformPartValidator):

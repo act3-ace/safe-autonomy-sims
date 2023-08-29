@@ -148,6 +148,29 @@ class SunAngleProp(BoxProp):
     description: str = "Sun Angle Sensor Properties"
 
 
+class SunVectorProp(BoxProp):
+    """
+    Sun vector sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "SunVector"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    description: str = "Sun Unit Vector Properties"
+
+
 class UninspectedPointProp(BoxProp):
     """
     Uninspected points cluster location properties.
