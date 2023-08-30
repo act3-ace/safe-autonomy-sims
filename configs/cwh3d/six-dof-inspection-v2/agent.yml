@@ -366,7 +366,7 @@
             "name": "ObservedPointsReward",
             "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.ObservedPointsReward",
             "config": {
-                "scale": 1.0,
+                "scale": 10.0,
                 "weighted_priority": True
             }
         },
@@ -375,7 +375,7 @@
             "name": "SafeInspectionSuccessReward",
             "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.SafeInspectionSuccessReward",
             "config": {
-                "scale": 1.0,
+                "scale": 0.0,
                 "crash_scale": -1.0,
                 "weight_threshold": 0.95,
             },
