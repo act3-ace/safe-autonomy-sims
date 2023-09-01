@@ -91,9 +91,46 @@ class OrientationUnitVectorSensor(CWHSensor):
             return np.array([0.0, 0.0, 0.0])
         current_orientation = r.apply(initial_orientation)
         return current_orientation
+
+
+class RotatedAxesSensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the vectors that result from 
+    rotating the initial coordinate frame's unit vectors into the deputy's 
+    frame.  
+    
+    Note: Because the canonical initial_sensor_unit_ec is [1, 0, 0] (we assume
+    this hasn't been changed), we omit this unit vector.  Thus, the sensor
+    returns 6 values, the x,y,x components of the remaining two unit vectors
+    after rotation.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.OrientationVectorProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - unit vector.
+
+        Returns
+        -------
+        list of floats
+            elements of unit vector that points in direction of spacecraft 
+            sensor.
+        """
+        quaternion = self.parent_platform.quaternion
+        r = R.from_quat(quaternion)
+        v1 = np.array([0.0, 1.0, 0.0])
+        v2 = np.array([0.0, 0.0, 1.0])
         
+        rot_v1 = r.apply(v1)
+        rot_v2 = r.apply(v2)
+        
+        out = np.concatenate([rot_v1, rot_v2])
+        return out
+
 
 for sim in [CWHSimulator, InspectionSimulator]:
-    for sensor, sensor_name in zip([QuaternionSensor, AngularVelocitySensor, OrientationUnitVectorSensor],
-                                   ["Sensor_Quaternion", "Sensor_AngularVelocity", "Sensor_OrientationUnitVector"]):
+    for sensor, sensor_name in zip([QuaternionSensor, AngularVelocitySensor, OrientationUnitVectorSensor, RotatedAxesSensor],
+                                   ["Sensor_Quaternion", "Sensor_AngularVelocity", "Sensor_OrientationUnitVector", "Sensor_RotatedAxes"]):
         PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": CWHAvailablePlatformTypes.CWHSixDOF})
