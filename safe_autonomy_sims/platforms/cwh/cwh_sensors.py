@@ -220,7 +220,9 @@ class UninspectedPointsSensor(CWHSensor):
         inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
         cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
         r = R.from_quat(self.parent_platform.quaternion)
-        return r.inv().apply(cluster)
+        
+        relative_cluster_position = cluster - self.parent_platform.position
+        return r.inv().apply(relative_cluster_position)
 
 
 # entity position sensors
