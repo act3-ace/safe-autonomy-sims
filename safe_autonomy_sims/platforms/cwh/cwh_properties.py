@@ -264,6 +264,28 @@ class OrientationVectorProp(BoxProp):
     description: str = "Orientation Unit Vector Sensor Properties"
 
 
+class RotatedAxesProp(BoxProp):
+    """
+    Coordinate axis unit vectors rotated into agent frame
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "rotated_axes_unit_vectors"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [-1.0] * 6
+    high: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [1.0] * 6
+    unit: Annotated[typing.List[StrictStr], Field(min_items=6, max_items=6)] = ["N/A"] * 6
+    description: str = "Rotated Axes Unit Vectors Sensor Properties"
+
 class AngularVelocityProp(BoxProp):
     """
     Angular Velocity sensor properties.
