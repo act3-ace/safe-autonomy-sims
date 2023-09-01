@@ -29,7 +29,8 @@
         {"part": "Sensor_InspectedPointsScore", "config": {"inspector_entity_name": "blue0"}},
         {"part": "Sensor_Quaternion"},
         {"part": "Sensor_AngularVelocity"},
-        {"part": "Sensor_OrientationUnitVector"}
+        {"part": "Sensor_OrientationUnitVector"},
+        {"part": "Sensor_RotatedAxes"}
     ],
     "episode_parameter_provider": {
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -196,6 +197,19 @@
               }
             },
         },
+        # {
+        #     "functor": "safe_autonomy_sims.glues.osam_glues.MagNormGlue3D",
+        #     "config": {
+        #       "normalization": {
+        #         "enabled": True,
+        #         "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+        #         "config": {
+        #           "mu": 0.0,
+        #           "sigma": [175, 1, 1, 1]
+        #         }
+        #       }
+        #     }
+        # },
         {
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
@@ -290,6 +304,15 @@
         {
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
+              "sensor": "Sensor_RotatedAxes",
+              "normalization": {
+                  "enabled": False
+            },
+          },
+        },
+        {
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
               "sensor": "Sensor_AngularVelocity",
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
@@ -366,7 +389,7 @@
             "name": "ObservedPointsReward",
             "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.ObservedPointsReward",
             "config": {
-                "scale": 10.0,
+                "scale": 1.0,
                 "weighted_priority": True
             }
         },
@@ -375,7 +398,7 @@
             "name": "SafeInspectionSuccessReward",
             "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.SafeInspectionSuccessReward",
             "config": {
-                "scale": 0.0,
+                "scale": 1.0,
                 "crash_scale": -1.0,
                 "weight_threshold": 0.95,
             },
@@ -427,24 +450,25 @@
                     ],
                 },
               "eps": .15,
-              "reward_scale": 0.0005,
+              "reward_scale": 0.001,
               "index": 0, # this is a unit vector not an angle; I believe [1, 0] means pointing @ opponent
               "target_value": 1.0,
               "max_diff": 1.0,
             },
         },
-        # {
-        #     "name": "InspectionDeltaVReward",
-        #     # See delta-v reward scale parameters in env config
-        #     "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
-        #     "config": {
-        #         "mode": "scale",
-        #     },
-        #     "references": {
-        #         "step_size": "step_size",
-        #         "mass": "mass",
-        #     },
-        # },
+        {
+            "name": "InspectionDeltaVReward",
+            # See delta-v reward scale parameters in env config
+            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
+            "config": {
+                "mode": "scale",
+                "constant_scale": -0.0025
+            },
+            "references": {
+                "step_size": "step_size",
+                "mass": "mass",
+            },
+        },
     ],
     "reference_store": !include parameters.yml
 }

@@ -105,7 +105,7 @@ class RotatedAxesSensor(CWHSensor):
     after rotation.
     """
 
-    def __init__(self, parent_platform, config, property_class=cwh_props.OrientationVectorProp):
+    def __init__(self, parent_platform, config, property_class=cwh_props.RotatedAxesProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
     def _calculate_measurement(self, state):
