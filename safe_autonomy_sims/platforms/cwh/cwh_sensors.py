@@ -221,10 +221,11 @@ class UninspectedPointsSensor(CWHSensor):
         cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
         r = R.from_quat(self.parent_platform.quaternion)
         
-        relative_cluster_position = cluster - self.parent_platform.position
-        rotated_relative_cluster = r.inv().apply(relative_cluster_position)
-        cluster_direction = rotated_relative_cluster / (np.linalg.norm(rotated_relative_cluster) + 1e-5)
-        return cluster_direction
+        # relative_cluster_position = cluster - self.parent_platform.position
+        # rotated_relative_cluster = r.inv().apply(relative_cluster_position)
+        # cluster_direction = rotated_relative_cluster / (np.linalg.norm(rotated_relative_cluster) + 1e-5)
+        # return cluster_direction
+        return r.inv().apply(cluster)
 
 
 # entity position sensors

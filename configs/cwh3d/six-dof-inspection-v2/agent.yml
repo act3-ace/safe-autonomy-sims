@@ -188,6 +188,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Position",
+              "training_export_behavior": "EXCLUDE",
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -197,23 +198,33 @@
               }
             },
         },
-        # {
-        #     "functor": "safe_autonomy_sims.glues.osam_glues.MagNormGlue3D",
-        #     "config": {
-        #       "normalization": {
-        #         "enabled": True,
-        #         "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-        #         "config": {
-        #           "mu": 0.0,
-        #           "sigma": [175, 1, 1, 1]
-        #         }
-        #       }
-        #     }
-        # },
+        {
+            "functor": "safe_autonomy_sims.glues.osam_glues.MagNorm3DGlue",
+            "config": {
+              "normalization": {
+                "enabled": True,
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [175.0, 1.0, 1.0, 1.0],
+                },
+              },
+            },
+            "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config": {
+                "sensor": "Sensor_Position",
+                "normalization": {
+                  "enabled": False
+                }
+              }
+            }
+        },
         {
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Velocity",
+              "training_export_behavior": "EXCLUDE",
               "output_units": ["m/s", "m/s", "m/s"],
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
@@ -223,6 +234,29 @@
               }
             },
           },
+        },
+        {
+            "functor": "safe_autonomy_sims.glues.osam_glues.MagNorm3DGlue",
+            "config": {
+              "normalization": {
+                "enabled": True,
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [0.866, 1.0, 1.0, 1.0]
+                }
+              }
+            },
+            "wrapped": {
+              "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+              "config": {
+                "sensor": "Sensor_Velocity",
+                "output_units": ["m/s", "m/s", "m/s"],
+                "normalization": {
+                  "enabled": False
+                }
+              }
+            }
         },
         {
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
@@ -259,9 +293,9 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_SunAngle",
-            #   "normalization": {
-            #       "enabled": False
-            # },
+              "normalization": {
+                  "enabled": False
+            },
           },
         },
         {
@@ -338,6 +372,15 @@
               "sensor": "Sensor_OrientationUnitVector",
               "normalization": {
                   "enabled": False
+              }
+            }
+        },
+        {
+            "functor": "safe_autonomy_sims.glues.uninspected_points_occluded_glue.UninspectedPointsOccludedGlue",
+            "config": {
+              "sensor": "Sensor_Position",
+              "normalization": {
+                "enabled": False
               }
             }
         }
