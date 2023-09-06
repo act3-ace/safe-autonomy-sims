@@ -221,10 +221,6 @@ class UninspectedPointsSensor(CWHSensor):
         cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
         r = R.from_quat(self.parent_platform.quaternion)
         
-        # relative_cluster_position = cluster - self.parent_platform.position
-        # rotated_relative_cluster = r.inv().apply(relative_cluster_position)
-        # cluster_direction = rotated_relative_cluster / (np.linalg.norm(rotated_relative_cluster) + 1e-5)
-        # return cluster_direction
         return r.inv().apply(cluster)
 
 
@@ -435,6 +431,32 @@ class InspectedPointsScoreSensor(CWHSensor):
         return np.array([weight])
 
 
+class OrbitStabilitySensor(CWHSensor):
+    """
+    Implementation of a sensor to give 2nx + v_y, the quantity that determines
+    stability of the un-controlled motion
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.OrbitStabilityProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - cluster_location.
+
+        Returns
+        -------
+        np.ndarray
+            Cluster location of the uninspected points.
+        """
+        pos = self.parent_platform.position
+        vel = self.parent_platform.velocity
+        n = self.parent_platform._platform.dynamics.n
+        
+        orbit_stability = 2 * pos[0] * n + vel[1]
+        return [orbit_stability]
+
+
 for sim in [CWHSimulator, InspectionSimulator]:
     for platform in [CWHAvailablePlatformTypes.CWH, CWHAvailablePlatformTypes.CWHSixDOF]:
         for sensor, sensor_name in zip(
@@ -451,6 +473,7 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 OriginPositionSensor,
                 PriorityVectorSensor,
                 InspectedPointsScoreSensor,
+                OrbitStabilitySensor,
             ],
             [
                 "Sensor_Generic",
@@ -465,6 +488,7 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 "Sensor_OriginPosition",
                 "Sensor_PriorityVector",
                 "Sensor_InspectedPointsScore",
+                "Sensor_OrbitStability"
             ]
         ):
             PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": platform})

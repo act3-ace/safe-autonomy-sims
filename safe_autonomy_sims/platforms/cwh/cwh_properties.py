@@ -349,3 +349,28 @@ class PointsScoreProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
     description: str = "Inspected Points Score Sensor Properties"
+
+
+class OrbitStabilityProp(BoxProp):
+    """
+    Property to hold the orbit stability quantity 2*n*x + v_y
+    Highs and lows are obtained manually from this equation and the highs/lows 
+    of the position and velocity properties and rounded
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "orbit stability"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-1025.0]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1025.0]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["m/s"]
+    description: str = "Orbit Stability Sensor Property"
