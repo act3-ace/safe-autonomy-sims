@@ -206,14 +206,6 @@
           },
         },
         {
-            "functor": "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
-            "config":
-              {
-                "sensor": "Sensor_Position",
-                "training_export_behavior": "EXCLUDE",
-              }
-        },
-        {
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_SunAngle",

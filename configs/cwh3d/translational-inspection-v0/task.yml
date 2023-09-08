@@ -51,3 +51,4 @@ config:
   env_config: [!include environment.yml, *env_config_updates]
   tune_config: [!include ../../common/ray/tune.yml, *tune_config_updates]
 
+  extra_callbacks: ["safe_autonomy_sims.simulators.inspection_simulator.InspectionCallbacks"]
