@@ -11,10 +11,8 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 """
-import abc
 
 from run_time_assurance.controller import RTABackupController
-from run_time_assurance.rta import RTAModule
 from run_time_assurance.zoo.cwh.docking_3d import (
     M_DEFAULT,
     N_DEFAULT,
@@ -29,7 +27,7 @@ from run_time_assurance.zoo.cwh.docking_3d import (
     Docking3dImplicitSwitchingRTA,
 )
 
-from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator
+from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator, RTASingleton
 
 
 class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
@@ -83,15 +81,6 @@ class RTAGlueCWHDocking3d(RTAGlue):
     def get_validator(cls):
         return CWHDocking3dRTAGlueValidator
 
-    def _create_rta_module(self) -> RTAModule:
-        rta_args = self._get_rta_args()
-        rta_module = self._instantiate_rta_module(**rta_args)
-        return rta_module
-
-    @abc.abstractmethod
-    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        raise NotImplementedError
-
     def _get_rta_args(self) -> dict:
         return {
             "m": self.config.m,
@@ -133,8 +122,8 @@ class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
     def get_validator(cls):
         return CWHDocking3dExplicitSwitchingRTAGlueValidator
 
-    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        return Docking3dExplicitSwitchingRTA(**kwargs)
+    def _get_singleton(self):
+        return CHWDocking3dExplicitSwitchingSingleton
 
     def _get_rta_args(self) -> dict:
         parent_args = super()._get_rta_args()
@@ -142,6 +131,13 @@ class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
             **parent_args,
             'backup_controller': self.config.backup_controller,
         }
+
+
+class CHWDocking3dExplicitSwitchingSingleton(RTASingleton):
+    """Explicit Switching Singleton"""
+
+    def _create_rta_module(self, **rta_args):
+        return Docking3dExplicitSwitchingRTA(**rta_args)
 
 
 class CWHDocking3dImplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
@@ -162,7 +158,7 @@ class CWHDocking3dImplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator
 
 class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
     """
-    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    RTA Glue to wrap CWH Docking 3d Implicit Switching RTA from the run-time-assurance package.
     """
 
     def __init__(self, **kwargs):
@@ -173,8 +169,8 @@ class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
     def get_validator(cls):
         return CWHDocking3dImplicitSwitchingRTAGlueValidator
 
-    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        return Docking3dImplicitSwitchingRTA(**kwargs)
+    def _get_singleton(self):
+        return CHWDocking3dImplicitSwitchingSingleton
 
     def _get_rta_args(self) -> dict:
         parent_args = super()._get_rta_args()
@@ -185,13 +181,27 @@ class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
         }
 
 
+class CHWDocking3dImplicitSwitchingSingleton(RTASingleton):
+    """Implicit Switching Singleton"""
+
+    def _create_rta_module(self, **rta_args):
+        return Docking3dImplicitSwitchingRTA(**rta_args)
+
+
 class RTAGlueCHWDocking3dExplicitOptimization(RTAGlueCWHDocking3d):
     """
-    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    RTA Glue to wrap CWH Docking 3d Explicit Optimization RTA from the run-time-assurance package.
     """
 
-    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        return Docking3dExplicitOptimizationRTA(**kwargs)
+    def _get_singleton(self):
+        return CHWDocking3dExplicitOptimizationSingleton
+
+
+class CHWDocking3dExplicitOptimizationSingleton(RTASingleton):
+    """Explicit Optimization Singleton"""
+
+    def _create_rta_module(self, **rta_args):
+        return Docking3dExplicitOptimizationRTA(**rta_args)
 
 
 class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValidator):
@@ -223,7 +233,7 @@ class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValida
 
 class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
     """
-    RTA Glue to wrap CWH Docking 3d Explicit Switching RTA from the run-time-assurance package.
+    RTA Glue to wrap CWH Docking 3d Implicit Optimization RTA from the run-time-assurance package.
     """
 
     def __init__(self, **kwargs):
@@ -234,8 +244,8 @@ class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
     def get_validator(cls):
         return CWHDocking3dImplicitOptimizationRTAGlueValidator
 
-    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        return Docking3dImplicitOptimizationRTA(**kwargs)
+    def _get_singleton(self):
+        return CHWDocking3dImplicitOptimizationSingleton
 
     def _get_rta_args(self) -> dict:
         parent_args = super()._get_rta_args()
@@ -246,3 +256,10 @@ class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
             'skip_length': self.config.skip_length,
             'backup_controller': self.config.backup_controller,
         }
+
+
+class CHWDocking3dImplicitOptimizationSingleton(RTASingleton):
+    """Implicit Optimization Singleton"""
+
+    def _create_rta_module(self, **rta_args):
+        return Docking3dImplicitOptimizationRTA(**rta_args)
