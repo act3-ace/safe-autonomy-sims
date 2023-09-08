@@ -1,3 +1,10 @@
+## 2.12.2 (2023-09-08)
+
+
+### Bug Fixes
+
+* Make RTA module a singleton 6c5ee4d
+
 ## 2.12.1 (2023-09-08)
 
 
