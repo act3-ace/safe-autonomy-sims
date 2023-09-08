@@ -15,7 +15,6 @@ import math
 from typing import Union
 
 import numpy as np
-from run_time_assurance.rta import RTAModule
 from run_time_assurance.utils import to_jnp_array_jit
 from run_time_assurance.zoo.cwh.inspection_1v1 import (
     CHIEF_RADIUS_DEFAULT,
@@ -33,7 +32,7 @@ from run_time_assurance.zoo.cwh.inspection_1v1 import (
     Inspection1v1RTA,
 )
 
-from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator
+from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator, RTASingleton
 
 
 class CWHInspection1v1RTAGlueValidator(RTAGlueValidator):
@@ -105,13 +104,8 @@ class RTAGlueCWHInspection1v1(RTAGlue):
     def get_validator(cls):
         return CWHInspection1v1RTAGlueValidator
 
-    def _create_rta_module(self) -> RTAModule:
-        rta_args = self._get_rta_args()
-        rta_module = self._instantiate_rta_module(**rta_args)
-        return rta_module
-
-    def _instantiate_rta_module(self, **kwargs) -> RTAModule:
-        return UpdatedInspection1v1RTA(**kwargs)
+    def _get_singleton(self):
+        return InspectionRTASingleton
 
     def _get_rta_args(self) -> dict:
         if self.config.collision_radius is not None:
@@ -134,6 +128,14 @@ class RTAGlueCWHInspection1v1(RTAGlue):
             "control_bounds_low": self.config.control_bounds_low,
             "constraints_to_use": self.config.constraints,
         }
+
+
+class InspectionRTASingleton(RTASingleton):
+    """Inspection Singleton
+    """
+
+    def _create_rta_module(self, **rta_args):
+        return UpdatedInspection1v1RTA(**rta_args)
 
 
 class UpdatedInspection1v1RTA(Inspection1v1RTA):

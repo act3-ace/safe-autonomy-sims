@@ -21,8 +21,6 @@ from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapper
 from corl.glues.common.controller_glue import ControllerGlue
 from run_time_assurance.rta import ConstraintBasedRTA, RTAModule
 
-# from safe_autonomy_sims.core.rta.cwh.cwh_rta import DockingRTA
-
 
 def flip_rta(control):
     """
@@ -69,7 +67,9 @@ class RTAGlue(BaseMultiWrapperGlue):
         self.config: RTAGlueValidator
         super().__init__(**kwargs)
         self.controller_glues = self._get_controller_glues(self)
-        self.rta = self._create_rta_module()
+        rta_args = self._get_rta_args()
+        singleton = self._get_singleton()
+        self.rta = singleton.instance(**rta_args).rta
         self.rta.enable = self.config.enabled
         self.filtered_action = None
 
@@ -158,7 +158,27 @@ class RTAGlue(BaseMultiWrapperGlue):
         return tuple(action_list)
 
     @abc.abstractmethod
-    def _create_rta_module(self) -> RTAModule:
+    def _get_singleton(self):
+        """
+        Get singleton class containing RTA module.
+
+        Returns
+        -------
+        RTASingleton
+            Custom singleton.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _get_rta_args(self) -> dict:
+        """
+        Get RTA arguments.
+
+        Returns
+        -------
+        dict
+            RTA args to be passed at initialization.
+        """
         raise NotImplementedError
 
     def observation_space(self):
@@ -205,3 +225,40 @@ class RTAGlue(BaseMultiWrapperGlue):
             applied_action = controller_glue.get_applied_control()
             stored_action.append(applied_action)
         return tuple(stored_action)
+
+
+class RTASingleton(abc.ABC):
+    """
+    Implement RTA module as a singleton.
+    This prevents reinitialization, which can cause memory leaks due to jit.
+    """
+
+    _instance = None
+
+    @classmethod
+    def instance(cls, **rta_args):
+        """Create singleton"""
+        if not cls._instance:
+            cls._instance = cls.__new__(cls)
+            cls.rta = cls._create_rta_module(cls._instance.__class__, **rta_args)
+        return cls._instance
+
+    def __init__(self, **kwargs):
+        raise RuntimeError("Use the 'instance' method to initialize RTA objects.")
+
+    @abc.abstractmethod
+    def _create_rta_module(self, **rta_args: dict) -> RTAModule:
+        """
+        Initialize the RTA module
+
+        Parameters
+        ----------
+        rta_args: dict
+            Dictionary of args passed to RTA.
+
+        Returns
+        -------
+        RTAModule
+            Custom RTA module.
+        """
+        raise NotImplementedError
