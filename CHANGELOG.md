@@ -1,3 +1,10 @@
+## 2.12.1 (2023-09-08)
+
+
+### Bug Fixes
+
+* Make inspection delta-V scale a callback e6a30c4
+
 # 2.12.0 (2023-08-10)
 
 
