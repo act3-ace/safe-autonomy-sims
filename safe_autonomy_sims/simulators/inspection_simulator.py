@@ -20,6 +20,10 @@ import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
 from corl.libraries.units import ValueWithUnits
 from pydantic import BaseModel, validator
+from ray.rllib import BaseEnv
+from ray.rllib.algorithms.callbacks import DefaultCallbacks
+from ray.rllib.policy import Policy
+from ray.rllib.utils.typing import PolicyID
 from safe_autonomy_dynamics.base_models import BaseEntity
 from safe_autonomy_dynamics.cwh import CWHSpacecraft, SixDOFSpacecraft
 from sklearn.cluster import KMeans
@@ -614,11 +618,6 @@ class InspectionSimulator(SafeRLSimulator):
 
         self.delta_v_scale = np.clip(self.delta_v_scale, self.delta_v_scale_bounds[0], self.delta_v_scale_bounds[1])
 
-        # pass delta_v_scale to platforms (TODO: needs better solution, this is to satisfy DeltaVGlue)
-        for platform in self.sim_platforms.values():
-            if isinstance(platform, CWHPlatform):
-                platform.delta_v_scale = self.delta_v_scale
-
         # reset points map
         self.inspection_points_map = self.create_inspection_points_map()
         for points in self.inspection_points_map.values():
@@ -652,10 +651,6 @@ class InspectionSimulator(SafeRLSimulator):
     def _step_update_sim_statuses(self, step_size: float):
         self.total_steps += 1
         self._state.total_steps = self.total_steps
-        # pass time to platforms (TODO: needs better solution, this is to satisfy DeltaVGlue)
-        for platform in self.sim_platforms.values():
-            if isinstance(platform, CWHPlatform):
-                platform.total_steps = self.total_steps
 
         # update inspection points positions
         for points in self.inspection_points_map.values():
@@ -714,3 +709,16 @@ class InspectionSimulator(SafeRLSimulator):
 
 
 PluginLibrary.AddClassToGroup(InspectionSimulator, "InspectionSimulator", {})
+
+
+class InspectionCallbacks(DefaultCallbacks):
+    """
+    Custom callbacks for the Inspection Simulator
+    Log value for the delta_v_scale
+    """
+
+    def on_episode_end(self, *, worker, base_env: BaseEnv, policies: typing.Dict[PolicyID, Policy], episode, **kwargs) -> None:
+        super().on_episode_end(worker=worker, base_env=base_env, policies=policies, episode=episode, **kwargs)
+        env = base_env.get_sub_environments()[episode.env_id]
+        episode.custom_metrics['info/delta_v_scale'] = env.simulator.delta_v_scale
+        episode.custom_metrics['info/total_steps'] = env.simulator.total_steps
