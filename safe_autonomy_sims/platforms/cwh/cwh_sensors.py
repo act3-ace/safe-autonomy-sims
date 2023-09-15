@@ -58,9 +58,55 @@ class PositionSensor(CWHSensor):
         list of floats
             Position of spacecraft.
         """
-        r = R.from_quat(self.parent_platform.quaternion)
-        chief_relative_position = r.inv().apply(-self.parent_platform.position)
-        return chief_relative_position
+        # r = R.from_quat(self.parent_platform.quaternion)
+        # chief_relative_position = r.inv().apply(-self.parent_platform.position)
+        # return chief_relative_position
+        return self.parent_platform.position
+
+
+class RelativePositionSensorValidator(BasePlatformPartValidator):
+    """
+    Validator for RelativePositionSensor
+
+    entity_name: str
+        The name of the entity the position of which is to be returned.
+    """
+    entity_name: str = "chief"
+    
+
+class RelativePositionSensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the position at any time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.RelativePositionProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+        
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return RelativePositionSensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        # handle initialization case
+        if self.config.entity_name not in state.sim_entities:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.entity_name} not found in simulator state!")
+            return np.array([0.0, 0.0, 0.0])
+        
+        return self.parent_platform.entity_relative_position(self.config.entity_name)
 
 
 class VelocitySensor(CWHSensor):
@@ -81,9 +127,56 @@ class VelocitySensor(CWHSensor):
         list of floats
             Velocity of spacecraft.
         """
-        r = R.from_quat(self.parent_platform.quaternion)
-        chief_relative_velocity = r.inv().apply(-self.parent_platform.velocity)
-        return chief_relative_velocity
+        # r = R.from_quat(self.parent_platform.quaternion)
+        # chief_relative_velocity = r.inv().apply(-self.parent_platform.velocity)
+        # return chief_relative_velocity
+        return self.parent_platform.velocity
+
+
+class RelativeVelocitySensorValidator(BasePlatformPartValidator):
+    """
+    Validator for RelativeVelocitySensor
+
+    entity_name: str
+        The name of the entity the velocity of which is to be returned.
+    """
+    entity_name: str = "chief"
+    
+
+class RelativeVelocitySensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the relative velocity at any 
+    time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.RelativeVelocityProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+        
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return RelativeVelocitySensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        # handle initialization case
+        if self.config.entity_name not in state.sim_entities:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.entity_name} not found in simulator state!")
+            return np.array([0.0, 0.0, 0.0])
+        
+        return self.parent_platform.entity_relative_velocity(self.config.entity_name)
 
 
 class InspectedPointsSensorValidator(BasePlatformPartValidator):
@@ -157,8 +250,9 @@ class SunAngleSensor(CWHSensor):
             sun angle
         """
         sun_position = np.array([np.cos(state.sun_angle), -np.sin(state.sun_angle), 0])
-        r = R.from_quat(self.parent_platform.quaternion)
-        return r.inv().apply(sun_position)
+        # r = R.from_quat(self.parent_platform.quaternion)
+        # return r.inv().apply(sun_position)
+        return sun_position
 
 
 class UninspectedPointsSensorValidator(BasePlatformPartValidator):
@@ -177,6 +271,12 @@ class UninspectedPointsSensorValidator(BasePlatformPartValidator):
 class UninspectedPointsSensor(CWHSensor):
     """
     Implementation of a sensor to give location of cluster of uninspected points.
+    
+    NOTE -- Should we change description to emphasize direction rather than 
+    location?  Currently the output is a unit vector so it's the same either
+    way but maybe we should discuss at some point.  If the general case is
+    "position" rather than "direction", then we may need to do something with
+    relative property like we do with Position and Velocity.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.UninspectedPointProp):
@@ -219,9 +319,10 @@ class UninspectedPointsSensor(CWHSensor):
         inspector_position = inspector_entity.position
         inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
         cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
-        r = R.from_quat(self.parent_platform.quaternion)
+        # r = R.from_quat(self.parent_platform.quaternion)
         
-        return r.inv().apply(cluster)
+        # return r.inv().apply(cluster)
+        return cluster
 
 
 # entity position sensors
@@ -374,8 +475,9 @@ class PriorityVectorSensor(CWHSensor):
         np.ndarray
             priority vector
         """
-        r = R.from_quat(self.parent_platform.quaternion)
-        return r.inv().apply(state.priority_vector)
+        # r = R.from_quat(self.parent_platform.quaternion)
+        # return r.inv().apply(state.priority_vector)
+        return state.priority_vector
 
 
 class InspectedPointsScoreSensorValidator(BasePlatformPartValidator):
@@ -464,6 +566,8 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 CWHSensor,
                 PositionSensor,
                 VelocitySensor,
+                RelativePositionSensor,
+                RelativeVelocitySensor,
                 InspectedPointsSensor,
                 SunAngleSensor,
                 UninspectedPointsSensor,
@@ -479,6 +583,8 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 "Sensor_Generic",
                 "Sensor_Position",
                 "Sensor_Velocity",
+                "Sensor_RelativePosition",
+                "Sensor_RelativeVelocity",
                 "Sensor_InspectedPoints",
                 "Sensor_SunAngle",
                 "Sensor_UninspectedPoints",

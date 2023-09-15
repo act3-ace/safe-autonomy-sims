@@ -129,6 +129,28 @@ class CWHPlatform(BaseSafeRLPlatform):
     @property
     def operable(self):
         return True
+    
+    def entity_relative_position(self, entity_name):
+        """
+        The position of entity_name relative to self (without rotation)
+        
+        Returns
+        -------
+        np.ndarray
+            The relative position of entity_name
+        """
+        return self._platform.entity_relative_position(entity_name)
+    
+    def entity_relative_velocity(self, entity_name):
+        """
+        The velocity of entity_name relative to self (without rotation)
+        
+        Returns
+        -------
+        np.ndarray
+            The relative velocity of entity_name
+        """
+        return self._platform.entity_relative_velocity(entity_name)
 
 
 class CWHSixDOFPlatformValidator(BasePlatformValidator):
@@ -208,3 +230,4 @@ class CWHSixDOFPlatform(CWHPlatform):
             The angular_velocity vector of the platform.
         """
         return self._platform.angular_velocity
+    

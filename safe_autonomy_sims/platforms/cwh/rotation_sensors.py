@@ -64,8 +64,8 @@ class AngularVelocitySensor(CWHSensor):
 
 class OrientationUnitVectorSensor(CWHSensor):
     """
-    Implementation of a sensor designed to give the sensor orientation unit 
-    vector at any time.
+    Implementation of a sensor designed to give the canonical (or reference) 
+    sensor orientation unit vector.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.OrientationVectorProp):
@@ -89,8 +89,8 @@ class OrientationUnitVectorSensor(CWHSensor):
             return np.array([0.0, 0.0, 0.0])
         if initial_orientation is None:
             return np.array([0.0, 0.0, 0.0])
-        current_orientation = r.apply(initial_orientation)
-        return current_orientation
+        # current_orientation = r.apply(initial_orientation)
+        return initial_orientation
 
 
 class RotatedAxesSensor(CWHSensor):
