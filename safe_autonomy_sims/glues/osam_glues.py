@@ -99,47 +99,6 @@ class MagNormGlue(BaseWrapperGlue):
         return d
 
 
-class MagNorm3DGlue(BaseWrapperGlue):
-    """Wrapper glue that converts output vector of wrapped glue into the form [magnitude, normalized unit vector]"""
-
-    class Fields:
-        """
-        Fields in this glue
-        """
-        DIRECT_OBSERVATION = "direct_observation"
-
-    def get_unique_name(self) -> str:
-        return self.glue().get_unique_name() + "_MagNorm3D"
-
-    def observation_space(self) -> gym.spaces.Space:
-        wrapped_space = self.glue().observation_space()[self.glue().Fields.DIRECT_OBSERVATION]
-
-        mag = np.linalg.norm(np.maximum(np.abs(wrapped_space.low), np.abs(wrapped_space.high)))
-
-        low = np.concatenate(([0], -1 * np.ones(3)), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
-        high = np.concatenate(([mag], np.ones(3)), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
-
-        d = gym.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low=low, high=high, dtype=np.float32)
-        return d
-
-    def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
-        obs = self.glue().get_observation(other_obs, obs_space, obs_units)[self.glue().Fields.DIRECT_OBSERVATION]
-
-        mag = np.linalg.norm(obs)
-
-        # if mag == 0:
-        if mag < 1e-5:
-            output = np.concatenate(([0], np.zeros_like(obs)), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
-        else:
-            output = np.concatenate(([mag], obs / mag), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
-
-        d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = output
-
-        return d
-
-
 class Angle2UnitCircleGlueValidator(BaseWrapperGlueValidator):
     """
     Validator for Angle2UnitCircleGlue

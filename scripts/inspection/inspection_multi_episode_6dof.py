@@ -564,9 +564,26 @@ class MultiEpisodeAnimationFromCheckpoint(BaseMultiEpisodeAnimation):
         plt.ylabel('Episode Count')
         plt.hist(final_delta_vs, bins=bins)
         plt.savefig(os.path.join(save_dir, 'delta_v_hist.png'))
+        plt.close()
 
         bool_arrays_list = data['bool_arrays']
+        pts_inspected = np.array([np.sum(b[-1]) for b in bool_arrays_list])
         wins = np.array([np.sum(b[-1]) >= 95 for b in bool_arrays_list])
+        episode_lengths = np.array([len(dv) for dv in delta_v_list])
+        
+        plt.figure()
+        plt.xlabel('Episode Length (steps)')
+        plt.ylabel('Episode Count')
+        plt.hist(episode_lengths, bins=bins)
+        plt.savefig(os.path.join(save_dir, 'episode_len_hist.png'))
+        plt.close()
+        
+        plt.figure()
+        plt.xlabel('Points Inspected')
+        plt.ylabel('Episode Count')
+        plt.hist(pts_inspected, bins=bins)
+        plt.savefig(os.path.join(save_dir, 'pts_inspected_hist.png'))
+        plt.close()
 
         # Print statistics
         win_rate = np.sum(wins) / self.n_episodes

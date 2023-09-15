@@ -87,6 +87,29 @@ class PositionProp(BoxProp):
     description: str = "Position Sensor Properties"
 
 
+class RelativePositionProp(BoxProp):
+    """
+    Relative position sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "relative_position"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-20000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [20000.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    description: str = "Relative Position Sensor Properties"
+
+
 class VelocityProp(BoxProp):
     """
     Velocity sensor properties.
@@ -110,6 +133,29 @@ class VelocityProp(BoxProp):
     description: str = "Velocity Sensor Properties"
 
 
+class RelativeVelocityProp(BoxProp):
+    """
+    Relative velocity sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "relative_velocity"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-2000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
+    description: str = "Relative Velocity Sensor Properties"
+    
+    
 class InspectedPointProp(DiscreteProp):
     """
     Inspected points sensor properties.

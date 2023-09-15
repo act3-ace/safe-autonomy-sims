@@ -1,0 +1,145 @@
+[
+{ # Total Points Inspected
+  functor: "corl.glues.common.observe_sensor.ObserveSensor",
+  config: {
+    training_export_behavior: "EXCLUDE",
+    sensor: "Sensor_InspectedPoints",
+    normalization: {
+      normalizer: "corl.libraries.normalization.StandardNormalNormalizer",
+      config: {
+        mu: 0.0,
+        sigma: [100.0],
+      },
+    },
+  },
+},
+{  # Uninspected Points Cluster Unit Vector in Local Frame
+  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  config: {
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_Quaternion",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_UninspectedPoints",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ]
+},
+{  # Delta V
+  functor: "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
+  config: {
+    sensor: "Sensor_Position",
+    training_export_behavior: "EXCLUDE",
+  }
+},
+{  # Sun Position in Local Frame
+  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  config: {
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_Quaternion",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_SunAngle",
+        "normalization": {
+            "enabled": False
+        },
+      },
+    },
+  ],
+},
+{  # Priority Vector in Local Frame
+  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  config: {
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_Quaternion",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+    { 
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_PriorityVector",
+        "normalization": {
+            "enabled": False
+        },
+      },
+    },
+  ],
+},
+{  # Inspected Points Score
+  functor: "corl.glues.common.observe_sensor.ObserveSensor",
+  config: {
+    sensor: "Sensor_InspectedPointsScore",
+    normalization: {
+        enabled: False
+    },
+  },
+},
+{  # Uninspected Points Occluded 
+  functor: "safe_autonomy_sims.glues.dot_product_glue.DotProductGlue",
+  config: {
+    normalize_obs_vectors: True,
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_UninspectedPoints",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_Position",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ],
+},
+]
