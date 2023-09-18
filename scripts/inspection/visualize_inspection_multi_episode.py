@@ -6,7 +6,7 @@ from inspection_multi_episode_6dof import MultiEpisodeAnimationFromCheckpoint
 if __name__ == '__main__':
     # ****Replace with your paths****
     # checkpoint_path = 'example_checkpoint' # Path to checkpoint directory
-    checkpoint_path = '/home/kbennett/Documents/projects/act3/RTA/safe-autonomy-sims/output/tune/ACT3-RLLIB-AGENTS/SIX-DOF-INSPECTION-V2-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_2bb9c_00000_0_num_gpus=0,num_workers=10,rollout_frag_2023-09-13_09-32-46/checkpoint_000890'
+    checkpoint_path = '/home/kbennett/Documents/projects/act3/RTA/safe-autonomy-sims/output/tune/ACT3-RLLIB-AGENTS/SIX-DOF-INSPECTION-V2-EpisodeParameterProviderSavingTrainer_ACT3MultiAgentEnv_df16b_00000_0_num_gpus=0,num_workers=10,rollout_frag_2023-09-15_15-19-01/checkpoint_000886'
     expr_config_path = '/home/kbennett/Documents/projects/act3/RTA/safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/experiment.yml' # Path to experiment config
     launch_dir_of_experiment = '/home/kbennett/Documents/projects/act3/RTA/safe-autonomy-sims'
     task_config_path = '/home/kbennett/Documents/projects/act3/RTA/safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/task.yml' # Path to task config
@@ -32,6 +32,13 @@ if __name__ == '__main__':
                         "description": "Actions"
                     }
                 },
+                {
+                    "name": "PositionVelocityVector",
+                    "functor": "safe_autonomy_sims.evaluation.general_metrics.PositionVelocityVector",
+                    "config": {
+                        "descriptions": "Position_and_Velocity_from_state"
+                    }
+                }
             ]
         }
     }

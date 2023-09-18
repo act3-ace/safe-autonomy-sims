@@ -465,6 +465,7 @@ class MultiEpisodeAnimationFromCheckpoint(BaseMultiEpisodeAnimation):
             this_series = data_path.loc[i]
             control_vector_list = this_series['ControlVector']
             obs_vector_list = this_series['ObservationVector']
+            posvel_vector_list = this_series['PositionVelocityVector']
 
             assert len(control_vector_list) == len(obs_vector_list)
             steps_this_episode = len(obs_vector_list)
@@ -480,10 +481,13 @@ class MultiEpisodeAnimationFromCheckpoint(BaseMultiEpisodeAnimation):
             for j in range(steps_this_episode):
                 obs_dict = obs_vector_list[j].data
                 control_dict = control_vector_list[j].data
+                posvel_dict = posvel_vector_list[j].data
 
-                pos = obs_dict['ObserveSensor_Sensor_Position'].value['direct_observation']
+                # pos = obs_dict['ObserveSensor_Sensor_Position'].value['direct_observation']
+                pos = posvel_dict['position']
                 episode_positions[j] = pos.copy()
-                vel = obs_dict['ObserveSensor_Sensor_Velocity'].value['direct_observation']
+                # vel = obs_dict['ObserveSensor_Sensor_Velocity'].value['direct_observation']
+                vel = posvel_dict['velocity']
                 episode_velocities[j] = vel.copy()
 
                 try:
