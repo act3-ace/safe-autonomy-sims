@@ -47,7 +47,8 @@ def evaluate(
     launch_dir_of_experiment: str,
     platform_serializer_class: PlatformSerializer,
     test_case_manager_config: dict = None,
-    rl_algorithm_name: str = None
+    rl_algorithm_name: str = None,
+    num_workers: int = 1
 ):
     """
     This function is responsible for instantiating necessary arguments and then launching the first stage of CoRL's Evaluation Framework.
@@ -105,7 +106,10 @@ def evaluate(
         trainer_cls = task.experiment_parse.config['tune_config'][1].get('run_or_experiment',
                                                                          None) if task.experiment_parse.config['tune_config'][1] else None
         trainer_cls = task.experiment_parse.config['tune_config'][0].get('run_or_experiment', 'PPO') if trainer_cls is None else trainer_cls
-    rllib_engine_args = {"callbacks": [], "workers": 0, "trainer_cls": trainer_cls}
+
+    # handle multiprocessing
+    rllib_engine_args = {"callbacks": [], "workers": num_workers, "trainer_cls": trainer_cls}
+    task.experiment_parse.config['rllib_configs']['default'][1]["rollout_fragment_length"] = "auto"
 
     # handle grid search seeds
     if isinstance(task.experiment_parse.config['rllib_configs']['local'][0]['seed'], dict):
@@ -493,6 +497,7 @@ def run_evaluations(
     visualize_metrics: bool = False,
     rl_algorithm_name: str = None,
     experiment_name: str = "",
+    num_workers: int = 1
 ):
     """
     This function is responsible for taking a list of checkpoint paths and iteratively running them through
@@ -534,6 +539,8 @@ def run_evaluations(
     if rl_algorithm_name:
         kwargs['rl_algorithm_name'] = rl_algorithm_name
 
+    kwargs["num_workers"] = num_workers
+
     # run sequence of evaluation
     for index, ckpt_path in enumerate(checkpoint_paths):
         # print progress
@@ -573,7 +580,8 @@ def run_one_evaluation(
     checkpoint_path: str,
     platfrom_serializer_class: PlatformSerializer,
     test_case_manager_config: dict = None,
-    rl_algorithm_name: str = None
+    rl_algorithm_name: str = None,
+    num_workers: int = 1
 ):
     """
     This function is responsible for taking a single checkpoint path and running it through
@@ -606,6 +614,8 @@ def run_one_evaluation(
     # rl algorithm
     if rl_algorithm_name:
         kwargs['rl_algorithm_name'] = rl_algorithm_name
+
+    kwargs["num_workers"] = num_workers
 
     metrics_config = add_required_metrics(metrics_config)
 

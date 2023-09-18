@@ -7,3 +7,5 @@ scikit-learn==1.2.1
 seaborn>=0.12.0  # used for example eval api (should be factored out)
 torch==1.13.0  # required by rllib (this is a bug in rllib)
 pint
+imageio==2.25.0
+imageio-ffmpeg==0.4.8
