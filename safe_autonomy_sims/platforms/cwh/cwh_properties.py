@@ -154,8 +154,8 @@ class RelativeVelocityProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
     description: str = "Relative Velocity Sensor Properties"
-    
-    
+
+
 class InspectedPointProp(DiscreteProp):
     """
     Inspected points sensor properties.
@@ -332,6 +332,7 @@ class RotatedAxesProp(BoxProp):
     unit: Annotated[typing.List[StrictStr], Field(min_items=6, max_items=6)] = ["N/A"] * 6
     description: str = "Rotated Axes Unit Vectors Sensor Properties"
 
+
 class AngularVelocityProp(BoxProp):
     """
     Angular Velocity sensor properties.
@@ -400,7 +401,7 @@ class PointsScoreProp(BoxProp):
 class OrbitStabilityProp(BoxProp):
     """
     Property to hold the orbit stability quantity 2*n*x + v_y
-    Highs and lows are obtained manually from this equation and the highs/lows 
+    Highs and lows are obtained manually from this equation and the highs/lows
     of the position and velocity properties and rounded
 
     name : str

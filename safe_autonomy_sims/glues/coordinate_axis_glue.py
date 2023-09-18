@@ -21,13 +21,12 @@ import gym
 import numpy as np
 from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
 
-from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
-
 
 class CoordinateAxisGlueValidator(BaseAgentGlueValidator):
     """
     """
     axis: str = 'x'
+
 
 class CoordinateAxisGlue(BaseAgentGlue):
     """Glue that simply outputs a simple 16x16 image for testing purposes"""
@@ -37,7 +36,7 @@ class CoordinateAxisGlue(BaseAgentGlue):
         Fields in this glue
         """
         DIRECT_OBSERVATION = "direct_observation"
-        
+
     @property
     def get_validator(self) -> typing.Type[CoordinateAxisGlueValidator]:
         return CoordinateAxisGlueValidator

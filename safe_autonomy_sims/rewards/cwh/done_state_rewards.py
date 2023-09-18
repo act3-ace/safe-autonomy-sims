@@ -15,33 +15,31 @@ import typing
 from collections import OrderedDict
 from functools import partial
 
-
-import numpy as np
 from corl.libraries.environment_dict import RewardDict
 from corl.libraries.state_dict import StateDict
 from corl.dones.done_func_base import DoneStatusCodes
-from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 from corl.rewards.episode_done import EpisodeDoneStateReward, EpisodeDoneStateRewardValidator
-from corl.simulators.common_platform_utils import get_platform_by_name
 
 from safe_autonomy_sims.dones.cwh.common import MaxDistanceDoneFunction
+
 
 class MaxDistanceDoneRewardValidator(EpisodeDoneStateRewardValidator):
     """Validation for MaxDistanceDoneReward"""
     done_name: str = MaxDistanceDoneFunction.__name__
     scale: float = -1.0
-    
+
+
 class MaxDistanceDoneReward(EpisodeDoneStateReward):
     """Reward that only responds to the MaxDistanceDone"""
-    
+
     def __init__(self, **kwargs) -> None:
         self.donfig: MaxDistanceDoneRewardValidator
         super().__init__(**kwargs)
-    
+
     @property
     def get_validator(self) -> typing.Type[MaxDistanceDoneRewardValidator]:
         return MaxDistanceDoneRewardValidator
-    
+
     def __call__(
         self,
         observation: OrderedDict,
@@ -52,17 +50,17 @@ class MaxDistanceDoneReward(EpisodeDoneStateReward):
         observation_space,
         observation_units
     ) -> RewardDict:
-        
+
         reward = RewardDict()
         reward[self.config.agent_name] = 0
-        
+
         done_state = next_state.agent_episode_state.get(self.config.agent_name, {})
         for done_name, done_code in done_state.items():
             if done_name in self._already_recorded:
                 continue
             self._already_recorded.add(done_name)
             self._status_codes[done_code].append(done_name)
-        
+
         # this will loop starting from win and go down
         consolidate_break = False
         for done_status in DoneStatusCodes:
@@ -79,7 +77,7 @@ class MaxDistanceDoneReward(EpisodeDoneStateReward):
         self._counter += 1 / next_state.sim_update_rate
 
         return reward
-    
+
     def get_scaling_method(
         self,
         observation: OrderedDict,

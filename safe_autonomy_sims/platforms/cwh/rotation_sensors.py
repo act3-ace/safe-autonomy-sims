@@ -64,7 +64,7 @@ class AngularVelocitySensor(CWHSensor):
 
 class OrientationUnitVectorSensor(CWHSensor):
     """
-    Implementation of a sensor designed to give the canonical (or reference) 
+    Implementation of a sensor designed to give the canonical (or reference)
     sensor orientation unit vector.
     """
 
@@ -78,27 +78,24 @@ class OrientationUnitVectorSensor(CWHSensor):
         Returns
         -------
         list of floats
-            elements of unit vector that points in direction of spacecraft 
+            elements of unit vector that points in direction of spacecraft
             sensor.
         """
-        quaternion = self.parent_platform.quaternion
-        r = R.from_quat(quaternion)
         try:
             initial_orientation = state.inspection_points_map['chief'].config.initial_sensor_unit_vec
         except KeyError:
             return np.array([0.0, 0.0, 0.0])
         if initial_orientation is None:
             return np.array([0.0, 0.0, 0.0])
-        # current_orientation = r.apply(initial_orientation)
         return initial_orientation
 
 
 class RotatedAxesSensor(CWHSensor):
     """
-    Implementation of a sensor designed to give the vectors that result from 
-    rotating the initial coordinate frame's unit vectors into the deputy's 
-    frame.  
-    
+    Implementation of a sensor designed to give the vectors that result from
+    rotating the initial coordinate frame's unit vectors into the deputy's
+    frame.
+
     Note: Because the canonical initial_sensor_unit_ec is [1, 0, 0] (we assume
     this hasn't been changed), we omit this unit vector.  Thus, the sensor
     returns 6 values, the x,y,x components of the remaining two unit vectors
@@ -115,17 +112,17 @@ class RotatedAxesSensor(CWHSensor):
         Returns
         -------
         list of floats
-            elements of unit vector that points in direction of spacecraft 
+            elements of unit vector that points in direction of spacecraft
             sensor.
         """
         quaternion = self.parent_platform.quaternion
         r = R.from_quat(quaternion)
         v1 = np.array([0.0, 1.0, 0.0])
         v2 = np.array([0.0, 0.0, 1.0])
-        
+
         rot_v1 = r.apply(v1)
         rot_v2 = r.apply(v2)
-        
+
         out = np.concatenate([rot_v1, rot_v2])
         return out
 

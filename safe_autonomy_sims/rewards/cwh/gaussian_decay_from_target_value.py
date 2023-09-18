@@ -22,18 +22,18 @@ from corl.rewards.base_measurement_operation import BaseMeasurementOperation, Ba
 
 class GaussianDecayFromTargetValueValidator(BaseMeasurementOperationValidator):
     """
-    reward scale: scale of this reward, this would be the maximum reward value 
+    reward scale: scale of this reward, this would be the maximum reward value
                   for a given time step
-    eps: the length of the reward curve for the exponential decay, would 
-         recommend playing with this value in a plotting software to determine 
+    eps: the length of the reward curve for the exponential decay, would
+         recommend playing with this value in a plotting software to determine
          the value you need
-    target_value: the value with which to take the difference from the wrapped 
+    target_value: the value with which to take the difference from the wrapped
                   observation value
     index: the index with which to pull data out of the observation extractor,
            useful if len(observation) > 1
     is_wrap: if the obs difference needs to wrap around 0/360
     is_rad: if the obs difference is in terms of radians
-    closer: to only reward with this reward if the difference to the target 
+    closer: to only reward with this reward if the difference to the target
             value is less than the last time step
     closer_tolerance: the difference tolerance at which point the agent is close
                       enough to the target value that "closer" is not a concern
@@ -54,8 +54,8 @@ class GaussianDecayFromTargetValueValidator(BaseMeasurementOperationValidator):
 
 class GaussianDecayFromTargetValue(BaseMeasurementOperation):
     """
-    Gaussian Decay from Target Value wraps some sort of observation and takes 
-    in a target value, the reward based on the difference between the target 
+    Gaussian Decay from Target Value wraps some sort of observation and takes
+    in a target value, the reward based on the difference between the target
     value and the observation. the reward Gaussian decays in value the further
     you are away from the target value.
     """

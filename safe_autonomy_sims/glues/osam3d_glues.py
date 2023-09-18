@@ -16,10 +16,8 @@ from collections import OrderedDict
 
 import gym
 import numpy as np
-from corl.glues.base_glue import BaseAgentGlue
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
-from corl.glues.base_wrapper import BaseWrapperGlue, BaseWrapperGlueValidator
-from corl.glues.common.observe_sensor import ObserveSensor
+from corl.glues.base_wrapper import BaseWrapperGlue
 from scipy.spatial.transform import Rotation
 
 
@@ -69,7 +67,8 @@ class RotateVectorToLocalRef3dGlueValidator(BaseMultiWrapperGlueValidator):
     """
     mode: str = 'quaternion'
     apply_inv: bool = True
-    
+
+
 class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
     """Multiwrapped glue that transforms a 3d vector to a local reference frame
 
@@ -82,7 +81,7 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         Fields in this glue
         """
         DIRECT_OBSERVATION = "direct_observation"
-    
+
     @property
     def get_validator(self) -> typing.Type[RotateVectorToLocalRef3dGlueValidator]:
         return RotateVectorToLocalRef3dGlueValidator
@@ -102,8 +101,10 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         orientation_wrapped = self.glues()[0]
         input_vector_wrapped = self.glues()[1]
 
-        orientation_obs = orientation_wrapped.get_observation(other_obs, obs_space, obs_units)[orientation_wrapped.Fields.DIRECT_OBSERVATION]
-        input_vector = input_vector_wrapped.get_observation(other_obs, obs_space, obs_units)[input_vector_wrapped.Fields.DIRECT_OBSERVATION]
+        orientation_obs = orientation_wrapped.get_observation(other_obs, obs_space, obs_units)[
+            orientation_wrapped.Fields.DIRECT_OBSERVATION]
+        input_vector = input_vector_wrapped.get_observation(other_obs, obs_space, obs_units)[
+            input_vector_wrapped.Fields.DIRECT_OBSERVATION]
 
         if self.config.mode == 'euler':
             orientation = Rotation.from_euler('z', angles=orientation_obs[0])
