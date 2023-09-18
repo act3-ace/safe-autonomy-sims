@@ -63,6 +63,8 @@ class BaseAnimation(abc.ABC):
             points algorithm to use. Either "cmu" or "fibonacci"
         """
 
+        print('***New animation available at safe-autonomy-sims/safe_autonomy_sims/evaluation/animation/inspection_animation.py***')
+
         tmp_dir = '/tmp/eval_results/animation_plots'
 
         times, positions, bool_arrays, sun_vectors, control_vectors, velocities = self.get_data(data_path)
