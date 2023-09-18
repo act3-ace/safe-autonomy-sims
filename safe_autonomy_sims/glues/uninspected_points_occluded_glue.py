@@ -30,7 +30,7 @@ class UninspectedPointsOccludedGlueValidator(ObserveSensorValidator):
         Name of the observation space entry corresponding to the position of the
         deputy in Hill's frame or deputy frame.
     orientation_obs_name: str
-        Name of the observation space entry corresponding to the unit vector 
+        Name of the observation space entry corresponding to the unit vector
         pointing in the direction of a cluster of uninspected points in Hill's
         frame or deputy frame.
     """
@@ -40,14 +40,14 @@ class UninspectedPointsOccludedGlueValidator(ObserveSensorValidator):
 
 class UninspectedPointsOccludedGlue(ObserveSensor):
     """
-    Computes the normalized dot product between the uninspected points vector 
+    Computes the normalized dot product between the uninspected points vector
     and the deputy position vector.  In Hill's frame, this quantity positive
-    if the uninspected point cluster an the deputy are on the same side of the 
+    if the uninspected point cluster an the deputy are on the same side of the
     Chief satellite (implying that the uninspected point is not occluded by
-    the chief).  If this quantity is negative, the chief occludes the 
+    the chief).  If this quantity is negative, the chief occludes the
     uninspected point from the deputy's current position.
     """
-    
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -57,7 +57,7 @@ class UninspectedPointsOccludedGlue(ObserveSensor):
 
     def get_unique_name(self) -> str:
         return super().get_unique_name() + "_UninspectedPointsOccluded"
-    
+
     def observation_units(self):
         d = gym.spaces.dict.Dict()
         d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
@@ -74,9 +74,9 @@ class UninspectedPointsOccludedGlue(ObserveSensor):
 
         mag1 = np.linalg.norm(position_obs)
         mag2 = np.linalg.norm(uninspected_points_obs)
-        
+
         occluded_measure = np.dot(position_obs, uninspected_points_obs) / (mag1 * mag2 + 1e-5)
-        
+
         d = OrderedDict()
         d[self.Fields.DIRECT_OBSERVATION] = np.array([occluded_measure], dtype=np.float32)
         return d

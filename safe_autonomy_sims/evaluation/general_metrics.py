@@ -105,6 +105,7 @@ class SafetyViolationRatioMetric(MetricGeneratorTerminalEventScope):
 
         return Real(np.mean(arr) * 100)
 
+
 class PositionVelocityVector(MetricGeneratorTerminalEventScope):
     """Generates vector of Dicts for the Positions calculated for each step during an event for an agent
     """
@@ -119,13 +120,13 @@ class PositionVelocityVector(MetricGeneratorTerminalEventScope):
 
         arr: typing.List[Metric] = []
         for step in params.steps:
-            
+
             this_step_platforms = [p['name'] for p in step.platforms]
 
             if platform_id not in this_step_platforms:
                 break
-            
-            platform = [p for p in step.platforms if p['name']==platform_id][0]
+
+            platform = [p for p in step.platforms if p['name'] == platform_id][0]
             pos = platform['position']
             vel = platform['velocity']
 

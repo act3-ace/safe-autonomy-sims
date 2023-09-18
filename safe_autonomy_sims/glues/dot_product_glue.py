@@ -30,17 +30,18 @@ class DotProductGlueValidator(BaseMultiWrapperGlueValidator):
         Name of the observation space entry corresponding to the position of the
         deputy in Hill's frame.
     orientation_obs_name: str
-        Name of the observation space entry corresponding to the unit vector 
+        Name of the observation space entry corresponding to the unit vector
         pointing in the direction of the deputy's orientation in Hill's frame.
     """
-    normalize_obs_vectors : bool  = False
+    normalize_obs_vectors : bool = False
+
 
 class DotProductGlue(BaseMultiWrapperGlue):
     """
-    Computes dot product between the deputy orientation unit vector and the 
+    Computes dot product between the deputy orientation unit vector and the
     unit vector pointing from the deputy to the chief
     """
-    
+
     class Fields:
         """
         Fields in this glue
@@ -55,7 +56,7 @@ class DotProductGlue(BaseMultiWrapperGlue):
         glue_name0 = self.glues()[0].get_unique_name()
         glue_name1 = self.glues()[1].get_unique_name()
         return glue_name0 + "_DotProduct_" + glue_name1
-    
+
     def observation_units(self):
         d = gym.spaces.dict.Dict()
         d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
@@ -77,9 +78,9 @@ class DotProductGlue(BaseMultiWrapperGlue):
 
         if self.config.normalize_obs_vectors:
             dot_product = dot_product / (np.linalg.norm(obs0) * np.linalg.norm(obs1) + 1e-5)
-        
+
         dot_product = np.clip(dot_product, -1.0, 1.0)
-        
+
         d = OrderedDict()
         d[self.Fields.DIRECT_OBSERVATION] = np.array([dot_product], dtype=np.float32)
         return d

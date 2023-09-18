@@ -16,7 +16,6 @@ import typing
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
 from corl.simulators.base_parts import BasePlatformPartValidator, BaseSensor
-from scipy.spatial.transform import Rotation as R
 
 import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
 from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
@@ -72,7 +71,7 @@ class RelativePositionSensorValidator(BasePlatformPartValidator):
         The name of the entity the position of which is to be returned.
     """
     entity_name: str = "chief"
-    
+
 
 class RelativePositionSensor(CWHSensor):
     """
@@ -81,7 +80,7 @@ class RelativePositionSensor(CWHSensor):
 
     def __init__(self, parent_platform, config, property_class=cwh_props.RelativePositionProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
-        
+
     @property
     def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
         """
@@ -105,7 +104,7 @@ class RelativePositionSensor(CWHSensor):
             if state.sim_time != 0.0:
                 raise ValueError(f"{self.config.entity_name} not found in simulator state!")
             return np.array([0.0, 0.0, 0.0])
-        
+
         return self.parent_platform.entity_relative_position(self.config.entity_name)
 
 
@@ -141,17 +140,17 @@ class RelativeVelocitySensorValidator(BasePlatformPartValidator):
         The name of the entity the velocity of which is to be returned.
     """
     entity_name: str = "chief"
-    
+
 
 class RelativeVelocitySensor(CWHSensor):
     """
-    Implementation of a sensor designed to give the relative velocity at any 
+    Implementation of a sensor designed to give the relative velocity at any
     time.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.RelativeVelocityProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
-        
+
     @property
     def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
         """
@@ -175,7 +174,7 @@ class RelativeVelocitySensor(CWHSensor):
             if state.sim_time != 0.0:
                 raise ValueError(f"{self.config.entity_name} not found in simulator state!")
             return np.array([0.0, 0.0, 0.0])
-        
+
         return self.parent_platform.entity_relative_velocity(self.config.entity_name)
 
 
@@ -271,8 +270,8 @@ class UninspectedPointsSensorValidator(BasePlatformPartValidator):
 class UninspectedPointsSensor(CWHSensor):
     """
     Implementation of a sensor to give location of cluster of uninspected points.
-    
-    NOTE -- Should we change description to emphasize direction rather than 
+
+    NOTE -- Should we change description to emphasize direction rather than
     location?  Currently the output is a unit vector so it's the same either
     way but maybe we should discuss at some point.  If the general case is
     "position" rather than "direction", then we may need to do something with
@@ -319,9 +318,7 @@ class UninspectedPointsSensor(CWHSensor):
         inspector_position = inspector_entity.position
         inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
         cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
-        # r = R.from_quat(self.parent_platform.quaternion)
-        
-        # return r.inv().apply(cluster)
+
         return cluster
 
 
@@ -554,7 +551,7 @@ class OrbitStabilitySensor(CWHSensor):
         pos = self.parent_platform.position
         vel = self.parent_platform.velocity
         n = self.parent_platform._platform.dynamics.n
-        
+
         orbit_stability = 2 * pos[0] * n + vel[1]
         return [orbit_stability]
 
