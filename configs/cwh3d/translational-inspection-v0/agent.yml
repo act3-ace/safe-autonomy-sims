@@ -189,14 +189,6 @@
             },
             },
         },
-        {
-            "functor": "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
-            "config":
-                {
-                "sensor": "Sensor_Position",
-                "training_export_behavior": "EXCLUDE",
-                }
-        },
     ],
     "dones": [
         {

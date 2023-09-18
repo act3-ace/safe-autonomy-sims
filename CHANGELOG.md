@@ -1,3 +1,31 @@
+## 2.12.2 (2023-09-08)
+
+
+### Bug Fixes
+
+* Make RTA module a singleton 6c5ee4d
+
+## 2.12.1 (2023-09-08)
+
+
+### Bug Fixes
+
+* Make inspection delta-V scale a callback e6a30c4
+
+# 2.12.0 (2023-08-10)
+
+
+### Features
+
+* Inspection Animation Updates 95d9eaf
+
+# 2.11.0 (2023-07-22)
+
+
+### Features
+
+* Added num_workers argument to eval api functions to expose multiprocessing option. Found and fixed nondeterministic KMeans cluster function. 5aa395b
+
 # 2.10.0 (2023-07-06)
 
 

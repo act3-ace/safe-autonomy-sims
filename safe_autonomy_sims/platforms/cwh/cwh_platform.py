@@ -58,8 +58,6 @@ class CWHPlatform(BaseSafeRLPlatform):
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._platform = self.config.platform
         self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
-        self.delta_v_scale = 0
-        self.total_steps_counter = 0
 
     @property
     def get_validator(self) -> typing.Type[CWHPlatformValidator]:

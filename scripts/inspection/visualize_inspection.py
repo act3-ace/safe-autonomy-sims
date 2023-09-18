@@ -1,6 +1,16 @@
-from safe_autonomy_sims.evaluation.evaluation_api import run_one_evaluation
-from safe_autonomy_sims.evaluation.launch.serialize_cwh3d import SerializeCWH3D
-from inspection_animation import AnimationFromCheckpoint
+"""
+---------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+Run an evaluation episode and make animation for the inspection environment
+"""
+from safe_autonomy_sims.evaluation.animation.inspection_animation import InspectionAnimation
 
 
 if __name__ == '__main__':
