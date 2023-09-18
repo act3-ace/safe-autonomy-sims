@@ -41,13 +41,13 @@
     },
   ]
 },
-{  # Delta V
-  functor: "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
-  config: {
-    sensor: "Sensor_Position",
-    training_export_behavior: "EXCLUDE",
-  }
-},
+# {  # Delta V
+#   functor: "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
+#   config: {
+#     sensor: "Sensor_Position",
+#     training_export_behavior: "EXCLUDE",
+#   }
+# },
 {  # Sun Position in Local Frame
   functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
   config: {
