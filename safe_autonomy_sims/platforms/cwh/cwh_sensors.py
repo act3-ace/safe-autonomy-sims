@@ -540,7 +540,7 @@ class OrbitStabilitySensor(CWHSensor):
         """
         pos = self.parent_platform.position
         vel = self.parent_platform.velocity
-        
+
         n = self.parent_platform._platform.dynamics.n  # pylint: disable=protected-access
 
         orbit_stability = 2 * pos[0] * n + vel[1]
