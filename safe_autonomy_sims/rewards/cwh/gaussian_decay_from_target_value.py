@@ -11,8 +11,8 @@ limitation or restriction. See accompanying README and LICENSE for details.
 """
 
 import logging
-import typing
 import numpy as np
+import typing
 
 from corl.libraries.environment_dict import RewardDict
 from corl.libraries.utils import get_wrap_diff

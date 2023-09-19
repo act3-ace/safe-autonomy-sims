@@ -11,8 +11,8 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 Contains implementations of sensors that can be used in junction with the six dof CWH platform.
 """
-from scipy.spatial.transform import Rotation as R
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 from corl.libraries.plugin_library import PluginLibrary
 
 import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props

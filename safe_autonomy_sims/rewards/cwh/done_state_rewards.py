@@ -11,14 +11,14 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module implements the Reward Functions and Reward Validators specific to the inspection task.
 """
-import typing
 from collections import OrderedDict
 from functools import partial
+import typing
 
-from corl.libraries.environment_dict import RewardDict
-from corl.libraries.state_dict import StateDict
 from corl.dones.done_func_base import DoneStatusCodes
+from corl.libraries.environment_dict import RewardDict
 from corl.rewards.episode_done import EpisodeDoneStateReward, EpisodeDoneStateRewardValidator
+from corl.libraries.state_dict import StateDict
 
 from safe_autonomy_sims.dones.cwh.common import MaxDistanceDoneFunction
 

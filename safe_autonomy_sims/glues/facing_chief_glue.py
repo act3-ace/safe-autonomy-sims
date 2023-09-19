@@ -42,9 +42,6 @@ class FacingChiefGlue(ObserveSensor):
     unit vector pointing from the deputy to the chief
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     @property
     def get_validator(self):
         return FacingChiefGlueValidator
