@@ -131,7 +131,7 @@ class CWHPlatform(BaseSafeRLPlatform):
     def entity_relative_position(self, entity_name):
         """
         The position of entity_name relative to self (without rotation)
-        
+
         Returns
         -------
         np.ndarray
@@ -142,7 +142,7 @@ class CWHPlatform(BaseSafeRLPlatform):
     def entity_relative_velocity(self, entity_name):
         """
         The velocity of entity_name relative to self (without rotation)
-        
+
         Returns
         -------
         np.ndarray

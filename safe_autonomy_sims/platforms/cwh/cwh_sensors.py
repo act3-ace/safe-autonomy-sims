@@ -57,9 +57,6 @@ class PositionSensor(CWHSensor):
         list of floats
             Position of spacecraft.
         """
-        # r = R.from_quat(self.parent_platform.quaternion)
-        # chief_relative_position = r.inv().apply(-self.parent_platform.position)
-        # return chief_relative_position
         return self.parent_platform.position
 
 
@@ -126,9 +123,6 @@ class VelocitySensor(CWHSensor):
         list of floats
             Velocity of spacecraft.
         """
-        # r = R.from_quat(self.parent_platform.quaternion)
-        # chief_relative_velocity = r.inv().apply(-self.parent_platform.velocity)
-        # return chief_relative_velocity
         return self.parent_platform.velocity
 
 
@@ -249,8 +243,6 @@ class SunAngleSensor(CWHSensor):
             sun angle
         """
         sun_position = np.array([np.cos(state.sun_angle), -np.sin(state.sun_angle), 0])
-        # r = R.from_quat(self.parent_platform.quaternion)
-        # return r.inv().apply(sun_position)
         return sun_position
 
 
@@ -472,8 +464,6 @@ class PriorityVectorSensor(CWHSensor):
         np.ndarray
             priority vector
         """
-        # r = R.from_quat(self.parent_platform.quaternion)
-        # return r.inv().apply(state.priority_vector)
         return state.priority_vector
 
 
@@ -550,7 +540,8 @@ class OrbitStabilitySensor(CWHSensor):
         """
         pos = self.parent_platform.position
         vel = self.parent_platform.velocity
-        n = self.parent_platform._platform.dynamics.n
+        
+        n = self.parent_platform._platform.dynamics.n  # pylint: disable=protected-access
 
         orbit_stability = 2 * pos[0] * n + vel[1]
         return [orbit_stability]

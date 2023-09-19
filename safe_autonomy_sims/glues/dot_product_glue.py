@@ -58,6 +58,13 @@ class DotProductGlue(BaseMultiWrapperGlue):
         return glue_name0 + "_DotProduct_" + glue_name1
 
     def observation_units(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         d = gym.spaces.dict.Dict()
         d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
         return d
