@@ -12,7 +12,6 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 import logging
 import typing
-
 import numpy as np
 
 from corl.libraries.environment_dict import RewardDict

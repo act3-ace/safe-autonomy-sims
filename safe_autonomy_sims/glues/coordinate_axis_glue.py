@@ -24,6 +24,7 @@ from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
 
 class CoordinateAxisGlueValidator(BaseAgentGlueValidator):
     """
+    Validator for coordinate axis glue
     """
     axis: str = 'x'
 

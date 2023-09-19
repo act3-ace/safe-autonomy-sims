@@ -58,6 +58,13 @@ class FacingChiefGlue(ObserveSensor):
         return d
 
     def observation_space(self):
+        """Gets observation space -- the interval [-1, 1]
+
+        Returns
+        -------
+        gym.spaces.Box
+            The space for this observation
+        """
         d = gym.spaces.dict.Dict()
         d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(-1.0, 1.0, shape=(1,), dtype=np.float32)
         return d

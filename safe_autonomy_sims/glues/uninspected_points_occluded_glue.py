@@ -48,9 +48,6 @@ class UninspectedPointsOccludedGlue(ObserveSensor):
     uninspected point from the deputy's current position.
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     @property
     def get_validator(self):
         return UninspectedPointsOccludedGlueValidator
