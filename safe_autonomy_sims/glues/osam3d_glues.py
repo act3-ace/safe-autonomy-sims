@@ -38,8 +38,8 @@ class MagNorm3DGlue(BaseWrapperGlue):
 
         mag = np.linalg.norm(np.maximum(np.abs(wrapped_space.low), np.abs(wrapped_space.high)))
 
-        low = np.concatenate(([0], -1 * np.ones(3)), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
-        high = np.concatenate(([mag], np.ones(3)), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
+        low = np.concatenate([[0], -1 * np.ones(3)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
+        high = np.concatenate([[mag], np.ones(3)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
 
         d = gym.spaces.dict.Dict()
         d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low=low, high=high, dtype=np.float32)
@@ -52,9 +52,9 @@ class MagNorm3DGlue(BaseWrapperGlue):
 
         # if mag == 0:
         if mag < 1e-5:
-            output = np.concatenate(([0], np.zeros_like(obs)), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
+            output = np.concatenate([[0], np.zeros_like(obs)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
         else:
-            output = np.concatenate(([mag], obs / mag), dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
+            output = np.concatenate([[mag], obs / mag], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
 
         d = OrderedDict()
         d[self.Fields.DIRECT_OBSERVATION] = output
