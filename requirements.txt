@@ -1,5 +1,5 @@
 corl==2.9.0
-numpy==1.22.2
+numpy>=1.23.5
 run-time-assurance==1.15.3
 safe-autonomy-dynamics==0.13.2
 tqdm  # pin version
