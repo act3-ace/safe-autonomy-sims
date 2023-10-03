@@ -1,7 +1,7 @@
 corl==2.9.0
-numpy==1.22.2
-run-time-assurance==1.15.2
-safe-autonomy-dynamics==0.13.1
+numpy>=1.23.5
+run-time-assurance==1.15.3
+safe-autonomy-dynamics==0.13.2
 tqdm  # pin version
 scikit-learn==1.2.1
 seaborn>=0.12.0  # used for example eval api (should be factored out)
