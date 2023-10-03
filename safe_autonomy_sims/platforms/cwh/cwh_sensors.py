@@ -242,7 +242,7 @@ class SunAngleSensor(CWHSensor):
         float
             sun angle
         """
-        return state.sun_angle
+        return np.array([state.sun_angle])
 
 
 class SunVectorSensor(CWHSensor):
