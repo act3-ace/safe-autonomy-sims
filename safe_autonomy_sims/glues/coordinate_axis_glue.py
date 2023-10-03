@@ -15,6 +15,7 @@ vector and the unit vector pointing from the deputy to the chief.
 Author: Kochise Bennett
 """
 import typing
+from pydantic import validator
 from collections import OrderedDict
 
 import gym
@@ -27,6 +28,12 @@ class CoordinateAxisGlueValidator(BaseAgentGlueValidator):
     Validator for coordinate axis glue
     """
     axis: str = 'x'
+    
+    @validator('axis')
+    def axis_must_be_in_xyz(cls, v):
+        if v.lower() not in ['x', 'y', 'z']:
+            raise ValueError('Axis must be x, y, or z')
+        return v
 
 
 class CoordinateAxisGlue(BaseAgentGlue):

@@ -13,6 +13,7 @@ This module implements the Reward Functions and Reward Validators specific to th
 """
 from collections import OrderedDict
 from functools import partial
+from pydantic import validator
 import typing
 
 from corl.dones.done_func_base import DoneStatusCodes
@@ -20,25 +21,32 @@ from corl.libraries.environment_dict import RewardDict
 from corl.rewards.episode_done import EpisodeDoneStateReward, EpisodeDoneStateRewardValidator
 from corl.libraries.state_dict import StateDict
 
-from safe_autonomy_sims.dones.cwh.common import MaxDistanceDoneFunction
 
-
-class MaxDistanceDoneRewardValidator(EpisodeDoneStateRewardValidator):
-    """Validation for MaxDistanceDoneReward"""
-    done_name: str = MaxDistanceDoneFunction.__name__
+class WinLoseDoneRewardValidator(EpisodeDoneStateRewardValidator):
+    """Validation for WinLoseDoneReward"""
+    done_name: str 
+    done_status: str = "lose"
     scale: float = -1.0
+    
+    @validator('done_status')
+    def status_is_win_or_lose(cls, v):
+        if v not in ['win', 'lose']:
+            raise ValueError('Done status must be "win" or "lose"')
+        return v        
 
 
-class MaxDistanceDoneReward(EpisodeDoneStateReward):
-    """Reward that only responds to the MaxDistanceDone"""
+class WinLoseDoneReward(EpisodeDoneStateReward):
+    """Reward that applies to a specific Done.  Can be applied when done status
+    is "win" or "lose"
+    """
 
     def __init__(self, **kwargs) -> None:
-        self.donfig: MaxDistanceDoneRewardValidator
+        self.config: WinLoseDoneRewardValidator
         super().__init__(**kwargs)
 
     @property
-    def get_validator(self) -> typing.Type[MaxDistanceDoneRewardValidator]:
-        return MaxDistanceDoneRewardValidator
+    def get_validator(self) -> typing.Type[WinLoseDoneRewardValidator]:
+        return WinLoseDoneRewardValidator
 
     def __call__(
         self,
@@ -93,7 +101,7 @@ class MaxDistanceDoneReward(EpisodeDoneStateReward):
         # pylint: disable=unused-argument
         # pylint: disable=arguments-differ
         if done_name == self.config.done_name:
-            if done_code.name.lower() == 'lose':
+            if done_code.name.lower() == self.config.done_status:
                 scale = self.config.scale
                 return partial(self.constant_scaling, scale=scale)
             return self._status_code_func[done_code.name.lower()]

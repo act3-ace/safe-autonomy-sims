@@ -16,10 +16,10 @@ config:
   rllib_config_updates: &rllib_config_updates
     horizon: 1223 # episode length (2 orbits is 12236 sec)
     rollout_fragment_length: 1500
-    train_batch_size: 15000  # set to num_workers * rollout_fragment_length
-    sgd_minibatch_size: 15000
-    num_workers: 10
-    num_cpus_for_driver: 2
+    train_batch_size: 1500  # set to num_workers * rollout_fragment_length
+    sgd_minibatch_size: 1500
+    num_workers: 1
+    num_cpus_for_driver: 0.5
     gamma: 0.997
     seed: 4900
 
