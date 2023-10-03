@@ -9,11 +9,11 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Glues for the osam environments
+Glues for the six-dof environments
 """
 import typing
-from pydantic import validator
 from collections import OrderedDict
+from pydantic import validator
 
 import gym
 import numpy as np
@@ -68,9 +68,10 @@ class RotateVectorToLocalRef3dGlueValidator(BaseMultiWrapperGlueValidator):
     """
     mode: str = 'quaternion'
     apply_inv: bool = True
-    
+
     @validator('mode')
     def mode_is_recognized(cls, v):
+        """Validate mode"""
         if v not in ['quaternion', 'euler']:
             raise ValueError('mode indicates an unrecognized format for the rotation; accepts "euler" or "quaternion"')
         return v

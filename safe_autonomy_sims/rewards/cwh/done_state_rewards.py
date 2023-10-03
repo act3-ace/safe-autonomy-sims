@@ -13,8 +13,8 @@ This module implements the Reward Functions and Reward Validators specific to th
 """
 from collections import OrderedDict
 from functools import partial
-from pydantic import validator
 import typing
+from pydantic import validator
 
 from corl.dones.done_func_base import DoneStatusCodes
 from corl.libraries.environment_dict import RewardDict
@@ -24,15 +24,16 @@ from corl.libraries.state_dict import StateDict
 
 class WinLoseDoneRewardValidator(EpisodeDoneStateRewardValidator):
     """Validation for WinLoseDoneReward"""
-    done_name: str 
+    done_name: str
     done_status: str = "lose"
     scale: float = -1.0
-    
+
     @validator('done_status')
     def status_is_win_or_lose(cls, v):
+        """Validate done_status"""
         if v not in ['win', 'lose']:
             raise ValueError('Done status must be "win" or "lose"')
-        return v        
+        return v
 
 
 class WinLoseDoneReward(EpisodeDoneStateReward):
