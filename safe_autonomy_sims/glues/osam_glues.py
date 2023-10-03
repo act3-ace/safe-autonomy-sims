@@ -1,7 +1,7 @@
 """
 --------------------------------------------------------------------------
 Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
-Reinforcement Learning (RL) Core  Extension.
+Reinforcement Learning (RL) Core Extension.
 
 This is a US Government Work not subject to copyright protection in the US.
 

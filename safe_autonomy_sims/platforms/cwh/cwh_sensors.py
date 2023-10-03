@@ -230,6 +230,26 @@ class SunAngleSensor(CWHSensor):
     Implementation of a sensor to give the sun angle
     """
 
+    def __init__(self, parent_platform, config, property_class=cwh_props.SunAngleProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - sun angle.
+
+        Returns
+        -------
+        float
+            sun angle
+        """
+        return state.sun_angle
+
+
+class SunVectorSensor(CWHSensor):
+    """
+    Implementation of a sensor to give the sun unit vector
+    """
+
     def __init__(self, parent_platform, config, property_class=cwh_props.SunVectorProp):
         super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
 
@@ -261,13 +281,8 @@ class UninspectedPointsSensorValidator(BasePlatformPartValidator):
 
 class UninspectedPointsSensor(CWHSensor):
     """
-    Implementation of a sensor to give location of cluster of uninspected points.
-
-    NOTE -- Should we change description to emphasize direction rather than
-    location?  Currently the output is a unit vector so it's the same either
-    way but maybe we should discuss at some point.  If the general case is
-    "position" rather than "direction", then we may need to do something with
-    relative property like we do with Position and Velocity.
+    Implementation of a sensor to give direction from the origin to the location
+    of a cluster of uninspected points.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.UninspectedPointProp):
@@ -558,6 +573,7 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 RelativeVelocitySensor,
                 InspectedPointsSensor,
                 SunAngleSensor,
+                SunVectorSensor,
                 UninspectedPointsSensor,
                 BoolArraySensor,
                 EntityPositionSensor,
@@ -575,6 +591,7 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 "Sensor_RelativeVelocity",
                 "Sensor_InspectedPoints",
                 "Sensor_SunAngle",
+                "Sensor_SunVector",
                 "Sensor_UninspectedPoints",
                 "Sensor_BoolArray",
                 "Sensor_EntityPosition",

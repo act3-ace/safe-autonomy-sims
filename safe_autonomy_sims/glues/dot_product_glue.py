@@ -26,14 +26,10 @@ class DotProductGlueValidator(BaseMultiWrapperGlueValidator):
     """
     Validator for the DotProductGlue.
 
-    position_obs_name: str
-        Name of the observation space entry corresponding to the position of the
-        deputy in Hill's frame.
-    orientation_obs_name: str
-        Name of the observation space entry corresponding to the unit vector
-        pointing in the direction of the deputy's orientation in Hill's frame.
+    normalize_obs_vectors: bool
+        Naormalize vectors before taking dot product
     """
-    normalize_obs_vectors : bool = False
+    normalize_vectors : bool = False
 
 
 class DotProductGlue(BaseMultiWrapperGlue):
@@ -83,10 +79,10 @@ class DotProductGlue(BaseMultiWrapperGlue):
 
         dot_product = np.dot(obs0, obs1)
 
-        if self.config.normalize_obs_vectors:
+        if self.config.normalize_vectors:
             dot_product = dot_product / (np.linalg.norm(obs0) * np.linalg.norm(obs1) + 1e-5)
 
-        dot_product = np.clip(dot_product, -1.0, 1.0)
+            dot_product = np.clip(dot_product, -1.0, 1.0)
 
         d = OrderedDict()
         d[self.Fields.DIRECT_OBSERVATION] = np.array([dot_product], dtype=np.float32)

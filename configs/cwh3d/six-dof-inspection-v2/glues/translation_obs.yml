@@ -1,7 +1,8 @@
 [
 {  # local position
-  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
   config: {
+    mode: "quaternion",
     normalization: {
       enabled: True,
       normalizer: "corl.libraries.normalization.StandardNormalNormalizer",
@@ -34,7 +35,7 @@
   ]
 },
 {  # local position MagNorm representation
-  functor: "safe_autonomy_sims.glues.osam3d_glues.MagNorm3DGlue",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.MagNorm3DGlue",
   config: {
     normalization: {
       enabled: True,
@@ -46,7 +47,7 @@
     }
   },
   wrapped: {
-    "functor": "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+    "functor": "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
     "config": {
       "normalization": {
         "enabled": False,
@@ -76,7 +77,7 @@
   }
 },
 {  # local velocity
-  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
   config: {
     normalization: {
       enabled: True,
@@ -110,7 +111,7 @@
   ]
 },
 {  # local velocity MagNorm representation
-  functor: "safe_autonomy_sims.glues.osam3d_glues.MagNorm3DGlue",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.MagNorm3DGlue",
   config: {
     normalization: {
       enabled: True,
@@ -122,7 +123,7 @@
     }
   },
   wrapped: {
-    "functor": "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+    "functor": "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
     "config": {
       "normalization": {
         "enabled": False,

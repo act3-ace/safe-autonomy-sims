@@ -14,7 +14,7 @@
   },
 },
 {  # Uninspected Points Cluster Unit Vector in Local Frame
-  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
   config: {
     normalization: {
       enabled: False
@@ -41,15 +41,8 @@
     },
   ]
 },
-# {  # Delta V
-#   functor: "safe_autonomy_sims.glues.delta_v_glue.DeltaVGlue",
-#   config: {
-#     sensor: "Sensor_Position",
-#     training_export_behavior: "EXCLUDE",
-#   }
-# },
 {  # Sun Position in Local Frame
-  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
   config: {
     normalization: {
       enabled: False
@@ -68,7 +61,7 @@
     {
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
-        "sensor": "Sensor_SunAngle",
+        "sensor": "Sensor_SunVector",
         "normalization": {
             "enabled": False
         },
@@ -77,7 +70,7 @@
   ],
 },
 {  # Priority Vector in Local Frame
-  functor: "safe_autonomy_sims.glues.osam3d_glues.RotateVectorToLocalRef3d",
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
   config: {
     normalization: {
       enabled: False
@@ -116,7 +109,7 @@
 {  # Uninspected Points Occluded 
   functor: "safe_autonomy_sims.glues.dot_product_glue.DotProductGlue",
   config: {
-    normalize_obs_vectors: True,
+    normalize_vectors: True,
     normalization: {
       enabled: False
     },
