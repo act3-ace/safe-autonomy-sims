@@ -510,8 +510,9 @@ class SafeInspectionSuccessReward(InspectionSuccessReward):
         value = reward[self.config.agent_name]
 
         if value != 0.0:
-            pos = observation[self.config.agent_name]['ObserveSensor_Sensor_Position']['direct_observation']
-            vel = observation[self.config.agent_name]['ObserveSensor_Sensor_Velocity']['direct_observation']
+            name = [p for p in self.config.platform_names if p in self.config.agent_name][0]
+            pos = next_state.sim_platforms[name].position
+            vel = next_state.sim_platforms[name].velocity
             state = np.concatenate((pos, vel))
             n = self.config.mean_motion
             times = np.arange(0, 2 * np.pi / n, self.config.fft_time_step)

@@ -104,3 +104,36 @@ class SafetyViolationRatioMetric(MetricGeneratorTerminalEventScope):
             arr.append(int(np.any([v < 0 for v in constraints.values()])))
 
         return Real(np.mean(arr) * 100)
+
+
+class PositionVelocityVector(MetricGeneratorTerminalEventScope):
+    """Generates vector of Dicts for the Positions calculated for each step during an event for an agent
+    """
+
+    def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
+
+        if "agent_id" not in kwargs:
+            raise RuntimeError("Expecting \"agent_id\" to be provided")
+
+        agent_id = kwargs["agent_id"].split('.')[0]
+        platform_id = params.agent_to_platforms[agent_id][0]
+
+        arr: typing.List[Metric] = []
+        for step in params.steps:
+
+            this_step_platforms = [p['name'] for p in step.platforms]
+
+            if platform_id not in this_step_platforms:
+                break
+
+            platform = [p for p in step.platforms if p['name'] == platform_id][0]
+            pos = platform['position']
+            vel = platform['velocity']
+
+            if pos is None or vel is None:
+                continue
+            # Create a non terminal metric (Dict) that is comprised of the terminal (Real) observations
+            real_dict: typing.Dict[str, Metric] = {'position': pos, 'velocity': vel}
+            arr.append(Dict(real_dict))
+
+        return Vector(arr)

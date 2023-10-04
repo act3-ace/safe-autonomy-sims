@@ -152,8 +152,8 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
         done = super().__call__(observation, action, next_observation, next_state, observation_space, observation_units)
 
         if done[self.config.platform_name]:
-            pos = observation[self.config.agent_name]['ObserveSensor_Sensor_Position']['direct_observation']
-            vel = observation[self.config.agent_name]['ObserveSensor_Sensor_Velocity']['direct_observation']
+            pos = next_state.sim_platforms[self.config.platform_name].position
+            vel = next_state.sim_platforms[self.config.platform_name].velocity
             state = np.concatenate((pos, vel))
             n = self.config.mean_motion
             times = np.arange(0, 2 * np.pi / n, self.config.fft_time_step)
@@ -197,8 +197,8 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
         done = super().__call__(observation, action, next_observation, next_state, observation_space, observation_units)
 
         if done[self.config.platform_name]:
-            pos = observation[self.config.agent_name]['ObserveSensor_Sensor_Position']['direct_observation']
-            vel = observation[self.config.agent_name]['ObserveSensor_Sensor_Velocity']['direct_observation']
+            pos = next_state.sim_platforms[self.config.platform_name].position
+            vel = next_state.sim_platforms[self.config.platform_name].velocity
             state = np.concatenate((pos, vel))
             n = self.config.mean_motion
             times = np.arange(0, 2 * np.pi / n, self.config.fft_time_step)

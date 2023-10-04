@@ -87,6 +87,29 @@ class PositionProp(BoxProp):
     description: str = "Position Sensor Properties"
 
 
+class RelativePositionProp(BoxProp):
+    """
+    Relative position sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "relative_position"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-20000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [20000.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    description: str = "Relative Position Sensor Properties"
+
+
 class VelocityProp(BoxProp):
     """
     Velocity sensor properties.
@@ -108,6 +131,29 @@ class VelocityProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1000.0] * 3
     unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
     description: str = "Velocity Sensor Properties"
+
+
+class RelativeVelocityProp(BoxProp):
+    """
+    Relative velocity sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "relative_velocity"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-2000.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
+    description: str = "Relative Velocity Sensor Properties"
 
 
 class InspectedPointProp(DiscreteProp):
@@ -146,6 +192,29 @@ class SunAngleProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [10000.]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
     description: str = "Sun Angle Sensor Properties"
+
+
+class SunVectorProp(BoxProp):
+    """
+    Sun vector sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "SunVector"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    description: str = "Sun Unit Vector Properties"
 
 
 class UninspectedPointProp(BoxProp):
@@ -218,6 +287,52 @@ class QuaternionProp(BoxProp):
     description: str = "Quaternion Sensor Properties"
 
 
+class OrientationVectorProp(BoxProp):
+    """
+    Orientation Unit Vector sensor properties.
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "orientation_unit_vector"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
+    high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
+    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["N/A"] * 3
+    description: str = "Orientation Unit Vector Sensor Properties"
+
+
+class RotatedAxesProp(BoxProp):
+    """
+    Coordinate axis unit vectors rotated into agent frame
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "rotated_axes_unit_vectors"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [-1.0] * 6
+    high: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [1.0] * 6
+    unit: Annotated[typing.List[StrictStr], Field(min_items=6, max_items=6)] = ["N/A"] * 6
+    description: str = "Rotated Axes Unit Vectors Sensor Properties"
+
+
 class AngularVelocityProp(BoxProp):
     """
     Angular Velocity sensor properties.
@@ -281,3 +396,28 @@ class PointsScoreProp(BoxProp):
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.]
     unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
     description: str = "Inspected Points Score Sensor Properties"
+
+
+class OrbitStabilityProp(BoxProp):
+    """
+    Property to hold the orbit stability quantity 2*n*x + v_y
+    Highs and lows are obtained manually from this equation and the highs/lows
+    of the position and velocity properties and rounded
+
+    name : str
+        Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
+    unit : str
+        Unit of measurement for sensor output.
+    description : str
+        Description of sensor properties.
+    """
+
+    name: str = "orbit stability"
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-1025.0]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1025.0]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["m/s"]
+    description: str = "Orbit Stability Sensor Property"
