@@ -1,3 +1,10 @@
+# 2.13.0 (2023-10-04)
+
+
+### Features
+
+* **6dof-inspection:** observations and rewards for the 6-dof inspection task 51d9f8a
+
 ## 2.12.2 (2023-09-08)
 
 
