@@ -66,7 +66,6 @@ if __name__ == '__main__':
 
     metric_list = [
         'custom_metrics/rewards_cumulative/blue0_ctrl/ObservedPointsReward_mean',
-        'custom_metrics/blue0_ctrl/ObserveSensor_Sensor_Position_DeltaV/delta_v_scale_mean',
         'episode_len_mean',
         'episode_reward_mean',
         'custom_metrics/done_results/blue0/SafeSuccessfulInspectionDoneFunction_mean',
