@@ -31,15 +31,8 @@
     },
   },
   wrapped: [
-    {
-      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-      "config": {
-        "sensor": "Sensor_Quaternion",
-        "normalization": {
-          "enabled": False
-        },
-      },
-    },
+    !include-extend rotation_quaternion.yml,
+
     {
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
@@ -61,15 +54,8 @@
     },
   },
   wrapped: [
-    {
-      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-      "config": {
-        "sensor": "Sensor_Quaternion",
-        "normalization": {
-          "enabled": False
-        },
-      },
-    },
+    !include-extend rotation_quaternion.yml,
+
     {
       "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
       "config": {
@@ -90,15 +76,8 @@
     },
   },
   wrapped: [
-    {
-      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-      "config": {
-        "sensor": "Sensor_Quaternion",
-        "normalization": {
-          "enabled": False
-        },
-      },
-    },
+    !include-extend rotation_quaternion.yml,
+
     {
       "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
       "config": {
@@ -119,15 +98,8 @@
     },
   },
   wrapped: [
-    {
-      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-      "config": {
-        "sensor": "Sensor_Quaternion",
-        "normalization": {
-          "enabled": False
-        },
-      },
-    },
+    !include-extend rotation_quaternion.yml,
+
     {
       "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
       "config": {
@@ -158,15 +130,8 @@
         },
       },
       "wrapped": [
-        {
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_Quaternion",
-            "normalization": {
-              "enabled": False
-            },
-          },
-        },
+        !include-extend rotation_quaternion.yml,
+
         {
           "functor": "corl.glues.common.observe_sensor.ObserveSensor",
           "config": {
