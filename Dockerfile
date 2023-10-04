@@ -15,7 +15,7 @@ FROM ${ACT3_OCI_REGISTRY}/act3-rl/corl/development/user-base-builder:v1.52.6  as
 #########################################################################################
 
 ARG IMAGE_REPO_BASE
-FROM ${IMAGE_REPO_BASE}docker.io/python:3.8 as develop
+FROM ${IMAGE_REPO_BASE}docker.io/python:3.10.5 as develop
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_ROOT_USER_ACTION=ignore
 ARG PIP_INDEX_URL

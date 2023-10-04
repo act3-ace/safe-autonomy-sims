@@ -60,6 +60,51 @@ class PositionSensor(CWHSensor):
         return self.parent_platform.position
 
 
+class RelativePositionSensorValidator(BasePlatformPartValidator):
+    """
+    Validator for RelativePositionSensor
+
+    entity_name: str
+        The name of the entity the position of which is to be returned.
+    """
+    entity_name: str = "chief"
+
+
+class RelativePositionSensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the position at any time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.RelativePositionProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return RelativePositionSensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        # handle initialization case
+        if self.config.entity_name not in state.sim_entities:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.entity_name} not found in simulator state!")
+            return np.array([0.0, 0.0, 0.0])
+
+        return self.parent_platform.entity_relative_position(self.config.entity_name)
+
+
 class VelocitySensor(CWHSensor):
     """
     Implementation of a sensor to give velocity at any time.
@@ -79,6 +124,52 @@ class VelocitySensor(CWHSensor):
             Velocity of spacecraft.
         """
         return self.parent_platform.velocity
+
+
+class RelativeVelocitySensorValidator(BasePlatformPartValidator):
+    """
+    Validator for RelativeVelocitySensor
+
+    entity_name: str
+        The name of the entity the velocity of which is to be returned.
+    """
+    entity_name: str = "chief"
+
+
+class RelativeVelocitySensor(CWHSensor):
+    """
+    Implementation of a sensor designed to give the relative velocity at any
+    time.
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.RelativeVelocityProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    @property
+    def get_validator(self) -> typing.Type[BasePlatformPartValidator]:
+        """
+        return the validator that will be used on the configuration
+        of this part
+        """
+        return RelativeVelocitySensorValidator
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - position.
+
+        Returns
+        -------
+        list of floats
+            Position of spacecraft.
+        """
+        # handle initialization case
+        if self.config.entity_name not in state.sim_entities:
+            # raise error if not initialization
+            if state.sim_time != 0.0:
+                raise ValueError(f"{self.config.entity_name} not found in simulator state!")
+            return np.array([0.0, 0.0, 0.0])
+
+        return self.parent_platform.entity_relative_velocity(self.config.entity_name)
 
 
 class InspectedPointsSensorValidator(BasePlatformPartValidator):
@@ -154,6 +245,27 @@ class SunAngleSensor(CWHSensor):
         return np.array([state.sun_angle])
 
 
+class SunVectorSensor(CWHSensor):
+    """
+    Implementation of a sensor to give the sun unit vector
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.SunVectorProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - sun angle.
+
+        Returns
+        -------
+        float
+            sun angle
+        """
+        sun_position = np.array([np.cos(state.sun_angle), -np.sin(state.sun_angle), 0])
+        return sun_position
+
+
 class UninspectedPointsSensorValidator(BasePlatformPartValidator):
     """
     Validator for InspectedPointsSensor
@@ -169,7 +281,8 @@ class UninspectedPointsSensorValidator(BasePlatformPartValidator):
 
 class UninspectedPointsSensor(CWHSensor):
     """
-    Implementation of a sensor to give location of cluster of uninspected points.
+    Implementation of a sensor to give direction from the origin to the location
+    of a cluster of uninspected points.
     """
 
     def __init__(self, parent_platform, config, property_class=cwh_props.UninspectedPointProp):
@@ -211,7 +324,9 @@ class UninspectedPointsSensor(CWHSensor):
         # get inspection points of object under inspection
         inspector_position = inspector_entity.position
         inspection_points = state.inspection_points_map[self.config.inspection_entity_name]
-        return inspection_points.kmeans_find_nearest_cluster(inspector_position)
+        cluster = inspection_points.kmeans_find_nearest_cluster(inspector_position)
+
+        return cluster
 
 
 # entity position sensors
@@ -420,6 +535,33 @@ class InspectedPointsScoreSensor(CWHSensor):
         return np.array([weight])
 
 
+class OrbitStabilitySensor(CWHSensor):
+    """
+    Implementation of a sensor to give 2nx + v_y, the quantity that determines
+    stability of the un-controlled motion
+    """
+
+    def __init__(self, parent_platform, config, property_class=cwh_props.OrbitStabilityProp):
+        super().__init__(property_class=property_class, parent_platform=parent_platform, config=config)
+
+    def _calculate_measurement(self, state):
+        """
+        Calculate the measurement - cluster_location.
+
+        Returns
+        -------
+        np.ndarray
+            Cluster location of the uninspected points.
+        """
+        pos = self.parent_platform.position
+        vel = self.parent_platform.velocity
+
+        n = self.parent_platform._platform.dynamics.n  # pylint: disable=protected-access
+
+        orbit_stability = 2 * pos[0] * n + vel[1]
+        return [orbit_stability]
+
+
 for sim in [CWHSimulator, InspectionSimulator]:
     for platform in [CWHAvailablePlatformTypes.CWH, CWHAvailablePlatformTypes.CWHSixDOF]:
         for sensor, sensor_name in zip(
@@ -427,8 +569,11 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 CWHSensor,
                 PositionSensor,
                 VelocitySensor,
+                RelativePositionSensor,
+                RelativeVelocitySensor,
                 InspectedPointsSensor,
                 SunAngleSensor,
+                SunVectorSensor,
                 UninspectedPointsSensor,
                 BoolArraySensor,
                 EntityPositionSensor,
@@ -436,13 +581,17 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 OriginPositionSensor,
                 PriorityVectorSensor,
                 InspectedPointsScoreSensor,
+                OrbitStabilitySensor,
             ],
             [
                 "Sensor_Generic",
                 "Sensor_Position",
                 "Sensor_Velocity",
+                "Sensor_RelativePosition",
+                "Sensor_RelativeVelocity",
                 "Sensor_InspectedPoints",
                 "Sensor_SunAngle",
+                "Sensor_SunVector",
                 "Sensor_UninspectedPoints",
                 "Sensor_BoolArray",
                 "Sensor_EntityPosition",
@@ -450,6 +599,7 @@ for sim in [CWHSimulator, InspectionSimulator]:
                 "Sensor_OriginPosition",
                 "Sensor_PriorityVector",
                 "Sensor_InspectedPointsScore",
+                "Sensor_OrbitStability"
             ]
         ):
             PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": platform})

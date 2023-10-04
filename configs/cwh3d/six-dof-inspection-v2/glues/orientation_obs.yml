@@ -1,0 +1,157 @@
+[
+{  # Quaternion
+  functor: "corl.glues.common.observe_sensor.ObserveSensor",
+  config: {
+    training_export_behavior: "EXCLUDE",
+    sensor: "Sensor_Quaternion",
+    normalization: {
+        enabled: False
+    },
+  },
+},
+{  # Angular Velocity
+  functor: "corl.glues.common.observe_sensor.ObserveSensor",
+  config: {
+    sensor: "Sensor_AngularVelocity",
+    normalization: {
+      "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+      "config": {
+        "mu": 0.0,
+        "sigma": [0.05, 0.05, 0.05],
+      },
+    },
+  },
+},
+{  # Canonical Orientation of Deputy Camera -- Rotated from local to Hill reference frame
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
+  config: {
+    apply_inv: False,
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    !include-extend rotation_quaternion.yml,
+
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_OrientationUnitVector",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ],
+},
+{  # Rotated X-Axis (local x-axis in Hill's frame)
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
+  config: {
+    apply_inv: False,
+    training_export_behavior: "EXCLUDE",  # Redundant with OrientationUnitVector
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    !include-extend rotation_quaternion.yml,
+
+    {
+      "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
+      "config": {
+        "axis": "x",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ]
+},
+{  # Rotated Y-Axis (local y-axis in Hill's frame)
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
+  config: {
+    apply_inv: False,
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    !include-extend rotation_quaternion.yml,
+
+    {
+      "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
+      "config": {
+        "axis": "y",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ],
+},
+{  # Rotated Z-Axis (local z-axis in Hill's frame)
+  functor: "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
+  config: {
+    apply_inv: False,
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    !include-extend rotation_quaternion.yml,
+
+    {
+      "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
+      "config": {
+        "axis": "z",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ],
+},
+{  # Facing Chief (equals 1 when deputy camera points at chief)
+  functor: "safe_autonomy_sims.glues.dot_product_glue.DotProductGlue",
+  config: {
+    normalize_vectors: True,
+    training_export_behavior: "EXCLUDE",  # Redundant with x-coordinate of chief in deputy frame -- still used for rewards though
+    normalization: {
+      enabled: False
+    },
+  },
+  wrapped: [
+    {
+      "functor": "safe_autonomy_sims.glues.six_dof_glues.RotateVectorToLocalRef3d",
+      "config": {
+        "apply_inv": False,
+        "normalization": {
+          "enabled": False
+        },
+      },
+      "wrapped": [
+        !include-extend rotation_quaternion.yml,
+
+        {
+          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+          "config": {
+            "sensor": "Sensor_OrientationUnitVector",
+            "normalization": {
+              "enabled": False
+            },
+          },
+        },
+      ]
+    },
+    {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_RelativeChiefPosition",
+        "normalization": {
+          "enabled": False
+        },
+      },
+    },
+  ],
+},
+]
