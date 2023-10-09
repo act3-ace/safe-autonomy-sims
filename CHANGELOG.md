@@ -1,3 +1,10 @@
+## 2.13.1 (2023-10-09)
+
+
+### Bug Fixes
+
+* Count sensor single value 2b3b8a4
+
 # 2.13.0 (2023-10-04)
 
 
