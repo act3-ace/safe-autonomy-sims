@@ -222,7 +222,7 @@ class InspectedPointsSensor(CWHSensor):
         for points in state.inspection_points_map.values():
             num_points_inspected += points.get_num_points_inspected(inspector_entity=inspector_entity)
 
-        return num_points_inspected
+        return np.array([num_points_inspected])
 
 
 class SunAngleSensor(CWHSensor):
