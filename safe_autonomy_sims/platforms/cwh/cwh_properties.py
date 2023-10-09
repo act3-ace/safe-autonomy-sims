@@ -13,7 +13,7 @@ This module defines the measurement and control properties for CWH spacecraft se
 """
 import typing
 
-from corl.libraries.property import BoxProp, DiscreteProp
+from corl.libraries.property import BoxProp
 from pydantic import Field, StrictFloat, StrictStr
 from typing_extensions import Annotated
 
@@ -156,22 +156,26 @@ class RelativeVelocityProp(BoxProp):
     description: str = "Relative Velocity Sensor Properties"
 
 
-class InspectedPointProp(DiscreteProp):
+class InspectedPointProp(BoxProp):
     """
     Inspected points sensor properties.
 
     name : str
         Sensor property name.
+    low : list[float]
+        Minimum bounds of sensor output.
+    high : list[float]
+        Maximum bounds of sensor output.
     unit : str
         Unit of measurement for sensor output.
-    n : int
-
     description : str
         Description of sensor properties.
     """
 
     name: str = "inspected_points"
-    n: int = 101
+    low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.]
+    high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [100.]
+    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
     description: str = "Inspected Points Sensor Properties"
 
 
