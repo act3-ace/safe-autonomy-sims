@@ -51,16 +51,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+/junit.xml
 
 # Flask stuff:
 instance/
@@ -139,6 +130,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+.devcontainer/.ssh/
+docs/corl/
 site/
 
 # ssh
@@ -149,3 +142,8 @@ site/
 
 # animation figures
 safe_autonomy_sims/evaluation/animation/figs/
+
+# Ray logs
+ray_logs/
+docker-compose-di2e.yml
+docker-compose-kr.yml

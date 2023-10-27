@@ -1,6 +1,6 @@
 # Configuration
 
-The environments and experiments built using CoRL are 
+The environments and experiments built using CoRL are
 designed to be highly configurable. There are several
 relevant configuration files used to define a full task
 environment and RL experiment. All configuration files
@@ -11,12 +11,14 @@ use the YAML file format.
 The agent configuration file defines the platform parts,
 rewards, dones, and glues used by an agent in an RL experiment.
 The agent configuration file contains two top level fields:
+
 ```yaml
 "agent": "corl.agents.base_agent.TrainableBaseAgent"
 "config": {
-    ...
+  ...
 }
 ```
+
 - `agent`: agent class of type [BaseAgent]({{corl_docs_url}}/reference/agents/base_agent/#corl.agents.base_agent.BaseAgent)
 - `config`: agent configuration parameters (see below)
 
@@ -25,99 +27,108 @@ The agent configuration file contains two top level fields:
 The agent config parameters define the agent platform used
 in the RL experiment. Available configuration parameters
 include:
+
 - `parts`: list of platform part entries
   - Each part entry includes the part's name (`part`) and optional initialization parameters (`config`)
   - Initialization parameters are unique to the platform part's implementation
   - Example:
+
     ```yaml
     "parts": [
-        {"part": "Controller_Thrust", 
-         "config": {
-            "name": "X Thrust", 
-            "axis": 0, 
-            "properties": {"name": "x_thrust"}
-          }
-        },
-        {"part": "Sensor_Position"},
-        {"part": "Sensor_Velocity"}
+      {"part": "Controller_Thrust", 
+        "config": {
+          "name": "X Thrust", 
+          "axis": 0, 
+          "properties": {"name": "x_thrust"}
+        }
+      },
+      {"part": "Sensor_Position"},
+      {"part": "Sensor_Velocity"}
     ]
     ```
+
 - `episode_parameter_provider`: object which provides agent initialization parameters during an experiment
   - `type`: class of type [EpisodeParameterProvider]({{corl_docs_url}}/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
   - `config`: implementation specific initialization parameters for the parameter provider
   - Example:
+
     ```yaml
     "episode_parameter_provider": {
-        "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
     },
     ```
+
 - `simulator_reset_parameters`: keyword arguments and values passed to the simulator used during the experiment whenever the simulator is reset. These values are simulator-specific, so refer to your simulator documentation to see what values are expected.
   - Example:
+
     ```yaml
     "simulator_reset_parameters": {
-        "x": 100,
-        "y": 100,
-        "z": 100,
-        "xdot": 0,
-        "ydot": 0,
-        "zdot": 0,
+      "x": 100,
+      "y": 100,
+      "z": 100,
+      "xdot": 0,
+      "ydot": 0,
+      "zdot": 0,
     },
     ```
-    
+
 - `glues`: list of glue entries
   - Glues connect an agent platform to a RL training framework by providing an endpoint for observations and actions.
   - A glue may transform and send data from a platform part to a training framework as an observation. The full set of glues which provide observations over all agents in the environment defines the environment's observation space.
   - A glue may transform and send data from a training framework to a platform part as an action. The full set of glues which provide actions over all agents in the environment defines the environment's action space.
   - Example:
-      ```yaml
-      "glues": [
-          {
-              "functor": "safe_autonomy_sims.core.dones.common_dones.TimeoutDoneFunction",
-              "config": { ... },
-          },
-          {
-              "functor": "safe_autonomy_sims.core.dones.docking_dones.MaxDistanceDoneFunction",
-              "config": { ... },
-          },
-          {
-              "functor": "safe_autonomy_sims.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
-              "config": { ... },
-          },
-      ]
-      ```
+
+    ```yaml
+    "glues": [
+      {
+        "functor": "safe_autonomy_sims.core.dones.common_dones.TimeoutDoneFunction",
+        "config": { ... },
+      },
+      {
+        "functor": "safe_autonomy_sims.core.dones.docking_dones.MaxDistanceDoneFunction",
+        "config": { ... },
+      },
+      {
+        "functor": "safe_autonomy_sims.core.glues.normal.normal_observe_glue.NormalObserveSensorGlue",
+        "config": { ... },
+      },
+    ]
+    ```
 
     - Glue entries have two top level fields:
       - `functor`: a class of type [BaseAgentGlue]({{corl_docs_url}}/reference/glues/base_glue/#corl.glues.base_glue.BaseAgentGlue)
       - `config`: a set of glue-specific configuration arguments
       - Example:
-      ```yaml
-      "functor": "corl.glues.common.controller_glue.ControllerGlue",
-      "config": {
+
+        ```yaml
+        "functor": "corl.glues.common.controller_glue.ControllerGlue",
+        "config": {
           "controller": "X Thrust",
           "training_export_behavior": "EXCLUDE",
           "normalization": {
             "enabled": False,
           }
-      }
-      ```
-      
+        }
+        ```
+
 - `dones`: list of done functions
   - Done functions provide the terminal conditions for an agent during an episode in an experiment.
   - Example:
+
       ```yaml
       "dones": [
-          {
-              "functor": "corl.glues.common.controller_glue.ControllerGlue",
-              "config": { ... },
-          },
-          {
-              "functor": "corl.glues.common.controller_glue.ControllerGlue",
-              "config": { ... },
-          },
-          {
-              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
-              "config": { ... },
-          },
+        {
+          "functor": "corl.glues.common.controller_glue.ControllerGlue",
+           "config": { ... },
+        },
+        {
+          "functor": "corl.glues.common.controller_glue.ControllerGlue",
+          "config": { ... },
+        },
+        {
+          "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
+          "config": { ... },
+        },
       ]
       ```
 
@@ -125,37 +136,39 @@ include:
       - `functor`: a class of type [DoneFuncBase]({{corl_docs_url}}/reference/dones/done_func_base/#corl.dones.done_func_base.DoneFuncBase)
       - `config`: a set of function-specific configuration arguments
       - Example:
-      ```yaml
-      "functor": "safe_autonomy_sims.core.dones.docking_dones.CrashDockingDoneFunction",
-      "config":{
-        "docking_region_radius": 0.5,
-        "velocity_threshold": 0.2,
-        "threshold_distance": 0.5,
-        "mean_motion": 0.001027,
-        "lower_bound": False,
-      },
-      ```
-      
+
+        ```yaml
+        "functor": "safe_autonomy_sims.core.dones.docking_dones.CrashDockingDoneFunction",
+        "config":{
+          "docking_region_radius": 0.5,
+          "velocity_threshold": 0.2,
+          "threshold_distance": 0.5,
+          "mean_motion": 0.001027,
+          "lower_bound": False,
+        },
+        ```
+
 - `rewards`: list of reward functions
   - Reward functions provide the agent rewards at each step during an episode in an experiment.
   - Example:
+
       ```yaml
       "rewards": [
-          {
-              "name": "DockingDistanceExponentialChangeReward",
-              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
-              "config": { ... },
-          },
-          {
-              "name": "DockingDeltaVReward",
-              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
-              "config": { ... },
-          },
-          {
-              "name": "DockingSuccessReward",
-              "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingSuccessReward",
-              "config": { ... },
-          },
+        {
+          "name": "DockingDistanceExponentialChangeReward",
+          "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDistanceExponentialChangeReward",
+          "config": { ... },
+        },
+        {
+          "name": "DockingDeltaVReward",
+          "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
+          "config": { ... },
+        },
+        {
+          "name": "DockingSuccessReward",
+          "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingSuccessReward",
+          "config": { ... },
+        },
       ]
       ```
 
@@ -164,15 +177,16 @@ include:
       - `functor`: a class of type [DoneFuncBase]({{corl_docs_url}}/reference/dones/done_func_base/#corl.dones.done_func_base.DoneFuncBase)
       - `config`: a set of function-specific configuration arguments
       - Example:
-      ```yaml
-      "name": "DockingDeltaVReward",
-      "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
-      "config": {
-        "scale": -0.01,
-        "bias": 0.0,
-        "mass": 12.0
-      }
-      ```
+
+        ```yaml
+        "name": "DockingDeltaVReward",
+        "functor": "safe_autonomy_sims.core.rewards.docking_rewards.DockingDeltaVReward",
+        "config": {
+          "scale": -0.01,
+          "bias": 0.0,
+          "mass": 12.0
+        }
+        ```
 
 ## Environment
 
@@ -186,6 +200,7 @@ and environment-level episode parameter provider.
   - `type`: the registered name of a class of type [BaseSimulator]({{corl_docs_url}}/reference/simulators/base_simulator/#corl.simulators.base_simulator.BaseSimulator)
   - `config`: a simulator-specific set of keyword arguments and values passed to the simulator during initialization
   - Example:
+
     ```yaml
     "simulator": {
       "type": "CWHSimulator",
@@ -197,25 +212,28 @@ and environment-level episode parameter provider.
 
 - `platforms`: list of registered platform types available in this environment
   - Example:
+
     ```yaml
     "platforms": "CWHSimulator_Platforms",
     ```
 
 - `plugin_paths`: list of module or package paths in which the plugin library should search for CoRL compatible plugins (platforms, platform parts, CoRL simulators)
   - Example:
+
     ```yaml
     "plugin_paths": ["safe_autonomy_sims.core.platforms", "safe_autonomy_sims.core.simulators"],
     ```
 
 - `episode_parameter_provider`: object which provides environment initialization parameters during an experiment
-    - `type`: class of type [EpisodeParameterProvider]({{corl_docs_url}}/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
-    - `config`: implementation specific initialization parameters for the parameter provider
-    - Example:
-        ```yaml
-        "episode_parameter_provider": {
-          "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
-        },
-        ```
+  - `type`: class of type [EpisodeParameterProvider]({{corl_docs_url}}/reference/episode_parameter_providers/core/#corl.episode_parameter_providers.core.EpisodeParameterProvider)
+  - `config`: implementation specific initialization parameters for the parameter provider
+  - Example:
+
+    ```yaml
+    "episode_parameter_provider": {
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
+    ```
 
 ## Platforms
 
@@ -226,11 +244,12 @@ preventing use of inappropriate platforms with inappropriate simulators, parts, 
 
 - `name`: name of allowed platform type
 - Example:
-    ```yaml
-    {
-      name: CWH
-    }
-    ```
+
+  ```yaml
+  {
+    name: CWH
+  }
+  ```
 
 ## Policy
 
@@ -250,10 +269,11 @@ of your chosen training framework.
   - The experiment class interfaces with your chosen training framework and defines how training is handled.
 - `config`: experiment class specific configuration parameters
 - Example (using Ray RLLib and Tune):
-    ```yaml
-    experiment_class: corl.experiments.rllib_experiment.RllibExperiment
-    config:
-      rllib_config_updates: &rllib_config_updates
+
+  ```yaml
+  experiment_class: corl.experiments.rllib_experiment.RllibExperiment
+  config:
+    rllib_config_updates: &rllib_config_updates
     
       # No overrides for ray as there are no changes
       ray_config_updates: &ray_config_updates
@@ -279,4 +299,4 @@ of your chosen training framework.
       ray_config: [!include ray_config.yml, *ray_config_updates]
       env_config: [!include ../../environments/cwh3d.yml, *env_config_updates]
       tune_config: [!include tune_config.yml, *tune_config_updates]
-    ```
+  ```
