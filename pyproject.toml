@@ -1,0 +1,102 @@
+[tool.poetry]
+name = "safe-autonomy-sims"
+version = "2.13.1"
+description = "The Safe-Autonomy-Sims library provides the components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA)"
+authors = [
+    "Charles Keating <Charles.Keating@udri.udayton.edu>",
+]
+license = "Distribution C"
+readme = "README.md"
+homepage = "https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims.git"
+repository = "https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims.git"
+documentation = 'https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/docs'
+keywords = []
+include = ["docs/*"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+packages = [
+        {include = "safe_autonomy_sims"},
+    ]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.9.7 || >3.9.7,<3.11"
+numpy = "^1.23.5"
+tqdm = "^4.66.1"
+scikit-learn = "1.2.1"
+seaborn = "^0.12.0"
+torch = "1.13.0"
+imageio = "2.25.0"
+imageio-ffmpeg = "0.4.8"
+pint = "^0.22"
+safe-autonomy-dynamics = "0.13.2"
+run-time-assurance = "1.15.3"
+corl = "2.9.0"
+
+[tool.poetry.group.lint.dependencies]
+pylint = "2.15.4"
+flake8 = "3.9.2"
+yapf = "^0.40.0"
+mypy = "0.930"
+isort = "5.9.3"
+bashate = "^2.1.0"
+velin = "^0.0.11"
+blacken-docs = "^1.12.1"
+detect-secrets = "1.1.0"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.1.2"
+pytest-cov = "2.11.1"
+pyinstrument = "^4.3.0"
+twine = "^4.0.2"
+coverage-badge = "^1.1.0"
+jsonlines = "^4.0.0"
+factory-boy = "3.2.1"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.3.1"
+mkdocs-git-revision-date-localized-plugin = "^1.1.0"
+mkdocs-macros-plugin = "^1.0.0"
+mkdocs-material = "^8.4.2"
+mkdocs-material-extensions = "^1.0.3"
+mkdocs-mermaid-plugin = "^0.1.1"
+mkdocs-pdf-export-plugin = "^0.5.10"
+mktheapidocs = {extras = ["plugin"], version = "^0.3.1"}
+mkdocstrings = "0.18.0"
+mkdocs-autorefs = "^0.5.0"
+mkdocs-coverage = "^0.2.5"
+mkdocs-gen-files = "^0.5.0"
+mkdocs-literate-nav = "^0.4.1"
+mkdocs-section-index = "^0.3.4"
+mkdocs-with-pdf = "^0.9.3"
+papermill = "^2.4.0"
+Pillow = "^9.2.0"
+pymdown-extensions = "^9.5"
+ipykernel = "^6.25.2"
+mkdocs-markdownextradata-plugin = "^0.2.5"
+
+
+[[tool.poetry.source]]
+name = "sa-dynamics"
+url = "https://git.act3-ace.com/api/v4/projects/826/packages/pypi/simple"
+priority = "supplemental"
+
+
+[[tool.poetry.source]]
+name = "sa-rta"
+url = "https://git.act3-ace.com/api/v4/projects/804/packages/pypi/simple"
+priority = "supplemental"
+
+
+[[tool.poetry.source]]
+name = "corl"
+url = "https://git.act3-ace.com/api/v4/projects/657/packages/pypi/simple"
+priority = "supplemental"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

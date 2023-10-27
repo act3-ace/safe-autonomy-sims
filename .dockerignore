@@ -1,0 +1,18 @@
+# Ignore everything
+**
+
+# Allow these files and directories
+!/.scripts/**
+!/.devcontainer/**
+!/safe_autonomy_sims/**
+!/docs/**
+!/config/**
+!/scripts/**
+!/Dockerfile
+!/LICENSE.md
+!/setup.cfg
+!/README.md
+!/pyproject.toml
+!/poetry.lock
+
+

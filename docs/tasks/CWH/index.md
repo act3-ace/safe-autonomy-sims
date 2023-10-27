@@ -16,19 +16,19 @@ $$
 x = [x, y, z, \dot{x}, \dot{y},\dot{z}]^T \in \mathcal{X} \subset \mathbb{R}^{6}
 $$
 
-where 
+where
 
 $$
 r = x \hat{e}_R + y \hat{e}_T + z\hat{e}_N
 $$
 
-is the position vector and 
+is the position vector and
 
 $$
 v = \dot{x}\hat{e}_R + \dot{y} \hat{e}_T + \dot{z} \hat{e}_N
 $$
 
-is the velocity vector of the deputy in Hill's Frame. 
+is the velocity vector of the deputy in Hill's Frame.
 
 The control for the system is defined by
 
@@ -41,6 +41,7 @@ $$
 *Hill's reference frame centered on a chief spacecraft and used to describe the relative motion of a deputy spacecraft conducting proximity operations (not to scale).*
 
 ## Dynamics
+
 A first order approximation of the relative motion dynamics between the deputy and chief spacecraft is given by Clohessy-Wiltshire equations:
 
 $$
@@ -55,17 +56,17 @@ $$
 \ddot{z}  = -n^2z+ \frac{F_z}{m}
 $$
 
-where $n$ is spacecraft mean motion and $m$ is the mass of the deputy. 
-
+where $n$ is spacecraft mean motion and $m$ is the mass of the deputy.
 
 ## Safety Constraint
+
 A common safety constraint accross all CWH tasks is the dynamic velocity constraint. This constraint restricts the relative velocity of the deputy to a velocity limit that decreases as it approaches the chief. The system is defined to be **safe** if it obeys the following safety constraint for all time:
 
 $$
-\varphi_{safety} :=\Vert v_{\rm H} \Vert \leq \nu_0 + \nu_1 \Vert r_{\rm H} \Vert 
+\varphi_{safety} :=\Vert v_{\rm H} \Vert \leq \nu_0 + \nu_1 \Vert r_{\rm H} \Vert
 $$
 
-where, 
+where,
 
 $$
 \nu_0, \nu_1 \in \mathbb{R}_{\geq 0}

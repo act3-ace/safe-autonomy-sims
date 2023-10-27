@@ -40,7 +40,7 @@ extra:
   sas_url: https://github.com/act3-ace/safe-autonomy-sims/-/tree/main
   git_url: https://github.com/act3-ace
   corl_url: https://github.com/act3-ace/act3-rl
-  git_ssh: git@github.com/act3-ace:rta/safe-autonomy-stack
+  git_ssh: git@github.com:act3-ace
   corl_ssh: git@github.com/act3-ace:act3-rl
   corl_docs_url: https://act3-rl.github.com/act3-ace/corl
 
@@ -131,10 +131,7 @@ nav:
           - tasks/CWH/docking_3d.md
         - "3D Docking - Multiagent":
           - tasks/CWH/docking_3d_multiagent.md
-#  - "Changelog": change_log.md
-#  - "License": license.md
   - "API":
-#      - reference/SUMMARY.md  # API "Table of Contents"
       - api/index.md
       - "agents":
           - api/agents/index.md
@@ -184,4 +181,3 @@ nav:
               - reference/simulators/saferl_simulator.md
       - "utils": reference/utils.md
   - "Experiments": experiments.md
-  - "Working in ACE Hub at AFRL": working_in_acehub.md
