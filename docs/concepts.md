@@ -6,12 +6,12 @@ found [here]({{corl_docs_url}}/concepts/).
 
 Concepts unique to safe-autonomy-sims, defined in safe_autonomy_sims/backend:
 
-##  Entities
+## Entities
 
-Entities represent an Aircraft or Spacecraft that exists 
+Entities represent an Aircraft or Spacecraft that exists
 within the environment (agent controlled or otherwise). Entities
-maintain a state, which encapsulates position, velocity, 
-orientation, and control values. These values are used 
+maintain a state, which encapsulates position, velocity,
+orientation, and control values. These values are used
 with a given task's dynamics model to calculate state transitions
 within a step() method.
 

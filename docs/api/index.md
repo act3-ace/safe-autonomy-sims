@@ -5,8 +5,7 @@ the page or sidebar to the left to explore. The contents of this API page are ge
 automatically from our code and the docstrings defined within.
 
 The core encapsulates all CoRL extensions required to run our tasks using CoRL's framework. This includes
-Agents, Dones, Glues, Platforms, Rewards, Run Time Assurance (RTA), and Simulators. 
-
+Agents, Dones, Glues, Platforms, Rewards, Run Time Assurance (RTA), and Simulators.
 
 - [agents](agents/index.md)
 - [dones](dones/index.md)

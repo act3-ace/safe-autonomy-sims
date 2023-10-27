@@ -13,7 +13,7 @@ framework to a platform part as an action. The full set
 of glues which provide actions over all agents in the
 environment defines the environment's action space.
 
-Multiple glues may be used in a decorator pattern to 
+Multiple glues may be used in a decorator pattern to
 reuse common transformation logic. See [CoRL
 documentation]({{corl_docs_url}}/reference/glues/__init__/) for more details!
 
