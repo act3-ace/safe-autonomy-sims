@@ -141,7 +141,7 @@ class RTAGlue(BaseMultiWrapperGlue):
 
     def _filter_action(self, desired_action: tuple, observation: typing.Dict) -> tuple:
         rta_state_vector = self._get_rta_state_vector(observation)
-        rta_action_vector = self._get_action_vector_from_action(desired_action)
+        rta_action_vector = self._get_action_vector_from_action(desired_action).flatten()
         filtered_action_vector = self.rta.filter_control(rta_state_vector, self.config.step_size, rta_action_vector)
         if isinstance(self.rta, ConstraintBasedRTA):
             self.rta.update_constraint_values(rta_state_vector)
