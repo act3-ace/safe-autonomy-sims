@@ -17,10 +17,13 @@ Author: Kochise Bennett
 import typing
 from collections import OrderedDict
 from pydantic import validator
+from functools import cached_property
 
-import gym
+import gymnasium
 import numpy as np
 from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
+from corl.libraries.units import corl_get_ureg
+from corl.libraries.property import DictProp, BoxProp
 
 
 class CoordinateAxisGlueValidator(BaseAgentGlueValidator):
@@ -46,18 +49,33 @@ class CoordinateAxisGlue(BaseAgentGlue):
         """
         DIRECT_OBSERVATION = "direct_observation"
 
-    @property
-    def get_validator(self) -> typing.Type[CoordinateAxisGlueValidator]:
+    @staticmethod
+    def get_validator() -> typing.Type[CoordinateAxisGlueValidator]:
         return CoordinateAxisGlueValidator
 
     def get_unique_name(self) -> str:
         return "Coordinate_Axis_Glue_" + self.config.axis.upper() + "-Axis"
 
-    def observation_space(self) -> gym.spaces.Space:
-        d = gym.spaces.dict.Dict()
+    @cached_property
+    def observation_prop(self):
+        prop = BoxProp(low=[-1, -1, -1], high=[1, 1, 1], unit="")
+        return DictProp(
+            spaces={self.Fields.DIRECT_OBSERVATION: prop}
+        )
+
+    @cached_property
+    def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+        """
+        passthrough property
+        """
+        return self.observation_space
+
+    @cached_property
+    def observation_space(self) -> gymnasium.spaces.Space:
+        d = gymnasium.spaces.dict.Dict()
         low = np.array([-1.0, -1.0, -1.0])
         high = np.array([1.0, 1.0, 1.0])
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low=low, high=high, dtype=np.float32)
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(low=low, high=high, dtype=np.float32)
         return d
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
@@ -69,6 +87,6 @@ class CoordinateAxisGlue(BaseAgentGlue):
             out = np.array([0.0, 0.0, 1.0], dtype=np.float32)
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = out
+        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(out, "")
 
         return d

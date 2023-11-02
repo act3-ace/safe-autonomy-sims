@@ -100,8 +100,8 @@ class RTAGlueCWHInspection1v1(RTAGlue):
         self.config: CWHInspection1v1RTAGlueValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(cls):
+    @staticmethod
+    def get_validator():
         return CWHInspection1v1RTAGlueValidator
 
     def _get_singleton(self):

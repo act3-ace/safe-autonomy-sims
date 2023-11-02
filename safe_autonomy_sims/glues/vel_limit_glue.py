@@ -15,11 +15,15 @@ Author: Jamie Cunningham
 """
 from collections import OrderedDict
 
-import gym
+import typing
+import gymnasium
 import numpy as np
+from functools import cached_property
 from corl.glues.base_glue import BaseAgentGlueNormalizationValidator
 from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
 from corl.libraries.normalization import StandardNormalNormalizer
+from corl.libraries.property import DictProp, BoxProp
+from corl.libraries.units import corl_get_ureg
 
 
 class VelocityLimitGlueValidator(ObserveSensorValidator):
@@ -49,8 +53,8 @@ class VelocityLimitGlue(ObserveSensor):
     Computes a velocity constraint from position and velocity sensor data.
     """
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         return VelocityLimitGlueValidator
 
     def get_unique_name(self) -> str:
@@ -59,16 +63,73 @@ class VelocityLimitGlue(ObserveSensor):
     def _vel_limit(self, dist):
         return self.config.velocity_threshold + (self.config.slope * self.config.mean_motion * (dist - self.config.threshold_distance))
 
-    def observation_space(self):
-        pos_obs_space = super().observation_space()[self.Fields.DIRECT_OBSERVATION]
+    @cached_property
+    def observation_prop(self):
+        prop = BoxProp(low=[-10000], high=[10000], unit='m/s')
+        return DictProp(
+            spaces={self.Fields.DIRECT_OBSERVATION: prop}
+        )
+
+    @cached_property
+    def observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+        pos_obs_space = super().observation_space[self.Fields.DIRECT_OBSERVATION]
         high = self._vel_limit(np.linalg.norm(pos_obs_space.high)) * np.sign(pos_obs_space.high)[0]
         low = self._vel_limit(np.linalg.norm(pos_obs_space.low)) * np.sign(pos_obs_space.low)[0]
-        d = gym.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low, high, shape=(1, ), dtype=np.float32)
+        d = gymnasium.spaces.dict.Dict()
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(low, high, shape=(1, ), dtype=np.float32)
         return d
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
         pos_obs = super().get_observation(other_obs, obs_space, obs_units)[self.Fields.DIRECT_OBSERVATION]
+        obs = corl_get_ureg().Quantity(np.array([self._vel_limit(np.linalg.norm(pos_obs.m))], dtype=np.float32), str(pos_obs.units))
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = np.array([self._vel_limit(np.linalg.norm(pos_obs))], dtype=np.float32)
+        d[self.Fields.DIRECT_OBSERVATION] = obs
         return d
+
+    # @cached_property
+    # def action_prop(self) -> typing.Optional[Prop]:
+    #     """
+    #     Build the action property for the controllers that defines the action this glue produces
+
+    #     Returns
+    #     -------
+    #     typing.Optional[Prop]
+    #         The Property that defines what this glue requires for an action
+    #     """
+    #     # collect action properties of wrapped controllers
+    #     action_props = tuple(glue.action_prop for glue in self.glues())
+    #     prop = TupleProp(spaces=action_props)
+    #     return prop
+
+    # @cached_property
+    # def action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+    #     action_spaces = [gymnasium.spaces.Dict({glue.action_prop.name:glue.action_space}) for glue in self.glues()]
+    #     return gymnasium.spaces.tuple.Tuple(tuple(action_spaces))
+    
+    # @cached_property
+    # def observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+    #     if isinstance(self.rta, ConstraintBasedRTA):
+    #         box = gymnasium.spaces.Box(-np.inf, np.inf, shape=(1, ), dtype=np.float32)
+    #         constraint_keys = {k: box for k in self.rta.constraints.keys()}
+    #         space = gymnasium.spaces.dict.Dict(
+    #             {
+    #                 "intervening": gymnasium.spaces.discrete.Discrete(2), "constraints": gymnasium.spaces.dict.Dict(constraint_keys)
+    #             }
+    #         )
+    #     else:
+    #         space = gymnasium.spaces.dict.Dict({"intervening": gymnasium.spaces.discrete.Discrete(2)})
+    #     return space
+
+    @cached_property
+    def normalized_action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+        """
+        passthrough property
+        """
+        return self.action_space
+    
+    @cached_property
+    def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+        """
+        passthrough property
+        """
+        return self.observation_space

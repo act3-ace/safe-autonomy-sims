@@ -187,5 +187,5 @@ def test_call(call_results, next_state, agent_name, cut_name, expected_value, ex
     expected_status : None or DoneStatusCodes
         The expected status corresponding to the status of the agent's episode
     """
-    assert call_results[agent_name] == expected_value
+    assert call_results == expected_value
     assert next_state.episode_state[agent_name][cut_name] is expected_status

@@ -13,10 +13,9 @@ Functions that define the terminal conditions for CWH Spacecraft Environments.
 """
 import typing
 
-import gym
+import gymnasium
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
-from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 from pydantic import PyObject
 
@@ -52,7 +51,7 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         next_state,
         observation_space,
         observation_units
-    ) -> DoneDict:
+    ) -> bool:
 
     Parameters
     ----------
@@ -64,14 +63,14 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gym.spaces.dict.Dict
+    observation_space : gymnasium.spaces.dict.Dict
         The agent observation space.
-    observation_units : gym.spaces.dict.Dict
+    observation_units : gymnasium.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
 
     Returns
     -------
-    done : DoneDict
+    done : bool
         Dictionary containing the done condition for the current agent.
     """
 
@@ -79,8 +78,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         self.config: MaxDistanceDoneValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Parameters
         ----------
@@ -99,22 +98,20 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gym.spaces.dict.Dict,
-        observation_units: gym.spaces.dict.Dict,
-    ) -> DoneDict:
-
-        done = DoneDict()
+        observation_space: gymnasium.spaces.dict.Dict,
+        observation_units: gymnasium.spaces.dict.Dict,
+    ) -> bool:
 
         # compute distance to reference entity
         platform = get_platform_by_name(next_state, self.config.platform_name)
         relative_position = get_relative_position(platform, self.config.reference_position_sensor_name)
         distance = np.linalg.norm(relative_position)
 
-        done[self.config.platform_name] = distance > self.config.max_distance
+        done = bool(distance > self.config.max_distance)
 
-        if done[self.config.platform_name]:
+        if done:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
-        self._set_all_done(done)
+
         return done
 
 
@@ -149,7 +146,7 @@ class CrashDoneFunction(DoneFuncBase):
         next_state,
         observation_space,
         observation_units
-    ) -> DoneDict:
+    ) -> bool:
 
     Parameters
     ----------
@@ -161,14 +158,14 @@ class CrashDoneFunction(DoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gym.spaces.dict.Dict
+    observation_space : gymnasium.spaces.dict.Dict
         The agent observation space.
-    observation_units : gym.spaces.dict.Dict
+    observation_units : gymnasium.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
 
     Returns
     -------
-    done : DoneDict
+    done : bool
         Dictionary containing the done condition for the current agent.
     """
 
@@ -176,8 +173,8 @@ class CrashDoneFunction(DoneFuncBase):
         self.config: CrashDoneValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Parameters
         ----------
@@ -197,11 +194,9 @@ class CrashDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gym.spaces.dict.Dict,
-        observation_units: gym.spaces.dict.Dict,
-    ) -> DoneDict:
-
-        done = DoneDict()
+        observation_space: gymnasium.spaces.dict.Dict,
+        observation_units: gymnasium.spaces.dict.Dict,
+    ) -> bool:
 
         # Get relatative position + velocity between platform and docking region
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -210,9 +205,9 @@ class CrashDoneFunction(DoneFuncBase):
 
         relative_velocity = get_relative_velocity(platform, self.config.reference_velocity_sensor_name)
 
-        in_crash_region = distance <= self.config.crash_region_radius
+        in_crash_region = bool(distance <= self.config.crash_region_radius)
 
-        done[self.config.platform_name] = in_crash_region
+        done = in_crash_region
 
         if self.config.velocity_constraint is not None:
             # check velocity constraint
@@ -226,11 +221,11 @@ class CrashDoneFunction(DoneFuncBase):
                 slope=self.config.velocity_constraint.slope,
             )
 
-            done[self.config.platform_name] = done[self.config.platform_name] and violated
+            done = done and violated
 
-        if done[self.config.platform_name]:
+        if done:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
-        self._set_all_done(done)
+
         return done
 
 
@@ -268,8 +263,8 @@ class TerminalRewardSaturationDoneFunction(DoneFuncBase):
         self.reward_total = 0
         self.reward_function.reset()
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Parameters
         ----------
@@ -288,19 +283,17 @@ class TerminalRewardSaturationDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gym.spaces.dict.Dict,
-        observation_units: gym.spaces.dict.Dict,
-    ) -> DoneDict:
+        observation_space: gymnasium.spaces.dict.Dict,
+        observation_units: gymnasium.spaces.dict.Dict,
+    ) -> bool:
 
-        reward_dict = self.reward_function(
+        reward_val = self.reward_function(
             observation, action, next_observation, next_state, next_state, observation_space, observation_units
         )
 
-        reward_val = reward_dict[self.config.agent_name]
-
         self.reward_total += reward_val
 
-        done = DoneDict()
+        done = False
 
         if self.config.bound == 'upper' and self.reward_total >= self.config.limit:
             limit_reached = True
@@ -309,8 +302,8 @@ class TerminalRewardSaturationDoneFunction(DoneFuncBase):
         else:
             limit_reached = False
 
-        done[self.config.platform_name] = limit_reached
-        if done[self.config.platform_name]:
+        done = limit_reached
+        if done:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
-        self._set_all_done(done)
+
         return done
