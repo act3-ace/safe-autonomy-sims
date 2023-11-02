@@ -138,6 +138,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Position",
+              "output_units": "m",
               "normalization": {
                 "normalizer": corl.libraries.normalization.StandardNormalNormalizer,
                 "config": {
@@ -151,6 +152,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Velocity",
+              "output_units": "m/s",
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -161,7 +163,8 @@
             },
         },
         {
-          "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          # "functor": "corl.glues.common.magnitude.MagnitudeGlue",
+          "functor": "safe_autonomy_sims.glues.magnitude_glue.SimsMagnitudeGlue",
             "config": {
               "normalization": {
                   "normalizer": "corl.libraries.normalization.StandardNormalNormalizer"
@@ -171,6 +174,7 @@
                 "functor": "corl.glues.common.observe_sensor.ObserveSensor",
                 "config":{
                     "sensor": Sensor_Velocity,
+                    "output_units": "m/s",
                 },
             },
         },

@@ -13,6 +13,7 @@
   functor: "corl.glues.common.observe_sensor.ObserveSensor",
   config: {
     sensor: "Sensor_AngularVelocity",
+    "output_units": "radians / second",
     normalization: {
       "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
       "config": {
@@ -31,7 +32,7 @@
     },
   },
   wrapped: [
-    !include-extend rotation_quaternion.yml,
+    !include-extend ./rotation_quaternion.yml,
 
     {
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
@@ -54,7 +55,7 @@
     },
   },
   wrapped: [
-    !include-extend rotation_quaternion.yml,
+    !include-extend ./rotation_quaternion.yml,
 
     {
       "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
@@ -76,7 +77,7 @@
     },
   },
   wrapped: [
-    !include-extend rotation_quaternion.yml,
+    !include-extend ./rotation_quaternion.yml,
 
     {
       "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
@@ -98,7 +99,7 @@
     },
   },
   wrapped: [
-    !include-extend rotation_quaternion.yml,
+    !include-extend ./rotation_quaternion.yml,
 
     {
       "functor": "safe_autonomy_sims.glues.coordinate_axis_glue.CoordinateAxisGlue",
@@ -130,12 +131,13 @@
         },
       },
       "wrapped": [
-        !include-extend rotation_quaternion.yml,
+        !include-extend ./rotation_quaternion.yml,
 
         {
           "functor": "corl.glues.common.observe_sensor.ObserveSensor",
           "config": {
             "sensor": "Sensor_OrientationUnitVector",
+            # "sensor": "OrientationUnitVector",
             "normalization": {
               "enabled": False
             },
@@ -147,6 +149,8 @@
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
         "sensor": "Sensor_RelativeChiefPosition",
+        # "sensor": "RelativeChiefPosition",
+        "output_units": "m",
         "normalization": {
           "enabled": False
         },

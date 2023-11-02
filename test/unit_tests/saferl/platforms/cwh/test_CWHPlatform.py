@@ -13,7 +13,7 @@ Tests for the CWHPlatform module
 """
 
 import os
-
+import pint
 import numpy as np
 import pytest
 
@@ -29,8 +29,8 @@ def test_CWHPlatform_getAppliedAction_default(cwh_platform):
     """
 
     platform_obj = cwh_platform
-    expected = np.array([0., 0., 0.])
-    assert np.array_equiv(platform_obj.get_applied_action(), expected)
+    expected = pint.Quantity(np.array([0., 0., 0.]), "newton")
+    assert np.all(platform_obj.get_applied_action() == expected)
 
 
 @pytest.fixture(name='applied_action')
@@ -38,7 +38,8 @@ def get_applied_action(request):  # pylint: disable=W0621
     """
     fixture to obtain the parameter 'applied_action' from a list
     """
-    return request.param
+    # action = pint.Quantity(, "newtons")
+    return request.param[0]
 
 
 class Test_get_applied_action:
@@ -84,13 +85,17 @@ class Test_save_action_to_platform:
         This is a parametrized test, where the tests are in the action_to_platform_tests
         """
 
-        cwh_platform.save_action_to_platform(applied_action[0][0], 0)  # TODO: fix needless 2d array
-        cwh_platform.save_action_to_platform(applied_action[0][1], 1)
-        cwh_platform.save_action_to_platform(applied_action[0][2], 2)
+        action0 = pint.Quantity(np.array([applied_action[0]]), "newton")
+        action1 = pint.Quantity(np.array([applied_action[1]]), "newton")
+        action2 = pint.Quantity(np.array([applied_action[2]]), "newton")
 
-        assert cwh_platform._last_applied_action[0] == applied_action[0][0]  #pylint: disable=W0212
-        assert cwh_platform._last_applied_action[1] == applied_action[0][1]  #pylint: disable=W0212
-        assert cwh_platform._last_applied_action[2] == applied_action[0][2]  #pylint: disable=W0212
+        cwh_platform.save_action_to_platform(action0, 0)
+        cwh_platform.save_action_to_platform(action1, 1)
+        cwh_platform.save_action_to_platform(action2, 2)
+
+        assert cwh_platform._last_applied_action[0] == action0  #pylint: disable=W0212
+        assert cwh_platform._last_applied_action[1] == action1  #pylint: disable=W0212
+        assert cwh_platform._last_applied_action[2] == action2  #pylint: disable=W0212
 
 
 class Test_position_attribute:

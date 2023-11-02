@@ -17,7 +17,6 @@ import typing
 from pydantic import validator
 
 from corl.dones.done_func_base import DoneStatusCodes
-from corl.libraries.environment_dict import RewardDict
 from corl.rewards.episode_done import EpisodeDoneStateReward, EpisodeDoneStateRewardValidator
 from corl.libraries.state_dict import StateDict
 
@@ -45,8 +44,8 @@ class WinLoseDoneReward(EpisodeDoneStateReward):
         self.config: WinLoseDoneRewardValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(self) -> typing.Type[WinLoseDoneRewardValidator]:
+    @staticmethod
+    def get_validator() -> typing.Type[WinLoseDoneRewardValidator]:
         return WinLoseDoneRewardValidator
 
     def __call__(
@@ -58,10 +57,9 @@ class WinLoseDoneReward(EpisodeDoneStateReward):
         next_state: StateDict,
         observation_space,
         observation_units
-    ) -> RewardDict:
+    ) -> float:
 
-        reward = RewardDict()
-        reward[self.config.agent_name] = 0
+        reward = 0.0
 
         done_state = next_state.agent_episode_state.get(self.config.agent_name, {})
         for done_name, done_code in done_state.items():
@@ -74,7 +72,7 @@ class WinLoseDoneReward(EpisodeDoneStateReward):
         consolidate_break = False
         for done_status in DoneStatusCodes:
             for done_name in self._status_codes[done_status]:
-                reward[self.config.agent_name] += self.get_scaling_method(
+                reward += self.get_scaling_method(
                     observation, action, next_observation, state, next_state, observation_space, observation_units, done_name, done_status
                 )(self._counter)
                 if self.config.consolidate:
@@ -83,7 +81,7 @@ class WinLoseDoneReward(EpisodeDoneStateReward):
             if consolidate_break:
                 break
 
-        self._counter += 1 / next_state.sim_update_rate
+        self._counter += 1 / next_state.sim_update_rate_hz
 
         return reward
 

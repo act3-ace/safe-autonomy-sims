@@ -12,9 +12,11 @@ limitation or restriction. See accompanying README and LICENSE for details.
 This module defines the measurement and control properties for CWH spacecraft sensors and controllers.
 """
 import typing
+import gymnasium
+import numpy as np
 
-from corl.libraries.property import BoxProp
-from pydantic import Field, StrictFloat, StrictStr
+from corl.libraries.property import BoxProp, Prop, PlainQuantity, NestedQuantity
+from pydantic import Field, StrictFloat
 from typing_extensions import Annotated
 
 
@@ -37,7 +39,7 @@ class ThrustProp(BoxProp):
     name: str = "thrust"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-1.0]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.0]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["newtons"]
+    unit: str = "newtons"
     description: str = "Direct Thrust Control"
 
 
@@ -60,7 +62,7 @@ class MomentProp(BoxProp):
     name: str = "moment"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-0.001]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.001]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["none"]
+    unit: str = ""
     description: str = "Direct Moment Control"
 
 
@@ -83,7 +85,7 @@ class PositionProp(BoxProp):
     name: str = "position"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-10000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [10000.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    unit: str = "m"
     description: str = "Position Sensor Properties"
 
 
@@ -106,7 +108,7 @@ class RelativePositionProp(BoxProp):
     name: str = "relative_position"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-20000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [20000.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    unit:  str = "m"
     description: str = "Relative Position Sensor Properties"
 
 
@@ -129,7 +131,7 @@ class VelocityProp(BoxProp):
     name: str = "velocity"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1000.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
+    unit: str = "m/s"
     description: str = "Velocity Sensor Properties"
 
 
@@ -152,7 +154,7 @@ class RelativeVelocityProp(BoxProp):
     name: str = "relative_velocity"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-2000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m/s"] * 3
+    unit:  str = "m/s"
     description: str = "Relative Velocity Sensor Properties"
 
 
@@ -175,7 +177,7 @@ class InspectedPointProp(BoxProp):
     name: str = "inspected_points"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [100.]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
+    unit:  str = ""
     description: str = "Inspected Points Sensor Properties"
 
 
@@ -194,7 +196,7 @@ class SunAngleProp(BoxProp):
     name: str = "SunAngle"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-10000.]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [10000.]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["rad"]
+    unit: str = "rad"
     description: str = "Sun Angle Sensor Properties"
 
 
@@ -217,7 +219,7 @@ class SunVectorProp(BoxProp):
     name: str = "SunVector"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    unit:  str = "m"
     description: str = "Sun Unit Vector Properties"
 
 
@@ -240,7 +242,7 @@ class UninspectedPointProp(BoxProp):
     name: str = "uninspected_points"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    unit: str = "m"
     description: str = "Uninspected points cluster location"
 
 
@@ -264,7 +266,7 @@ class BoolArrayProp(BoxProp):
     num_points: int = 100
     low: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [0.0] * num_points
     high: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [1.0] * num_points
-    unit: Annotated[typing.List[StrictStr], Field(min_items=num_points, max_items=num_points)] = ["None"] * num_points
+    unit: str = ""
     description: str = "Boolean array"
 
 
@@ -287,7 +289,7 @@ class QuaternionProp(BoxProp):
     name: str = "quaternion"
     low: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [-1.0] * 4
     high: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [1.0] * 4
-    unit: Annotated[typing.List[StrictStr], Field(min_items=4, max_items=4)] = ["N/A"] * 4
+    unit: str = ""
     description: str = "Quaternion Sensor Properties"
 
 
@@ -310,7 +312,7 @@ class OrientationVectorProp(BoxProp):
     name: str = "orientation_unit_vector"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["N/A"] * 3
+    unit:  str = ""
     description: str = "Orientation Unit Vector Sensor Properties"
 
 
@@ -333,7 +335,7 @@ class RotatedAxesProp(BoxProp):
     name: str = "rotated_axes_unit_vectors"
     low: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [-1.0] * 6
     high: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [1.0] * 6
-    unit: Annotated[typing.List[StrictStr], Field(min_items=6, max_items=6)] = ["N/A"] * 6
+    unit:  str = ""
     description: str = "Rotated Axes Unit Vectors Sensor Properties"
 
 
@@ -356,7 +358,7 @@ class AngularVelocityProp(BoxProp):
     name: str = "angular velocity"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-10.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [10.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["rad/s"] * 3
+    unit: str = "rad/s"
     description: str = "Angular Velocity Sensor Properties"
 
 
@@ -379,7 +381,7 @@ class PriorityVectorProp(BoxProp):
     name: str = "priority vector"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
-    unit: Annotated[typing.List[StrictStr], Field(min_items=3, max_items=3)] = ["m"] * 3
+    unit: str = "m"
     description: str = "Priority Vector Sensor Properties"
 
 
@@ -398,9 +400,60 @@ class PointsScoreProp(BoxProp):
     name: str = "inspected points score"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["None"]
+    unit: str = ""
     description: str = "Inspected Points Score Sensor Properties"
 
+
+class TupleProp(Prop):
+    """
+    """
+    spaces: typing.Tuple
+
+    def create_space(self, seed=None) -> gymnasium.spaces.Space:
+        """
+        Creates MultiDiscrete gymnasium space
+        """
+        subspaces = tuple(sub_prop.create_space(seed=seed) for sub_prop in self.spaces)
+        return gymnasium.spaces.Tuple(subspaces)
+
+    def get_units(self):
+        return tuple({prop.name: prop.get_units()} for prop in self.spaces)
+
+    def create_unit_converted_prop(self, unit: str):
+        raise RuntimeError(
+            f"Prop was told to try and convert to unit {unit} but the only but a Prop is not "
+            f"capable of having a unit as it is not a leaf node.  this error should never happen and is just a sanity check"
+            "to show this code path is not supported"
+        )
+
+    def zero_mean(self) -> Prop:
+        raise NotImplementedError
+
+    def scale(self, scale) -> Prop:
+        raise NotImplementedError
+    
+    def create_quantity(self, value: dict | (float | (int | (list | np.ndarray)))) -> PlainQuantity | NestedQuantity:
+        """
+        This function taskes in values and will attempt to create either a Quantity or NestedQuantity
+        from it, properly applying units along the way
+        """
+        raise NotImplementedError
+
+    def create_zero_sample(self) -> PlainQuantity | NestedQuantity:
+        """
+        This function will attempt to return 0 for each leaf node for all properties
+        in a tree, as this is usually a safe default.  however if 0 is not in the low
+        or high for this space it will return the lowest value possible
+        Discrete values will always be the lowest, which should be 0
+        """
+        raise NotImplementedError
+
+    def create_low_sample(self) -> PlainQuantity | NestedQuantity:
+        """
+        This function will attempt to return the lowest possible value for each leaf node
+        for all properties in a tree.
+        """
+        raise NotImplementedError
 
 class OrbitStabilityProp(BoxProp):
     """
@@ -423,5 +476,5 @@ class OrbitStabilityProp(BoxProp):
     name: str = "orbit stability"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-1025.0]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1025.0]
-    unit: Annotated[typing.List[StrictStr], Field(min_items=1, max_items=1)] = ["m/s"]
+    unit: str = "m/s"
     description: str = "Orbit Stability Sensor Property"
