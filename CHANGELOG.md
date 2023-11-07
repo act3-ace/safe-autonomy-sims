@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.0...v3.2.1) (2023-11-07)
+
+
+### Bug Fixes
+
+* remove inspection chief assumption ([0ff2bf3](https://github.com/act3-ace/safe-autonomy-sims/commit/0ff2bf3d28962daa4095134cb5897277bf17b262))
+
 # [3.2.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.1.0...v3.2.0) (2023-11-07)
 
 
