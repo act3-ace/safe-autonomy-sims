@@ -11,13 +11,13 @@ import typing
 from datetime import datetime
 
 import ray
-import ray.rllib.agents.ppo as ppo
+# import ray.rllib.agents.ppo as ppo
+from ray.rllib.algorithms.ppo import ppo
 import tqdm
 from corl.environment.multi_agent_env import ACT3MultiAgentEnv, ACT3MultiAgentEnvValidator
 from corl.episode_parameter_providers.remote import RemoteEpisodeParameterProvider
 from corl.experiments.rllib_experiment import RllibExperiment, RllibExperimentValidator
 from corl.libraries.factory import Factory
-from corl.libraries.rllib_setup_util import auto_configure_rllib_config
 
 
 class RllibAPIExperimentValidator(RllibExperimentValidator):
@@ -35,8 +35,8 @@ class RllibAPIExperiment(RllibExperiment):
     and reward data and logic for environment development and validation.
     """
 
-    @property
-    def get_validator(self) -> typing.Type[RllibAPIExperimentValidator]:
+    @staticmethod
+    def get_validator() -> typing.Type[RllibAPIExperimentValidator]:
         return RllibAPIExperimentValidator
 
     def run_experiment(self, args: argparse.Namespace):
@@ -56,8 +56,6 @@ class RllibAPIExperiment(RllibExperiment):
         ray.init(**self.config.ray_config)
 
         ray_resources = ray.available_resources()
-
-        auto_configure_rllib_config(rllib_config, self.config.auto_rllib_config_setup, ray_resources)
 
         self.config.env_config["agents"], self.config.env_config["agent_platforms"] = self.create_agents(
             args.platform_config, args.agent_config

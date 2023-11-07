@@ -25,7 +25,7 @@ config:
 
   # No overrides for ray as there are no changes
   ray_config_updates: &ray_config_updates
-    local_mode: false
+    # local_mode: false
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
@@ -48,7 +48,7 @@ config:
     local: [!include ../../common/ray/rllib.yml,  *rllib_config_updates]
 
   ray_config: [!include ../../common/ray/ray.yml, *ray_config_updates]
-  env_config: [!include environment.yml, *env_config_updates]
+  env_config: [!include ./environment.yml, *env_config_updates]
   tune_config: [!include ../../common/ray/tune.yml, *tune_config_updates]
 
   extra_callbacks: ["safe_autonomy_sims.simulators.inspection_simulator.InspectionCallbacks"]

@@ -61,7 +61,7 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
 
     Returns
     -------
-    done : DoneDict
+    done : bool
         Dictionary containing the done condition for the current agent.
     """
 
@@ -69,8 +69,8 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
         self.config: SuccessfulInspectionDoneValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Parameters
         ----------
@@ -91,8 +91,7 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> DoneDict:
-        done = DoneDict()
+    ) -> bool:
 
         if self.config.weight_threshold is not None:
             weight = next_state.inspection_points_map[self.config.inspection_entity_name].get_total_weight_inspected()
@@ -101,10 +100,10 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
             inspection_points = next_state.inspection_points_map[self.config.inspection_entity_name]
             done_check = all(inspection_points.points_inspected_dict.values())
 
-        done[self.config.platform_name] = done_check
-        if done[self.config.platform_name]:
+        done = bool(done_check)
+        if done:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
-        self._set_all_done(done)
+
         return done
 
 
@@ -132,8 +131,8 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
         self.config: SafeSuccessfulInspectionDoneValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Config validator for the SafeSuccessfulInspectionDoneFunction.
         """
@@ -147,11 +146,11 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> DoneDict:
+    ) -> bool:
 
         done = super().__call__(observation, action, next_observation, next_state, observation_space, observation_units)
 
-        if done[self.config.platform_name]:
+        if done:
             pos = next_state.sim_platforms[self.config.platform_name].position
             vel = next_state.sim_platforms[self.config.platform_name].velocity
             state = np.concatenate((pos, vel))
@@ -161,8 +160,8 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
             if dist >= self.config.crash_region_radius:
                 next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
             else:
-                done[self.config.platform_name] = False
-                self._set_all_done(done)
+                #TODO: why is done set to False if deputy is within crash radius? Would crash not end episode?
+                done = False
 
         return done
 
@@ -177,8 +176,8 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
         self.config: SafeSuccessfulInspectionDoneValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Config validator for the SafeSuccessfulInspectionDoneFunction.
         """
@@ -192,11 +191,11 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> DoneDict:
+    ) -> bool:
 
         done = super().__call__(observation, action, next_observation, next_state, observation_space, observation_units)
 
-        if done[self.config.platform_name]:
+        if done:
             pos = next_state.sim_platforms[self.config.platform_name].position
             vel = next_state.sim_platforms[self.config.platform_name].velocity
             state = np.concatenate((pos, vel))
@@ -206,8 +205,7 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
             if dist < self.config.crash_region_radius:
                 next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
             else:
-                done[self.config.platform_name] = False
-                self._set_all_done(done)
+                done = False
 
         return done
 
@@ -258,8 +256,8 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
         Dictionary containing the done condition for each agent.
     """
 
-    @property
-    def get_validator(self) -> typing.Type[SharedDoneFuncBaseValidator]:
+    @staticmethod
+    def get_validator() -> typing.Type[SharedDoneFuncBaseValidator]:
         """
         Returns the validator for this done function.
 

@@ -16,7 +16,6 @@ import logging
 import typing
 
 import numpy as np
-from corl.libraries.environment_dict import RewardDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 
 
@@ -36,8 +35,8 @@ class LiveTimestepReward(RewardFuncBase):
     Gives reward for a discrete action matching its target
     """
 
-    @property
-    def get_validator(self) -> typing.Type[LiveTimestepRewardValidator]:
+    @staticmethod
+    def get_validator() -> typing.Type[LiveTimestepRewardValidator]:
         return LiveTimestepRewardValidator
 
     def __init__(self, **kwargs) -> None:
@@ -45,10 +44,9 @@ class LiveTimestepReward(RewardFuncBase):
         super().__init__(**kwargs)
         self._logger = logging.getLogger(self.name)
 
-    def __call__(self, observation, action, next_observation, state, next_state, observation_space, observation_units) -> RewardDict:
+    def __call__(self, observation, action, next_observation, state, next_state, observation_space, observation_units) -> float:
 
-        reward = RewardDict()
-        reward[self.config.agent_name] = 0
+        reward = 0.0
 
         if self.config.agent_name not in next_observation:
             return reward
@@ -56,6 +54,6 @@ class LiveTimestepReward(RewardFuncBase):
         sim_time = next_state.sim_time
 
         if sim_time <= self.config.max_time_rewarded:
-            reward[self.config.agent_name] = self.config.step_reward
+            reward = self.config.step_reward
 
         return reward

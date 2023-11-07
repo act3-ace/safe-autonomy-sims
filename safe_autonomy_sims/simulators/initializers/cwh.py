@@ -17,11 +17,11 @@ import typing
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from safe_autonomy_sims.simulators.initializers.initializer import InitializerValidator, PintUnitConversionInitializer
+from safe_autonomy_sims.simulators.initializers.initializer import InitializerValidator, BaseInitializerWithPint, strip_units_from_dict
 from safe_autonomy_sims.utils import velocity_limit
 
 
-class CWH3DRadialInitializer(PintUnitConversionInitializer):
+class CWH3DRadialInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     Both position and velocity are initialized radially (with radius and angles) to allow for control over magnitude and direction
@@ -50,9 +50,10 @@ class CWH3DRadialInitializer(PintUnitConversionInitializer):
         'vel_elevation_angle': 'radians',
     }
 
-    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
-        return self._compute_with_units(**kwargs_with_stripped_units)
+    def compute(self, **kwargs):
+        return self._compute_with_units(**strip_units_from_dict(kwargs))
 
+    #TODO: change name or function to reflect unit use. Currently, no units used.
     def _compute_with_units(
         self,
         radius: float,
@@ -116,7 +117,7 @@ class CWH3DENMTInitializerValidator(InitializerValidator):
     mean_motion: float = 0.001027
 
 
-class CWH3DENMTInitializer(PintUnitConversionInitializer):
+class CWH3DENMTInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     It ensures that each agent starts on an elliptical Natural Motion Trajectory (eNMT)
@@ -142,8 +143,8 @@ class CWH3DENMTInitializer(PintUnitConversionInitializer):
         'z_dot': 'meters/second',
     }
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Returns
         -------
@@ -152,8 +153,8 @@ class CWH3DENMTInitializer(PintUnitConversionInitializer):
         """
         return CWH3DENMTInitializerValidator
 
-    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
-        return self._compute_with_units(**kwargs_with_stripped_units)
+    def compute(self, **kwargs):
+        return self._compute_with_units(**strip_units_from_dict(kwargs))
 
     def _compute_with_units(
         self,
@@ -219,7 +220,7 @@ class Docking3DRadialInitializerValidator(InitializerValidator):
     mean_motion: float = 0.001027
 
 
-class Docking3DRadialInitializer(PintUnitConversionInitializer):
+class Docking3DRadialInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D docking environment.
     It ensures that the initial velocity of the deputy does not violate the maximum velocity safety constraint.
@@ -251,8 +252,8 @@ class Docking3DRadialInitializer(PintUnitConversionInitializer):
         super().__init__(config)
         self.config: Docking3DRadialInitializerValidator
 
-    @property
-    def get_validator(self):
+    @staticmethod
+    def get_validator():
         """
         Returns
         -------
@@ -261,8 +262,8 @@ class Docking3DRadialInitializer(PintUnitConversionInitializer):
         """
         return Docking3DRadialInitializerValidator
 
-    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
-        return self._compute_with_units(**kwargs_with_stripped_units)
+    def compute(self, **kwargs):
+        return self._compute_with_units(**strip_units_from_dict(kwargs))
 
     def _compute_with_units(
         self,
@@ -321,7 +322,7 @@ class Docking3DRadialInitializer(PintUnitConversionInitializer):
         }
 
 
-class CWHSixDOFRadialInitializer(PintUnitConversionInitializer):
+class CWHSixDOFRadialInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     Both position and velocity are initialized radially (with radius and angles) to allow for control over magnitude and direction
@@ -353,8 +354,8 @@ class CWHSixDOFRadialInitializer(PintUnitConversionInitializer):
         'wz': 'radians/second',
     }
 
-    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
-        return self._compute_with_units(**kwargs_with_stripped_units)
+    def compute(self, **kwargs):
+        return self._compute_with_units(**strip_units_from_dict(kwargs))
 
     def _compute_with_units(
         self,
@@ -418,7 +419,7 @@ class CWHSixDOFRadialInitializer(PintUnitConversionInitializer):
         }
 
 
-class CWH3DRadialWithSunInitializer(PintUnitConversionInitializer):
+class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     Both position and velocity are initialized radially (with radius and angles) to allow for
@@ -450,8 +451,8 @@ class CWH3DRadialWithSunInitializer(PintUnitConversionInitializer):
         'sensor_fov': 'radians',
     }
 
-    def compute_with_units(self, kwargs_with_converted_units, kwargs_with_stripped_units):
-        return self._compute_with_units(**kwargs_with_stripped_units)
+    def compute(self, **kwargs):
+        return self._compute_with_units(**strip_units_from_dict(kwargs))
 
     def _compute_with_units(
         self,
