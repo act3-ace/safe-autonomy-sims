@@ -10,4 +10,5 @@
   "mass": 12,
   "reference_position_sensor_name": "reference_position",
   "reference_velocity_sensor_name": "reference_velocity",
+  "constraints": ["chief_collision", "rel_vel", "sun", "r_max", "PSM", "x_vel", "y_vel", "z_vel"],
 }

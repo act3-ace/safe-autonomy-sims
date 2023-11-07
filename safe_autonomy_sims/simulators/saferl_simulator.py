@@ -119,6 +119,7 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
     default_initializer: InitializerResetValidator = InitializerResetValidator(functor=PassThroughInitializer)
     additional_entities: typing.Dict[str, AdditionalEntityValidator] = {}
+    init_state: typing.Optional[BaseModel] = None
 
 
 class SafeRLSimulatorState(BaseSimulatorState):
@@ -171,11 +172,13 @@ class SafeRLSimulator(BaseSimulator):
         self.clock = 0.0
         self.last_entity_actions = {}
         self.sim_platforms = self.construct_platforms()
+        self.init_state = None
 
         self._state: SafeRLSimulatorState = None
 
     def reset(self, config):
         reset_config = self.get_reset_validator(**config)
+        self.init_state = reset_config.init_state
 
         self.clock = 0.0
         self.last_entity_actions = {}
