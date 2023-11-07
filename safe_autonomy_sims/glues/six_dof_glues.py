@@ -168,32 +168,3 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         d[self.Fields.DIRECT_OBSERVATION] =  corl_get_ureg().Quantity(rotated_vector, "")
 
         return d
-
-
-class AngleToUnitVector(BaseWrapperGlue):
-    """Wrapper glue that converts an angle about the z axis into a unit vector"""
-
-    class Fields:
-        """
-        Fields in this glue
-        """
-        DIRECT_OBSERVATION = "direct_observation"
-
-    def get_unique_name(self) -> str:
-        return self.glue().get_unique_name() + "_AngleToUnitVector"
-
-    @cached_property 
-    def observation_space(self) -> gymnasium.spaces.Space:
-        d = gymnasium.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(shape=(3,), low=-1.0, high=1.0, dtype=np.float32)
-        return d
-
-    def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
-        obs = self.glue().get_observation(other_obs, obs_space, obs_units)[self.glue().Fields.DIRECT_OBSERVATION]
-
-        sun_position = corl_get_ureg().Quantity(np.array([np.cos(obs[0].m), -np.sin(obs[0].m), 0.]), "m")
-
-        d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = sun_position
-
-        return d
