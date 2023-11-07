@@ -34,7 +34,6 @@ def test_training_fast(
 ):
     """Test a training for a single iteration
     """
-    relative_path_to_checkpoints = 'training/ACT3-RLLIB-AGENTS/*/checkpoint*'
     # Determine filename of the checkpoint
-    checkpoint_glob = list(tmp_path.glob(relative_path_to_checkpoints))
+    checkpoint_glob = list(tmp_path.glob('training/**/checkpoint*1'))
     assert len(checkpoint_glob) == 1

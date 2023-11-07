@@ -22,7 +22,7 @@ import pytest
 def fixture_expected_value(request):
     """
     Parameterized fixture for comparison to the expected value of reward to be found corresponding to the agent_name (the key)
-    in the float returned by the DockingSuccessRewardFunction.
+    in the RewardDict returned by the DockingSuccessRewardFunction.
 
     Returns
     -------
@@ -130,8 +130,8 @@ def fixture_call_results(
 
     Returns
     -------
-    results : float
-        The resulting reward value from calling the DockingSuccessRewardFunction
+    results : RewardDict
+        The resulting RewardDict from calling the DockingSuccessRewardFunction
     """
     with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_platform_by_name") as func:
         with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_relative_velocity") as func1:

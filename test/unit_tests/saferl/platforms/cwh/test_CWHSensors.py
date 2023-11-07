@@ -62,7 +62,7 @@ class TestPositionSensor:
         parametrized test for the _calculate_measurement method of the Position Sensor
         """
         state = np.array([0., 0., 0.])
-        calced = pos_sensor._calculate_measurement(state).m  #pylint: disable=W0212
+        calced = pos_sensor._calculate_measurement(state)  #pylint: disable=W0212
         assert np.array_equiv(calced, pos_expected)
 
 
@@ -94,5 +94,5 @@ class TestVelocitySensor:
         """
 
         state = np.array([0., 0., 0.])
-        calced = vel_sensor._calculate_measurement(state).m  #pylint: disable=W0212
+        calced = vel_sensor._calculate_measurement(state)  #pylint: disable=W0212
         assert np.array_equiv(calced, vel_expected)

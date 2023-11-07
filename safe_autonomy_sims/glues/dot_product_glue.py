@@ -16,13 +16,10 @@ Author: Kochise Bennett
 """
 import typing
 from collections import OrderedDict
-from functools import cached_property
 
-import gymnasium
+import gym
 import numpy as np
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
-from corl.libraries.units import corl_get_ureg
-from corl.libraries.property import DictProp, BoxProp
 
 
 class DotProductGlueValidator(BaseMultiWrapperGlueValidator):
@@ -47,8 +44,8 @@ class DotProductGlue(BaseMultiWrapperGlue):
         """
         DIRECT_OBSERVATION = "direct_observation"
 
-    @staticmethod
-    def get_validator() -> typing.Type[DotProductGlueValidator]:
+    @property
+    def get_validator(self) -> typing.Type[DotProductGlueValidator]:
         return DotProductGlueValidator
 
     def get_unique_name(self) -> str:
@@ -56,44 +53,29 @@ class DotProductGlue(BaseMultiWrapperGlue):
         glue_name1 = self.glues()[1].get_unique_name()
         return glue_name0 + "_DotProduct_" + glue_name1
 
-    # def observation_units(self):
-    #     """_summary_
+    def observation_units(self):
+        """_summary_
 
-    #     Returns
-    #     -------
-    #     _type_
-    #         _description_
-    #     """
-    #     d = gymnasium.spaces.dict.Dict()
-    #     d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
-    #     return d
-
-    @cached_property
-    def observation_prop(self):
-        prop = BoxProp(low=[-100], high=[100], unit="")
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
-
-    @cached_property
-    def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
+        Returns
+        -------
+        _type_
+            _description_
         """
-        passthrough property
-        """
-        return self.observation_space
+        d = gym.spaces.dict.Dict()
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
+        return d
 
-    @cached_property
     def observation_space(self):
-        d = gymnasium.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(-1.0, 1.0, shape=(1,), dtype=np.float32)
+        d = gym.spaces.dict.Dict()
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(-1.0, 1.0, shape=(1,), dtype=np.float32)
         return d
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
         glue0 = self.glues()[0]
         glue1 = self.glues()[1]
 
-        obs0 = glue0.get_observation(other_obs, obs_space, obs_units)[glue0.Fields.DIRECT_OBSERVATION].m
-        obs1 = glue1.get_observation(other_obs, obs_space, obs_units)[glue1.Fields.DIRECT_OBSERVATION].m
+        obs0 = glue0.get_observation(other_obs, obs_space, obs_units)[glue0.Fields.DIRECT_OBSERVATION]
+        obs1 = glue1.get_observation(other_obs, obs_space, obs_units)[glue1.Fields.DIRECT_OBSERVATION]
 
         dot_product = np.dot(obs0, obs1)
 
@@ -103,5 +85,5 @@ class DotProductGlue(BaseMultiWrapperGlue):
             dot_product = np.clip(dot_product, -1.0, 1.0)
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(np.array([dot_product], dtype=np.float32), "")
+        d[self.Fields.DIRECT_OBSERVATION] = np.array([dot_product], dtype=np.float32)
         return d

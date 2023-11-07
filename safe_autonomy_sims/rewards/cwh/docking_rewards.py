@@ -15,6 +15,7 @@ import math
 from collections import OrderedDict
 
 import numpy as np
+from corl.libraries.environment_dict import RewardDict
 from corl.libraries.state_dict import StateDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 from corl.simulators.common_platform_utils import get_platform_by_name
@@ -52,7 +53,7 @@ class DockingTimeReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method allocates reward based on the step size of the simulation.
 
@@ -75,7 +76,7 @@ class DockingTimeReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for the change in time.
     """
 
@@ -83,8 +84,8 @@ class DockingTimeReward(RewardFuncBase):
         self.config: DockingTimeRewardValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -99,9 +100,10 @@ class DockingTimeReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
-        reward = self.config.scale * self.config.step_size
+        reward = RewardDict()
+        reward[self.config.agent_name] = self.config.scale * self.config.step_size
 
         return reward
 
@@ -133,7 +135,7 @@ class DockingDistanceChangeReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method calculates the current position of the agent and compares it to the previous position. The
     difference is used to return a proportional reward.
@@ -157,7 +159,7 @@ class DockingDistanceChangeReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for their change in distance.
     """
 
@@ -166,8 +168,8 @@ class DockingDistanceChangeReward(RewardFuncBase):
         super().__init__(**kwargs)
         self._dist_buffer = RingBuffer(capacity=2, dtype=float)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -182,7 +184,10 @@ class DockingDistanceChangeReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
+
+        reward = RewardDict()
+        val = 0
 
         # get relative dist
         # Assumes one platfrom per agent!
@@ -191,12 +196,12 @@ class DockingDistanceChangeReward(RewardFuncBase):
         distance = np.linalg.norm(relative_position)
 
         self._dist_buffer.append(distance)
-        
-        reward = 0.0
 
         # TODO intialize distance buffer from initial state
         if len(self._dist_buffer) == 2:
-            reward = self.config.scale * (self._dist_buffer[1] - self._dist_buffer[0])
+            val = self.config.scale * (self._dist_buffer[1] - self._dist_buffer[0])
+
+        reward[self.config.agent_name] = val
 
         return reward
 
@@ -250,7 +255,7 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method calculates the current position of the agent and compares it to the previous position. The
     difference is used to return an exponential reward.
@@ -274,7 +279,7 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for their change in distance.
     """
 
@@ -294,8 +299,8 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         self.c = self.config.c
         self.scale = self.config.scale
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -349,7 +354,10 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
+
+        reward = RewardDict()
+        val = 0
 
         # get relative dist
         # assumes one platform per agent!
@@ -359,13 +367,12 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
         self.update_dist(distance)
 
-        reward = 0.0
-
         # TODO initialize distance buffer from initial state
         if len(self._dist_buffer) == 2:
-            reward = self.c * (math.exp(-self.a * self.curr_dist) - math.exp(-self.a * self.prev_dist))
-            reward = self.scale * reward
+            val = self.c * (math.exp(-self.a * self.curr_dist) - math.exp(-self.a * self.prev_dist))
+            val = self.scale * val
 
+        reward[self.config.agent_name] = val
         return reward
 
 
@@ -402,7 +409,7 @@ class DockingDeltaVReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method retrieves the current thrust control applied by the agent (delta v), which is used to calculate and
     return a proportional reward.
@@ -426,7 +433,7 @@ class DockingDeltaVReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for their change in distance.
     """
 
@@ -454,11 +461,11 @@ class DockingDeltaVReward(RewardFuncBase):
         """
         deputy = get_platform_by_name(state, self.config.platform_names[0])
         control_vec = deputy.get_applied_action()
-        d_v = np.sum(np.abs(control_vec.m)) / self.mass * self.step_size
+        d_v = np.sum(np.abs(control_vec)) / self.mass * self.step_size
         return d_v
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -473,9 +480,10 @@ class DockingDeltaVReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
-
-        reward = self.scale * self.delta_v(next_state) + self.bias
+    ) -> RewardDict:
+        reward = RewardDict()
+        val = self.scale * self.delta_v(next_state) + self.bias
+        reward[self.config.agent_name] = val
         return reward
 
 
@@ -532,7 +540,7 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method calculates the current velocity constraint based on the relative distance from the chief.
     It compares the velocity constraint with the deputy's current velocity. If the velocity constraint is
@@ -557,7 +565,7 @@ class DockingVelocityConstraintReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for their change in distance.
     """
 
@@ -575,8 +583,8 @@ class DockingVelocityConstraintReward(RewardFuncBase):
 
         self.agent_name = self.config.agent_name
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -591,8 +599,8 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
-
+    ) -> RewardDict:
+        reward = RewardDict()
 
         # Get relative position and velocity
         # Assumes one platfrom per agent!
@@ -610,11 +618,11 @@ class DockingVelocityConstraintReward(RewardFuncBase):
             slope=self.config.slope,
         )
 
-        reward = 0.0
-
         if violated:
-            reward = self.scale * violation + self.bias
-
+            val = self.scale * violation + self.bias
+        else:
+            val = 0
+        reward[self.config.agent_name] = val
         return reward
 
 
@@ -669,7 +677,7 @@ class DockingSuccessReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method determines if the agent has succeeded and returns an appropriate reward.
 
@@ -692,7 +700,7 @@ class DockingSuccessReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for their change in distance.
     """
 
@@ -700,8 +708,8 @@ class DockingSuccessReward(RewardFuncBase):
         self.config: DockingSuccessRewardValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -716,7 +724,10 @@ class DockingSuccessReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
+
+        reward = RewardDict()
+        value = 0.0
 
         platform = get_platform_by_name(next_state, self.config.platform_names[0])
         sim_time = platform.sim_time
@@ -740,14 +751,13 @@ class DockingSuccessReward(RewardFuncBase):
             slope=self.config.slope,
         )
 
-        reward = 0.0
-
         if in_docking and not violated:
-            reward = self.config.scale
+            value = self.config.scale
             if self.config.timeout:
                 # Add time reward component, if timeout specified
-                reward += 1 - (sim_time / self.config.timeout)
+                value += 1 - (sim_time / self.config.timeout)
 
+        reward[self.config.agent_name] = value
         return reward
 
 
@@ -811,7 +821,7 @@ class DockingFailureReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
     This method determines if the agent had failed the task and allocates an appropriate reward.
 
@@ -834,7 +844,7 @@ class DockingFailureReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for their change in distance.
     """
 
@@ -842,8 +852,8 @@ class DockingFailureReward(RewardFuncBase):
         self.config: DockingFailureRewardValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -858,7 +868,10 @@ class DockingFailureReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
+
+        reward = RewardDict()
+        value = 0.0
 
         platform = get_platform_by_name(next_state, self.config.platform_names[0])
         sim_time = platform.sim_time
@@ -882,16 +895,15 @@ class DockingFailureReward(RewardFuncBase):
             slope=self.config.slope,
         )
 
-        reward = 0.0
-
         if sim_time >= self.config.timeout:
             # episode reached max time
-            reward = self.config.timeout_reward
+            value = self.config.timeout_reward
         elif distance >= self.config.max_goal_distance:
             # agent exceeded max distance from goal
-            reward = self.config.distance_reward
+            value = self.config.distance_reward
         elif in_docking and violated:
             # agent exceeded velocity constraint within docking region
-            reward = self.config.crash_reward
+            value = self.config.crash_reward
 
+        reward[self.config.agent_name] = value
         return reward

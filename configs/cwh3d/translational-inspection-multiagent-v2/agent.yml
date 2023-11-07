@@ -139,7 +139,6 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Position",
-              "output_units": "m",
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -153,7 +152,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_Velocity",
-              "output_units": "m/s",
+              "output_units": ["m/s", "m/s", "m/s"],
               "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -180,7 +179,6 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_UninspectedPoints",
-              "output_units": "m",
               "normalization": {
                   "enabled": False
             },
@@ -190,7 +188,6 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
               "sensor": "Sensor_SunAngle",
-              "output_units": "radians",
               "normalization": {
                   "enabled": False
             },
@@ -305,18 +302,6 @@
                 "mass": "mass",
             },
         },
-        {
-            "name": "MaxDistanceReward",
-            # See delta-v reward scale parameters in env config
-            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.MaxDistanceReward",
-            "config": {
-                "scale": 2.0,
-            },
-            "references": {
-                "max_distance": "max_distance",
-                "reference_position_sensor_name": "reference_position_sensor_name",
-            },
-        },
     ],
-    "reference_store": !include ./parameters.yml
+    "reference_store": !include parameters.yml
 }

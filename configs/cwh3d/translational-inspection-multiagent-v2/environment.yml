@@ -101,11 +101,7 @@
         "config": {
           "success_function_name": "SafeSuccessfulInspectionDoneFunction"
         },
-      },
-      {
-        "functor": "safe_autonomy_sims.dones.common_dones.SetAllDoneFunction",
-        "config": {},
-      },
+      }
     ]
   }
 }

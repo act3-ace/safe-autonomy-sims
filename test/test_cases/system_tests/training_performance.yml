@@ -1,43 +1,19 @@
-# Test each environment
-- ID: Docking
+# Test each task
+- ID: CWH Docking 3D
   experiment_config_path: configs/cwh3d/docking/experiments/experiment.yml
   seed: 1
-  max_training_iteration: 200
+  max_training_iteration: 55
   success_mean_metric: done_results/blue0/SuccessfulDockingDoneFunction_mean
   expected_success_rate: 0.9
-# - ID: 6DOF Inspection Multiagent v2
-#   experiment_config_path: configs/cwh3d/six-dof-inspection-multiagent-v2/experiment.yml
-#   seed: 1
-#   max_training_iteration: 100
-#   success_mean_metric: done_status/blue0/DoneStatusCodes.WIN_mean
-#   expected_success_rate: 0.9
-- ID: 6DOF Inspection v2
-  experiment_config_path: configs/cwh3d/six-dof-inspection-v2/experiment.yml
+- ID: CWH Inspection 3D
+  experiment_config_path: configs/cwh3d/inspection/experiments/experiment.yml
   seed: 1
-  max_training_iteration: 200
+  max_training_iteration: 50
+  success_mean_metric: done_results/blue0/SuccessfulInspectionDoneFunction_mean
+  expected_success_rate: 0.9
+- ID: CWH Inspection 3D Multiagent
+  experiment_config_path: configs/cwh3d/inspection/experiments/experiment_multiagent.yml
+  seed: 1
+  max_training_iteration: 10
   success_mean_metric: agent_done_status/blue0_ctrl/DoneStatusCodes.WIN_mean
-  expected_success_rate: 0.9
-- ID: Translational Inspection Multiagent v2
-  experiment_config_path: configs/cwh3d/translational-inspection-multiagent-v2/experiment.yml
-  seed: 1
-  max_training_iteration: 100
-  success_mean_metric: done_status/blue0/DoneStatusCodes.WIN_mean
-  expected_success_rate: 0.9
-- ID: Translational Inspection v0
-  experiment_config_path: configs/cwh3d/translational-inspection-v0/experiment.yml
-  seed: 1
-  max_training_iteration: 100
-  success_mean_metric: done_results/blue0/SuccessfulInspectionDoneFunction_mean
-  expected_success_rate: 0.9
-- ID: Translational Inspection v1
-  experiment_config_path: configs/cwh3d/translational-inspection-v1/experiment.yml
-  seed: 1
-  max_training_iteration: 100
-  success_mean_metric: done_results/blue0/SuccessfulInspectionDoneFunction_mean
-  expected_success_rate: 0.9
-- ID: Translational Inspection v2
-  experiment_config_path: configs/cwh3d/translational-inspection-v2/experiment.yml
-  seed: 1
-  max_training_iteration: 200
-  success_mean_metric: done_results/blue0/SafeSuccessfulInspectionDoneFunction_mean
   expected_success_rate: 0.9
