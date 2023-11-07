@@ -22,14 +22,12 @@ from test.system_tests.training.constants import CUSTOM_METRICS, TRAINING_ITERAT
 from test.system_tests.training.success_criteria import SuccessCriteria
 from corl.experiments.base_experiment import ExperimentParse
 from corl.parsers.yaml_loader import load_file
-from corl.train_rl import parse_corl_args
-
-from safe_autonomy_sims.experiments.rllib_api_experiment import RllibAPIExperiment
+from corl.train_rl import parse_corl_args, ExperimentFileParse
 
 
 # Define test assay
 test_cases_file_path = os.path.join(os.path.split(__file__)[0], "../../test_cases/system_tests/training_performance.yml")
-parameterized_fixture_keywords = ["experiment_config", "seed", "max_training_iteration", "success_mean_metric", "expected_success_rate"]
+parameterized_fixture_keywords = ["experiment_config_path", "seed", "max_training_iteration", "success_mean_metric", "expected_success_rate"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
 
@@ -50,7 +48,7 @@ def fixture_success_mean_metric(request):
 
 @pytest.fixture(name="success_rate")
 def fixture_run_training(
-    experiment_config,
+    training_config,
     tmp_path,
     self_managed_ray,
     max_training_iteration,
@@ -76,17 +74,18 @@ def fixture_run_training(
 
     try:
         print(self_managed_ray)
-        args = parse_corl_args(["--cfg", experiment_config])
 
-        config = load_file(config_filename=args.config)
-
+        # new train rl
+        experiment_file_validated = ExperimentFileParse(**training_config)
+        config = load_file(config_filename=str(experiment_file_validated.config))
         experiment_parse = ExperimentParse(**config)
-
-        # RllibAPIExperiment is used for debuging not training
-        if experiment_parse.experiment_class is RllibAPIExperiment:
-            return
-
+        # experiment_parse.experiment_class.process_cli_args(experiment_parse.config, experiment_file_validated)
         experiment_class = experiment_parse.experiment_class(**experiment_parse.config)
+        # experiment_class.run_experiment(experiment_file_validated)
+
+        # experiment_parse = ExperimentParse(**training_config)
+
+        # experiment_class = experiment_parse.experiment_class(**experiment_parse.config)
 
         experiment_class.config.rllib_configs["local"]["seed"] = seed
 
@@ -108,19 +107,14 @@ def fixture_run_training(
         experiment_class.config.tune_config['local_dir'] = str(tmp_path / "training")
         experiment_class.config.tune_config['checkpoint_freq'] = 0
         experiment_class.config.tune_config['max_failures'] = 1
-        args.compute_platform = "local"
-        experiment_class.run_experiment(args)
+        experiment_file_validated.compute_platform = "local"
+
+        experiment_class.run_experiment(experiment_file_validated)
 
         # get success rate
         with jsonlines.open(str(list(tmp_path.glob('training/*/*/result.json'))[0])) as results:
             results = [line for line in results]
             success_rate = results[-1][CUSTOM_METRICS][success_mean_metric]
-            num_training_iterations = results[-1][TRAINING_ITERATIONS]
-
-        output_path = "/home/john/AFRL/performance_test_branch_translational_NEW.txt"
-        with open(output_path, 'w') as file:
-            file.write(f"success_rate: {success_rate}\n")
-            file.write(f"num_training_iterations: {num_training_iterations}\n")
 
         # return success rate
         yield success_rate
@@ -138,8 +132,7 @@ def fixture_run_training(
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs)
 def test_training_performance(
     success_rate,
-    expected_success_rate,
-    tmp_path,
+    expected_success_rate
 ):
     """Test a training for a single iteration
     """

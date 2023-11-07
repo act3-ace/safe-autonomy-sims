@@ -26,7 +26,7 @@ from corl.evaluation.evaluation_artifacts import (
     EvaluationArtifact_Visualization,
 )
 from corl.evaluation.launchers import launch_evaluate, launch_generate_metrics, launch_visualize
-from corl.evaluation.loader.check_point_file import CheckpointFile
+from corl.evaluation.loader.policy_checkpoint import PolicyCheckpoint
 from corl.evaluation.recording.folder import Folder, FolderRecord
 from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import RllibTrainer
 from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
@@ -260,7 +260,7 @@ def construct_teams(experiment_config_path: str, launch_dir_of_experiment: str, 
         policy_config_path = os.path.join(launch_dir_of_experiment, policy_config_path)
 
         agent_checkpoint = checkpoint_path.format(agent_name)  # put policy ID in path
-        agent_loader = CheckpointFile(checkpoint_filename=agent_checkpoint)
+        agent_loader = PolicyCheckpoint(checkpoint_filename=agent_checkpoint, )
 
         teams_platforms_config.append(Platform(name=platform_name, config=platform_config_path))
         teams_agents_config.append(

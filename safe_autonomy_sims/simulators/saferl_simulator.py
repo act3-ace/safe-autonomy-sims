@@ -17,7 +17,6 @@ import abc
 import typing
 from graphlib import CycleError, TopologicalSorter
 
-import numpy as np
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, PyObject, validator
@@ -25,7 +24,7 @@ from safe_autonomy_dynamics.base_models import BaseEntity
 
 from safe_autonomy_sims.simulators.initializers.initializer import (
     Accessor,
-    CorlUnitsToPintInitializer,
+    PassThroughInitializer,
     EntityAttributeAccessor,
     SimAttributeAccessor,
 )
@@ -118,7 +117,7 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
         Key is entity name, value is entity's initialization dict.
     """
     platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
-    default_initializer: InitializerResetValidator = InitializerResetValidator(functor=CorlUnitsToPintInitializer)
+    default_initializer: InitializerResetValidator = InitializerResetValidator(functor=PassThroughInitializer)
     additional_entities: typing.Dict[str, AdditionalEntityValidator] = {}
 
 
@@ -365,7 +364,7 @@ class SafeRLSimulator(BaseSimulator):
             episode_state {OrderedDict} -- The episode state at the end of the simulation
         """
 
-    def save_episode_information(self, dones, rewards, observations):
+    def save_episode_information(self, dones, rewards, observations, observation_units):
         pass
 
     def step(self, platforms_to_action):
@@ -392,7 +391,7 @@ class SafeRLSimulator(BaseSimulator):
         for platform in self._state.sim_platforms.values():
             platform_id = platform.name
             if platform_id in platforms_to_action:
-                action = np.array(platform.get_applied_action(), dtype=np.float32)
+                action = platform.get_applied_action().m
                 entity_actions[platform_id] = action
                 self.last_entity_actions[platform_id] = action
             else:

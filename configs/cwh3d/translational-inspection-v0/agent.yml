@@ -91,7 +91,7 @@
             "functor": "safe_autonomy_sims.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
             "config": {
               "training_export_behavior": "EXCLUDE",
-              "state_observation_names": ["ObserveSensor_Sensor_Position", "ObserveSensor_Sensor_Velocity"],
+              "state_observation_names": ["Obs_Sensor_Position", "Obs_Sensor_Velocity"],
               "enabled": False, # Set to True to turn RTA on
               # No constraints listed defaults to all constraints active
               # Constraint options: "chief_collision", "rel_vel", "r_max", "PSM", "x_vel", "y_vel", "z_vel"
@@ -144,6 +144,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
                 "sensor": "Sensor_Position",
+                "output_units": "m",
                 "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -157,7 +158,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
                 "sensor": "Sensor_Velocity",
-                "output_units": ["m/s", "m/s", "m/s"],
+                "output_units": "m/s",
                 "normalization": {
                 "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
                 "config": {
@@ -184,6 +185,7 @@
             "functor": "corl.glues.common.observe_sensor.ObserveSensor",
             "config": {
                 "sensor": "Sensor_UninspectedPoints",
+                "output_units": "m",
                 "normalization": {
                     "enabled": False
             },
@@ -257,5 +259,5 @@
             },
         },
     ],
-    "reference_store": !include parameters.yml
+    "reference_store": !include ./parameters.yml
 }
