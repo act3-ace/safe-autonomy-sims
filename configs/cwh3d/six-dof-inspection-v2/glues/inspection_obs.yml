@@ -45,37 +45,16 @@
   wrapped: [
     !include-extend ./rotation_quaternion.yml,
 
-    # {
-    #   "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-    #   "config": {
-    #     "sensor": "Sensor_SunVector",
-    #     "normalization": {
-    #         "enabled": False
-    #     },
-    #   },
-    # },
-    
     {
-      functor: "safe_autonomy_sims.glues.six_dof_glues.AngleToUnitVector",
-      config: {
+      "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+      "config": {
+        "sensor": "Sensor_SunVector",
         "output_units": "m",
         "normalization": {
-          enabled: False
+            "enabled": False
         },
       },
-      wrapped: 
-        {
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_SunAngle",
-            "output_units": "radians",
-            "normalization": {
-                "enabled": False
-            },
-          },
-        },
     },
-
   ],
 },
 {  # Priority Vector in Local Frame
