@@ -424,7 +424,7 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     Both position and velocity are initialized radially (with radius and angles) to allow for
     control over magnitude and direction of the resulting vectors.
-    The sun angle is considered such that the agent is not pointing a sensor towards the sun.
+    The sun angle is also passed through.
 
     def __call__(self, reset_config):
 
@@ -448,7 +448,6 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
         'vel_azimuth_angle': 'radians',
         'vel_elevation_angle': 'radians',
         'sun_angle': 'radians',
-        'sensor_fov': 'radians',
     }
 
     def compute(self, **kwargs):
@@ -463,7 +462,6 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
         vel_azimuth_angle: float,
         vel_elevation_angle: float,
         sun_angle: float,
-        sensor_fov: float,
     ) -> typing.Dict:
         """Computes radial initial conditions for cwh 3d
 
@@ -483,9 +481,6 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
             velocity vector elevation angle from x-y plane. Positive angles = positive z. rad
         sun_angle : float
             Initial angle of the sun. rad
-        sensor_fov : float
-            Sensor field of view (sun will be kept out of this zone). rad
-            TODO: add buffer?
 
         Returns
         -------
@@ -501,15 +496,6 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
         y_dot = vel_mag * np.sin(vel_azimuth_angle) * np.cos(vel_elevation_angle)
         z_dot = vel_mag * np.sin(vel_elevation_angle)
 
-        sun_vec = -np.array([(np.cos(sun_angle)), -1 * (np.sin(sun_angle)), 0])
-        pos = np.array([x, y, z])
-        p_hat = pos / np.linalg.norm(pos)
-        c_hat = sun_vec / np.linalg.norm(sun_vec)
-        if np.arccos(np.dot(p_hat, c_hat)) < sensor_fov / 2:
-            x *= -1
-            y *= -1
-            z *= -1
-
         return {
             'x': x,
             'y': y,
@@ -517,4 +503,5 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
             'x_dot': x_dot,
             'y_dot': y_dot,
             'z_dot': z_dot,
+            'sun_angle': sun_angle,
         }
