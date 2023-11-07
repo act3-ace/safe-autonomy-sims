@@ -97,7 +97,7 @@ def get_relative_position(platform: BasePlatform, reference_position_sensor_name
 
     position = platform.position
     reference_position = get_sensor_by_name(platform, reference_position_sensor_name).get_measurement()
-    relative_position = np.array(position) - np.array(reference_position)
+    relative_position = np.array(position) - reference_position.m
 
     return relative_position
 
@@ -121,7 +121,7 @@ def get_relative_velocity(platform: BasePlatform, reference_velocity_sensor_name
 
     velocity = platform.velocity
     reference_velocity = get_sensor_by_name(platform, reference_velocity_sensor_name).get_measurement()
-    relative_velocity = np.array(velocity) - np.array(reference_velocity)
+    relative_velocity = np.array(velocity) - reference_velocity.m
 
     return relative_velocity
 
@@ -189,10 +189,10 @@ def max_vel_violation(relative_position, relative_velocity, velocity_threshold, 
     vel_limit = velocity_limit(distance, velocity_threshold, threshold_distance, mean_motion, slope=slope)
 
     violation = relative_velocity_magnitude - vel_limit
-    violated = relative_velocity_magnitude > vel_limit
+    violated = bool(relative_velocity_magnitude > vel_limit)
     if lower_bound:
         violation *= -1
-        violated = relative_velocity_magnitude < vel_limit
+        violated = bool(relative_velocity_magnitude < vel_limit)
 
     return violated, violation
 

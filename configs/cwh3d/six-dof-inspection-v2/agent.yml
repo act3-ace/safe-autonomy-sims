@@ -128,17 +128,17 @@
     },
     "glues": [
         # Control
-        !include-extend glues/controllers.yml,
+        !include-extend ./glues/controllers.yml,
 
         ### Observations ###
         # Position and Velocity Obs
-        !include-extend glues/translation_obs.yml,
+        !include-extend ./glues/translation_obs.yml,
 
         # Orientation Obs
-        !include-extend glues/orientation_obs.yml,
+        !include-extend ./glues/orientation_obs.yml,
 
         # Inspection-Specific Obs
-        !include-extend glues/inspection_obs.yml,
+        !include-extend ./glues/inspection_obs.yml,
     ],
     "dones": [
         {
@@ -244,7 +244,7 @@
                 {
                   "fields":
                     [
-                      "ObserveSensor_Sensor_OrientationUnitVector_Local_Ref_DotProduct_ObserveSensor_Sensor_RelativeChiefPosition",
+                      "Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition",
                       "direct_observation",
                     ],
                 },
@@ -269,5 +269,5 @@
             },
         },
     ],
-    "reference_store": !include parameters.yml
+    "reference_store": !include ./parameters.yml
 }

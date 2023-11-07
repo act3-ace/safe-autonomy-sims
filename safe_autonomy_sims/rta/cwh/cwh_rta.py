@@ -77,8 +77,8 @@ class RTAGlueCWHDocking3d(RTAGlue):
         self.config: CWHDocking3dRTAGlueValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(cls):
+    @staticmethod
+    def get_validator():
         return CWHDocking3dRTAGlueValidator
 
     def _get_rta_args(self) -> dict:
@@ -118,8 +118,8 @@ class RTAGlueCHWDocking3dExplicitSwitching(RTAGlueCWHDocking3d):
         self.config: CWHDocking3dExplicitSwitchingRTAGlueValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(cls):
+    @staticmethod
+    def get_validator():
         return CWHDocking3dExplicitSwitchingRTAGlueValidator
 
     def _get_singleton(self):
@@ -165,8 +165,8 @@ class RTAGlueCHWDocking3dImplicitSwitching(RTAGlueCWHDocking3d):
         self.config: CWHDocking3dImplicitSwitchingRTAGlueValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(cls):
+    @staticmethod
+    def get_validator():
         return CWHDocking3dImplicitSwitchingRTAGlueValidator
 
     def _get_singleton(self):
@@ -240,8 +240,8 @@ class RTAGlueCHWDocking3dImplicitOptimization(RTAGlueCWHDocking3d):
         self.config: CWHDocking3dImplicitOptimizationRTAGlueValidator
         super().__init__(**kwargs)
 
-    @property
-    def get_validator(cls):
+    @staticmethod
+    def get_validator():
         return CWHDocking3dImplicitOptimizationRTAGlueValidator
 
     def _get_singleton(self):

@@ -14,7 +14,6 @@ import logging
 import typing
 import numpy as np
 
-from corl.libraries.environment_dict import RewardDict
 from corl.libraries.utils import get_wrap_diff
 from corl.rewards.base_measurement_operation import BaseMeasurementOperation, BaseMeasurementOperationValidator
 
@@ -59,8 +58,8 @@ class GaussianDecayFromTargetValue(BaseMeasurementOperation):
     you are away from the target value.
     """
 
-    @property
-    def get_validator(self) -> typing.Type[GaussianDecayFromTargetValueValidator]:
+    @staticmethod
+    def get_validator() -> typing.Type[GaussianDecayFromTargetValueValidator]:
         return GaussianDecayFromTargetValueValidator
 
     def __init__(self, **kwargs) -> None:
@@ -68,10 +67,10 @@ class GaussianDecayFromTargetValue(BaseMeasurementOperation):
         super().__init__(**kwargs)
         self._last_value = None
         self._logger = logging.getLogger(self.name)
-        self._reward = RewardDict()
+        self._reward = 0.0
 
-    def __call__(self, observation, action, next_observation, state, next_state, observation_space, observation_units) -> RewardDict:
-        self._reward[self.config.agent_name] = 0
+    def __call__(self, observation, action, next_observation, state, next_state, observation_space, observation_units) -> float:
+        self._reward = 0.0
 
         if self.config.agent_name not in next_observation:
             return self._reward
@@ -82,7 +81,7 @@ class GaussianDecayFromTargetValue(BaseMeasurementOperation):
             # Note: this always returns the min angle diff and is positive
             diff = get_wrap_diff(obs, self.config.target_value, self.config.is_rad, self.config.method)
         else:
-            diff = obs - self.config.target_value
+            diff = obs.m - self.config.target_value
 
         abs_diff = abs(diff)
         if self._last_value is None:
@@ -93,7 +92,7 @@ class GaussianDecayFromTargetValue(BaseMeasurementOperation):
             if not abs_diff > self.config.max_diff:
                 func_applied = np.exp(-np.abs(diff**2 / self.config.eps))
 
-        self._reward[self.config.agent_name] = self.config.reward_scale * func_applied
+        self._reward = self.config.reward_scale * func_applied
 
         self._last_value = abs_diff  # type: ignore
         return self._reward

@@ -192,4 +192,4 @@ def test_reward_function(call_results, agent_name, expected_value):
     expected_value : float
         The expected value from the reward function
     """
-    assert call_results[agent_name] == expected_value
+    assert call_results == expected_value
