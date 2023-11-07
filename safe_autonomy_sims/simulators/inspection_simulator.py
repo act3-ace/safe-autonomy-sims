@@ -611,13 +611,14 @@ class InspectionSimulator(SafeRLSimulator):
 
         if self.inspection_points_map:
             # calculate delta_v_scale
-            # TODO: remove "chief" assumption
-            final_num_points_inspected = self.inspection_points_map["chief"].get_num_points_inspected()
+            # TODO: assumes first agent
+            agent = list(self.inspection_points_map.keys())[0]
+            final_num_points_inspected = self.inspection_points_map[agent].get_num_points_inspected()
             if final_num_points_inspected != 0:
                 if self.delta_v_updater_criteria == 'score':
-                    self.inspected_points_value_list.append(self.inspection_points_map["chief"].get_total_weight_inspected())
+                    self.inspected_points_value_list.append(self.inspection_points_map[agent].get_total_weight_inspected())
                 elif self.delta_v_updater_criteria == 'count':
-                    self.inspected_points_value_list.append(self.inspection_points_map["chief"].get_percentage_of_points_inspected())
+                    self.inspected_points_value_list.append(self.inspection_points_map[agent].get_percentage_of_points_inspected())
                 else:
                     raise ValueError('delta_v_updater_criteria must be either "score" or "count"')
             if self.total_steps >= self.update_step_current:
