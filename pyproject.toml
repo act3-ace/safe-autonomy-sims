@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-autonomy-sims"
-version = "3.1.0"
+version = "3.2.0"
 description = "The Safe-Autonomy-Sims library provides the components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA)"
 authors = [
     "Charles Keating <Charles.Keating@udri.udayton.edu>",
