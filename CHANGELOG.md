@@ -1,3 +1,10 @@
+# [3.2.0](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.1.0...v3.2.0) (2023-11-07)
+
+
+### Features
+
+* Rejection Sampling ([5854581](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/5854581d9db0e47059b498194109a73f2e163af9))
+
 # [3.1.0](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.0.0...v3.1.0) (2023-11-07)
 
 
