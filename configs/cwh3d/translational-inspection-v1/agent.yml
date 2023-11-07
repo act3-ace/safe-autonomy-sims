@@ -28,16 +28,76 @@
     },
     "simulator_reset_parameters": {
       "initializer": {
-        "functor": "safe_autonomy_sims.rta.rta_rejection_sampler.RejectionSamplerInitializer",
-        "config": {
-          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot"],
-        }
+        "functor": "safe_autonomy_sims.simulators.initializers.cwh.CWH3DRadialWithSunInitializer",
       },
       "config": {
-        "init_state": {
-          "type": "safe_autonomy_sims.simulators.initializers.initializer.SimAttributeAccessor",
+        "radius": {
+          "type": "corl.libraries.parameters.UniformParameter",
           "config": {
-            "attribute_name": "init_state",
+            "name": "radius",
+            "units": "meters",
+            "low": 50,
+            "high": 100,
+          }
+        },
+        "azimuth_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "azimuth_angle",
+            "units": "radians",
+            "low": 0,
+            "high": 6.283,
+          }
+        },
+        "elevation_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "elevation_angle",
+            "units": "radians",
+            "low": -1.57,
+            "high": 1.57,
+          }
+        },
+        "vel_mag": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "vel_mag",
+            "units": "m/s",
+            "low": 0,
+            "high": 0.3,
+          }
+        },
+        "vel_azimuth_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "vel_azimuth_angle",
+            "units": "radians",
+            "low": 0,
+            "high": 6.283,
+          }
+        },
+        "vel_elevation_angle": {
+          "type": "corl.libraries.parameters.UniformParameter",
+          "config": {
+            "name": "vel_elevation_angle",
+            "units": "radians",
+            "low": -1.57,
+            "high": 1.57,
+          }
+        },
+        "sun_angle": {
+          "type": "safe_autonomy_sims.simulators.initializers.initializer.EntityAttributeAccessor",
+          "config": {
+            "attribute_name": "theta",
+            "entity_name": "sun"
+          }
+        },
+        "sensor_fov": {
+          "type": "corl.libraries.parameters.ConstantParameter",
+          "config": {
+            "name": "sensor_fov",
+            "units": "degrees",
+            "value": 60
           }
         },
       }
@@ -49,6 +109,10 @@
               "training_export_behavior": "EXCLUDE",
               "state_observation_names": ["Obs_Sensor_Position", "Obs_Sensor_Velocity", "Obs_Sensor_SunAngle"],
               "enabled": False, # Set to True to turn RTA on
+              # No constraints listed defaults to all constraints active
+              # Constraint options: "chief_collision", "rel_vel", "sun", "r_max", "PSM", "x_vel", "y_vel", "z_vel"
+              # More details here: https://github.com/act3-ace/run-time-assurance/-/blob/main/run_time_assurance/zoo/cwh/inspection_1v1.py
+              "constraints": ["chief_collision", "rel_vel", "sun", "r_max", "PSM", "x_vel", "y_vel", "z_vel"],
           },
           "references": {
             "step_size": "step_size",
@@ -58,7 +122,6 @@
             "v1_coef": "vel_limit_slope",
             "n": "mean_motion",
             "r_max": "max_distance",
-            "constraints": "constraints",
           },
           "wrapped": [
             {
