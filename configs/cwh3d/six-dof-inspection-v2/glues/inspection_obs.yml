@@ -21,13 +21,12 @@
     },
   },
   wrapped: [
-    !include-extend ./rotation_quaternion.yml,
+    !include-extend rotation_quaternion.yml,
 
     {
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
         "sensor": "Sensor_UninspectedPoints",
-        "output_units": "m",
         "normalization": {
           "enabled": False
         },
@@ -43,13 +42,12 @@
     },
   },
   wrapped: [
-    !include-extend ./rotation_quaternion.yml,
+    !include-extend rotation_quaternion.yml,
 
     {
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
         "sensor": "Sensor_SunVector",
-        "output_units": "m",
         "normalization": {
             "enabled": False
         },
@@ -65,13 +63,12 @@
     },
   },
   wrapped: [
-    !include-extend ./rotation_quaternion.yml,
+    !include-extend rotation_quaternion.yml,
 
     { 
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
         "sensor": "Sensor_PriorityVector",
-        "output_units": "m",
         "normalization": {
             "enabled": False
         },
@@ -101,7 +98,6 @@
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
         "sensor": "Sensor_UninspectedPoints",
-        "output_units": "m",
         "normalization": {
           "enabled": False
         },
@@ -111,7 +107,6 @@
       "functor": "corl.glues.common.observe_sensor.ObserveSensor",
       "config": {
         "sensor": "Sensor_Position",
-        "output_units": "m",
         "normalization": {
           "enabled": False
         },

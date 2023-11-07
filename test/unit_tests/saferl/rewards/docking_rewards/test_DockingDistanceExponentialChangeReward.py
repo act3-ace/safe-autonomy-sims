@@ -160,8 +160,8 @@ def fixture_call_results(
 
     Returns
     -------
-    results : float
-        The resulting reward value from calling the MaxDistanceDoneFunction
+    results : RewardDict
+        The resulting RewardDict from calling the MaxDistanceDoneFunction
     """
     with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_platform_by_name") as func:
         with mock.patch("safe_autonomy_sims.rewards.cwh.docking_rewards.get_relative_position") as func1:
@@ -192,4 +192,4 @@ def test_reward_function(call_results, agent_name, expected_value):
     expected_value : bool
         The expected bool corresponding to whether the agent's episode is done or not
     """
-    assert call_results == expected_value
+    assert call_results[agent_name] == expected_value

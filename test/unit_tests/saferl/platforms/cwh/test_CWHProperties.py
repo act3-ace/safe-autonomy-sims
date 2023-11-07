@@ -25,7 +25,7 @@ def test_ThrustProp():
     assert obj.name == 'thrust'
     assert obj.low == [-1.0]
     assert obj.high == [1.0]
-    assert obj.unit == "newtons"
+    assert obj.unit == ["newtons"]
     assert obj.description == 'Direct Thrust Control'
 
 
@@ -38,7 +38,7 @@ def test_PositionProp():
     assert obj.name == 'position'
     assert obj.low == [-10000.0] * 3
     assert obj.high == [10000.0] * 3
-    assert obj.unit == "m"
+    assert obj.unit == ["m"] * 3
     assert obj.description == "Position Sensor Properties"
 
 
@@ -51,5 +51,5 @@ def test_VelocityProp():
     assert obj.name == 'velocity'
     assert obj.low == [-1000.0] * 3
     assert obj.high == [1000.0] * 3
-    assert obj.unit == "m/s"
+    assert obj.unit == ["m/s"] * 3
     assert obj.description == "Velocity Sensor Properties"

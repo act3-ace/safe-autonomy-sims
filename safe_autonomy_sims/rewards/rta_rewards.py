@@ -13,6 +13,7 @@ This module implements the Reward Functions and Reward Validators specific to RT
 """
 from collections import OrderedDict
 
+from corl.libraries.environment_dict import RewardDict
 from corl.libraries.state_dict import StateDict
 from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidator
 
@@ -50,7 +51,7 @@ class RTAInterveningReward(RewardFuncBase):
 
     Returns
     -------
-    reward : float
+    reward : RewardDict
         The agent's reward for the change in time.
     """
 
@@ -58,8 +59,8 @@ class RTAInterveningReward(RewardFuncBase):
         self.config: RTAInterveningRewardValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Method to return class's Validator.
         """
@@ -74,10 +75,13 @@ class RTAInterveningReward(RewardFuncBase):
         next_state: StateDict,
         observation_space: StateDict,
         observation_units: StateDict,
-    ) -> float:
+    ) -> RewardDict:
 
-        reward = 0.
+        reward = RewardDict()
+        value = 0.
         if next_observation[self.config.agent_name]['RTAModule']['intervening']:
-            reward = self.config.scale
+            value = self.config.scale
+
+        reward[self.config.agent_name] = value
 
         return reward

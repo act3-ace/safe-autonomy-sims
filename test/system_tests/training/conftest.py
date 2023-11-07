@@ -21,7 +21,8 @@ import tempfile
 import os
 from corl.experiments.base_experiment import ExperimentParse
 from corl.parsers.yaml_loader import load_file
-from corl.train_rl import parse_corl_args, merge_cfg_and_args, ExperimentFileParse
+from corl.train_rl import parse_corl_args
+from safe_autonomy_sims.experiments.rllib_api_experiment import RllibAPIExperiment
 
 
 @pytest.fixture(name="_ray_session_temp_dir", scope="session", autouse=True)
@@ -104,16 +105,14 @@ def fixture_change_cwd():
 
 @pytest.fixture(name="training_config")
 def fixture_training_config(experiment_config_path):
-    cfg=None
     try:
         args = parse_corl_args(["--cfg", experiment_config_path])
-        cfg = load_file(config_filename=args.cfg)
-        cfg = merge_cfg_and_args(cfg, args)
+        config = load_file(config_filename=args.config)
 
     except Exception as e:
         print(e)
 
-    return cfg
+    return args, config
 
 @pytest.fixture(name="run_training")
 def fixture_run_training(cwd, training_config, tmp_path, self_managed_ray):
@@ -123,14 +122,15 @@ def fixture_run_training(cwd, training_config, tmp_path, self_managed_ray):
 
     try:
         print(self_managed_ray)
-        
-        experiment_file_validated = ExperimentFileParse(**training_config)
-        config = load_file(config_filename=str(experiment_file_validated.config))
-        experiment_parse = ExperimentParse(**config)
-        experiment_parse.experiment_class.process_cli_args(experiment_parse.config, experiment_file_validated)
+        args, training_config = training_config
+
+        experiment_parse = ExperimentParse(**training_config)
+
+        # RllibAPIExperiment is used for debuging not training
+        if experiment_parse.experiment_class is RllibAPIExperiment:
+            return
 
         experiment_class = experiment_parse.experiment_class(**experiment_parse.config)
-
 
         experiment_class.config.rllib_configs["local"] = {
             'horizon': 10,
@@ -161,7 +161,8 @@ def fixture_run_training(cwd, training_config, tmp_path, self_managed_ray):
         experiment_class.config.tune_config['local_dir'] = str(tmp_path / "training")
         experiment_class.config.tune_config['checkpoint_freq'] = 1
         experiment_class.config.tune_config['max_failures'] = 1
-        experiment_class.run_experiment(experiment_file_validated)
+        args.compute_platform = "local"
+        experiment_class.run_experiment(args)
 
     except Exception as e:
         print(e)

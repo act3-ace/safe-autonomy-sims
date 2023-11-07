@@ -13,9 +13,10 @@ Functions that define the terminal conditions for the Docking Environment.
 This in turn defines whether the end of an episode has been reached.
 """
 
-import gymnasium
+import gym
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
+from corl.libraries.environment_dict import DoneDict
 from corl.simulators.common_platform_utils import get_platform_by_name
 
 from safe_autonomy_sims.utils import get_relative_position, get_relative_velocity, max_vel_violation
@@ -66,7 +67,7 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         next_state,
         observation_space,
         observation_units
-    ) -> bool:
+    ) -> DoneDict:
 
     Parameters
     ----------
@@ -78,14 +79,14 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
+    observation_space : gym.spaces.dict.Dict
         The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
+    observation_units : gym.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
 
     Returns
     -------
-    done : bool
+    done : DoneDict
         Dictionary containing the done condition for the current agent.
     """
 
@@ -93,8 +94,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         self.config: SuccessfulDockingDoneValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Parameters
         ----------
@@ -113,11 +114,12 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
-    ) -> bool:
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
 
         # eventually will include velocity constraint
+        done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -137,11 +139,11 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
             slope=self.config.slope
         )
 
-        done = bool(in_docking and not violated)
+        done[self.config.platform_name] = bool(in_docking and not violated)
 
-        if done:
+        if done[self.config.platform_name]:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
-
+        self._set_all_done(done)
         return done
 
 
@@ -188,7 +190,7 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         next_state,
         observation_space,
         observation_units
-    ) -> bool:
+    ) -> DoneDict:
 
     Parameters
     ----------
@@ -200,15 +202,15 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
+    observation_space : gym.spaces.dict.Dict
         The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
+    observation_units : gym.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
 
 
     Returns
     -------
-    done : bool
+    done : DoneDict
         Dictionary containing the done condition for the current agent.
     """
 
@@ -216,8 +218,8 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         self.config: DockingVelocityLimitDoneFunctionValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Parameters
         ----------
@@ -236,9 +238,11 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
-    ) -> bool:
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
+
+        done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -255,10 +259,10 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
             slope=self.config.slope,
         )
 
-        done = bool(violated)
-        if done:
+        done[self.config.platform_name] = violated
+        if done[self.config.platform_name]:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
-
+        self._set_all_done(done)
         return done
 
 
@@ -305,7 +309,7 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         next_state,
         observation_space,
         observation_units
-    ) -> bool:
+    ) -> DoneDict:
 
     Parameters
     ----------
@@ -317,14 +321,14 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
+    observation_space : gym.spaces.dict.Dict
         The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
+    observation_units : gym.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
 
     Returns
     -------
-    done : bool
+    done : DoneDict
         Dictionary containing the done condition for the current agent.
     """
 
@@ -332,8 +336,8 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         self.config: DockingRelativeVelocityConstraintDoneFunctionValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(self):
         """
         Parameters
         ----------
@@ -352,10 +356,12 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
-    ) -> bool:
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
+
         # eventually will include velocity constraint
+        done = DoneDict()
 
         # Get relatative position + velocity between platform and docking region
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -372,9 +378,9 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
             slope=self.config.slope,
         )
 
-        done = bool(violated)
+        done[self.config.platform_name] = violated
 
-        if done:
+        if done[self.config.platform_name]:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
-
+        self._set_all_done(done)
         return done

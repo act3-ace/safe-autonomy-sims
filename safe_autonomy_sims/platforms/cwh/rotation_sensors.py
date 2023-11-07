@@ -14,9 +14,7 @@ Contains implementations of sensors that can be used in junction with the six do
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from corl.libraries.plugin_library import PluginLibrary
-from corl.libraries.units import corl_get_ureg
 
-import numpy as np
 import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
 from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from safe_autonomy_sims.platforms.cwh.cwh_sensors import CWHSensor
@@ -41,8 +39,7 @@ class QuaternionSensor(CWHSensor):
         list of floats
             quaternion of spacecraft.
         """
-        quaternion = np.array(self.parent_platform.quaternion, dtype=np.float32)
-        return corl_get_ureg().Quantity(quaternion, "")
+        return self.parent_platform.quaternion
 
 
 class AngularVelocitySensor(CWHSensor):
@@ -62,8 +59,7 @@ class AngularVelocitySensor(CWHSensor):
         list of floats
             Angular velocity of spacecraft.
         """
-        angular_velocity = np.array(self.parent_platform.angular_velocity, dtype=np.float32)
-        return corl_get_ureg().Quantity(angular_velocity, "radians / second")
+        return self.parent_platform.angular_velocity
 
 
 class OrientationUnitVectorSensor(CWHSensor):
@@ -85,15 +81,12 @@ class OrientationUnitVectorSensor(CWHSensor):
             elements of unit vector that points in direction of spacecraft
             sensor.
         """
-        initial_orientation = None
         try:
             initial_orientation = state.inspection_points_map['chief'].config.initial_sensor_unit_vec
         except KeyError:
-            initial_orientation = np.array([0.0, 0.0, 0.0])
+            return np.array([0.0, 0.0, 0.0])
         if initial_orientation is None:
-            initial_orientation = np.array([0.0, 0.0, 0.0])
-        
-        initial_orientation = corl_get_ureg().Quantity(np.array(initial_orientation, dtype=np.float32), "")
+            return np.array([0.0, 0.0, 0.0])
         return initial_orientation
 
 
@@ -131,11 +124,10 @@ class RotatedAxesSensor(CWHSensor):
         rot_v2 = r.apply(v2)
 
         out = np.concatenate([rot_v1, rot_v2])
-        out = corl_get_ureg().Quantity(np.array(out, dtype=np.float32), "")
         return out
 
 
 for sim in [CWHSimulator, InspectionSimulator]:
     for sensor, sensor_name in zip([QuaternionSensor, AngularVelocitySensor, OrientationUnitVectorSensor, RotatedAxesSensor],
                                    ["Sensor_Quaternion", "Sensor_AngularVelocity", "Sensor_OrientationUnitVector", "Sensor_RotatedAxes"]):
-        PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": CWHAvailablePlatformTypes})
+        PluginLibrary.AddClassToGroup(sensor, sensor_name, {"simulator": sim, "platform_type": CWHAvailablePlatformTypes.CWHSixDOF})

@@ -18,7 +18,7 @@ import typing
 import matplotlib.pyplot as plt
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
-from pint import Quantity
+from corl.libraries.units import ValueWithUnits
 from pydantic import BaseModel, validator
 from ray.rllib import BaseEnv
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
@@ -110,7 +110,7 @@ class InspectionPoints:
     """
 
     def __init__(self, parent_entity: CWHSpacecraft, priority_vector: np.ndarray, **kwargs):
-        self.config: InspectionPointsValidator = self.get_validator()(**kwargs)
+        self.config: InspectionPointsValidator = self.get_validator(**kwargs)
         self.sun_angle = 0.0
         self.clock = 0.0
         self.parent_entity = parent_entity
@@ -120,8 +120,8 @@ class InspectionPoints:
         self.last_points_inspected = 0
         self.last_cluster = None
 
-    @staticmethod
-    def get_validator() -> typing.Type[InspectionPointsValidator]:
+    @property
+    def get_validator(self) -> typing.Type[InspectionPointsValidator]:
         """
         Get the validator used to validate the kwargs passed to BaseAgent.
 
@@ -438,7 +438,7 @@ class InspectionSimulatorState(SafeRLSimulatorState):
         The scale of the delta_v reward. This value is updated over time, based on the value of inspected_points_value.
         See safe_autonomy_sims/rewards/cwh/inspection_rewards for more details.
         Note that this feature is experimental, and currently does not synchronize between workers.
-    sun_angle: typing.Union[Quantity, float]
+    sun_angle: typing.Union[ValueWithUnits, float]
         Angle of the Sun in the x-y plane
     priority_vector: np.ndarray
         Vector indicating priority of points to be inspected
@@ -446,7 +446,7 @@ class InspectionSimulatorState(SafeRLSimulatorState):
     inspection_points_map: typing.Dict[str, InspectionPoints]
     total_steps: int
     delta_v_scale: float
-    sun_angle: typing.Union[Quantity, float] = 0.0
+    sun_angle: typing.Union[ValueWithUnits, float] = 0.0
     priority_vector: np.ndarray
 
     class Config:
@@ -501,17 +501,13 @@ class InspectionSimulatorResetValidator(SafeRLSimulatorResetValidator):
     """
     A validator for the InspectionSimulator reset.
 
-    priority_vector_azimuth_angle: typing.Union[Quantity, float]
+    priority_vector_azimuth_angle: typing.Union[ValueWithUnits, float]
         Azimuth angle of the priority vector for weighting points
-    priority_vector_elevation_angle: typing.Union[Quantity, float]
+    priority_vector_elevation_angle: typing.Union[ValueWithUnits, float]
         Elevation angle of the priority vector for weighting points
     """
-    priority_vector_azimuth_angle: typing.Union[Quantity, float] = 0.0
-    priority_vector_elevation_angle: typing.Union[Quantity, float] = 0.0
-
-    class Config:
-        """Allow arbitrary types for Parameter"""
-        arbitrary_types_allowed = True
+    priority_vector_azimuth_angle: typing.Union[ValueWithUnits, float] = 0.0
+    priority_vector_elevation_angle: typing.Union[ValueWithUnits, float] = 0.0
 
 
 class InspectionSimulator(SafeRLSimulator):
@@ -651,11 +647,11 @@ class InspectionSimulator(SafeRLSimulator):
     def _get_initial_priority_vector(self, config):
         """Get the initial priority vector for weighting points"""
         azi = config["priority_vector_azimuth_angle"]
-        if isinstance(azi, Quantity):
-            azi = azi.magnitude
+        if isinstance(azi, ValueWithUnits):
+            azi = azi.value
         ele = config["priority_vector_elevation_angle"]
-        if isinstance(ele, Quantity):
-            ele = ele.magnitude
+        if isinstance(ele, ValueWithUnits):
+            ele = ele.value
 
         self.priority_vector[0] = np.cos(azi) * np.cos(ele)
         self.priority_vector[1] = np.sin(azi) * np.cos(ele)

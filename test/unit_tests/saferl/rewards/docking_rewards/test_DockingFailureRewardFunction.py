@@ -234,11 +234,11 @@ def test_reward_function(call_results, agent_name, expected_value):
 
     Parameters
     ----------
-    call_results : float
-        The resulting reward value from calling the DockingFailureRewardFunction
+    call_results : RewardDict
+        The resulting RewardDict from calling the DockingFailureRewardFunction
     agent_name : str
         The name of the agent
     expected_value : bool
         The expected bool corresponding to whether the agent's episode is done or not
     """
-    assert call_results == expected_value
+    assert call_results[agent_name] == expected_value

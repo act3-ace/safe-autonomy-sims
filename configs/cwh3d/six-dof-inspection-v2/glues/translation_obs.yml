@@ -13,13 +13,13 @@
     },
   },
   wrapped: [
-  !include-extend ./rotation_quaternion.yml,
+  !include-extend rotation_quaternion.yml,
 
   {
     "functor": "corl.glues.common.observe_sensor.ObserveSensor",
     "config": {
       "sensor": "Sensor_RelativeChiefPosition",
-      "output_units": "m",
+      "output_units": ["m", "m", "m"],
       "normalization": {
         "enabled": False,
       },
@@ -47,13 +47,13 @@
       },
     },
     "wrapped": [
-      !include-extend ./rotation_quaternion.yml,
+      !include-extend rotation_quaternion.yml,
 
       {
         "functor": "corl.glues.common.observe_sensor.ObserveSensor",
         "config": {
           "sensor": "Sensor_RelativeChiefPosition",
-          "output_units": "m",
+          "output_units": ["m", "m", "m"],
           "normalization": {
             "enabled": False,
           }
@@ -75,13 +75,13 @@
     },
   },
   wrapped: [
-  !include-extend ./rotation_quaternion.yml,
+  !include-extend rotation_quaternion.yml,
 
   {
     "functor": "corl.glues.common.observe_sensor.ObserveSensor",
     "config": {
       "sensor": "Sensor_RelativeChiefVelocity",
-      "output_units": "m/s",
+      "output_units": ["m/s", "m/s", "m/s"],
       "normalization": {
         "enabled": False,
       },
@@ -109,13 +109,13 @@
       },
     },
     "wrapped": [
-      !include-extend ./rotation_quaternion.yml,
+      !include-extend rotation_quaternion.yml,
 
       {
         "functor": "corl.glues.common.observe_sensor.ObserveSensor",
         "config": {
           "sensor": "Sensor_RelativeChiefVelocity",
-          "output_units": "m/s",
+          "output_units": ["m/s", "m/s", "m/s"],
           "normalization": {
             "enabled": False,
           }

@@ -17,7 +17,6 @@ import typing
 
 import numpy as np
 from corl.simulators.base_platform import BasePlatformValidator
-from corl.libraries.units import corl_get_ureg
 from safe_autonomy_dynamics.cwh import CWHSpacecraft, SixDOFSpacecraft
 
 from safe_autonomy_sims.platforms.common.platform import BaseSafeRLPlatform
@@ -58,10 +57,10 @@ class CWHPlatform(BaseSafeRLPlatform):
         self.config: CWHPlatformValidator
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._platform = self.config.platform
-        self._last_applied_action = corl_get_ureg().Quantity(np.array([0, 0, 0], dtype=np.float32), "newtons")
+        self._last_applied_action = np.array([0, 0, 0], dtype=np.float32)
 
-    @staticmethod
-    def get_validator() -> typing.Type[CWHPlatformValidator]:
+    @property
+    def get_validator(self) -> typing.Type[CWHPlatformValidator]:
         """
         get validator for this CWHPlatform
 
@@ -99,14 +98,7 @@ class CWHPlatform(BaseSafeRLPlatform):
         axis: int
             The index of the action space where the action shall be saved.
         """
-        if isinstance(action.m, np.ndarray) and len(action.m) == 1:
-            # TODO: is there a way to ensure quantity coming in is of correct units?
-            #       currently, incoming action is 'dimensionless'.
-            # action = action.to('newton')
-            self._last_applied_action.m[axis] = action.m[0]
-        else:
-            raise TypeError(f"Action saved to platform is of incompatible type:\
-                             expected pint.Quantity with numpy.ndarray of length 1, but got {type(action.m)}")
+        self._last_applied_action[axis] = action
 
     @property
     def position(self) -> np.ndarray:
@@ -193,10 +185,10 @@ class CWHSixDOFPlatform(CWHPlatform):
     def __init__(self, platform_name, platform, parts_list, sim_time=0.0):
         self.config: CWHSixDOFPlatformValidator
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
-        self._last_applied_action = corl_get_ureg().Quantity(np.array([0, 0, 0, 0, 0, 0], dtype=np.float32), "newtons")
+        self._last_applied_action = np.array([0, 0, 0, 0, 0, 0], dtype=np.float32)
 
-    @staticmethod
-    def get_validator() -> typing.Type[CWHSixDOFPlatformValidator]:
+    @property
+    def get_validator(self) -> typing.Type[CWHSixDOFPlatformValidator]:
         """
         get validator for this CWHPlatform
 
