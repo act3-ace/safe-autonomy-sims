@@ -1,3 +1,10 @@
+# [3.1.0](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.0.0...v3.1.0) (2023-11-07)
+
+
+### Features
+
+* add angle to unit_vector transformation glue ([4073500](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/40735008fb6d7b6114eaa325197846769de75e15))
+
 # [3.0.0](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v2.13.1...v3.0.0) (2023-11-07)
 
 
