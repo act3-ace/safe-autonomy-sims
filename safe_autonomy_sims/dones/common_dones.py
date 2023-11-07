@@ -15,7 +15,7 @@ This module contains functions that define common terminal conditions across env
 import typing
 from collections import OrderedDict
 
-import gymnasium
+import gym
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes, SharedDoneFuncBase, SharedDoneFuncBaseValidator
 from corl.libraries.environment_dict import DoneDict
@@ -40,8 +40,8 @@ class TimeoutDoneFunction(DoneFuncBase):
         self.config: TimeoutDoneValidator
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(cls):
         """
         Parameters
         ----------
@@ -60,9 +60,9 @@ class TimeoutDoneFunction(DoneFuncBase):
         action,
         next_observation,
         next_state,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
-    ) -> bool:
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
+    ) -> DoneDict:
         """
         Parameters
         ----------
@@ -77,19 +77,22 @@ class TimeoutDoneFunction(DoneFuncBase):
 
         Returns
         -------
-        done : bool
-            the done condition for the current agent.
+        done : DoneDict
+            dictionary containing the done condition for the current agent.
         """
 
+        done = DoneDict()
+
         # get sim time
-        platform = get_platform_by_name(next_state, self.config.platform_name)
+        platform = get_platform_by_name(next_state, self.config.agent_name)
         sim_time = platform.sim_time
 
-        done = sim_time >= self.config.max_sim_time
+        done[self.config.platform_name] = sim_time >= self.config.max_sim_time
 
-        if done:
+        if done[self.config.platform_name]:
             next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.LOSE
 
+        self._set_all_done(done)
         return done
 
 
@@ -131,9 +134,9 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
+    observation_space : gym.spaces.dict.Dict
         The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
+    observation_units : gym.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
     local_dones: DoneDict
         DoneDict containing name to boolean KVPs representing done statuses of each agent
@@ -146,8 +149,8 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         Dictionary containing the done condition for each agent.
     """
 
-    @staticmethod
-    def get_validator() -> typing.Type[SharedDoneFuncBaseValidator]:
+    @property
+    def get_validator(self) -> typing.Type[SharedDoneFuncBaseValidator]:
         """
         Returns the validator for this done function.
 
@@ -164,8 +167,8 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         action: OrderedDict,
         next_observation: OrderedDict,
         next_state: StateDict,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
@@ -249,9 +252,9 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         np.ndarray describing the incoming observation
     next_state : np.ndarray
         np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
+    observation_space : gym.spaces.dict.Dict
         The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
+    observation_units : gym.spaces.dict.Dict
         The units of the observations in the observation space. This may be None.
     local_dones: DoneDict
         DoneDict containing name to boolean KVPs representing done statuses of each agent
@@ -264,8 +267,8 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         Dictionary containing the done condition for each agent.
     """
 
-    @staticmethod
-    def get_validator() -> typing.Type[SharedDoneFuncBaseValidator]:
+    @property
+    def get_validator(self) -> typing.Type[SharedDoneFuncBaseValidator]:
         """
         Returns the validator for this done function.
 
@@ -283,8 +286,8 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         action: OrderedDict,
         next_observation: OrderedDict,
         next_state: StateDict,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
+        observation_space: gym.spaces.dict.Dict,
+        observation_units: gym.spaces.dict.Dict,
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
@@ -308,70 +311,3 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         for k in local_dones.keys():
             done[k] = True
         return done
-
-
-class SetAllDoneFunction(SharedDoneFuncBase):
-    """
-    A done function that sets all agents to done if one agent is found to be done.
-
-
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units,
-        local_dones,
-        local_done_info
-    ) -> DoneDict:
-
-    Parameters
-    ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-    local_dones: DoneDict
-        DoneDict containing name to boolean KVPs representing done statuses of each agent
-    local_done_info: OrderedDict
-        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
-
-    Returns
-    -------
-    done : DoneDict
-        Dictionary containing the done condition for each agent.
-    """
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action: OrderedDict,
-        next_observation: OrderedDict,
-        next_state: StateDict,
-        observation_space: gymnasium.spaces.dict.Dict,
-        observation_units: gymnasium.spaces.dict.Dict,
-        local_dones: DoneDict,
-        local_done_info: OrderedDict
-    ) -> DoneDict:
-
-        # get list of spacecrafts
-        platform_names = list(local_dones.keys())
-        # populate DoneDict
-        dones = DoneDict()
-
-        done = any(local_dones.values())
-
-        for name in platform_names:
-            dones[name] = done
-
-        return dones

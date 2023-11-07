@@ -14,16 +14,12 @@ Glues for the six-dof environments
 import typing
 from collections import OrderedDict
 from pydantic import validator
-from functools import cached_property
-from pint import Quantity
 
-import gymnasium
+import gym
 import numpy as np
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
 from corl.glues.base_wrapper import BaseWrapperGlue
 from scipy.spatial.transform import Rotation
-from corl.libraries.units import corl_get_ureg
-from corl.libraries.property import DictProp, BoxProp
 
 
 class MagNorm3DGlue(BaseWrapperGlue):
@@ -38,48 +34,31 @@ class MagNorm3DGlue(BaseWrapperGlue):
     def get_unique_name(self) -> str:
         return self.glue().get_unique_name() + "_MagNorm3D"
 
-    @cached_property
-    def observation_prop(self):
-        # unit = self.glue().observation_space[self.glue().Fields.DIRECT_OBSERVATION].unit
-        prop = BoxProp(low=[-10000, -1, -1, -1], high=[10000, 1, 1, 1], unit="")
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
-
-    @cached_property
-    def observation_space(self) -> gymnasium.spaces.Space:
-        wrapped_space = self.glue().observation_space[self.glue().Fields.DIRECT_OBSERVATION]
+    def observation_space(self) -> gym.spaces.Space:
+        wrapped_space = self.glue().observation_space()[self.glue().Fields.DIRECT_OBSERVATION]
 
         mag = np.linalg.norm(np.maximum(np.abs(wrapped_space.low), np.abs(wrapped_space.high)))
 
         low = np.concatenate([[0], -1 * np.ones(3)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
         high = np.concatenate([[mag], np.ones(3)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
 
-        d = gymnasium.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(low=low, high=high, dtype=np.float32)
+        d = gym.spaces.dict.Dict()
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low=low, high=high, dtype=np.float32)
         return d
-    
-    @cached_property
-    def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
-        return self.observation_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
         obs = self.glue().get_observation(other_obs, obs_space, obs_units)[self.glue().Fields.DIRECT_OBSERVATION]
-        obs_units = str(obs.units)
 
-        mag = np.linalg.norm(obs.m)
+        mag = np.linalg.norm(obs)
 
         # if mag == 0:
         if mag < 1e-5:
-            output = np.concatenate([[0], np.zeros_like(obs.m)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
+            output = np.concatenate([[0], np.zeros_like(obs)], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
         else:
-            output = np.concatenate([[mag], obs.m / mag], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
+            output = np.concatenate([[mag], obs / mag], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(output, obs_units)
+        d[self.Fields.DIRECT_OBSERVATION] = output
 
         return d
 
@@ -111,37 +90,20 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         """
         DIRECT_OBSERVATION = "direct_observation"
 
-    @staticmethod
-    def get_validator() -> typing.Type[RotateVectorToLocalRef3dGlueValidator]:
+    @property
+    def get_validator(self) -> typing.Type[RotateVectorToLocalRef3dGlueValidator]:
         return RotateVectorToLocalRef3dGlueValidator
 
     def get_unique_name(self) -> str:
         return self.glues()[1].get_unique_name() + "_Local_Ref"
 
-    @cached_property
-    def observation_prop(self):
-        # unit = self.glues()[1].observation_space[self.glues()[1].Fields.DIRECT_OBSERVATION].unit
-        unit = ""
-        prop = BoxProp(low=[-10000, -10000, -10000], high=[10000, 10000, 10000], unit=unit)
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
-
-    @cached_property
-    def observation_space(self) -> gymnasium.spaces.Space:
+    def observation_space(self) -> gym.spaces.Space:
         source_glue = self.glues()[1]
-        source_obs_space = source_glue.observation_space[source_glue.Fields.DIRECT_OBSERVATION]
+        source_obs_space = source_glue.observation_space()[source_glue.Fields.DIRECT_OBSERVATION]
         mag = np.linalg.norm(np.maximum(np.abs(source_obs_space.low), np.abs(source_obs_space.high)))
-        d = gymnasium.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(low=-mag, high=mag, shape=(3, ), dtype=np.float32)
+        d = gym.spaces.dict.Dict()
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gym.spaces.Box(low=-mag, high=mag, shape=(3, ), dtype=np.float32)
         return d
-
-    @cached_property
-    def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
-        return self.observation_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
         orientation_wrapped = self.glues()[0]
@@ -152,19 +114,17 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         input_vector = input_vector_wrapped.get_observation(other_obs, obs_space, obs_units)[
             input_vector_wrapped.Fields.DIRECT_OBSERVATION]
 
-        # input_vector_units = str(input_vector.units)
-
         if self.config.mode == 'euler':
-            orientation = Rotation.from_euler('z', angles=orientation_obs.m[0])
+            orientation = Rotation.from_euler('z', angles=orientation_obs[0])
         elif self.config.mode == 'quaternion':
-            orientation = Rotation.from_quat(orientation_obs.m)
+            orientation = Rotation.from_quat(orientation_obs)
 
         if self.config.apply_inv:
-            rotated_vector = orientation.inv().apply(input_vector.m).astype(np.float32)
+            rotated_vector = orientation.inv().apply(input_vector).astype(np.float32)
         else:
-            rotated_vector = orientation.apply(input_vector.m).astype(np.float32)
+            rotated_vector = orientation.apply(input_vector).astype(np.float32)
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] =  corl_get_ureg().Quantity(rotated_vector, "")
+        d[self.Fields.DIRECT_OBSERVATION] = rotated_vector
 
         return d

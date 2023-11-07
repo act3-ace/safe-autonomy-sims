@@ -16,7 +16,7 @@ Author: John McCarroll
 
 from unittest import mock
 
-import gymnasium
+import gym
 import pytest
 
 
@@ -50,17 +50,17 @@ def expected_status(request):
 @pytest.fixture(name='observation_space')
 def fixture_observation_space():
     """
-    A fixture to return a gymnasium.spaces.dict.Dict.
+    A fixture to return a gym.spaces.dict.Dict.
     """
-    return gymnasium.spaces.dict.Dict()
+    return gym.spaces.dict.Dict()
 
 
 @pytest.fixture(name='observation_untis')
 def fixture_observation_units():
     """
-    A fixture to return a gymnasium.spaces.dict.Dict.
+    A fixture to return a gym.spaces.dict.Dict.
     """
-    return gymnasium.spaces.dict.Dict()
+    return gym.spaces.dict.Dict()
 
 
 # TODO: generalize patch so that this function need not be duplicated by lower level conftests. same function is being patched, just the

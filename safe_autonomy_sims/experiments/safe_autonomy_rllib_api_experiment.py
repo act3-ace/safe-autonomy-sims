@@ -32,6 +32,7 @@ from corl.episode_parameter_providers.remote import RemoteEpisodeParameterProvid
 from corl.experiments.base_experiment import BaseExperiment, BaseExperimentValidator
 from corl.experiments.rllib_utils.policy_mapping_functions import PolicyIsAgent
 from corl.libraries.factory import Factory
+from corl.libraries.rllib_setup_util import AutoRllibConfigSetup, auto_configure_rllib_config
 from corl.parsers.yaml_loader import apply_patches
 from corl.policies.base_policy import BasePolicyValidator
 from pydantic import BaseModel, PyObject, validator
@@ -64,6 +65,7 @@ class SafeAutonomyRllibExperimentValidator(BaseExperimentValidator):
     rllib_configs: typing.Dict[str, typing.Dict[str, typing.Any]]
     tune_config: typing.Dict[str, typing.Any]
     trainable_config: typing.Optional[typing.Dict[str, typing.Any]]
+    auto_rllib_config_setup: AutoRllibConfigSetup = AutoRllibConfigSetup()
     hparam_search_class: typing.Optional[PyObject]
     hparam_search_config: typing.Optional[typing.Dict[str, typing.Any]]
     extra_callbacks: typing.Optional[typing.List[PyObject]]
@@ -149,12 +151,12 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
         self._logger = logging.getLogger(SafeAutonomyRllibExperiment.__name__)
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator() -> typing.Type[SafeAutonomyRllibExperimentValidator]:
+    @property
+    def get_validator(self) -> typing.Type[SafeAutonomyRllibExperimentValidator]:
         return SafeAutonomyRllibExperimentValidator
 
-    @staticmethod
-    def get_policy_validator() -> typing.Type[RllibPolicyValidator]:
+    @property
+    def get_policy_validator(self) -> typing.Type[RllibPolicyValidator]:
         """Return validator"""
         return RllibPolicyValidator
 
@@ -174,6 +176,8 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
         ray.init(**self.config.ray_config)
 
         ray_resources = ray.available_resources()
+
+        auto_configure_rllib_config(rllib_config, self.config.auto_rllib_config_setup, ray_resources)
 
         self.config.env_config["agents"], self.config.env_config["agent_platforms"] = self.create_agents(
             args.platform_config, args.agent_config

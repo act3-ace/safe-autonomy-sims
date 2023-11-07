@@ -73,6 +73,6 @@ class RTAAgent(TrainableBaseAgent):
         self.config: ExtendedAgentParser
         super().__init__(**kwargs)
 
-    @staticmethod
-    def get_validator():
+    @property
+    def get_validator(cls):
         return ExtendedAgentParser
