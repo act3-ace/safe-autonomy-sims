@@ -1,3 +1,16 @@
+# [3.0.0](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v2.13.1...v3.0.0) (2023-11-07)
+
+
+### Features
+
+* Rejection Sampling ([5e6a1df](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/5e6a1df8fffdf7a60e8e4bf4adac9ab812ebce70))
+* update corl to 3.2.6 ([df8fb65](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/df8fb65a3d0431a02e50e87841eee0ad3debb5f1))
+
+
+### BREAKING CHANGES
+
+* The CoRL update introduces breaking changes, which propagates the breaking changes to the extensions provided by safe-autonomy-sims
+
 ## 2.13.1 (2023-10-09)
 
 
