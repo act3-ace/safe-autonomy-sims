@@ -86,40 +86,6 @@ class VelocityLimitGlue(ObserveSensor):
         d[self.Fields.DIRECT_OBSERVATION] = obs
         return d
 
-    # @cached_property
-    # def action_prop(self) -> typing.Optional[Prop]:
-    #     """
-    #     Build the action property for the controllers that defines the action this glue produces
-
-    #     Returns
-    #     -------
-    #     typing.Optional[Prop]
-    #         The Property that defines what this glue requires for an action
-    #     """
-    #     # collect action properties of wrapped controllers
-    #     action_props = tuple(glue.action_prop for glue in self.glues())
-    #     prop = TupleProp(spaces=action_props)
-    #     return prop
-
-    # @cached_property
-    # def action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-    #     action_spaces = [gymnasium.spaces.Dict({glue.action_prop.name:glue.action_space}) for glue in self.glues()]
-    #     return gymnasium.spaces.tuple.Tuple(tuple(action_spaces))
-    
-    # @cached_property
-    # def observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-    #     if isinstance(self.rta, ConstraintBasedRTA):
-    #         box = gymnasium.spaces.Box(-np.inf, np.inf, shape=(1, ), dtype=np.float32)
-    #         constraint_keys = {k: box for k in self.rta.constraints.keys()}
-    #         space = gymnasium.spaces.dict.Dict(
-    #             {
-    #                 "intervening": gymnasium.spaces.discrete.Discrete(2), "constraints": gymnasium.spaces.dict.Dict(constraint_keys)
-    #             }
-    #         )
-    #     else:
-    #         space = gymnasium.spaces.dict.Dict({"intervening": gymnasium.spaces.discrete.Discrete(2)})
-    #     return space
-
     @cached_property
     def normalized_action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
         """
