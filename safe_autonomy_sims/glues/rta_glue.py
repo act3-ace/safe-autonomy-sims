@@ -105,7 +105,6 @@ class RTAGlue(BaseMultiWrapperGlue):
         action_spaces = [gymnasium.spaces.Dict({glue.action_prop.name:glue.action_space}) for glue in self.glues()]
         return gymnasium.spaces.tuple.Tuple(tuple(action_spaces))
 
-    # TODO: redundant to action_space property?
     def controller_glue_action_space(self) -> gymnasium.spaces.tuple.Tuple:
         """
         Compiles the action spaces for the terminal control glues for each wrapped chain of glues
@@ -205,34 +204,14 @@ class RTAGlue(BaseMultiWrapperGlue):
         raise NotImplementedError
 
     @cached_property
-    def observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        if isinstance(self.rta, ConstraintBasedRTA):
-            box = gymnasium.spaces.Box(-np.inf, np.inf, shape=(1, ), dtype=np.float32)
-            constraint_keys = {k: box for k in self.rta.constraints.keys()}
-            space = gymnasium.spaces.dict.Dict(
-                {
-                    "intervening": gymnasium.spaces.discrete.Discrete(2), "constraints": gymnasium.spaces.dict.Dict(constraint_keys)
-                }
-            )
-        else:
-            space = gymnasium.spaces.dict.Dict({"intervening": gymnasium.spaces.discrete.Discrete(2)})
-        return space
-
-    @cached_property
     def normalized_action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
         """
         passthrough property
         """
         return self.action_space
-    
-    @cached_property
-    def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
-        return self.observation_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
+        # TODO: Add info to callback for eval metrics
         # obs = {"intervening": int(self.rta.intervening)}
         # if isinstance(self.rta, ConstraintBasedRTA):
         #     info = self.rta.generate_info()['constraints'].items()
