@@ -123,14 +123,22 @@ nav:
       - tasks/index.md
       - "CWH":
         - tasks/CWH/index.md
-        - "3D Inspection":
-          - tasks/CWH/inspection_3d.md
-        - "3D Inspection - Multiagent":
-          - tasks/CWH/inspection_3d_multiagent.md
-        - "3D Docking":
-          - tasks/CWH/docking_3d.md
-        - "3D Docking - Multiagent":
-          - tasks/CWH/docking_3d_multiagent.md
+        - "Docking":
+          - tasks/CWH/docking.md
+        - "Multiagent Docking":
+          - tasks/CWH/multiagent_docking.md
+        - "Translational Inspection":
+          - tasks/CWH/translational_inspection.md
+        - "Multiagent Translational Inspection":
+          - tasks/CWH/multiagent_translational_inspection.md
+        - "Weighted Translational Inspection":
+          - tasks/CWH/translational_inspection.md
+        - "Multiagent Weighted Translational Inspection":
+          - tasks/CWH/multiagent_translational_inspection.md
+        - "Six DoF Inspection":
+          - tasks/CWH/six_dof_inspection.md
+        - "Multiagent Six DoF Inspection":
+          - tasks/CWH/multiagent_six_dof_inspection.md
   - "API":
       - api/index.md
       - "agents":

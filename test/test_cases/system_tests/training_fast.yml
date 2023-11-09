@@ -1,15 +1,17 @@
 # # Test each task
-- ID: CWH Docking 3D
-  experiment_config_path: configs/cwh3d/docking/experiments/experiment.yml
-- ID: CWH Translational Inspection v0
-  experiment_config_path: configs/cwh3d/translational-inspection-v0/experiment.yml
-- ID: CWH Translational Inspection v1
-  experiment_config_path: configs/cwh3d/translational-inspection-v1/experiment.yml
-- ID: CWH Translational Inspection v2
-  experiment_config_path: configs/cwh3d/translational-inspection-v2/experiment.yml
-- ID: CWH Translational Inspection Multiagent v2
-  experiment_config_path: configs/cwh3d/translational-inspection-multiagent-v2/experiment.yml
-- ID: CWH Six DoF Inspection v2
-  experiment_config_path: configs/cwh3d/six-dof-inspection-v2/experiment.yml
-- ID: CWH Six DoF Inspection Multiagent v2
-  experiment_config_path: configs/cwh3d/six-dof-inspection-multiagent-v2/experiment.yml
+- ID: Docking
+  experiment_config_path: configs/docking/experiment.yml
+- ID: Multiagent Docking
+  experiment_config_path: configs/multiagent-docking/experiment.yml
+- ID: Translational Inspection
+  experiment_config_path: configs/translational-inspection/experiment.yml
+- ID: Multiagent Translational Inspection
+  experiment_config_path: configs/multiagent-translational-inspection/experiment.yml
+- ID: Weighted Translational Inspection
+  experiment_config_path: configs/weighted-translational-inspection/experiment.yml
+- ID: Multiagent Weighted Translational Inspection
+  experiment_config_path: configs/multiagent-weighted-translational-inspection/experiment.yml
+- ID: Six DoF Inspection
+  experiment_config_path: configs/six-dof-inspection/experiment.yml
+- ID: Multiagent Six DoF Inspection
+  experiment_config_path: configs/multiagent-six-dof-inspection/experiment.yml

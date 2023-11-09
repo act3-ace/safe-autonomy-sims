@@ -86,8 +86,8 @@ class SixDofAnimation(BaseAnimationModule):
 
     def __init__(
         self,
-        expr_config_path: str = 'safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/experiment.yml',
-        task_config_path: str = 'safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/task.yml',
+        expr_config_path: str = 'safe-autonomy-sims/configs/six-dof-inspection-v2/experiment.yml',
+        task_config_path: str = 'safe-autonomy-sims/configs/six-dof-inspection-v2/task.yml',
         platform_serializer_class: PlatformSerializer = SerializeCWH3D,
         radius: float = 10.,
         num_points: int = 100,
