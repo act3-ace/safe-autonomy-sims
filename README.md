@@ -94,7 +94,7 @@ As an example, you can launch a training loop for the
 provided Docking 3D environment using the following command:
 
 ```shell
-python -m corl.train_rl_ --cfg /path/to/safe-autonomy-sims/configs/cw3hd/docking/experiments/experiment.yml --compute-platform local
+python -m corl.train_rl_ --cfg /path/to/safe-autonomy-sims/configs/docking/experiment.yml
 ```
 
 ## Environments

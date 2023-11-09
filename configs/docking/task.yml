@@ -1,0 +1,49 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+####################################################################
+# Task-specific configuration overrides
+####################################################################
+
+experiment_class: corl.experiments.rllib_experiment.RllibExperiment
+config:
+  rllib_config_updates: &rllib_config_updates
+    num_workers: 6
+    train_batch_size: 36000  # set to num_workers * rollout_fragment_length
+    sgd_minibatch_size: 3600
+    gamma: 0.968559
+    lambda: 0.928544
+
+
+  # No overrides for ray as there are no changes
+  ray_config_updates: &ray_config_updates
+    local_mode: false
+
+  # Change the default path for saving out the data
+  env_config_updates: &env_config_updates
+    TrialName: DOCKING
+    output_path: ./output/env/
+
+  # Change the default path for saving out the data
+  tune_config_updates: &tune_config_updates
+    # checkpoint_freq: 1
+
+  ####################################################################
+  # Setup the actual keys used by the code
+  # Note that items are patched from the update section
+  ###################################################################
+  rllib_configs:
+    default: [!include configs/docking/rllib.yml, *rllib_config_updates]
+    local: [!include configs/docking/rllib.yml,  *rllib_config_updates]
+
+  ray_config: [!include configs/docking/ray.yml, *ray_config_updates]
+  env_config: [!include configs/docking/environment.yml, *env_config_updates]
+  tune_config: [!include configs/docking/tune.yml, *tune_config_updates]
+

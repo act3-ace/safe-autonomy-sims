@@ -46,10 +46,10 @@ class InspectionAnimation(BaseAnimationModule):
 
     def __init__(
         self,
-        expr_config_path: str = 'safe-autonomy-sims/configs/cwh3d/translational-inspection-v2/experiment.yml',
-        task_config_path: str = 'safe-autonomy-sims/configs/cwh3d/translational-inspection-v2/task.yml',
+        expr_config_path: str = 'safe-autonomy-sims/configs/translational-inspection/experiment.yml',
+        task_config_path: str = 'safe-autonomy-sims/configs/translational-inspection/task.yml',
         platform_serializer_class: PlatformSerializer = SerializeCWH3D,
-        parameters_path: str = 'safe-autonomy-sims/configs/cwh3d/translational-inspection-v2/parameters.yml',
+        parameters_path: str = 'safe-autonomy-sims/configs/translational-inspection/parameters.yml',
         radius: float = 10.,
         fft_time: float = 172800.,
         points_algorithm: str = "cmu",
