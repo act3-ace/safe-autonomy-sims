@@ -1,0 +1,56 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Train Docking",
+            "type": "python",
+            "request": "launch",
+            "module": "corl.train_rl",
+            "args": ["--cfg", "${workspaceFolder}/configs/docking/experiment.yml"],
+            "justMyCode": true
+        },
+        {
+            "name": "Train Multiagent Docking",
+            "type": "python",
+            "request": "launch",
+            "module": "corl.train_rl",
+            "args": ["--cfg", "${workspaceFolder}/configs/multiagent-docking/experiment.yml"],
+            "justMyCode": true
+        },
+        {
+            "name": "Train Multiagent Six DOF Inspection",
+            "type": "python",
+            "request": "launch",
+            "module": "corl.train_rl",
+            "args": ["--cfg", "${workspaceFolder}/configs/multiagent-six-dof-inspection/experiment.yml"],
+            "justMyCode": true
+        },
+        {
+            "name": "Train Multiagent Translational Inspection",
+            "type": "python",
+            "request": "launch",
+            "module": "corl.train_rl",
+            "args": ["--cfg", "${workspaceFolder}/configs/multiagent-translational-inspection/experiment.yml"],
+            "justMyCode": true
+        },
+        {
+            "name": "Train Six DOF Inspection",
+            "type": "python",
+            "request": "launch",
+            "module": "corl.train_rl",
+            "args": ["--cfg", "${workspaceFolder}/configs/six-dof-inspection/experiment.yml"],
+            "justMyCode": true
+        },
+        {
+            "name": "Train Translational Inspection",
+            "type": "python",
+            "request": "launch",
+            "module": "corl.train_rl",
+            "args": ["--cfg", "${workspaceFolder}/configs/translational-inspection/experiment.yml"],
+            "justMyCode": true
+        },
+    ]
+}

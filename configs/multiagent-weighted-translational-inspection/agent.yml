@@ -1,0 +1,285 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+#####################################
+# Agent default configuration options
+#####################################
+
+"agent": "corl.agents.base_agent.TrainableBaseAgent"
+"config": {
+    "frame_rate": 0.1,  # Hz
+    # Agent platform parts (controllers + sensors)
+    "parts": [
+        {"part": "RateController", "config": {"name": "X Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 0, properties: {name: "x_thrust"}}},
+        {"part": "RateController", "config": {"name": "Y Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 1, properties: {name: "y_thrust"}}},
+        {"part": "RateController", "config": {"name": "Z Thrust", "property_class": "safe_autonomy_sims.platforms.cwh.cwh_properties.ThrustProp", "axis": 2, properties: {name: "z_thrust"}}},
+        {"part": "Sensor_Position"},
+        {"part": "Sensor_Velocity"},
+        {"part": "Sensor_SunAngle"},
+        {"part": "Sensor_InspectedPoints", "config": {"inspector_entity_name": "blue0"}},
+        {"part": "Sensor_UninspectedPoints", "config": {"inspector_entity_name": "blue0", "inspection_entity_name": "chief"}},
+        {"part": "Sensor_EntityPosition", "config": {"name": "reference_position", "entity_name": "chief"}},
+        {"part": "Sensor_EntityVelocity", "config": {"name": "reference_velocity", "entity_name": "chief"}},
+        {"part": "Sensor_PriorityVector"},
+        {"part": "Sensor_InspectedPointsScore", "config": {"inspector_entity_name": "blue0"}},
+    ],
+    "episode_parameter_provider": {
+      "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+    },
+    "simulator_reset_parameters": {  # Default agent reset parameters
+      "initializer": {
+        # Agent initializer which sets agent initial state given a set of initial conditions
+        # Rejects sampled initial conditions if they produce unsafe initial states
+        "functor": "safe_autonomy_sims.rta.rta_rejection_sampler.RejectionSamplerInitializer",
+        "config": {
+          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot"],
+        }
+      },
+      "config": {
+        "init_state": {
+          "type": "safe_autonomy_sims.simulators.initializers.initializer.SimAttributeAccessor",
+          "config": {
+            "attribute_name": "init_state",
+          }
+        },
+      }
+    },
+    "glues": [
+        {
+            # Runtime Assurance glue (action space)
+            "functor": "safe_autonomy_sims.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
+            "config": {
+              "training_export_behavior": "EXCLUDE", # Exclude from action/obs space during training
+              "state_observation_names": ["Obs_Sensor_Position", "Obs_Sensor_Velocity", "Obs_Sensor_SunAngle"],
+              "enabled": False, # Set to True to turn RTA on
+          },
+          "references": {
+            "step_size": "step_size",
+            "collision_radius": "collision_radius",
+            "v0": "velocity_threshold",
+            "v0_distance": "collision_radius",
+            "v1_coef": "vel_limit_slope",
+            "n": "mean_motion",
+            "r_max": "max_distance",
+            "constraints": "constraints",
+          },
+          "wrapped": [
+            {
+                "functor": "corl.glues.common.controller_glue.ControllerGlue",
+                "config": {
+                    "controller": "X Thrust",
+                    "training_export_behavior": "EXCLUDE",
+                    "normalization": {
+                      "enabled": False,
+                    }
+                },
+            },
+            {
+                "functor": "corl.glues.common.controller_glue.ControllerGlue",
+                "config":{
+                    "controller": "Y Thrust",
+                    "training_export_behavior": "EXCLUDE",
+                    "normalization": {
+                      "enabled": False,
+                    }
+                }
+            },
+            {
+                "functor": "corl.glues.common.controller_glue.ControllerGlue",
+                "config":{
+                  "controller": "Z Thrust",
+                  "training_export_behavior": "EXCLUDE",
+                  "normalization": {
+                    "enabled": False,
+                  }
+                }
+            }
+          ],
+        },
+        {
+            # Position Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_Position",
+              "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "output_units": "m",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [100, 100, 100],
+                }
+              }
+            },
+        },
+        {
+            # Velocity Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_Velocity",
+              "output_units": "m/s",
+              "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [0.5, 0.5, 0.5],
+              }
+            },
+          },
+        },
+        {
+            # Inspected Points Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_InspectedPoints",
+              "normalization": {
+                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
+                "config": {
+                  "mu": 0.0,
+                  "sigma": [100.0],
+              },
+            },
+          },
+        },
+        {
+            # Uninspected Points Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_UninspectedPoints",
+              "output_units": "m",
+              "normalization": {
+                  "enabled": False
+            },
+          },
+        },
+        {
+            # Sun Angle Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_SunAngle",
+              "output_units": "radians",
+              "normalization": {
+                  "enabled": False
+            },
+          },
+        },
+        {
+            # Priority Vector Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_PriorityVector",
+              "normalization": {
+                  "enabled": False
+            },
+          },
+        },
+        {
+            # Inspected Points Score Sensor Glue (observation space)
+            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
+            "config": {
+              "sensor": "Sensor_InspectedPointsScore",
+              "normalization": {
+                  "enabled": False
+            },
+          },
+        },
+    ],
+    "dones": [
+        {
+            # Max distance from origin
+            "functor": "safe_autonomy_sims.dones.cwh.common.MaxDistanceDoneFunction",
+            "references": {
+              "max_distance": "max_distance",
+              "reference_position_sensor_name": "reference_position_sensor_name"
+            },
+        },
+        {
+            # Crash into chief entity
+            "functor": "safe_autonomy_sims.dones.cwh.common.CrashDoneFunction",
+            "references": {
+              "crash_region_radius": "collision_radius",
+              "reference_position_sensor_name": "reference_position_sensor_name",
+              "reference_velocity_sensor_name": "reference_velocity_sensor_name",
+            },
+        },
+        {
+            # Success (inspected all points without crashing)
+            "functor": "safe_autonomy_sims.dones.cwh.inspection_dones.SafeSuccessfulInspectionDoneFunction",
+            "config":{
+              "weight_threshold": 0.95
+            },
+            "references": {
+              "crash_region_radius": "collision_radius",
+              "mean_motion": "mean_motion",
+            },
+        },
+        {
+            # Crash after inspecting all points (FFT)
+            "functor": "safe_autonomy_sims.dones.cwh.inspection_dones.CrashAfterSuccessfulInspectionDoneFunction",
+            "config":{
+              "weight_threshold": 0.95
+            },
+            "references": {
+              "crash_region_radius": "collision_radius",
+              "mean_motion": "mean_motion",
+            },
+        },
+    ],
+    "rewards": [
+        {
+            # reward = number of newly observed points
+            "name": "ObservedPointsReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.ObservedPointsReward",
+            "config": {
+                "scale": 1.0,
+                "weighted_priority": True
+            }
+        },
+        {
+            # reward = scale (if all points are inspected)
+            "name": "SafeInspectionSuccessReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.SafeInspectionSuccessReward",
+            "config": {
+                "scale": 1.0,
+                "crash_scale": -1.0,
+                "weight_threshold": 0.95,
+            },
+            "references": {
+              "crash_region_radius": "collision_radius",
+              "mean_motion": "mean_motion",
+            },
+        },
+        {
+            # reward = scale (if crash occurs)
+            "name": "InspectionCrashReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionCrashReward",
+            "config": {
+                "scale": -1.0,
+            },
+            "references": {
+                "crash_region_radius": "collision_radius",
+                "reference_position_sensor_name": "reference_position_sensor_name",
+                "reference_velocity_sensor_name": "reference_velocity_sensor_name",
+            },
+        },
+        {
+            "name": "InspectionDeltaVReward",
+            # See delta-v reward scale parameters in env config
+            "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
+            "config": {
+                "mode": "scale",
+            },
+            "references": {
+                "step_size": "step_size",
+                "mass": "mass",
+            },
+        },
+    ],
+    "reference_store": !include configs/weighted-translational-inspection/parameters.yml
+}

@@ -16,9 +16,9 @@ from safe_autonomy_sims.evaluation.animation.inspection_animation import Inspect
 if __name__ == '__main__':
     # ****Replace with your paths****
     checkpoint_path = 'example_checkpoint' # Path to checkpoint directory
-    expr_config_path = '/root/repos/safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/experiment.yml' # Path to experiment config
+    expr_config_path = '/root/repos/safe-autonomy-sims/configs/six-dof-inspection-v2/experiment.yml' # Path to experiment config
     launch_dir_of_experiment = 'safe-autonomy-sims'
-    task_config_path = '/root/repos/safe-autonomy-sims/configs/cwh3d/six-dof-inspection-v2/task.yml' # Path to task config
+    task_config_path = '/root/repos/safe-autonomy-sims/configs/six-dof-inspection-v2/task.yml' # Path to task config
     save_dir = 'safe-autonomy-sims/safe_autonomy_sims/evaluation/' # Path to directory to save png/mp4
     mode = 'operator' # Plotting mode: 'operator', 'obs_act', or '3d_pos'
     last_step = True # True for png of last step, False for mp4

@@ -59,6 +59,7 @@ def inspection_points_config():
     return {
         "num_points": 100,
         "radius": 10,
+        "priority_vector": np.zeros(3),
     }
 
 
