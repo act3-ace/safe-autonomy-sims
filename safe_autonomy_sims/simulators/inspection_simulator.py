@@ -373,6 +373,8 @@ class InspectionPoints:
         parent_position = self.parent_entity.position
         parent_orientation = self.parent_entity.orientation
 
+        self.priority_vector = parent_orientation.apply(self.priority_vector)
+
         for point_id, default_position in self._default_points_position_dict.items():
             # rotate about origin
             new_position = parent_orientation.apply(default_position)
@@ -636,6 +638,8 @@ class InspectionSimulator(SafeRLSimulator):
         self.inspection_points_map = self.create_inspection_points_map()
         for points in self.inspection_points_map.values():
             points.update_points_position()
+            # TODO: assign priority vector to specific agent
+            self.priority_vector = points.priority_vector
         # illuminate
         if self.config.illumination_params:
             # pass sun_angle to InspectionPoints objs
@@ -669,6 +673,8 @@ class InspectionSimulator(SafeRLSimulator):
         # update inspection points positions
         for points in self.inspection_points_map.values():
             points.update_points_position()
+            # TODO: assign priority vector to specific agent
+            self.priority_vector = points.priority_vector
 
         # illuminate
         if self.config.illumination_params:
