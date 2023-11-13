@@ -1,3 +1,10 @@
+## [3.2.2](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.1...v3.2.2) (2023-11-13)
+
+
+### Bug Fixes
+
+* Inspection-Inspector entity ([9902c4b](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/9902c4b4190176cbdae7afc60a4662c2e7ee7731))
+
 ## [3.2.1](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.0...v3.2.1) (2023-11-07)
 
 
