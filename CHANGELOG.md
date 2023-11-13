@@ -1,3 +1,10 @@
+## [3.2.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.2...v3.2.3) (2023-11-13)
+
+
+### Bug Fixes
+
+* Rotate priority vector based on entity ([2a63e26](https://github.com/act3-ace/safe-autonomy-sims/commit/2a63e265c1dd8396c0cd2c20854c5dffbde02059))
+
 ## [3.2.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.1...v3.2.2) (2023-11-13)
 
 
