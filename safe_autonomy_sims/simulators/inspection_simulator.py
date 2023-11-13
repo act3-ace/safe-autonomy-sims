@@ -718,7 +718,7 @@ class InspectionSimulator(SafeRLSimulator):
     def _update_inspection_points_statuses(self):
         for inspection_entity_name, points in self.inspection_points_map.items():
             for inspector_entity_name, inspector_entity in self.agent_sim_entities.items():
-                if inspection_entity_name is not inspector_entity_name:
+                if inspection_entity_name != inspector_entity_name:
                     points.update_points_inspection_status(inspector_entity)
 
 
