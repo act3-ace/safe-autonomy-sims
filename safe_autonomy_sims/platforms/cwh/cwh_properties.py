@@ -24,6 +24,8 @@ class ThrustProp(BoxProp):
     """
     Thrust control properties.
 
+    Attributes
+    ----------
     name : str
         Control property name.
     low : list[float]
@@ -47,6 +49,8 @@ class MomentProp(BoxProp):
     """
     Moment control properties.
 
+    Attributes
+    ----------
     name : str
         Control property name.
     low : list[float]
@@ -70,6 +74,8 @@ class PositionProp(BoxProp):
     """
     Position sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -93,6 +99,8 @@ class RelativePositionProp(BoxProp):
     """
     Relative position sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -116,6 +124,8 @@ class VelocityProp(BoxProp):
     """
     Velocity sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -139,6 +149,8 @@ class RelativeVelocityProp(BoxProp):
     """
     Relative velocity sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -162,6 +174,8 @@ class InspectedPointProp(BoxProp):
     """
     Inspected points sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -185,6 +199,8 @@ class SunAngleProp(BoxProp):
     """
     Sun angle sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     unit : str
@@ -204,6 +220,8 @@ class SunVectorProp(BoxProp):
     """
     Sun vector sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -227,6 +245,8 @@ class UninspectedPointProp(BoxProp):
     """
     Uninspected points cluster location properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -250,6 +270,8 @@ class BoolArrayProp(BoxProp):
     """
     bool array properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -274,6 +296,8 @@ class QuaternionProp(BoxProp):
     """
     Quaternion sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -297,6 +321,8 @@ class OrientationVectorProp(BoxProp):
     """
     Orientation Unit Vector sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -320,6 +346,8 @@ class RotatedAxesProp(BoxProp):
     """
     Coordinate axis unit vectors rotated into agent frame
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -343,6 +371,8 @@ class AngularVelocityProp(BoxProp):
     """
     Angular Velocity sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -366,6 +396,8 @@ class PriorityVectorProp(BoxProp):
     """
     Priority Vector sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]
@@ -389,6 +421,8 @@ class PointsScoreProp(BoxProp):
     """
     Inspected points score sensor properties.
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     unit : str
@@ -406,6 +440,10 @@ class PointsScoreProp(BoxProp):
 
 class TupleProp(Prop):
     """
+    Tuple space properties
+
+    spaces : tuple
+        set of subspaces to combine into a single Tuple space
     """
     spaces: typing.Tuple
 
@@ -461,6 +499,8 @@ class OrbitStabilityProp(BoxProp):
     Highs and lows are obtained manually from this equation and the highs/lows
     of the position and velocity properties and rounded
 
+    Attributes
+    ----------
     name : str
         Sensor property name.
     low : list[float]

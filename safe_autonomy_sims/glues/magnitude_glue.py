@@ -9,9 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Extension of CoRL Magnitude Glue with implemented observation_prop property.
-
-Author: John McCarroll
+This module implements an extension of the CoRL Magnitude Glue with the observation_prop property.
 """
 
 from functools import cached_property

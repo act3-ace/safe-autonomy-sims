@@ -7,15 +7,7 @@ authors:
 date: 2023-10-29
 ---
 
----
-
 # Translational Multi-Spacecraft Inspection With Illumination
-
-POCs: David van Wijk, Kyle Dunlap, Nate Hamilton, and Kerianne Hobbs
-
-Last Updated: Oct 29, 2023
-
----
 
 ## Motivation
 
@@ -46,18 +38,17 @@ The chief is covered in 100 inspection points that the agent must observe while 
 | Observation High | [$\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $2\pi$, 100, 1, 1, 1] |
 | Observation Low | [-$\infty$, -$\infty$, -$\infty$, -$\infty$, -$\infty$, -$\infty$, 0, 0, -1, -1, -1] |
 
-
 ### Observation Space
 
 At each timestep, each agent $i$ receives the observation, $o_i = [x, y, z, v_x, v_y, v_z, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}]$ given deputy $i$, where:
 
 * $x, y,$ and $z$ represent the deputy's position in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
+    * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
 * $v_x, v_y,$ and $v_z$ represent the deputy's directional velocity in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
 * $\theta_{sun}$ is the angle of the sun,
 * $n$ is the number of points that have been inspected so far and,
-  * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
+    * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
 * $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vectors pointing to the nearest large cluster of unispected points as determined by the *Uninspected Points Sensor*.
 
 __Uninspected Points Sensor:__
@@ -80,21 +71,21 @@ where the state $\boldsymbol{x}=[x,y,z,\dot{x},\dot{y},\dot{z}]^T \in \mathcal{X
 $$
     A =
 \begin{bmatrix}
-0 & 0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 0 & 0 & 1 \\
-3n^2 & 0 & 0 & 0 & 2n & 0 \\
-0 & 0 & 0 & -2n & 0 & 0 \\
-0 & 0 & -n^2 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 \\
+    3n^2 & 0 & 0 & 0 & 2n & 0 \\
+    0 & 0 & 0 & -2n & 0 & 0 \\
+    0 & 0 & -n^2 & 0 & 0 & 0 \\
 \end{bmatrix},
     B =
 \begin{bmatrix}
- 0 & 0 & 0 \\
- 0 & 0 & 0 \\
- 0 & 0 & 0 \\
-\frac{1}{m} & 0 & 0 \\
-0 & \frac{1}{m} & 0 \\
-0 & 0 & \frac{1}{m} \\
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    \frac{1}{m} & 0 & 0 \\
+    0 & \frac{1}{m} & 0 \\
+    0 & 0 & \frac{1}{m} \\
 \end{bmatrix},
 $$
 
@@ -118,21 +109,21 @@ At the start of any episode, the state is randomly initialized with the followin
 * chief radius = $10 m$
 * chief # of points = $100$
 * each deputy's position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
-  * $r \in [50, 100] m$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $x = r \cos{\psi} \cos{\phi}$
-  * $y = r \sin{\psi} \cos{\phi}$
-  * $z = r \sin{\phi}$
+    * $r \in [50, 100] m$
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $x = r \cos{\psi} \cos{\phi}$
+    * $y = r \sin{\psi} \cos{\phi}$
+    * $z = r \sin{\phi}$
 * each deputy's velocity $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
-  * $v \in [0, 0.8] * v_{\rm max}, \quad v_{\rm max} = 2nr$ m/s
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $v_x = v \cos{\psi} \cos{\phi}$
-  * $v_y = v \sin{\psi} \cos{\phi}$
-  * $v_z = v \sin{\phi}$
+    * $v \in [0, 0.8] * v_{\rm max}, \quad v_{\rm max} = 2nr$ m/s
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $v_x = v \cos{\psi} \cos{\phi}$
+    * $v_y = v \sin{\psi} \cos{\phi}$
+    * $v_z = v \sin{\phi}$
 * Initial sun angle is randomly selected using a uniform distribution
-  * $\theta_{sun} \in [0, 2\pi] rad$
+    * $\theta_{sun} \in [0, 2\pi] rad$
 
 ### Done Conditions
 
@@ -198,7 +189,7 @@ From `configs/multiagent-translational-inspection/environment.yml`:
         "rta": {
           "functor": "safe_autonomy_sims.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
           "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot", "sun_angle"],
-          "args": !include configs/cwh3d/translational-inspection-v1/parameters.yml,
+          "args": !include configs/translational-inspection/parameters.yml,
           "arg_map": {
             "step_size": "step_size",
             "collision_radius": "collision_radius",

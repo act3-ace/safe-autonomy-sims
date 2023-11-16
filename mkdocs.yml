@@ -21,12 +21,15 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          selection:
+          paths: [.]
+          options:
             docstring_style: numpy
   - autorefs
   - gen-files:
       scripts:
         - docs/gen_ref_nav.py  # or any other name or path
+  - literate-nav:
+      nav_file: SUMMARY.txt
   - section-index
   - pdf-export:
       verbose: false
@@ -70,6 +73,7 @@ theme:
 
 
 extra_css:
+  - css/images.css
   - css/style.css
   - css/material.css
   - css/mkdocstrings.css
@@ -104,20 +108,9 @@ extra_javascript:
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
-handlers:
-  python:
-    setup_commands:
-    - import sys
-    - sys.path.append("docs")
-    selection:
-      new_path_syntax: yes
-    import:  # demonstration purpose in the docs
-      - https://docs.python-requests.org/en/master/objects.inv
-
 nav:
   - "Introduction": index.md
   - "Install": install.md
-  - "Concepts": concepts.md
   - "Configuration": configuration.md
   - "Tasks":
       - tasks/index.md
@@ -125,67 +118,20 @@ nav:
         - tasks/CWH/index.md
         - "Docking":
           - tasks/CWH/docking.md
-        - "Multiagent Docking":
-          - tasks/CWH/multiagent_docking.md
         - "Translational Inspection":
           - tasks/CWH/translational_inspection.md
+        - "Weighted Translational Inspection":
+          - tasks/CWH/weighted_translational_inspection.md
+        - "Weighted Six DoF Inspection":
+          - tasks/CWH/weighted_six_dof_inspection.md
+        - "Multiagent Docking":
+          - tasks/CWH/multiagent_docking.md
         - "Multiagent Translational Inspection":
           - tasks/CWH/multiagent_translational_inspection.md
-        - "Weighted Translational Inspection":
-          - tasks/CWH/translational_inspection.md
         - "Multiagent Weighted Translational Inspection":
-          - tasks/CWH/multiagent_translational_inspection.md
-        - "Six DoF Inspection":
-          - tasks/CWH/six_dof_inspection.md
-        - "Multiagent Six DoF Inspection":
-          - tasks/CWH/multiagent_six_dof_inspection.md
+          - tasks/CWH/multiagent_weighted_translational_inspection.md
+        - "Multiagent Weighted Six DoF Inspection":
+          - tasks/CWH/multiagent_weighted_six_dof_inspection.md
   - "API":
-      - api/index.md
-      - "agents":
-          - api/agents/index.md
-          - "rta agent":
-              - reference/agents/rta_agent.md
-      - "dones":
-          - api/dones/index.md
-          - "common dones":
-              - reference/dones/common_dones.md
-          - "cwh":
-              - "common":
-                  - reference/dones/cwh/common.md
-              - "docking dones":
-                  - reference/dones/cwh/docking_dones.md
-              - "inspection dones":
-                  - reference/dones/cwh/inspection_dones.md
-      - "glues":
-          - api/glues/index.md
-          - reference/glues/rta_glue.md
-          - reference/glues/vel_limit_glue.md
-      - "platforms":
-          - api/platforms/index.md
-          - "common":
-              - reference/platforms/common/sensors.md
-          - "cwh":
-              - api/platforms/cwh/index.md
-              - reference/platforms/cwh/cwh_available_platforms.md
-              - reference/platforms/cwh/cwh_controllers.md
-              - reference/platforms/cwh/cwh_platform.md
-              - reference/platforms/cwh/cwh_properties.md
-              - reference/platforms/cwh/cwh_sensors.md
-      - "rewards":
-          - api/rewards/index.md
-          - "docking rewards":
-              - reference/rewards/docking_rewards.md
-      - "rta":
-          - api/rta/index.md
-          - "cwh_rta":
-              - reference/rta/cwh/cwh_rta.md
-          - "inspection_rta_1v1":
-              - reference/rta/cwh/inspection_rta_1v1.md
-      - "simulators":
-          - api/simulators/index.md
-          - "cwh simulator":
-              - reference/simulators/cwh_simulator.md
-          - "saferl simulator":
-              - reference/simulators/saferl_simulator.md
-      - "utils": reference/utils.md
+      - API Reference: reference/
   - "Experiments": experiments.md

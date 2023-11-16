@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
+This module implements Run Time Assurance for the inspection task.
 """
 import math
 from typing import Union
@@ -37,9 +37,9 @@ from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator, RTASing
 
 class CWHInspection1v1RTAGlueValidator(RTAGlueValidator):
     """
-    Base validator for cwh inspection 1v1 rta glues.
+    A configuration validator for CWHInspection1v1RTAGlue.
 
-    Parameters
+    Attributes
     ----------
     m : float, optional
         mass in kg of spacecraft, by default M_DEFAULT

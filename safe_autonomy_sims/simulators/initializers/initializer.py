@@ -1,7 +1,15 @@
 """
-This module defines the base initializer class.
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
 
-Author: John McCarroll
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
+This module implements the base initializer class.
 """
 
 import abc
@@ -69,7 +77,7 @@ class BaseInitializer(abc.ABC):
     """
     This class defines the template for Initializer classes. Initializers are responsible
     for providing a dictionary complete with all relevant agent_reset_config values. Initializers
-    encapsulatie the  initialization of randomized and conditional (dependant) agent state values.
+    encapsulate the  initialization of randomized and conditional (dependent) agent state values.
     """
 
     def __init__(self, config):
@@ -146,7 +154,7 @@ class Accessor(abc.ABC):
 
     @abc.abstractmethod
     def access(self, sim, sim_entities: typing.Dict[str, typing.Any]):
-        """_summary_
+        """Access values in the sim and sim entities
 
         Parameters
         ----------

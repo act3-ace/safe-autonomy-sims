@@ -40,6 +40,10 @@ from safe_autonomy_sims.simulators.saferl_simulator import (
 
 class IlluminationValidator(BaseModel):
     """
+    A configuration validator for illumination parameters
+
+    Attributes
+    ----------
     mean_motion: float
         A float representing the mean motion of the spacecraft in Low Earth Orbit (LEO) in [RADIANS/SECOND].
     avg_rad_Earth2Sun: float
@@ -71,8 +75,10 @@ class IlluminationValidator(BaseModel):
 
 class InspectionPointsValidator(BaseModel):
     """
-    Validator for an InspectionPoints object.
+    A configuration validator for an InspectionPoints object.
 
+    Attributes
+    ----------
     num_points: int
         The number of inspectable points maintained.
     radius: float
@@ -171,9 +177,9 @@ class InspectionPoints:
 
         Parameters
         ----------
-        position: tuple or array
-            inspector's position in cartesian coords
-
+        inspector_entity : PyObject
+            sim entity of inspector platform
+        
         Returns
         -------
         None
@@ -223,7 +229,18 @@ class InspectionPoints:
                                     self.points_inspected_dict[point_id] = inspector_entity.name
 
     def kmeans_find_nearest_cluster(self, position):
-        """Finds nearest cluster of uninspected points using kmeans clustering"""
+        """Finds nearest cluster of uninspected points using kmeans clustering
+        
+        Parameters
+        ----------
+        position : list
+            position vector
+
+        Returns
+        -------
+        list
+            unit vector pointing to nearest cluster
+        """
         uninspected = []
         for point_id, inspected in self.points_inspected_dict.items():
             point_position = self.points_position_dict[point_id]
@@ -263,7 +280,20 @@ class InspectionPoints:
         return out
 
     def check_if_illuminated(self, point, position):
-        """Check if points is illuminated"""
+        """Check if point is illuminated
+        
+        Parameters
+        ----------
+        point : list
+            point position vector
+        position : list
+            agent position vector
+
+        Returns
+        -------
+        bool
+            True if point is illuminated, False otherwise
+        """
         r = self.config.radius
         r_avg = self.config.illumination_params.avg_rad_Earth2Sun
         chief_properties = self.config.illumination_params.chief_properties
@@ -354,19 +384,7 @@ class InspectionPoints:
 
     def update_points_position(self):
         """
-        Return the new locations of the points on the chief after rotation
-
-        Parameters
-        ----------
-        points: list
-            points on spherical chief
-        current_quat:
-            current attitude of chief according to propagation with angular velocities
-
-        Returns
-        -------
-        newPoints: dict
-            rotated points on the chief
+        Update the locations of the points on the chief after rotation
         """
 
         # get parent entity info
@@ -431,6 +449,8 @@ class InspectionSimulatorState(SafeRLSimulatorState):
     """
     The basemodel for the state of the InspectionSimulator.
 
+    Attributes
+    ----------
     inspection_points_map: dict
         The dictionary containing the points the agent needs to inspect.
         Keys: point_id int. Values: InspectionPoints objects.
@@ -458,9 +478,11 @@ class InspectionSimulatorState(SafeRLSimulatorState):
 
 class InspectionSimulatorValidator(SafeRLSimulatorValidator):
     """
-    A validator for the InspectionSimulator config.
+    A configuration validator for the InspectionSimulator config.
 
-    illumination_params: typing.Union[IlluminationValidator, None] = None
+    Attributes
+    ----------
+    illumination_params: IlluminationValidator
         dict of illumination parameters, described above
     steps_until_update: int
         Number of steps between updates to the delta_v_scale
@@ -501,11 +523,11 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
 
 class InspectionSimulatorResetValidator(SafeRLSimulatorResetValidator):
     """
-    A validator for the InspectionSimulator reset.
+    A configuration validator for the InspectionSimulator reset method.
 
-    priority_vector_azimuth_angle: typing.Union[Quantity, float]
+    priority_vector_azimuth_angle: Quantity, float
         Azimuth angle of the priority vector for weighting points
-    priority_vector_elevation_angle: typing.Union[Quantity, float]
+    priority_vector_elevation_angle: Quantity, float
         Elevation angle of the priority vector for weighting points
     """
     priority_vector_azimuth_angle: typing.Union[Quantity, float] = 0.0
@@ -564,7 +586,7 @@ class InspectionSimulator(SafeRLSimulator):
 
     def create_inspection_points_map(self):
         """
-        create map of inspection points for each entity
+        Create map of inspection points for each entity
         """
         points_map = {}
         for entity_name, inspection_points_validator in self.config.inspection_points_map.items():

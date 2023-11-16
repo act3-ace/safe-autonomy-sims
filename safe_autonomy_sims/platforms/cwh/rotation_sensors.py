@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Contains implementations of sensors that can be used in junction with the six dof CWH platform.
+This module implements rotation sensor for use with the CWHSixDofPlatform
 """
 import numpy as np
 from scipy.spatial.transform import Rotation as R

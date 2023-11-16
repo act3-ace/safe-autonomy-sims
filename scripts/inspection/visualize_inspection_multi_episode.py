@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+"""
 from safe_autonomy_sims.evaluation.evaluation_api import run_one_evaluation
 from safe_autonomy_sims.evaluation.launch.serialize_cwh3d import SerializeCWH3D
 from inspection_multi_episode_6dof import MultiEpisodeAnimationFromCheckpoint

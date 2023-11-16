@@ -24,8 +24,10 @@ from safe_autonomy_sims.utils import get_closest_fft_distance, get_relative_posi
 
 class ObservedPointsRewardValidator(RewardFuncBaseValidator):
     """
-    Configuration validator for ObservedPointsReward.
+    A configuration validator for ObservedPointsReward.
 
+    Attributes
+    ----------
     scale : float
         A scalar value applied to reward.
     inspection_entity_name: str
@@ -40,41 +42,7 @@ class ObservedPointsRewardValidator(RewardFuncBaseValidator):
 
 class ObservedPointsReward(RewardFuncBase):
     """
-    Calculates reward based on the number of new
-    points inspected by the agent.
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : np.ndarray
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for the number of new points inspected.
+    Calculates reward based on the number of new points inspected by the agent.
     """
 
     def __init__(self, **kwargs):
@@ -86,9 +54,6 @@ class ObservedPointsReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return ObservedPointsRewardValidator
 
     def __call__(
@@ -122,8 +87,10 @@ class ObservedPointsReward(RewardFuncBase):
 
 class ChiefDistanceRewardValidator(RewardFuncBaseValidator):
     """
-    Configuration validator for ChiefDistanceReward.
+    A configuration validator for ChiefDistanceReward.
 
+    Attributes
+    ----------
     scale : float
         A scalar value applied to reward.
     punishment_reward : float
@@ -146,39 +113,6 @@ class ChiefDistanceRewardValidator(RewardFuncBaseValidator):
 class ChiefDistanceReward(RewardFuncBase):
     """
     Calculates reward based on the distance from chief.
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : np.ndarray
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for the number of new points inspected.
     """
 
     def __init__(self, **kwargs):
@@ -188,9 +122,6 @@ class ChiefDistanceReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return ChiefDistanceRewardValidator
 
     def __call__(
@@ -223,8 +154,10 @@ class ChiefDistanceReward(RewardFuncBase):
 
 class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingDeltaVReward Reward Function.
+    A configuration validator for DockingDeltaVReward
 
+    Attributes
+    ----------
     bias : float
         A bias value added to the reward.
     step_size : float
@@ -250,43 +183,6 @@ class InspectionDeltaVRewardValidator(RewardFuncBaseValidator):
 class InspectionDeltaVReward(RewardFuncBase):
     """
     Calculates reward based on the agent's fuel consumption measured in delta-v.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method retrieves the current thrust control applied by the agent (delta v), which is used to calculate and
-    return a proportional reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : OrderedDict
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -328,9 +224,6 @@ class InspectionDeltaVReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return InspectionDeltaVRewardValidator
 
     def __call__(
@@ -361,8 +254,10 @@ class InspectionDeltaVReward(RewardFuncBase):
 
 class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the InspectionSuccessReward Reward Function.
+    A configuration validator for the InspectionSuccessReward Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     inspection_entity_name: str
@@ -379,42 +274,6 @@ class InspectionSuccessRewardValidator(RewardFuncBaseValidator):
 class InspectionSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful inspection.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method determines if the agent has succeeded and returns an appropriate reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -423,9 +282,6 @@ class InspectionSuccessReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return InspectionSuccessRewardValidator
 
     def __call__(
@@ -458,6 +314,10 @@ class InspectionSuccessReward(RewardFuncBase):
 
 class SafeInspectionSuccessRewardValidator(InspectionSuccessRewardValidator):
     """
+    A configuration validator for SafeInspectionSuccessReward
+
+    Attributes
+    ----------
     mean_motion : float
         orbital mean motion in rad/s of current Hill's reference frame
     crash_region_radius : float
@@ -485,9 +345,6 @@ class SafeInspectionSuccessReward(InspectionSuccessReward):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return SafeInspectionSuccessRewardValidator
 
     def __call__(
@@ -519,8 +376,10 @@ class SafeInspectionSuccessReward(InspectionSuccessReward):
 
 class InspectionCrashRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the InspectionCollisionRewardValidator Reward Function.
+    A configuration validator for the InspectionCollisionRewardValidator Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     crash_region_radius : float
@@ -536,42 +395,6 @@ class InspectionCrashRewardValidator(RewardFuncBaseValidator):
 class InspectionCrashReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a collision.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method determines if the agent had failed the task and allocates an appropriate reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -580,9 +403,6 @@ class InspectionCrashReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return InspectionCrashRewardValidator
 
     def __call__(
@@ -613,8 +433,10 @@ class InspectionCrashReward(RewardFuncBase):
 
 class MaxDistanceRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the InspectionCollisionRewardValidator Reward Function.
+    A configuration validator for the InspectionCollisionRewardValidator Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     crash_region_radius : float
@@ -630,42 +452,6 @@ class MaxDistanceRewardValidator(RewardFuncBaseValidator):
 class MaxDistanceReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a collision.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method determines if the agent had failed the task and allocates an appropriate reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -674,9 +460,6 @@ class MaxDistanceReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return MaxDistanceRewardValidator
 
     def __call__(

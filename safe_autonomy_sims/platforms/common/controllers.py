@@ -49,8 +49,10 @@ class CommonController(BaseController):
 
 class RateControllerValidator(BasePlatformPartValidator):
     """
-    Generic rate controller validator.
+    A configuration validator for RateController
 
+    Attributes
+    ----------
     axis: int
         Index in combined control vector for this controller's output action.
     """
@@ -59,8 +61,10 @@ class RateControllerValidator(BasePlatformPartValidator):
 
 class ControllerPropValidator(BaseModel):
     """
-    Controller Prop validator.
+    A configuration validator for ControllerProp
 
+    Attributes
+    ----------
     property_class: PyObject
         The Prop class defining the controller's bounds and units
     """

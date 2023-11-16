@@ -36,6 +36,11 @@
         {"part": "Sensor_InspectedPointsScore", "config": {"inspector_entity_name": "blue0"}},
         {"part": "Sensor_Quaternion"},
         {"part": "Sensor_AngularVelocity"},
+        {"part": "Sensor_OrientationUnitVector"},
+        {"part": "Sensor_RotatedAxes"},
+        {"part": "Sensor_OrbitStability"},
+        {"part": "Sensor_RelativePosition", "config": {"name": "Sensor_RelativeChiefPosition", "entity_name": "chief"}},
+        {"part": "Sensor_RelativeVelocity", "config": {"name": "Sensor_RelativeChiefVelocity", "entity_name": "chief"}},
     ],
     "episode_parameter_provider": {
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -136,181 +141,19 @@
     },
     "glues": [
         # CoRL glue configurations. Glues define the action and observation space
-        {
-            # X-Axis Thrust Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config": {
-                "controller": "X Thrust",
-                "training_export_behavior": "EXCLUDE",
-                "normalization": {
-                  "enabled": False,
-                }
-            },
-        },
-        {
-            # Y-Axis Thrust Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-                "controller": "Y Thrust",
-                "training_export_behavior": "EXCLUDE",
-                "normalization": {
-                  "enabled": False,
-                }
-            }
-        },
-        {
-            # Z-Axis Thrust Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Z Thrust",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # X Moment Controller Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "X Moment",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # Y Moment Controller Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Y Moment",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # Z Moment Controller Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Z Moment",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # Position Sensor Glue (observation space)
-            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-            "config": {
-              "sensor": "Sensor_Position",
-              "output_units": "m",
-              "normalization": {
-                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-                "config": {
-                  "mu": 0.0,
-                  "sigma": [100, 100, 100],
-                }
-              }
-            },
-        },
-        {
-            # Velocity Sensor Glue (observation space)
-            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-            "config": {
-              "sensor": "Sensor_Velocity",
-              "output_units": "m/s",
-              "normalization": {
-                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-                "config": {
-                  "mu": 0.0,
-                  "sigma": [0.5, 0.5, 0.5],
-              }
-            },
-          },
-        },
-        {
-          # Inspected Points Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_InspectedPoints",
-            "normalization": {
-              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-              "config": {
-                "mu": 0.0,
-                "sigma": [100.0],
-              },
-            },
-          },
-        },
-        {
-          # Uninspected Points Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_UninspectedPoints",
-            "output_units": "m",
-            "normalization": {
-                "enabled": False
-          ``},
-          },
-        },
-        {
-          # Sun Angle Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_SunAngle",
-            "normalization": {
-              "enabled": False
-            },
-          },
-        },
-        {
-          # Priority Vector Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_PriorityVector",
-            "normalization": {
-              "enabled": False
-            },
-          },
-        },
-        {
-          # Inspected Points Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_InspectedPointsScore",
-            "normalization": {
-                "enabled": False
-            },
-          },
-        },
-        {
-          # Orientation Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_Quaternion",
-            "normalization": {
-                "enabled": False
-            },
-          },
-        },
-        {
-          # Angular Velocity Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_AngularVelocity",
-            "normalization": {
-              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-              "config": {
-                "mu": 0.0,
-                "sigma": [0.05, 0.05, 0.05],
-              }
-            }
-          },
-        },
+
+        # Controller glues
+        !include-extend ./glues/controllers.yml,
+
+        ### Observations ###
+        # Position and Velocity Obs
+        !include-extend ./glues/translation_obs.yml,
+
+        # Orientation Obs
+        !include-extend ./glues/orientation_obs.yml,
+
+        # Inspection-Specific Obs
+        !include-extend ./glues/inspection_obs.yml,
     ],
     "dones": [
         {
@@ -391,11 +234,49 @@
             },
         },
         {
+            "name": "MaxDistanceDoneReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.done_state_rewards.WinLoseDoneReward",
+            "config": {
+                "scale": -1.0,
+                "done_name": "MaxDistanceDoneFunction",
+                "done_status": "lose"
+            },
+        },
+        {
+            "name": "LiveTimestepReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.live_timestep_reward.LiveTimestepReward",
+            "config": {
+                "step_reward": 0.001,  # Can also try 1.0 / (max_time_rewarded / step_size)
+                "max_time_rewarded": 3000.0  # Earn step_reward for every timestep up until this sim_time
+            }
+        },
+        {
+          "name": "FacingChiefReward",
+          "functor": "safe_autonomy_sims.rewards.cwh.gaussian_decay_from_target_value.GaussianDecayFromTargetValue",
+          "config":
+            {
+              "observation":
+                {
+                  "fields":
+                    [
+                      "Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition",
+                      "direct_observation",
+                    ],
+                },
+              "eps": .15,
+              "reward_scale": 0.0005,
+              "index": 0, 
+              "target_value": 1.0,
+              "max_diff": 1.0,
+            },
+        },
+        {
             "name": "InspectionDeltaVReward",
             # See delta-v reward scale parameters in env config
             "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
             "config": {
                 "mode": "scale",
+                "constant_scale": -0.005
             },
             "references": {
                 "step_size": "step_size",
@@ -403,5 +284,5 @@
             },
         },
     ],
-    "reference_store": !include configs/multiagent-six-dof-inspection/parameters.yml
+    "reference_store": !include configs/weighted-six-dof-inspection/parameters.yml
 }

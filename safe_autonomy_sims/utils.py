@@ -10,8 +10,6 @@ limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
 This module contains various utility functions.
-
-Author: Jamie Cunningham
 """
 import typing
 
@@ -82,8 +80,6 @@ def get_relative_position(platform: BasePlatform, reference_position_sensor_name
 
     Parameters
     ----------
-    state: BaseSimulatorState
-        The current state of the system
     platform: BasePlatform
         The name of the platform whose relative position will be returned
     reference_position_sensor_name: str
@@ -199,8 +195,10 @@ def max_vel_violation(relative_position, relative_velocity, velocity_threshold, 
 
 class VelocityConstraintValidator(BaseModel):
     """
-    Validator for velocity constraint configuration options.
+    A configuration validator for velocity constraint configuration options.
 
+    Attributes
+    ----------
     velocity_threshold : float
         The maximum tolerated velocity within crashing region without crashing.
     threshold_distance : float

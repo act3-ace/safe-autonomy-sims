@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module implements the Reward Functions and Reward Validators specific to the inspection task.
+This module implements reward functions based on done status
 """
 from collections import OrderedDict
 from functools import partial
@@ -22,7 +22,17 @@ from corl.libraries.state_dict import StateDict
 
 
 class WinLoseDoneRewardValidator(EpisodeDoneStateRewardValidator):
-    """Validation for WinLoseDoneReward"""
+    """A configuration validator for WinLoseDoneReward
+    
+    Attributes
+    ----------
+    done_name : str
+        name of done to generate reward from 
+    done_status : str
+        done status code to generate reward from
+    scale : float
+        reward scaling value
+    """
     done_name: str
     done_status: str = "lose"
     scale: float = -1.0

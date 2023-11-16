@@ -7,15 +7,7 @@ authors:
 date: 2023-10-29
 ---
 
----
-
 # Translational Single Spacecraft Inspection With Illumination and Weighted Inspection Points
-
-POCs: David van Wijk, Kyle Dunlap, Nate Hamilton, and Kerianne Hobbs
-
-Last Updated: Oct 29, 2023
-
----
 
 ## Motivation
 
@@ -37,10 +29,8 @@ python -m corl.train_rl --cfg configs/translational-inspection/experiment.yml
 
 In this inspection environment, the goal is for a single deputy spacecraft, controlled by a RL agent, to navigate around and inspect the entire surface of a chief spacecraft. This is shown in the image below.
 
-<figure markdown>
-  ![Basic Inspection Problem](../../images/inspection_problem.png){width=300}
-  <figcaption>Figure: The single spacecraft inspection problem without illumination.</figcaption>
-</figure>
+![Basic Inspection Problem](../../images/inspection_problem.png)
+*Figure: The single spacecraft inspection problem without illumination.*
 
 The chief is covered in 100 inspection points that the agent must observe while they are illuminated by the moving sun. The points are weighted by priority, such that it is more important to inspect some points than others. A unit vector is used to indicate the direction of highest importance, where points are weighted based on their angular distance to this vector. All point weights add up to a value of one. The optimal policy will inspect points whose cumulative weight exceeds 0.95 within 2 revolutions of the sun while using as little fuel as possible. In this translational inspection environment, the agent only controls its translational motion and is always assumed to be pointing at the chief spacecraft. __Note: the policy selects a new action every 10 seconds__
 
@@ -56,12 +46,12 @@ The chief is covered in 100 inspection points that the agent must observe while 
 At each timestep, the agent receives the observation, $o = [x, y, z, v_x, v_y, v_z, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}, x_{pv}, y_{pv}, z_{pv}, w_{points}]$, where:
 
 * $x, y,$ and $z$ represent the deputy's position in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
+    * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
 * $v_x, v_y,$ and $v_z$ represent the deputy's directional velocity in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
 * $\theta_{sun}$ is the angle of the sun,
 * $n$ is the number of points that have been inspected so far and,
-  * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
+    * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
 * $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vector elements pointing to the nearest large cluster of unispected points as determined by the *Uninspected Points Sensor*.
 * $x_{pv}, y_{pv},$ and $z_{pv}$ are the unit vector elements pointing to the priority vector indicating point priority.
 * $w_{points}$ is the cumulative weight of inpsected points
@@ -123,25 +113,25 @@ At the start of any episode, the state is randomly initialized with the followin
 * chief radius = $10 m$
 * chief # of points = $100$
 * priority unit vector orientation for point weighting is randomly sampled from a uniform distribution using polar notation $(\phi, \psi)$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$ 
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
 * deputy position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
-  * $r \in [50, 100] m$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $x = r \cos{\psi} \cos{\phi}$
-  * $y = r \sin{\psi} \cos{\phi}$
-  * $z = r \sin{\phi}$
+    * $r \in [50, 100] m$
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $x = r \cos{\psi} \cos{\phi}$
+    * $y = r \sin{\psi} \cos{\phi}$
+    * $z = r \sin{\phi}$
 * deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
-  * $v \in [0, 0.3]$ m/s
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $v_x = v \cos{\psi} \cos{\phi}$
-  * $v_y = v \sin{\psi} \cos{\phi}$
-  * $v_z = v \sin{\phi}$
+    * $v \in [0, 0.3]$ m/s
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $v_x = v \cos{\psi} \cos{\phi}$
+    * $v_y = v \sin{\psi} \cos{\phi}$
+    * $v_z = v \sin{\phi}$
 * Initial sun angle is randomly selected using a uniform distribution
-  * $\theta_{sun} \in [0, 2\pi] rad$
-  * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
+    * $\theta_{sun} \in [0, 2\pi] rad$
+    * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
 
 ### Done Conditions
 

@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Contains implementations of sensors that can be used in junction with the CWH platform.
+This module implements sensors for CWH platforms.
 """
 import typing
 
@@ -65,8 +65,10 @@ class PositionSensor(CWHSensor):
 
 class RelativePositionSensorValidator(BasePlatformPartValidator):
     """
-    Validator for RelativePositionSensor
+    A configuration validator for RelativePositionSensor
 
+    Attributes
+    ----------
     entity_name: str
         The name of the entity the position of which is to be returned.
     """
@@ -135,8 +137,10 @@ class VelocitySensor(CWHSensor):
 
 class RelativeVelocitySensorValidator(BasePlatformPartValidator):
     """
-    Validator for RelativeVelocitySensor
+    A configuration validator for RelativeVelocitySensor
 
+    Attributes
+    ----------
     entity_name: str
         The name of the entity the velocity of which is to be returned.
     """
@@ -184,8 +188,10 @@ class RelativeVelocitySensor(CWHSensor):
 
 class InspectedPointsSensorValidator(BasePlatformPartValidator):
     """
-    Validator for InspectedPointsSensor
+    A configuration validator for InspectedPointsSensor
 
+    Attributes
+    ----------
     inspector_entity_name: str
         The name of the entity performing inspection.
     """
@@ -279,8 +285,10 @@ class SunVectorSensor(CWHSensor):
 
 class UninspectedPointsSensorValidator(BasePlatformPartValidator):
     """
-    Validator for InspectedPointsSensor
+    A configuration validator for InspectedPointsSensor
 
+    Attributes
+    ----------
     inspector_entity_name: str
         The name of the entity performing inspection.
     inspection_entity_name: str
@@ -343,7 +351,12 @@ class UninspectedPointsSensor(CWHSensor):
 # entity position sensors
 class EntitySensorValidator(BasePlatformPartValidator):
     """
-    Validator for the EntitySensors
+    A configuration validator for the various EntitySensors
+
+    Attributes
+    ----------
+    entity_name : str
+        name of the entity to sense
     """
     entity_name: str
 
@@ -426,8 +439,10 @@ class EntityVelocitySensor(CWHSensor):
 
 class BoolArraySensorValidator(BasePlatformPartValidator):
     """
-    Validator for BoolArraySensor.
+    A configuration validator for BoolArraySensor.
 
+    Attributes
+    ----------
     inspection_entity_name: str
         The name of the entity under inspection.
     """
@@ -498,8 +513,10 @@ class PriorityVectorSensor(CWHSensor):
 
 class InspectedPointsScoreSensorValidator(BasePlatformPartValidator):
     """
-    Validator for InspectedPointsScoreSensor
+    A configuration validator for InspectedPointsScoreSensor
 
+    Attributes
+    ----------
     inspection_entity_name: str
         The name of the entity under inspection.
     """

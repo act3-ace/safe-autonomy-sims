@@ -1,5 +1,15 @@
 """
-This class defines an experiemnt class which runs training episodes via ray rllib's API.
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
+
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
+This module defines an experiment class which runs training episodes via ray rllib's API.
 This is useful for debugging and validating new environments and can easily be modified to log state data.
 """
 # pylint: disable=C0301,R0914,R1732,W0612,R0915
@@ -23,9 +33,16 @@ from corl.libraries.factory import Factory
 class RllibAPIExperimentValidator(RllibExperimentValidator):
     """
     The validator for the RllibAPIExperiment class.
+
+    Attributes
+    ----------
+    serialized_ray_config_path: str
+        path to params.pkl file
+    trained_models_checkpoint_path: str
+        path to checkpoint directory 
     """
-    serialized_ray_config_path: str  # path to params.pkl file
-    trained_models_checkpoint_path: str  # path to checkpoint directory
+    serialized_ray_config_path: str
+    trained_models_checkpoint_path: str
 
 
 class RllibAPIExperiment(RllibExperiment):

@@ -42,8 +42,10 @@ class SafeRLSimulatorValidator(
 
 class InitializerResetValidator(BaseModel):
     """
-    A validator for the Initializaer config.
+    A configuration validator for the Initializer reset config.
 
+    Attributes
+    ----------
     functor: str
         The class module of the Initializer to be instantiated.
     config: dict
@@ -54,9 +56,9 @@ class InitializerResetValidator(BaseModel):
 
 
 class AgentResetParamsValidator(BaseModel):
-    """Validator for Agent platform reset parameters
+    """A configuration validator for Agent platform reset parameters
 
-    Parameters
+    Attributes
     ----------
     initializer: InitializerResetValidator
         params for bulding an initializer object
@@ -68,9 +70,9 @@ class AgentResetParamsValidator(BaseModel):
 
 
 class AdditionalEntityValidator(BaseModel):
-    """_summary_
+    """A configuration validator for additional sim entities
 
-    Parameters
+    Attributes
     ----------
     platform: str
         Name of platform type that can be found in sim's platform map
@@ -102,9 +104,9 @@ class AdditionalEntityValidator(BaseModel):
 
 class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
     """
-    Validator for SafeRLSimulator reset configs.
+    A configuration validator for the SafeRLSimulator reset method.
 
-    Parameters
+    Attributes
     ----------
     platforms: dict
         Contains individual initialization dicts for each agent.
@@ -124,11 +126,12 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
 
 class SafeRLSimulatorState(BaseSimulatorState):
     """
-    The basemodel for the state of the InspectionSimulator.
+    The basemodel for the state of the SafeRLSimulator.
 
-    points: dict
-        The dictionary containing the points the agent needs to inspect.
-        Keys: (x,y,z) tuple. Values: True if inspected, False otherwise.
+    Attributes
+    ----------
+    dict
+        simulation entities
     """
     sim_entities: typing.Dict
 
@@ -362,9 +365,12 @@ class SafeRLSimulator(BaseSimulator):
         Takes in the done_info specifying how the episode completed
         and does any book keeping around ending an episode
 
-        Arguments:
-            done_info {OrderedDict} -- The Dict describing which Done conditions ended an episode
-            episode_state {OrderedDict} -- The episode state at the end of the simulation
+        Parameters
+        ----------
+        done_info : OrderedDict
+            The Dict describing which Done conditions ended an episode
+        episode_state : OrderedDict
+            The episode state at the end of the simulation
         """
 
     def save_episode_information(self, dones, rewards, observations, observation_units):

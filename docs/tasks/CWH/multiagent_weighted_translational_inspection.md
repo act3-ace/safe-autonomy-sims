@@ -7,15 +7,7 @@ authors:
 date: 2023-10-29
 ---
 
----
-
 # Translational Multi-Spacecraft Inspection With Illumination and Weighted Inspection Points
-
-POCs: David van Wijk, Kyle Dunlap, Nate Hamilton, and Kerianne Hobbs
-
-Last Updated: Oct 29, 2023
-
----
 
 ## Motivation
 
@@ -52,13 +44,13 @@ The chief is covered in 100 inspection points that the agents must collectively 
 At each timestep, each agent receives the observation, $o = [x, y, z, v_x, v_y, v_z, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}, x_{pv}, y_{pv}, z_{pv}, w_{points}]$, where:
 
 * $x, y,$ and $z$ represent the deputy's position in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
+    * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
 * $v_x, v_y,$ and $v_z$ represent the deputy's directional velocity in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
 * $\theta_{sun}$ is the angle of the sun,
 * $n$ is the number of points that have been inspected so far and,
-  * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
-* $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vector elements pointing to the nearest large cluster of unispected points as determined by the *Uninspected Points Sensor*.
+    * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
+* $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vector elements pointing to the nearest large cluster of unispected points as determined by the _Uninspected Points Sensor_.
 * $x_{pv}, y_{pv},$ and $z_{pv}$ are the unit vector elements pointing to the priority vector indicating point priority.
 * $w_{points}$ is the cumulative weight of inpsected points
 
@@ -82,21 +74,21 @@ where the state $\boldsymbol{x}=[x,y,z,\dot{x},\dot{y},\dot{z}]^T \in \mathcal{X
 $$
     A =
 \begin{bmatrix}
-0 & 0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 0 & 0 & 1 \\
-3n^2 & 0 & 0 & 0 & 2n & 0 \\
-0 & 0 & 0 & -2n & 0 & 0 \\
-0 & 0 & -n^2 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 1 \\
+    3n^2 & 0 & 0 & 0 & 2n & 0 \\
+    0 & 0 & 0 & -2n & 0 & 0 \\
+    0 & 0 & -n^2 & 0 & 0 & 0 \\
 \end{bmatrix},
     B =
 \begin{bmatrix}
- 0 & 0 & 0 \\
- 0 & 0 & 0 \\
- 0 & 0 & 0 \\
-\frac{1}{m} & 0 & 0 \\
-0 & \frac{1}{m} & 0 \\
-0 & 0 & \frac{1}{m} \\
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    \frac{1}{m} & 0 & 0 \\
+    0 & \frac{1}{m} & 0 \\
+    0 & 0 & \frac{1}{m} \\
 \end{bmatrix},
 $$
 
@@ -111,15 +103,6 @@ We use a mix of sparse and dense rewards to define the desired behavior. These a
 * `InspectionCrashOriginReward` is a sparse reward that punishes each agent for crashing with the chief spacecraft. $r = -1$ if $radius < crash\_region\_radius$, else 0.
 * `InspectionRTAReward` is a sparse reward that assigns a punishment for using the RTA if included in the environment. $r = -0.01$ if $intervene$, else 0.
 * `InspectionDeltaVReward` is a dense reward that assigns a cost to using the thrusters that can be thought of similar to a fuel cost, $r = -0.1||\boldsymbol{u}||$
-  * During the training of our [baseline agent](baseline_agents.md), this reward follows a reward schedule and $r = -w||\boldsymbol{u}||$, where $w$ is the scale of the reward. Training begins with $w = 0.001$, and increases by $0.0001$ every iteration where 90% of points are inspected on average ($w_{max}=0.1$).
-
-<!-- | Description | Calculation | Weight |
-|-------------|-------------|--------|
-| `ObservedPointsReward` rewards the agent +1 for every new point inspected in a timestep. The episode total for this reward will max at 1. | $num\_inspected\_points_i - num\_inspected\_points_{i-1}$ | 0.01 |
-| `InspectionSuccessReward` rewards the agent for successfully inspecting all the points with a vlaue of 1. | if $num\_inspected\_points_i == 100$ then +1, else +0 | 1 |
-| `InspectionCrashOriginReward` punishes the agent for crashing with the chief spacecraft. | if $radius < crash\_region\_radius$ -10, else +0 | 1 |
-| `InspectionRTAReward` assigns a punishment for using the RTA if included in the environment. | if $intervene$ then -1, else +0 | 0.01 |
-| `InspectionDeltaVReward` assigns a cost to using the thrusters that can be thought of similar to a fuel cost. | Described below | 1 | -->
 
 ### Initial Conditions
 
@@ -129,27 +112,25 @@ At the start of any episode, the state is randomly initialized with the followin
 * chief radius = $10 m$
 * chief # of points = $100$
 * priority unit vector orientation for point weighting is randomly sampled from a uniform distribution using polar notation $(\phi, \psi)$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$ 
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
 * each deputy's position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
-  * $r \in [50, 100] m$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $x = r \cos{\psi} \cos{\phi}$
-  * $y = r \sin{\psi} \cos{\phi}$
-  * $z = r \sin{\phi}$
+    * $r \in [50, 100] m$
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $x = r \cos{\psi} \cos{\phi}$
+    * $y = r \sin{\psi} \cos{\phi}$
+    * $z = r \sin{\phi}$
 * each deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
-  * $v \in [0, 0.3]$ m/s
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $v_x = v \cos{\psi} \cos{\phi}$
-  * $v_y = v \sin{\psi} \cos{\phi}$
-  * $v_z = v \sin{\phi}$
+    * $v \in [0, 0.3]$ m/s
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $v_x = v \cos{\psi} \cos{\phi}$
+    * $v_y = v \sin{\psi} \cos{\phi}$
+    * $v_z = v \sin{\phi}$
 * Initial sun angle is randomly selected using a uniform distribution
-  * $\theta_{sun} \in [0, 2\pi] rad$
-  * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
-
-<!-- $\psi$ is azimuth angle and $\phi$ is elevation angle -->
+    * $\theta_{sun} \in [0, 2\pi] rad$
+    * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
 
 ### Done Conditions
 
@@ -170,7 +151,7 @@ Similarly, previous work has been done to solve the inspection problem using bot
 
 ## Configuration Files
 
-Written out below are the core configuration files necessary for recreating the environment as described above. These are the *Environment Config* found in `configs/multiagent-weighted-translational-inspection/environment.yml` and the *Agent Config* found in `configs/multiagent-weighted-translational_inspection/agent.yml`.
+Written out below are the core configuration files necessary for recreating the environment as described above. These are the _Environment Config_ found in `configs/multiagent-weighted-translational-inspection/environment.yml` and the _Agent Config_ found in `configs/multiagent-weighted-translational_inspection/agent.yml`.
 
 <details>
 <summary>Environment Config</summary>
@@ -563,11 +544,11 @@ From `configs/multiagent-weighted-translational-inspection/agent.yml`:
 ## References
 
 <a id="1">[1]</a>
-Clohessy, W., and Wiltshire, R., “Terminal Guidance System for Satellite Rendezvous,” *Journal of the Aerospace Sciences*, Vol. 27, No. 9, 1960, pp. 653–658.
+Clohessy, W., and Wiltshire, R., “Terminal Guidance System for Satellite Rendezvous,” _Journal of the Aerospace Sciences_, Vol. 27, No. 9, 1960, pp. 653–658.
 
 <a id="2">[2]</a>
 Dunlap, K., Mote, M., Delsing, K., and Hobbs, K. L., “Run Time Assured Reinforcement Learning for Safe Satellite
-Docking,” *Journal of Aerospace Information Systems*, Vol. 20, No. 1, 2023, pp. 25–36. [https://doi.org/10.2514/1.I011126](https://doi.org/10.2514/1.I011126).
+Docking,” _Journal of Aerospace Information Systems_, Vol. 20, No. 1, 2023, pp. 25–36. [https://doi.org/10.2514/1.I011126](https://doi.org/10.2514/1.I011126).
 
 <a id="3">[3]</a>
 Gaudet, B., Linares, R., and Furfaro, R., “Adaptive Guidance and Integrated Navigation with Reinforcement Meta-Learning,”
@@ -586,12 +567,12 @@ Landing,” 2018.
 
 <a id="7">[7]</a>
 Lei, H. H., Shubert, M., Damron, N., Lang, K., and Phillips, S., “Deep reinforcement Learning for Multi-agent Autonomous
-Satellite Inspection,” *AAS Guidance Navigation and Control Conference*, 2022.
+Satellite Inspection,” _AAS Guidance Navigation and Control Conference_, 2022.
 
 <a id="8">[8]</a>
 Aurand, J., Lei, H., Cutlip, S., Lang, K., and Phillips, S., “Exposure-Based Multi-Agent Inspection of a Tumbling Target Using
-Deep Reinforcement Learning,” *AAS Guidance Navigation and Control Conference*, 2023.
+Deep Reinforcement Learning,” _AAS Guidance Navigation and Control Conference_, 2023.
 
 <a id="9">[9]</a>
 Brandonisio, A., Lavagna, M., and Guzzetti, D., “Reinforcement Learning for Uncooperative Space Objects Smart Imaging
-Path-Planning,” The *Journal of the Astronautical Sciences*, Vol. 68, No. 4, 2021, pp. 1145–1169. [https://doi.org/10.1007/s40295-021-00288-7](https://doi.org/10.1007/s40295-021-00288-7).
+Path-Planning,” The _Journal of the Astronautical Sciences_, Vol. 68, No. 4, 2021, pp. 1145–1169. [https://doi.org/10.1007/s40295-021-00288-7](https://doi.org/10.1007/s40295-021-00288-7).

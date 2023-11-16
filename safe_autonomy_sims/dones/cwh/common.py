@@ -9,7 +9,8 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Functions that define the terminal conditions for CWH Spacecraft Environments.
+This module implements functions which define the terminal conditions
+for the CWH spacecraft environments.
 """
 import typing
 
@@ -24,8 +25,10 @@ from safe_autonomy_sims.utils import VelocityConstraintValidator, get_relative_p
 
 class MaxDistanceDoneValidator(DoneFuncBaseValidator):
     """
-    Configuration validator for the MaxDistanceDoneFunction
+    A configuration validator for the MaxDistanceDoneFunction
 
+    Attributes
+    ----------
     max_distance: float
         The maximum tolerated relative distance between deputy and origin before episode termination.
     reference_position_sensor_name: str
@@ -41,37 +44,10 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     A done function that determines if the agent is
     beyond a maximum distance from the origin.
 
-
-    def __call__(
-        self,
-        observation,
-        action,relavtive_distance = np.linalg.norm(np.array(position) - chief_position)
-
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units
-    ) -> bool:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-
-    Returns
-    -------
-    done : bool
-        Dictionary containing the done condition for the current agent.
+    config: MaxDistanceDoneValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -81,9 +57,8 @@ class MaxDistanceDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
@@ -101,6 +76,27 @@ class MaxDistanceDoneFunction(DoneFuncBase):
         observation_space: gymnasium.spaces.dict.Dict,
         observation_units: gymnasium.spaces.dict.Dict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         # compute distance to reference entity
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -117,8 +113,10 @@ class MaxDistanceDoneFunction(DoneFuncBase):
 
 class CrashDoneValidator(DoneFuncBaseValidator):
     """
-    Configuration validator for CrashDoneFunction
+    A configuration validator for the CrashDoneFunction.
 
+    Attributes
+    ----------
     crash_region_radius : float
         The radius of the crashing region in meters.
     velocity_constraint : VelocityConstraintValidator
@@ -136,37 +134,13 @@ class CrashDoneValidator(DoneFuncBaseValidator):
 
 class CrashDoneFunction(DoneFuncBase):
     """
-    A done function that determines if deputy has crashed with the chief (at origin).
+    A done function which determines if deputy has crashed
+    with the chief situated at the origin.
 
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units
-    ) -> bool:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-
-    Returns
-    -------
-    done : bool
-        Dictionary containing the done condition for the current agent.
+    config: CrashDoneValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -176,9 +150,8 @@ class CrashDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
@@ -197,6 +170,27 @@ class CrashDoneFunction(DoneFuncBase):
         observation_space: gymnasium.spaces.dict.Dict,
         observation_units: gymnasium.spaces.dict.Dict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         # Get relatative position + velocity between platform and docking region
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -230,8 +224,11 @@ class CrashDoneFunction(DoneFuncBase):
 
 
 class TerminalRewardSaturationDoneFunctionValidator(DoneFuncBaseValidator):
-    """Validator for TerminalRewardSaturationDoneFunction
+    """
+    A configuration validator for the TerminalRewardSaturationDoneFunction.
 
+    Attributes
+    ----------
     limit : float
         cumulative reward value limit. Done triggers when this limit value is reached
     bound: string
@@ -248,7 +245,15 @@ class TerminalRewardSaturationDoneFunctionValidator(DoneFuncBaseValidator):
 
 
 class TerminalRewardSaturationDoneFunction(DoneFuncBase):
-    """Triggers done condition when wrapped cumulative reward limit reached"""
+    """
+    A done function which checks if a cumulative reward limit
+    has been reached.
+
+    Attributes
+    ----------
+    config: TerminalRewardSaturationDoneFunctionValidator
+        The function's validated configuration parameters
+    """
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -266,13 +271,13 @@ class TerminalRewardSaturationDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
-        DockingRelativeVelocityConstraintDoneFunctionValidator : DoneFunctionValidator
+        TerminalRewardSaturationDoneFunctionValidator
+            Config validator for the TerminalRewardSaturationDoneFunction. 
         """
 
         return TerminalRewardSaturationDoneFunctionValidator
@@ -286,6 +291,27 @@ class TerminalRewardSaturationDoneFunction(DoneFuncBase):
         observation_space: gymnasium.spaces.dict.Dict,
         observation_units: gymnasium.spaces.dict.Dict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         reward_val = self.reward_function(
             observation, action, next_observation, next_state, next_state, observation_space, observation_units

@@ -9,8 +9,8 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Functions that define the terminal conditions for the Inspection Environment.
-This in turn defines whether the end of an episode has been reached.
+This module implements functions that define the terminal conditions
+for the inspection environment.
 """
 import typing
 from collections import OrderedDict
@@ -25,9 +25,10 @@ from safe_autonomy_sims.utils import get_closest_fft_distance
 
 class SuccessfulInspectionDoneValidator(DoneFuncBaseValidator):
     """
-    This class validates that the config contains the Inspection_region_radius data needed for
-    computations in the SuccessfulInspectionDoneFunction.
+    A configuration validator for the SuccessfulInspectionDoneValidator.
 
+    Attributes
+    ----------
     inspection_entity_name: str
         The name of the entity under inspection.
     weight_threshold : float
@@ -40,29 +41,13 @@ class SuccessfulInspectionDoneValidator(DoneFuncBaseValidator):
 
 class SuccessfulInspectionDoneFunction(DoneFuncBase):
     """
-    A done function that determines if the deputy has successfully inspected the chief.
+    A done function that determines if the deputy has successfully
+    inspected the chief.
 
-    def __call__(self, observation, action, next_observation, next_state):
-
-    Parameters
+    Attributes
     ----------
-    observation : OrderedDict
-        the current observation
-    action : OrderedDict
-        the current action
-    next_observation : OrderedDict
-        the incoming observation
-    next_state : StateDict
-        the incoming state
-    observation_space: StateDict
-        the observation space
-    observation_units: StateDict
-        the observation units
-
-    Returns
-    -------
-    done : bool
-        Dictionary containing the done condition for the current agent.
+    config: SuccessfulInspectionDoneValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -72,9 +57,8 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
@@ -92,6 +76,27 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : OrderedDict
+            the current observation
+        action : OrderedDict
+            the current action
+        next_observation : OrderedDict
+            the incoming observation
+        next_state : StateDict
+            the incoming state
+        observation_space: StateDict
+            the observation space
+        observation_units: StateDict
+            the observation units
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         if self.config.weight_threshold is not None:
             weight = next_state.inspection_points_map[self.config.inspection_entity_name].get_total_weight_inspected()
@@ -109,6 +114,10 @@ class SuccessfulInspectionDoneFunction(DoneFuncBase):
 
 class SafeSuccessfulInspectionDoneValidator(SuccessfulInspectionDoneValidator):
     """
+    A configuration validator for the SafeSuccessfulInspectionDoneFunction.
+
+    Attributes
+    ----------
     mean_motion : float
         orbital mean motion in rad/s of current Hill's reference frame
     crash_region_radius : float
@@ -123,8 +132,16 @@ class SafeSuccessfulInspectionDoneValidator(SuccessfulInspectionDoneValidator):
 
 class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
     """
-    A done function that determines if the deputy has successfully inspected the chief.
-    Considers if a Free Flight Trajectory once the episode ends would result in a collision.
+    A done function that determines if the deputy has successfully
+    inspected the chief.
+
+    Considers if a Free Flight Trajectory once the episode ends
+    **would not** result in a collision.
+
+    Attributes
+    ----------
+    config: SafeSuccessfulInspectionDoneValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -134,8 +151,13 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
     @staticmethod
     def get_validator():
         """
-        Config validator for the SafeSuccessfulInspectionDoneFunction.
-        """
+        Returns configuration validator object for this done
+        function.
+
+        Returns
+        -------
+        SafeSuccessfulInspectionDoneValidator
+            Config validator for the SafeSuccessfulInspectionDoneFunction.        """
         return SafeSuccessfulInspectionDoneValidator
 
     def __call__(
@@ -147,6 +169,27 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : OrderedDict
+            the current observation
+        action : OrderedDict
+            the current action
+        next_observation : OrderedDict
+            the incoming observation
+        next_state : StateDict
+            the incoming state
+        observation_space: StateDict
+            the observation space
+        observation_units: StateDict
+            the observation units
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         done = super().__call__(observation, action, next_observation, next_state, observation_space, observation_units)
 
@@ -168,8 +211,16 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
 
 class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
     """
-    A done function that determines if the deputy has successfully inspected the chief.
-    Considers if a Free Flight Trajectory once the episode ends would result in a collision.
+    A done function that determines if the deputy has successfully
+    inspected the chief.
+
+    Considers if a Free Flight Trajectory once the episode ends
+    **would** result in a collision.
+
+    Attributes
+    ----------
+    config: SafeSuccessfulInspectionDoneValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -179,7 +230,13 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
     @staticmethod
     def get_validator():
         """
-        Config validator for the SafeSuccessfulInspectionDoneFunction.
+        Returns configuration validator object for this done
+        function.
+
+        Returns
+        -------
+        SafeSuccessfulInspectionDoneValidator
+            Config validator for the CrashAfterSuccessfulInspectionDoneFunction.
         """
         return SafeSuccessfulInspectionDoneValidator
 
@@ -192,6 +249,27 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : OrderedDict
+            the current observation
+        action : OrderedDict
+            the current action
+        next_observation : OrderedDict
+            the incoming observation
+        next_state : StateDict
+            the incoming state
+        observation_space: StateDict
+            the observation space
+        observation_units: StateDict
+            the observation units
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         done = super().__call__(observation, action, next_observation, next_state, observation_space, observation_units)
 
@@ -212,8 +290,10 @@ class CrashAfterSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunctio
 
 class MultiagentSuccessfulInspectionDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
-    The validator for the MultiagentSuccessfulDockingDoneFunction.
+    A configuration validator for the MultiagentSuccessfulDockingDoneFunction.
 
+    Attributes
+    ----------
     inspection_entity_name: str
         The name of the entity under inspection.
     weight_threshold : float
@@ -226,34 +306,13 @@ class MultiagentSuccessfulInspectionDoneFunctionValidator(SharedDoneFuncBaseVali
 
 class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
     """
-    This done function determines whether every agent in the environment
-    has reached a specified successful done condition.
+    A done function which determines whether every agent in the
+    environment has reached a specified successful done condition.
 
-    def __call__(self, observation, action, next_observation, next_state, local_dones, local_done_info):
-
-    Parameters
+    Attributes
     ----------
-    observation : OrderedDict
-        the current observation
-    action : OrderedDict
-        the current action
-    next_observation : OrderedDict
-        the incoming observation
-    next_state : StateDict
-        the incoming state
-    observation_space: StateDict
-        the observation space
-    observation_units: StateDict
-        the observation units
-    local_dones: DoneDict
-        DoneDict containing name to boolean KVPs representing done statuses of each agent
-    local_done_info: OrderedDict
-        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
-
-    Returns
-    -------
-    done : DoneDict
-        Dictionary containing the done condition for each agent.
+    config: MultiagentSuccessfulInspectionDoneFunctionValidator
+        The function's validated configuration parameters
     """
 
     @staticmethod
@@ -264,7 +323,7 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
         Returns
         -------
         MultiagentSuccessfulDockingDoneFunctionValidator
-            done function validator
+            Config validator for the MultiagentSuccessfulInspectionDoneFunction.
         """
         return MultiagentSuccessfulInspectionDoneFunctionValidator
 
@@ -279,6 +338,27 @@ class MultiagentSuccessfulInspectionDoneFunction(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
+        """
+        Parameters
+        ----------
+        observation : OrderedDict
+            the current observation
+        action : OrderedDict
+            the current action
+        next_observation : OrderedDict
+            the incoming observation
+        next_state : StateDict
+            the incoming state
+        observation_space: StateDict
+            the observation space
+        observation_units: StateDict
+            the observation units
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         done = DoneDict()
 

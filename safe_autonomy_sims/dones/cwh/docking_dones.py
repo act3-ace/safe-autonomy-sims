@@ -9,8 +9,8 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Functions that define the terminal conditions for the Docking Environment.
-This in turn defines whether the end of an episode has been reached.
+This module implements functions that define the terminal conditions
+for the Docking Environment.
 """
 
 import gymnasium
@@ -23,9 +23,10 @@ from safe_autonomy_sims.utils import get_relative_position, get_relative_velocit
 
 class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
     """
-    This class validates that the config contains the docking_region_radius data needed for
-    computations in the SuccessfulDockingDoneFunction.
+    A configuration validator for the SuccessfulDockingDoneFunction.
 
+    Attributes
+    ----------
     docking_region_radius : float
         The radius of the docking region in meters.
     velocity_threshold : float
@@ -56,37 +57,13 @@ class SuccessfulDockingDoneValidator(DoneFuncBaseValidator):
 
 class SuccessfulDockingDoneFunction(DoneFuncBase):
     """
-    A done function that determines if the deputy has successfully docked with the chief.
+    A done function that determines if the deputy has successfully
+    docked with the chief.
 
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units
-    ) -> bool:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-
-    Returns
-    -------
-    done : bool
-        Dictionary containing the done condition for the current agent.
+    config: SuccessfulDockingDoneValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -96,9 +73,8 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
@@ -116,6 +92,27 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
         observation_space: gymnasium.spaces.dict.Dict,
         observation_units: gymnasium.spaces.dict.Dict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         # eventually will include velocity constraint
 
@@ -147,8 +144,10 @@ class SuccessfulDockingDoneFunction(DoneFuncBase):
 
 class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
     """
-    Validator for the DockingVelocityLimitDoneFunction.
+    A configuration validator for the DockingVelocityLimitDoneFunction.
 
+    Attributes
+    ----------
     docking_region_radius : float
         The radius of the docking region in meters.
     velocity_threshold : float
@@ -177,39 +176,13 @@ class DockingVelocityLimitDoneFunctionValidator(DoneFuncBaseValidator):
 
 class DockingVelocityLimitDoneFunction(DoneFuncBase):
     """
-    This done function determines whether the velocity limit has been exceeded or not.
+    This done function determines whether the velocity limit
+    has been exceeded.
 
-
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units
-    ) -> bool:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-
-
-    Returns
-    -------
-    done : bool
-        Dictionary containing the done condition for the current agent.
+    config: DockingVelocityLimitDoneFunctionValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -219,14 +192,13 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
-        DockingVelocityLimitDoneFunctionValidator : done function
-            Done function for the DockingVelocityLimitDoneFunction.
+        DockingVelocityLimitDoneFunctionValidator
+            Config validator for the DockingVelocityLimitDoneFunction.
         """
         return DockingVelocityLimitDoneFunctionValidator
 
@@ -239,6 +211,27 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
         observation_space: gymnasium.spaces.dict.Dict,
         observation_units: gymnasium.spaces.dict.Dict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
 
         # Get relatative position + velocity between platform and docking region
         platform = get_platform_by_name(next_state, self.config.platform_name)
@@ -264,8 +257,10 @@ class DockingVelocityLimitDoneFunction(DoneFuncBase):
 
 class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidator):
     """
-    This class validates that the config contains essential data for the done function.
+    A configuration validator for the DockingRelativeVelocityConstraintDoneFunction.
 
+    Attributes
+    ----------
     velocity_threshold : float
         The maximum tolerated velocity within docking region without crashing.
     threshold_distance : float
@@ -293,39 +288,14 @@ class DockingRelativeVelocityConstraintDoneFunctionValidator(DoneFuncBaseValidat
 # needs a reference object
 class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     """
-    A done function that checks if the docking velocity relative to a target object has exceeded a certain specified
-    threshold velocity.
+    A done function that checks if the docking velocity relative
+    to a target object has exceeded a certain specified threshold
+    velocity.
 
-
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units
-    ) -> bool:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-
-    Returns
-    -------
-    done : bool
-        Dictionary containing the done condition for the current agent.
+    config: DockingRelativeVelocityConstraintDoneFunctionValidator
+        The function's validated configuration parameters
     """
 
     def __init__(self, **kwargs) -> None:
@@ -335,13 +305,13 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns configuration validator object for this done
+        function.
 
         Returns
         -------
-        DockingRelativeVelocityConstraintDoneFunctionValidator : DoneFunctionValidator
+        DockingRelativeVelocityConstraintDoneFunctionValidator
+            Configuration validator for the DockingRelativeVelocityConstraintDoneFunction
         """
 
         return DockingRelativeVelocityConstraintDoneFunctionValidator
@@ -355,6 +325,27 @@ class DockingRelativeVelocityConstraintDoneFunction(DoneFuncBase):
         observation_space: gymnasium.spaces.dict.Dict,
         observation_units: gymnasium.spaces.dict.Dict,
     ) -> bool:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+
+        Returns
+        -------
+        done : bool
+            Dictionary containing the done condition for the current agent.
+        """
         # eventually will include velocity constraint
 
         # Get relatative position + velocity between platform and docking region

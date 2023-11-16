@@ -5,15 +5,7 @@ authors:
 date: 2023-10-29
 ---
 
----
-
 # CWH 3D Spacecraft Docking
-
-POCs: 
-
-Last Updated: Oct 29, 2023
-
----
 
 ## Motivation
 
@@ -45,9 +37,9 @@ In this docking environment, the goal is for a single deputy spacecraft, control
 At each timestep, the agent receives the observation, $o = [x, y, z, v_x, v_y, v_z, s, v_{limit}]$, where:
 
 * $x, y,$ and $z$ represent the deputy's position in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
+    * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
 * $v_x, v_y,$ and $v_z$ represent the deputy's directional velocity in the Hill's frame,
-  * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
 * $s$ is the speed of the deputy,
 * $v_{limit}$ is the safe velocity limit given by: $v_{max} + an(d_{chief} - r_{docking})$
     * $v_{max}$ is the maximum allowable velocity of the deputy within the docking region
@@ -119,19 +111,19 @@ At the start of any episode, the state is randomly initialized with the followin
 * chief $(x,y,z)$ = $(0, 0, 0)$
 * docking radius = $0.5 m$
 * deputy position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
-  * $r \in [100, 150] m$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $x = r \cos{\psi} \cos{\phi}$
-  * $y = r \sin{\psi} \cos{\phi}$
-  * $z = r \sin{\phi}$
+    * $r \in [100, 150] m$
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $x = r \cos{\psi} \cos{\phi}$
+    * $y = r \sin{\psi} \cos{\phi}$
+    * $z = r \sin{\phi}$
 * deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
-  * $v \in [0, 0.8]$ m/s
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $v_x = v \cos{\psi} \cos{\phi}$
-  * $v_y = v \sin{\psi} \cos{\phi}$
-  * $v_z = v \sin{\phi}$
+    * $v \in [0, 0.8]$ m/s
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $v_x = v \cos{\psi} \cos{\phi}$
+    * $v_y = v \sin{\psi} \cos{\phi}$
+    * $v_z = v \sin{\phi}$
 
 ### Done Conditions
 

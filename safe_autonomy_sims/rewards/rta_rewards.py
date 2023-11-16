@@ -19,8 +19,10 @@ from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidato
 
 class RTAInterveningRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the RTAInterveningReward Reward Function.
+    A configuration validator for the RTAInterveningReward Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     """
@@ -30,28 +32,6 @@ class RTAInterveningRewardValidator(RewardFuncBaseValidator):
 class RTAInterveningReward(RewardFuncBase):
     """
     This reward function allocates reward based on if RTA is intervening or not.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to values in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for the change in time.
     """
 
     def __init__(self, **kwargs):
@@ -60,9 +40,6 @@ class RTAInterveningReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return RTAInterveningRewardValidator
 
     def __call__(
