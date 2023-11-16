@@ -32,32 +32,32 @@ OtherVars = typing.Mapping[tuple[str, ...], Quantity]
 
 class RTAValidator(BaseModel):
     """
-    Validator for RTA glue object
+    A configuration validator for RTA glue object
 
-    Parameters
+    Attributes
     ----------
     functor: PyObject
         The class module of the RTA Glue to be instantiated
-    states: typing.List
+    states: list
         States to be passed from the initializer to the RTA module (in order)
-    args: typing.Dict
+    args: dict
         Arguments used to initialize the RTA module
-    arg_map: typing.Union[typing.Dict, None]
+    arg_map: dict
         Mapping of arguments from 'args' to kwargs accepted by the RTA module.
         Useful when 'args' contains extra values or naming is different.
         By default None.
     """
     functor: PyObject
-    states: typing.List
-    args: typing.Dict
-    arg_map: typing.Union[typing.Dict, None] = None
+    states: list
+    args: dict
+    arg_map: typing.Union[dict, None] = None
 
 
 class RejectionSamplerWrapper(ParameterWrapperValidator):
     """
-    Validator for rejection sampler parameter wrapper
+    A configuration validator for rejection sampler parameter wrapper
 
-    Parameters
+    Attributes
     ----------
     initializer: InitializerResetValidator
         Initializer to convert parameters to values used by the RTA
@@ -190,9 +190,9 @@ class RejectionSampler(ParameterWrapper):
 
 class RejectionSamplerInitializerValidator(InitializerValidator):
     """
-    Validator for agent initializer to be used with the rejection sampler
+    A configuration validator for agent initializer to be used with the rejection sampler
 
-    Parameters
+    Attributes
     ----------
     states: typing.Optional[typing.List]
         State keys to initialize the agent.

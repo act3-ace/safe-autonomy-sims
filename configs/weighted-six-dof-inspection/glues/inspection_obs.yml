@@ -44,17 +44,6 @@
   },
   wrapped: [
     !include-extend ./rotation_quaternion.yml,
-
-    # {
-    #   "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-    #   "config": {
-    #     "sensor": "Sensor_SunVector",
-    #     "normalization": {
-    #         "enabled": False
-    #     },
-    #   },
-    # },
-    
     {
       functor: "safe_autonomy_sims.glues.six_dof_glues.AngleToUnitVector",
       config: {

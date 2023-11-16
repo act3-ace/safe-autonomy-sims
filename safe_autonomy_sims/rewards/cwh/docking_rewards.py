@@ -25,8 +25,10 @@ from safe_autonomy_sims.utils import get_relative_position, get_relative_velocit
 
 class DockingTimeRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingTimeRewardValidator Reward Function.
+    A configuration validator for the DockingTimeRewardValidator Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     step_size : float
@@ -41,42 +43,6 @@ class DockingTimeReward(RewardFuncBase):
     """
     This reward function allocates reward based on the number of time steps (BaseSimulator.step() method calls) that
     have passed in a single episode.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method allocates reward based on the step size of the simulation.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to values in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for the change in time.
     """
 
     def __init__(self, **kwargs):
@@ -85,9 +51,6 @@ class DockingTimeReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return DockingTimeRewardValidator
 
     def __call__(
@@ -108,8 +71,10 @@ class DockingTimeReward(RewardFuncBase):
 
 class DockingDistanceChangeRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingTimeRewardValidator Reward Function.
+    A configuration validator for the DockingTimeRewardValidator Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     reference_position_sensor_name: str
@@ -123,42 +88,6 @@ class DockingDistanceChangeReward(RewardFuncBase):
     """
     This RewardFuncBase extension is responsible for calculating the reward associated with a change in agent position.
 
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method calculates the current position of the agent and compares it to the previous position. The
-    difference is used to return a proportional reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -168,9 +97,6 @@ class DockingDistanceChangeReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return DockingDistanceChangeRewardValidator
 
     def __call__(
@@ -203,8 +129,10 @@ class DockingDistanceChangeReward(RewardFuncBase):
 
 class DockingDistanceExponentialChangeRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingDistanceExponentialChangeReward Reward Function.
+    A configuration validator for the DockingDistanceExponentialChangeReward Reward Function.
 
+    Attributes
+    ----------
     c : float
         Scale factor of exponential distance function
     a : float
@@ -240,42 +168,6 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         and the reward accumulated going from distance r=inf to r=pivot is c(1/pivot_ratio)
 
     Alternatively a can be set directly instead of using pivot and pivot ratio
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method calculates the current position of the agent and compares it to the previous position. The
-    difference is used to return an exponential reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : np.ndarray
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -296,9 +188,6 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return DockingDistanceExponentialChangeRewardValidator
 
     @property
@@ -333,10 +222,6 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
         ----------
         dist: float
             The current distance of the agent from the target.
-
-        Returns
-        -------
-        None
         """
         self._dist_buffer.append(dist)
 
@@ -371,8 +256,10 @@ class DockingDistanceExponentialChangeReward(RewardFuncBase):
 
 class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingDeltaVReward Reward Function.
+    A configuration validator for the DockingDeltaVReward Reward Function.
 
+    Attributes
+    ----------
     scale : float
         A scalar value applied to reward.
     bias : float
@@ -391,43 +278,6 @@ class DockingDeltaVRewardValidator(RewardFuncBaseValidator):
 class DockingDeltaVReward(RewardFuncBase):
     """
     Calculates reward based on the agent's fuel consumption measured in delta-v.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method retrieves the current thrust control applied by the agent (delta v), which is used to calculate and
-    return a proportional reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : np.ndarray
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -459,9 +309,6 @@ class DockingDeltaVReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return DockingDeltaVRewardValidator
 
     def __call__(
@@ -481,8 +328,10 @@ class DockingDeltaVReward(RewardFuncBase):
 
 class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingVelocityConstraintReward Reward function.
+    A configuration validator for the DockingVelocityConstraintReward Reward function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     bias : float
@@ -521,44 +370,6 @@ class DockingVelocityConstraintRewardValidator(RewardFuncBaseValidator):
 class DockingVelocityConstraintReward(RewardFuncBase):
     """
     Calculates reward based on agent's violation of the velocity constraint.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method calculates the current velocity constraint based on the relative distance from the chief.
-    It compares the velocity constraint with the deputy's current velocity. If the velocity constraint is
-    exceeded, the function returns a penalty for the agent.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action : np.ndarray
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space.
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs):
@@ -577,9 +388,6 @@ class DockingVelocityConstraintReward(RewardFuncBase):
 
     @staticmethod
     def get_validator():
-        """
-        Method to return class's Validator.
-        """
         return DockingVelocityConstraintRewardValidator
 
     def __call__(
@@ -620,8 +428,10 @@ class DockingVelocityConstraintReward(RewardFuncBase):
 
 class DockingSuccessRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingSuccessRewardValidator Reward Function.
+    A configuration validator for the DockingSuccessRewardValidator Reward Function.
 
+    Attributes
+    ----------
     scale : float
         Scalar value to adjust magnitude of the reward.
     timeout : float
@@ -658,42 +468,6 @@ class DockingSuccessRewardValidator(RewardFuncBaseValidator):
 class DockingSuccessReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward associated with a successful docking.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method determines if the agent has succeeded and returns an appropriate reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs) -> None:
@@ -753,8 +527,10 @@ class DockingSuccessReward(RewardFuncBase):
 
 class DockingFailureRewardValidator(RewardFuncBaseValidator):
     """
-    Validator for the DockingFailureRewardValidator Reward Function.
+    A configuraion validator for the DockingFailureRewardValidator Reward Function.
 
+    Attributes
+    ----------
     timeout_reward : float
         Reward (penalty) associated with a failure by exceeding max episode time.
     distance_reward : float
@@ -800,42 +576,6 @@ class DockingFailureRewardValidator(RewardFuncBaseValidator):
 class DockingFailureReward(RewardFuncBase):
     """
     This Reward Function is responsible for calculating the reward (penalty) associated with a failed episode.
-
-
-    def __call__(
-        self,
-        observation: OrderedDict,
-        action,
-        next_observation: OrderedDict,
-        state: StateDict,
-        next_state: StateDict,
-        observation_space: StateDict,
-        observation_units: StateDict,
-    ) -> float:
-
-    This method determines if the agent had failed the task and allocates an appropriate reward.
-
-    Parameters
-    ----------
-    observation : OrderedDict
-        The observations available to the agent from the previous state.
-    action
-        The last action performed by the agent.
-    next_observation : OrderedDict
-        The observations available to the agent from the current state.
-    state : StateDict
-        The previous state of the simulation.
-    next_state : StateDict
-        The current state of the simulation.
-    observation_space : StateDict
-        The agent's observation space.
-    observation_units : StateDict
-        The units corresponding to keys in the observation_space?
-
-    Returns
-    -------
-    reward : float
-        The agent's reward for their change in distance.
     """
 
     def __init__(self, **kwargs) -> None:

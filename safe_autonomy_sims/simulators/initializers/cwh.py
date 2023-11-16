@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module contains CWH Initializers
+This module implements initializers for CWH platforms.
 """
 
 import typing
@@ -25,20 +25,7 @@ class CWH3DRadialInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     Both position and velocity are initialized radially (with radius and angles) to allow for control over magnitude and direction
-        of the resulting vectors.
-
-    def __call__(self, reset_config):
-
-    Parameters
-    ----------
-    reset_config: dict
-        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
-        are the values
-
-    Returns
-    -------
-    reset_config: dict
-        The modified reset config of agent name to initialization values KVPs.
+    of the resulting vectors.
     """
 
     param_units = {
@@ -106,9 +93,9 @@ class CWH3DRadialInitializer(BaseInitializerWithPint):
 
 class CWH3DENMTInitializerValidator(InitializerValidator):
     """
-    Validator for CWH3DENMTInitializer.
+    A configuration validator for CWH3DENMTInitializer.
 
-    Parameters
+    Attributes
     ----------
     mean_motion : float
         Orbital mean motion of Hill's reference frame's circular orbit in rad/s
@@ -121,19 +108,6 @@ class CWH3DENMTInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     It ensures that each agent starts on an elliptical Natural Motion Trajectory (eNMT)
-
-    def __call__(self, reset_config):
-
-    Parameters
-    ----------
-    reset_config: dict
-        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
-        are the values
-
-    Returns
-    -------
-    reset_config: dict
-        The modified reset config of agent name to initialization values KVPs.
     """
 
     param_units = {
@@ -200,9 +174,9 @@ class CWH3DENMTInitializer(BaseInitializerWithPint):
 
 class Docking3DRadialInitializerValidator(InitializerValidator):
     """
-    Validator for Docking3DInitializer.
+    A configuration validator for Docking3DInitializer.
 
-    Parameters
+    Attributes
     ----------
     velocity_threshold : float
         The maximum tolerated velocity within docking region without crashing.
@@ -224,19 +198,6 @@ class Docking3DRadialInitializer(BaseInitializerWithPint):
     """
     This class handles the initialization of agent reset parameters for the cwh 3D docking environment.
     It ensures that the initial velocity of the deputy does not violate the maximum velocity safety constraint.
-
-    def __call__(self, reset_config):
-
-    Parameters
-    ----------
-    reset_config: dict
-        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
-        are the values
-
-    Returns
-    -------
-    reset_config: dict
-        The modified reset config of agent name to initialization values KVPs.
     """
 
     param_units = {
@@ -327,19 +288,6 @@ class CWHSixDOFRadialInitializer(BaseInitializerWithPint):
     This class handles the initialization of agent reset parameters for the cwh 3D environment.
     Both position and velocity are initialized radially (with radius and angles) to allow for control over magnitude and direction
         of the resulting vectors.
-
-    def __call__(self, reset_config):
-
-    Parameters
-    ----------
-    reset_config: dict
-        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
-        are the values
-
-    Returns
-    -------
-    reset_config: dict
-        The modified reset config of agent name to initialization values KVPs.
     """
 
     param_units = {
@@ -425,19 +373,6 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
     Both position and velocity are initialized radially (with radius and angles) to allow for
     control over magnitude and direction of the resulting vectors.
     The sun angle is also passed through.
-
-    def __call__(self, reset_config):
-
-    Parameters
-    ----------
-    reset_config: dict
-        A dictionary containing the reset values for each agent. Agent names are the keys and initialization config dicts
-        are the values
-
-    Returns
-    -------
-    reset_config: dict
-        The modified reset config of agent name to initialization values KVPs.
     """
 
     param_units = {

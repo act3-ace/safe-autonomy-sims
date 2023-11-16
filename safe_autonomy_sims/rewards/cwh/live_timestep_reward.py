@@ -21,8 +21,14 @@ from corl.rewards.reward_func_base import RewardFuncBase, RewardFuncBaseValidato
 
 class LiveTimestepRewardValidator(RewardFuncBaseValidator):
     """
-    step_reward: the maximum reward value for each timestep
-    max_time_rewarded: the maximum simulation time.  Reward is zero for all
+    A configuration validator for LiveTimestepReward
+
+    Attributes
+    ----------
+    step_reward : float
+        the maximum reward value for each timestep
+    max_time_rewarded : float
+        the maximum simulation time.  Reward is zero for all
         timesteps for which sim_time > max_time_rewarded [Note use of sim_time
         instead of timestep count!]
     """

@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-General observation and action metrics
+This module implements general observation and action metrics
 """
 import typing
 
@@ -23,7 +23,9 @@ from corl.evaluation.metrics.types.terminals.real import Real
 
 
 class ObservationVector(MetricGeneratorTerminalEventScope):
-    """Generates vector of Dicts for the observations calculated for each step during an event for an agent
+    """
+    Generates vector of Dicts for the observations calculated
+    for each step during an event for an agent
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -51,7 +53,9 @@ class ObservationVector(MetricGeneratorTerminalEventScope):
 
 
 class ControlVector(MetricGeneratorTerminalEventScope):
-    """Generates vector of Dicts for the control for each step during an event for an agent
+    """
+    Generates vector of Dicts for the control for each
+    step during an event for an agent
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -79,8 +83,9 @@ class ControlVector(MetricGeneratorTerminalEventScope):
 
 
 class SafetyViolationRatioMetric(MetricGeneratorTerminalEventScope):
-    """Generates single Real indicating percentage of steps where safety is violated.
-    Must use constraint based RTA.
+    """
+    Generates single Real indicating percentage of steps where safety
+    is violated. Must use constraint based RTA.
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -107,7 +112,9 @@ class SafetyViolationRatioMetric(MetricGeneratorTerminalEventScope):
 
 
 class PositionVelocityVector(MetricGeneratorTerminalEventScope):
-    """Generates vector of Dicts for the Positions calculated for each step during an event for an agent
+    """
+    Generates vector of Dicts for the Positions calculated for each
+    step during an event for an agent
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:

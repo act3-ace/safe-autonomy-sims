@@ -1,6 +1,23 @@
 # Default state for all rules
 default: true
 
+MD007:
+  # Indent length (spaces)
+  indent: 4
+
 MD013:
   # Number of characters
   line_length: -1
+
+MD025:
+  # Ignore title parameter in front matter
+  front_matter_title: ""
+
+MD033:
+  # Allow inline HTML for collapsible sections, figures, and references
+  allowed_elements:
+    - "details"
+    - "summary"
+    - "a"
+    - "figure"
+    - "figcaption"

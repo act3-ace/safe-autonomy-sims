@@ -21,7 +21,7 @@ config:
     sgd_minibatch_size: 1500
     num_workers: 1
     num_cpus_for_driver: 0.5
-    gamma: 0.997
+    gamma: 0.99
     seed: 4900
 
   # No overrides for ray as there are no changes
@@ -30,13 +30,13 @@ config:
 
   # Change the default path for saving out the data
   env_config_updates: &env_config_updates
-    TrialName: SIX-DOF-INSPECTION
+    TrialName: MULTIAGENT-SIX-DOF-INSPECTION
     output_path: ./output/env/
 
   # Change the default path for saving out the data
   tune_config_updates: &tune_config_updates
     keep_checkpoints_num: 1000
-    checkpoint_freq: 10  # FOR EVAL
+    checkpoint_freq: 50  # FOR EVAL
     stop:
       timesteps_total: 5000000
 
@@ -45,11 +45,11 @@ config:
   # Note that items are patched from the update section
   ###################################################################
   rllib_configs:
-    default: [!include configs/six-dof-inspection/rllib.yml, *rllib_config_updates]
-    local: [!include configs/six-dof-inspection/rllib.yml,  *rllib_config_updates]
+    default: [!include configs/multiagent-weighted-six-dof-inspection/rllib.yml, *rllib_config_updates]
+    local: [!include configs/multiagent-weighted-six-dof-inspection/rllib.yml,  *rllib_config_updates]
 
-  ray_config: [!include configs/six-dof-inspection/ray.yml, *ray_config_updates]
-  env_config: [!include configs/six-dof-inspection/environment.yml, *env_config_updates]
-  tune_config: [!include configs/six-dof-inspection/tune.yml, *tune_config_updates]
+  ray_config: [!include configs/multiagent-weighted-six-dof-inspection/ray.yml, *ray_config_updates]
+  env_config: [!include configs/multiagent-weighted-six-dof-inspection/environment.yml, *env_config_updates]
+  tune_config: [!include configs/multiagent-weighted-six-dof-inspection/tune.yml, *tune_config_updates]
 
   extra_callbacks: ["safe_autonomy_sims.simulators.inspection_simulator.InspectionCallbacks"]

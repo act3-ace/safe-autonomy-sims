@@ -30,8 +30,6 @@ def get_sun_position(current_time, angular_velocity, initial_theta, r_avg):
     ----------
     current_time: int
         current simulation time in seconds
-    dt: float
-        step size in seconds
     angular_velocity: float
         mean motion of sun in meters per second
     initial_theta: float
@@ -96,6 +94,11 @@ def check_illum(point, sun_angle, r_avg, radius):
 def num_inspected_points(points):
     """
     Returns number of inspected points
+
+    Parameters
+    ----------
+    points : dict
+        set of inspection points
     """
     pts = 0
     for point in points:
@@ -106,10 +109,24 @@ def num_inspected_points(points):
 
 
 def save_data(points, current_time, position, sun_position, action, velocity, path):
-    """
-    Saves data
+    """Save environment data
 
-    No returns
+    Parameters
+    ----------
+    points : dict
+        inspection points
+    current_time : float
+        current sim time
+    position : list
+        position vector
+    sun_position : list
+        sun position vector
+    action : list
+        action vector
+    velocity : list
+        velocity vector
+    path : str
+        path to save data
     """
     points_bool = []
     for point in points:

@@ -8,6 +8,8 @@ This is a US Government Work not subject to copyright protection in the US.
 The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
+
+This module implements evaluation metrics for the inspection environment.
 """
 import typing
 
@@ -21,9 +23,6 @@ from corl.evaluation.metrics.types.terminals.void import Void
 
 class DeltaV(MetricGeneratorTerminalEventScope):
     """Generates vector of Dicts for the control for each step during an event for an agent
-
-    Metric: Vector[Dict]
-    Scope: Event
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -52,9 +51,6 @@ class DeltaV(MetricGeneratorTerminalEventScope):
 
 class InspectedPoints(MetricGeneratorTerminalEventScope):
     """Generates single Real indicating the total inspected points for an event
-
-    Metric: Real
-    Scope: Event
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -80,9 +76,6 @@ class InspectedPoints(MetricGeneratorTerminalEventScope):
 
 class EpisodeLength(MetricGeneratorTerminalEventScope):
     """Generates single Real indicating the episode length for an event
-
-    Metric: Real
-    Scope: Event
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -103,9 +96,6 @@ class EpisodeLength(MetricGeneratorTerminalEventScope):
 
 class Success(MetricGeneratorTerminalEventScope):
     """Generates single Real indicating the success percentage for an event
-
-    Metric: Real
-    Scope: Event
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -131,9 +121,6 @@ class Success(MetricGeneratorTerminalEventScope):
 
 class SafeSuccess(MetricGeneratorTerminalEventScope):
     """Generates single Real indicating the success percentage for an event
-
-    Metric: Real
-    Scope: Event
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:
@@ -159,9 +146,6 @@ class SafeSuccess(MetricGeneratorTerminalEventScope):
 
 class InspectedPointsScore(MetricGeneratorTerminalEventScope):
     """Generates single Real indicating the score for inspected points score for an event
-
-    Metric: Real
-    Scope: Event
     """
 
     def generate_metric(self, params: EpisodeArtifact, **kwargs) -> Metric:

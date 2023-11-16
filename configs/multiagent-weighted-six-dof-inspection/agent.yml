@@ -403,5 +403,5 @@
             },
         },
     ],
-    "reference_store": !include configs/multiagent-six-dof-inspection/parameters.yml
+    "reference_store": !include configs/multiagent-weighted-six-dof-inspection/parameters.yml
 }

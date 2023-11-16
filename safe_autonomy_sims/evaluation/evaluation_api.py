@@ -1,9 +1,20 @@
 """
-This module defines a python API for running CoRL's Evaluation Framework. It also defines helper functions to support the reuse
-of training configs, evaluation of multiple trained policies, and creation of comparative plots of chosen Metrics. These functions
-streamline visualization and analysis of comparative RL test assays.
+--------------------------------------------------------------------------
+Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+Reinforcement Learning (RL) Core  Extension.
 
-Author: John McCarroll
+This is a US Government Work not subject to copyright protection in the US.
+
+The use, dissemination or disclosure of data in this file is subject to
+limitation or restriction. See accompanying README and LICENSE for details.
+---------------------------------------------------------------------------
+
+This module defines a python API for running CoRL's Evaluation Framework.
+
+It also defines helper functions to support the reuse
+of training configs, evaluation of multiple trained policies,
+and creation of comparative plots of chosen Metrics. These functions
+streamline visualization and analysis of comparative RL test assays.
 """
 
 # pylint: disable=E0401
@@ -198,8 +209,6 @@ def visualize(evaluate_output_path: str):
     evaluate_output_path: str
         The absolute path to the directory in which evaluation episodes' data was saved (from the initial 'evaluate' step
         of the Evaluation Framework)
-    metrics_config: dict
-        The nested structure defining the Metrics to be instantiated and calculated from Evaluation Episode data
     """
 
     artifact_metrics = EvaluationArtifact_Metrics(location=evaluate_output_path)
@@ -900,8 +909,10 @@ def extract_metadata(experiment_analysis: ExperimentAnalysis, trial_index: int =
 
     Parameters
     ----------
-    checkpoint_paths: list
-        A list of path strings to each checkpoint, typically checkpoints are from a single training job
+    experiment_analysis : ExperimentAnalysis
+        Ray Tune experiment analysis object
+    trial_index : int
+        the index of the trial of interest
 
     Returns
     -------

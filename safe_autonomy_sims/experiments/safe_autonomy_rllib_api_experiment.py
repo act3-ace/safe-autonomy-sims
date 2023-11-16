@@ -1,7 +1,5 @@
 """
 ---------------------------------------------------------------------------
-
-
 Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
 Reinforcement Learning (RL) Core.
 
@@ -10,6 +8,8 @@ This is a US Government Work not subject to copyright protection in the US.
 The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
+
+This module implements a patchable CoRL experiment for use with multiagent environments.
 """
 import argparse
 import importlib
@@ -42,7 +42,14 @@ from ray.tune.registry import get_trainable_cls
 
 
 class RllibPolicyMappingValidator(BaseModel):
-    """validator of data used to generate policy mapping
+    """A configuration validator used to generate policy mappings
+
+    Attributes
+    ----------
+    functor: PyObject
+        policy mapping functor
+    config: dict    
+        configuration parameters for policy mapping functor
     """
     functor: PyObject = PolicyIsAgent
     config: dict = {}
@@ -50,14 +57,32 @@ class RllibPolicyMappingValidator(BaseModel):
 
 class SafeAutonomyRllibExperimentValidator(BaseExperimentValidator):
     """
-    ray_config: dictionary to be fed into ray init, validated by ray init call
-    env_config: environment configuration, validated by environment class
-    rllib_configs: a mapping of compute platforms to rllib configs, see apply_patches_rllib_configs
-                    for information on the typing
-    tune_config: kwarg arguments to be sent to tune for this experiment
-    extra_callbacks: extra rllib callbacks that will be added to the callback list
-    trial_creator_function: this function will overwrite the default trial string creator
-                            and allow more fine tune trial name creators
+    A configuration validator for SafeAutonomyRllibExperiment.
+
+    Attributes
+    ----------
+    ray_config : dict
+        dictionary to be fed into ray init, validated by ray init call
+    env_config : dict
+        environment configuration, validated by environment class
+    rllib_configs : dict
+        a mapping of compute platforms to rllib configs, see apply_patches_rllib_configs
+        for information on the typing
+    tune_config : dict
+        kwarg arguments to be sent to tune for this experiment
+    trainable_config : dict
+        training configuration parameters
+    hparam_search_class : PyObject
+        rllib hyperparameter search object
+    hparam_search_config : PyObject
+        configuration parameters for hyperparameter search
+    extra_callbacks : list
+        extra rllib callbacks that will be added to the callback list
+    trial_creator_function : PyObject
+        this function will overwrite the default trial string creator
+        and allow more fine tune trial name creators
+    policy_mapping : RllibPolicyMappingValidator
+        policy mapping function and configuration options
     """
     ray_config: typing.Dict[str, typing.Any]
     env_config: EnvContext
@@ -78,12 +103,6 @@ class SafeAutonomyRllibExperimentValidator(BaseExperimentValidator):
         the list down to a typing.Dict[str, typing.Dict[str, typing.Any]]
         instead of
         typing.Dict[str, typing.Union[typing.List[typing.Dict[str, typing.Any]], typing.Dict[str, typing.Any]]]
-
-        Raises:
-            RuntimeError: [description]
-
-        Returns:
-            [type] -- [description]
         """
         if not isinstance(v, dict):
             raise RuntimeError("rllib_configs are expected to be a dict of keys to different compute configs")
@@ -100,13 +119,8 @@ class SafeAutonomyRllibExperimentValidator(BaseExperimentValidator):
         """
         reduces a field from
         typing.Union[typing.List[typing.Dict[str, typing.Any]], typing.Dict[str, typing.Any]]]
-        to
-        typing.Dict[str, typing.Any]
-
+        to typing.Dict[str, typing.Any]
         by patching the first dictionary in the list with each patch afterwards
-
-        Returns:
-            [type] -- [description]
         """
         if isinstance(v, list):
             v = apply_patches(v)
@@ -122,16 +136,14 @@ class SafeAutonomyRllibExperimentValidator(BaseExperimentValidator):
 
 class RllibPolicyValidator(BasePolicyValidator):
     """
-    policy_class: callable policy class None will use default from trainer
-    train: should this policy be trained
-    Arguments:
-        BaseModel {[type]} -- [description]
+    A configuration validator for RllibPolicy
 
-    Raises:
-        RuntimeError: [description]
-
-    Returns:
-        [type] -- [description]
+    Attributes
+    ----------
+    policy_class: PyObject
+        callable policy class, if None will use default from trainer
+    train: bool
+        should this policy be trained
     """
     config: typing.Dict[str, typing.Any] = {}
     policy_class: typing.Union[PyObject, None] = None
@@ -140,7 +152,7 @@ class RllibPolicyValidator(BasePolicyValidator):
 
 class SafeAutonomyRllibExperiment(BaseExperiment):
     """
-    The Rllib Experiment is an experiment for running
+    This RllibExperiment is an experiment for running
     multiagent configurable environments with patchable settings
     """
 

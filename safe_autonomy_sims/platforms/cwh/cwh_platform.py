@@ -25,9 +25,9 @@ from safe_autonomy_sims.platforms.common.platform import BaseSafeRLPlatform
 
 class CWHPlatformValidator(BasePlatformValidator):
     """
-    CWHPlatformValidator
+    A configuration validator for CWHPlatform
 
-    Parameters
+    Attributes
     ----------
     platform : CWHSpacecraft
         underlying dynamics platform
@@ -41,20 +41,21 @@ class CWHPlatform(BaseSafeRLPlatform):
     A platform representing a spacecraft operating under CWH dynamics.
     Allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function.
-
-    Parameters
-    ----------
-    platform_name : str
-        Name of the platform.
-    platform : sim_entity
-        Backend simulation entity associated with the platform.
-    platform_config : dict
-        Platform-specific configuration dictionary.
-    sim_time : float
-        simulation time at platform creation
     """
 
     def __init__(self, platform_name, platform, parts_list, sim_time=0.0):
+        """
+        Parameters
+        ----------
+        platform_name : str
+            Name of the platform.
+        platform : sim_entity
+            Backend simulation entity associated with the platform.
+        parts_list : dict
+            Platform-specific parts configuration dictionary.
+        sim_time : float
+            simulation time at platform creation
+        """
         self.config: CWHPlatformValidator
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._platform = self.config.platform
@@ -65,7 +66,8 @@ class CWHPlatform(BaseSafeRLPlatform):
         """
         get validator for this CWHPlatform
 
-        Returns:
+        Returns
+        -------
             CWHPlatformValidator -- validator the platform will use to generate a configuration
         """
         return CWHPlatformValidator
@@ -161,14 +163,13 @@ class CWHPlatform(BaseSafeRLPlatform):
 
 class CWHSixDOFPlatformValidator(BasePlatformValidator):
     """
-    CWHSixDOFPlatformValidator
+    A configuration validator for CWHSixDOFPlatform
 
-    Parameters
+    Attributes
     ----------
     platform : SixDOFSpacecraft
         underlying dynamics platform
     """
-
     platform: SixDOFSpacecraft
 
 
@@ -177,20 +178,21 @@ class CWHSixDOFPlatform(CWHPlatform):
     A platform representing a spacecraft operating under CWH dynamics with rotation.
     Allows for saving an action to the platform for when the platform needs
     to give an action to the environment during the environment step function.
-
-    Parameters
-    ----------
-    platform_name : str
-        Name of the platform.
-    platform : sim_entity
-        Backend simulation entity associated with the platform.
-    platform_config : dict
-        Platform-specific configuration dictionary.
-    sim_time : float
-        simulation time at platform creation
     """
 
     def __init__(self, platform_name, platform, parts_list, sim_time=0.0):
+        """
+        Parameters
+        ----------
+        platform_name : str
+            Name of the platform.
+        platform : sim_entity
+            Backend simulation entity associated with the platform.
+        parts_list : dict
+            Platform-specific parts configuration dictionary.
+        sim_time : float
+            simulation time at platform creation
+        """
         self.config: CWHSixDOFPlatformValidator
         super().__init__(platform_name=platform_name, platform=platform, parts_list=parts_list, sim_time=sim_time)
         self._last_applied_action = corl_get_ureg().Quantity(np.array([0, 0, 0, 0, 0, 0], dtype=np.float32), "newtons")

@@ -12,24 +12,24 @@
 # Experiment Setup
 ##################
 
-"config": "configs/multiagent-six-dof-inspection/task.yml"
+"config": "configs/multiagent-weighted-six-dof-inspection/task.yml"
 "platform_config":
   - name: "blue0"
-    config: "configs/multiagent-six-dof-inspection/platform.yml"
+    config: "configs/multiagent-weighted-six-dof-inspection/platform.yml"
   - name: "blue1"
-    config: "configs/multiagent-six-dof-inspection/platform.yml"
+    config: "configs/multiagent-weighted-six-dof-inspection/platform.yml"
   - name: "blue2"
-    config: "configs/multiagent-six-dof-inspection/platform.yml"
+    config: "configs/multiagent-weighted-six-dof-inspection/platform.yml"
 "agent_config":
   - name: "blue0_ctrl"
     platforms: ["blue0"]
-    config: "configs/multiagent-six-dof-inspection/agent.yml"
-    policy: "configs/multiagent-six-dof-inspection/ppo.yml"
+    config: "configs/multiagent-weighted-six-dof-inspection/agent.yml"
+    policy: "configs/multiagent-weighted-six-dof-inspection/ppo.yml"
   - name: "blue1_ctrl"
     platforms: ["blue1"]
-    config: "configs/multiagent-six-dof-inspection/agent.yml"
-    policy: "configs/multiagent-six-dof-inspection/ppo.yml"
+    config: "configs/multiagent-weighted-six-dof-inspection/agent.yml"
+    policy: "configs/multiagent-weighted-six-dof-inspection/ppo.yml"
   - name: "blue2_ctrl"
     platforms: ["blue2"]
-    config: "configs/multiagent-six-dof-inspection/agent.yml"
-    policy: "configs/multiagent-six-dof-inspection/ppo.yml"
+    config: "configs/multiagent-weighted-six-dof-inspection/agent.yml"
+    policy: "configs/multiagent-weighted-six-dof-inspection/ppo.yml"
