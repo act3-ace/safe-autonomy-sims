@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Glue containing RTA module for filtering actions.
+This module implements a glue for filtering an agent's action through a Run Time Assurance filter.
 """
 import abc
 import typing
@@ -49,8 +49,10 @@ def flip_rta(control):
 
 class RTAGlueValidator(BaseMultiWrapperGlueValidator):
     """
-    Validator for RTAGlue class.
+    A configuration validator for RTAGlue.
 
+    Attributes
+    ----------
     step_size: float
         duration in seconds that agent's action will be applied
     state_observation_names: list[str]
@@ -205,9 +207,6 @@ class RTAGlue(BaseMultiWrapperGlue):
 
     @cached_property
     def normalized_action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
         return self.action_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):

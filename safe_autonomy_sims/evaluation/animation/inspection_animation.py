@@ -107,6 +107,13 @@ class InspectionAnimation(BaseAnimationModule):
 
     def get_closest_fft(self, pos, vel):
         """Get closest relative position to the origin along a Free Flight Trajectory (FFT)
+
+        Parameters
+        ----------
+        pos: list
+            position vector
+        vel: list
+            velocity vector
         """
         time = np.arange(0, self.fft_time, self.step_size)
         positions = []
@@ -173,7 +180,22 @@ class InspectionAnimation(BaseAnimationModule):
         return data
 
     def setup_ric(self, data, max_pos, return_plots):
-        """Setup RIC plots"""
+        """Set up RIC plots.
+
+        Parameters
+        ----------
+        data : dict
+            data to plot
+        max_pos : float
+            max position value
+        return_plots : dict
+            plots to modify
+
+        Returns
+        -------
+        dict
+            modified plots in RIC frame
+        """
         ax_ri = plt.subplot2grid((5, 4), (0, 0), colspan=2, rowspan=3)
         ax_ri.grid(True)
         ax_ri.set_xlabel('In-Track [m]')
@@ -222,7 +244,20 @@ class InspectionAnimation(BaseAnimationModule):
         return return_plots
 
     def setup_rp_rv(self, data, return_plots):
-        """Setup relative position and relative velocity plots"""
+        """Set up relative position and velocity plots
+
+        Parameters
+        ----------
+        data : dict
+            data to plot
+        return_plots : dict
+            plots to modify
+
+        Returns
+        -------
+        dict
+            modified plots with relative position and velocity
+        """
         max_rp = []
         for x in data['positions']:
             max_rp.append(np.linalg.norm(x))
@@ -391,7 +426,19 @@ class InspectionAnimation(BaseAnimationModule):
             )
 
     def animate_sun_and_points(self, axes, data, i, max_pos):
-        """Animate the sun vector and points"""
+        """Animate the sun vector and points
+
+        Parameters
+        ----------
+        axes : pyplot.Axes
+            Plot axes
+        data : dict
+            data to plot
+        i : int
+            data index
+        max_pos : float
+            maximum position value
+        """
         # Sun vector plot
         sun_vector = data['sun_vectors'][i] / np.linalg.norm(data['sun_vectors'][i])
         point_inSunDir = max_pos / 1.1 * sun_vector

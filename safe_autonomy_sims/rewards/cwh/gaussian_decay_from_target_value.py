@@ -8,6 +8,8 @@ This is a US Government Work not subject to copyright protection in the US.
 The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
+
+This module implements a gaussian decay reward function.
 """
 
 import logging
@@ -20,6 +22,10 @@ from corl.rewards.base_measurement_operation import BaseMeasurementOperation, Ba
 
 class GaussianDecayFromTargetValueValidator(BaseMeasurementOperationValidator):
     """
+    A configuration validator for GaussianDecayFromTargetValue 
+
+    Attributes
+    ----------
     reward scale: scale of this reward, this would be the maximum reward value
                   for a given time step
     eps: the length of the reward curve for the exponential decay, would

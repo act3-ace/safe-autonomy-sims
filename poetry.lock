@@ -1831,6 +1831,20 @@ completion = ["shtab"]
 test = ["mockito (>=1.2.1)", "pytest (>=5.4.1)", "pytest-runner"]
 
 [[package]]
+name = "griffe"
+version = "0.36.9"
+description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "griffe-0.36.9-py3-none-any.whl", hash = "sha256:7874febe7cd81e8e47eb7b8130ff9d38c8f3656233c01d2d217d2e898a0925f5"},
+    {file = "griffe-0.36.9.tar.gz", hash = "sha256:b4e510bf0ed1fc91c58453c68018a2247c561adec8f5dadc40275afc01f51eac"},
+]
+
+[package.dependencies]
+colorama = ">=0.4"
+
+[[package]]
 name = "grpcio"
 version = "1.59.2"
 description = "HTTP/2-based RPC framework"
@@ -3213,13 +3227,13 @@ weasyprint = ">=0.44"
 
 [[package]]
 name = "mkdocstrings"
-version = "0.18.0"
+version = "0.23.0"
 description = "Automatic documentation from sources, for MkDocs."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "mkdocstrings-0.18.0-py3-none-any.whl", hash = "sha256:75e277f6a56a894a727efcf6d418d36cd43d4db7da9614c2dc23300e257d95ad"},
-    {file = "mkdocstrings-0.18.0.tar.gz", hash = "sha256:01d8ab962fc1f388c9b15cbf8c078b8738f92adf983b626d74135aaee2bce33a"},
+    {file = "mkdocstrings-0.23.0-py3-none-any.whl", hash = "sha256:051fa4014dfcd9ed90254ae91de2dbb4f24e166347dae7be9a997fe16316c65e"},
+    {file = "mkdocstrings-0.23.0.tar.gz", hash = "sha256:d9c6a37ffbe7c14a7a54ef1258c70b8d394e6a33a1c80832bce40b9567138d1c"},
 ]
 
 [package.dependencies]
@@ -3228,7 +3242,6 @@ Markdown = ">=3.3"
 MarkupSafe = ">=1.1"
 mkdocs = ">=1.2"
 mkdocs-autorefs = ">=0.3.1"
-mkdocstrings-python-legacy = ">=0.2"
 pymdown-extensions = ">=6.3"
 
 [package.extras]
@@ -3237,19 +3250,19 @@ python = ["mkdocstrings-python (>=0.5.2)"]
 python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
-name = "mkdocstrings-python-legacy"
-version = "0.2.2"
-description = "A legacy Python handler for mkdocstrings."
+name = "mkdocstrings-python"
+version = "1.7.3"
+description = "A Python handler for mkdocstrings."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "mkdocstrings-python-legacy-0.2.2.tar.gz", hash = "sha256:f0e7ec6a19750581b752acb38f6b32fcd1efe006f14f6703125d2c2c9a5c6f02"},
-    {file = "mkdocstrings_python_legacy-0.2.2-py3-none-any.whl", hash = "sha256:379107a3a5b8db9b462efc4493c122efe21e825e3702425dbd404621302a563a"},
+    {file = "mkdocstrings_python-1.7.3-py3-none-any.whl", hash = "sha256:2439d6ad3e34f0bb4c643b845fb3c06ae9233499a1736f9fa273424b75cc5894"},
+    {file = "mkdocstrings_python-1.7.3.tar.gz", hash = "sha256:c20128fa96c24dbc6437b10dfedaf33b0415d4503e51ce9ce5e84b271278268e"},
 ]
 
 [package.dependencies]
-mkdocstrings = ">=0.18"
-pytkdocs = ">=0.14"
+griffe = ">=0.35"
+mkdocstrings = ">=0.20"
 
 [[package]]
 name = "mktheapidocs"
@@ -4870,20 +4883,6 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
-
-[[package]]
-name = "pytkdocs"
-version = "0.16.1"
-description = "Load Python objects documentation."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pytkdocs-0.16.1-py3-none-any.whl", hash = "sha256:a8c3f46ecef0b92864cc598e9101e9c4cf832ebbf228f50c84aa5dd850aac379"},
-    {file = "pytkdocs-0.16.1.tar.gz", hash = "sha256:e2ccf6dfe9dbbceb09818673f040f1a7c32ed0bffb2d709b06be6453c4026045"},
-]
-
-[package.extras]
-numpy-style = ["docstring_parser (>=0.7)"]
 
 [[package]]
 name = "pytz"
@@ -7218,4 +7217,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "25fb9f5ce75a41652381f735bf52e37b04eea57963ae26e6880f0d304bdfa66c"
+content-hash = "b3e2b0ebd923ea82383d16c8e9e46c84053fe9efb1c5bf852d374369e042eb05"

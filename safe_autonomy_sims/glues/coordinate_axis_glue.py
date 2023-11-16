@@ -9,8 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Glue which returns the dot product between the deputy orientation unit
-vector and the unit vector pointing from the deputy to the chief.
+This module implements a glue which passes a coordinate axis as an observation to an agent.
 
 Author: Kochise Bennett
 """
@@ -28,7 +27,12 @@ from corl.libraries.property import DictProp, BoxProp
 
 class CoordinateAxisGlueValidator(BaseAgentGlueValidator):
     """
-    Validator for coordinate axis glue
+    A configuration validator for CoordinateAxisGlue
+
+    Attributes
+    ----------
+    axis : str
+        name of the axis to observe
     """
     axis: str = 'x'
 

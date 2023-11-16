@@ -9,10 +9,11 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-The `safe-autonomy-sims` package provides reinforement learning environments
-built using the CoRL framework.
+This package implements CoRL experiments for safe autonomy training
+runs.
 
-The included environments define safety-critical spacecraft docking and
-spacecraft inspection tasks. The intent of these environments is to
-provide a baseline for training RL agents to safely perform these tasks.
+CoRL `Experiment`s act as containers around training runs. Within
+an experiment a user can define custom training behavior and
+develop integration for different RL frameworks and backend simulator
+solutions.
 """

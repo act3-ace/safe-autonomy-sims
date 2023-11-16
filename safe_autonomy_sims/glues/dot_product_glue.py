@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Glue which returns the dot product between the deputy orientation unit
+This module implements a glue which returns the dot product between the deputy orientation unit
 vector and the unit vector pointing from the deputy to the chief.
 
 Author: Kochise Bennett
@@ -27,8 +27,10 @@ from corl.libraries.property import DictProp, BoxProp
 
 class DotProductGlueValidator(BaseMultiWrapperGlueValidator):
     """
-    Validator for the DotProductGlue.
+    A configuration validator for the DotProductGlue.
 
+    Attributes
+    ----------
     normalize_obs_vectors: bool
         Naormalize vectors before taking dot product
     """
@@ -55,18 +57,6 @@ class DotProductGlue(BaseMultiWrapperGlue):
         glue_name0 = self.glues()[0].get_unique_name()
         glue_name1 = self.glues()[1].get_unique_name()
         return glue_name0 + "_DotProduct_" + glue_name1
-
-    # def observation_units(self):
-    #     """_summary_
-
-    #     Returns
-    #     -------
-    #     _type_
-    #         _description_
-    #     """
-    #     d = gymnasium.spaces.dict.Dict()
-    #     d.spaces[self.Fields.DIRECT_OBSERVATION] = ['N/A']
-    #     return d
 
     @cached_property
     def observation_prop(self):

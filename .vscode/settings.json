@@ -1,7 +1,11 @@
 {
+    // Pytest
     "python.testing.pytestArgs": [
         "test"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+
+    // Autodocstrings
+    "autoDocstring.docstringFormat": "numpy"
 }

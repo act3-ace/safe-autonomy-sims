@@ -24,8 +24,7 @@ from safe_autonomy_sims.simulators.inspection_simulator import InspectionPoints
 
 
 class Arrow3D(FancyArrowPatch):
-    """
-    Class to make 3d arrow
+    """Make a 3d arrow
     Credit: https://gist.github.com/WetHat/1d6cd0f7309535311a539b42cccca89c
     """
 
@@ -86,8 +85,8 @@ class SixDofAnimation(BaseAnimationModule):
 
     def __init__(
         self,
-        expr_config_path: str = 'safe-autonomy-sims/configs/six-dof-inspection-v2/experiment.yml',
-        task_config_path: str = 'safe-autonomy-sims/configs/six-dof-inspection-v2/task.yml',
+        expr_config_path: str = 'safe-autonomy-sims/configs/weighted-six-dof-inspection-v2/experiment.yml',
+        task_config_path: str = 'safe-autonomy-sims/configs/weighted-six-dof-inspection-v2/task.yml',
         platform_serializer_class: PlatformSerializer = SerializeCWH3D,
         radius: float = 10.,
         num_points: int = 100,

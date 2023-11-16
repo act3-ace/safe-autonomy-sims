@@ -9,9 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Common sensor implementations.
-
-Author: Jamie Cunningham
+This module implements common sensors for the safe autonomy environments.
 """
 import abc
 import typing

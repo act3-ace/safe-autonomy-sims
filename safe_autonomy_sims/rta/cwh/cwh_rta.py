@@ -32,9 +32,9 @@ from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator, RTASing
 
 class CWHDocking3dRTAGlueValidator(RTAGlueValidator):
     """
-    Base validator for cwh docking 3d rta glues.
+    A configuration validator for cwh docking 3d rta glues.
 
-    Parameters
+    Attributes
     ----------
     m : float, optional
         Mass in kg of spacecraft, by default M_DEFAULT.
@@ -97,9 +97,9 @@ class RTAGlueCWHDocking3d(RTAGlue):
 
 class CWHDocking3dExplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
     """
-    Validator for CWH Docking 3d Explicit Switching RTA Glue.
+    A configuration validator for CWH Docking 3d Explicit Switching RTA Glue.
 
-    Parameters
+    Attributes
     ----------
     backup_controller : RTABackupController, optional
         Backup controller object utilized by rta module to generate backup control.
@@ -142,9 +142,9 @@ class CHWDocking3dExplicitSwitchingSingleton(RTASingleton):
 
 class CWHDocking3dImplicitSwitchingRTAGlueValidator(CWHDocking3dRTAGlueValidator):
     """
-    Validator for CWH Docking 3d Implicit Switching RTA Glue.
+    A configuration validator for CWH Docking 3d Implicit Switching RTA Glue.
 
-    Parameters
+    Attributes
     ----------
     backup_window : float
         Duration of time in seconds to evaluate backup controller trajectory.
@@ -206,9 +206,9 @@ class CHWDocking3dExplicitOptimizationSingleton(RTASingleton):
 
 class CWHDocking3dImplicitOptimizationRTAGlueValidator(CWHDocking3dRTAGlueValidator):
     """
-    Validator for CWH Docking 3d Implicit Optimization RTA Glue.
+    A configuration validator for CWH Docking 3d Implicit Optimization RTA Glue.
 
-    Parameters
+    Attributes
     ----------
     backup_window : float
         Duration of time in seconds to evaluate backup controller trajectory.

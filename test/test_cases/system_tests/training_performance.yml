@@ -1,18 +1,18 @@
 # Test each environment
 - ID: Docking
-  experiment_config_path: configs/cwh3d/docking/experiments/experiment.yml
+  experiment_config_path: configs/docking/experiments/experiment.yml
   seed: 1
   max_training_iteration: 200
   success_mean_metric: done_results/blue0/SuccessfulDockingDoneFunction_mean
   expected_success_rate: 0.9
 - ID: Six DOF Inspection
-  experiment_config_path: configs/six-dof-inspection/experiment.yml
+  experiment_config_path: configs/weighted-six-dof-inspection/experiment.yml
   seed: 1
   max_training_iteration: 200
   success_mean_metric: agent_done_status/blue0_ctrl/DoneStatusCodes.WIN_mean
   expected_success_rate: 0.9
 # - ID: Multiagent Six DOF Inspection
-#   experiment_config_path: configs/multiagent-six-dof-inspection/experiment.yml
+#   experiment_config_path: configs/multiagent-weighted-six-dof-inspection/experiment.yml
 #   seed: 1
 #   max_training_iteration: 200
 #   success_mean_metric: done_status/blue0/DoneStatusCodes.WIN_mean

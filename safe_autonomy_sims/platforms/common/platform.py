@@ -8,6 +8,8 @@ This is a US Government Work not subject to copyright protection in the US.
 The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
+
+This module implements a common platform object for the safe autonomy environments.
 """
 
 from corl.simulators.base_platform import BasePlatform

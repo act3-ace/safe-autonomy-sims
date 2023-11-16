@@ -10,8 +10,6 @@ limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
 Wrapper glue which returns a velocity constraint based on position and velocity sensor data as an observation.
-
-Author: Jamie Cunningham
 """
 from collections import OrderedDict
 
@@ -28,8 +26,10 @@ from corl.libraries.units import corl_get_ureg
 
 class VelocityLimitGlueValidator(ObserveSensorValidator):
     """
-    Validator for the VelocityLimitGlue.
+    A configuration validator for the VelocityLimitGlue.
 
+    Attributes
+    ----------
     velocity_threshold: float
         The maximum tolerated velocity within docking region without crashing
     threshold_distance: float
@@ -88,14 +88,8 @@ class VelocityLimitGlue(ObserveSensor):
 
     @cached_property
     def normalized_action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
         return self.action_space
     
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
         return self.observation_space

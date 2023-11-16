@@ -25,7 +25,12 @@ from corl.simulators.common_platform_utils import get_platform_by_name
 
 class TimeoutDoneValidator(DoneFuncBaseValidator):
     """
-    This class validates that the TimeoutDoneFunction config contains the max_sim_time value.
+    A configuration validator for the TimeoutDoneFunction.
+
+    Attributes
+    ----------
+    max_sim_time: float
+        The maximum simulation time
     """
     max_sim_time: float
 
@@ -33,7 +38,13 @@ class TimeoutDoneValidator(DoneFuncBaseValidator):
 # TODO: remove redundant done func
 class TimeoutDoneFunction(DoneFuncBase):
     """
-    A done function that determines if the max episode time has been reached.
+    A done function that determines if the max episode time
+    has been reached.
+
+    Attributes
+    ----------
+    config: TimeoutDoneValidator
+        The function's validated configuration parameters 
     """
 
     def __init__(self, **kwargs) -> None:
@@ -43,14 +54,12 @@ class TimeoutDoneFunction(DoneFuncBase):
     @staticmethod
     def get_validator():
         """
-        Parameters
-        ----------
-        cls : constructor function
+        Returns the validator for this done function.
 
         Returns
         -------
         TimeoutDoneValidator
-            config validator for the TimeoutDoneValidator.
+            Config validator for the TimeoutDoneFunction.
         """
         return TimeoutDoneValidator
 
@@ -95,9 +104,11 @@ class TimeoutDoneFunction(DoneFuncBase):
 
 class CollisionDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
-    Validator for the CollisionDoneFunction.
+    A configuration validator for the CollisionDoneFunction.
 
-    spacecraft_safety_constraint : float
+    Attributes
+    ----------
+    safety_constraint : float
         The minimum radial distance between spacecrafts that must be maintained in order to avoid a collision.
     """
     safety_constraint: float = 0.5  # meters
@@ -105,45 +116,13 @@ class CollisionDoneFunctionValidator(SharedDoneFuncBaseValidator):
 
 class CollisionDoneFunction(SharedDoneFuncBase):
     """
-    A done function that determines if an agent's spacecraft has collided with another
-    agent's spacecraft in the environemt.
+    A done function that determines if an agent's spacecraft
+    has collided with another agent's spacecraft in the environemt.
 
-
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units,
-        local_dones,
-        local_done_info
-    ) -> DoneDict:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-    local_dones: DoneDict
-        DoneDict containing name to boolean KVPs representing done statuses of each agent
-    local_done_info: OrderedDict
-        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
-
-    Returns
-    -------
-    done : DoneDict
-        Dictionary containing the done condition for each agent.
+    config: CollisionDoneFunctionValidator
+        The function's validated configuration parameters 
     """
 
     @staticmethod
@@ -154,7 +133,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         Returns
         -------
         CollisionDoneFunctionValidator
-            done function validator
+            Config validator for the CollisionDoneFunction.
         """
         return CollisionDoneFunctionValidator
 
@@ -169,6 +148,31 @@ class CollisionDoneFunction(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+        local_dones: DoneDict
+            DoneDict containing name to boolean KVPs representing done statuses of each agent
+        local_done_info: OrderedDict
+            An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
+
+        Returns
+        -------
+        done : DoneDict
+            Dictionary containing the done condition for each agent.
+        """
 
         # get list of spacecrafts
         platform_names = list(local_dones.keys())
@@ -213,55 +217,27 @@ class CollisionDoneFunction(SharedDoneFuncBase):
 
 class MultiagentSuccessDoneFunctionValidator(SharedDoneFuncBaseValidator):
     """
-    The validator for the MultiagentSuccessfulDockingDoneFunction.
+    A configuration validator for the MultiagentSuccessfulDockingDoneFunction.
 
+    Attributes
+    ----------
     success_function_name : str
-        The name of the successful docking function, which this function will reference to ensure all agents have reached a
-        DoneStatusCodes.WIN before ending the episode.
+        The name of the successful docking function, which this
+        function will reference to ensure all agents have reached a
+        DoneStatusCodes.WIN state before ending the episode.
     """
     success_function_name: str = "RejoinSuccessDone"
 
 
 class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
     """
-    This done function determines whether every agent in the environment has reached a specified successful done condition.
+    This done function determines whether every agent in the
+    environment has reached a specified successful done condition.
 
-
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units,
-        local_dones,
-        local_done_info
-    ) -> DoneDict:
-
-    Parameters
+    Attributes
     ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-    local_dones: DoneDict
-        DoneDict containing name to boolean KVPs representing done statuses of each agent
-    local_done_info: OrderedDict
-        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
-
-    Returns
-    -------
-    done : DoneDict
-        Dictionary containing the done condition for each agent.
+    config: MultiagentSuccessDoneFunctionValidator
+        The function's validated configuration parameters 
     """
 
     @staticmethod
@@ -272,8 +248,7 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         Returns
         -------
         MultiagentSuccessDoneFunctionValidator
-            done function validator
-
+            Config validator for the MultiagentSuccessDoneFunction.
         """
         return MultiagentSuccessDoneFunctionValidator
 
@@ -288,6 +263,31 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+        local_dones: DoneDict
+            DoneDict containing name to boolean KVPs representing done statuses of each agent
+        local_done_info: OrderedDict
+            An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
+
+        Returns
+        -------
+        done : DoneDict
+            Dictionary containing the done condition for each agent.
+        """
 
         # populate DoneDict
         done = DoneDict()
@@ -312,44 +312,8 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
 
 class SetAllDoneFunction(SharedDoneFuncBase):
     """
-    A done function that sets all agents to done if one agent is found to be done.
-
-
-    def __call__(
-        self,
-        observation,
-        action,
-        next_observation,
-        next_state,
-        observation_space,
-        observation_units,
-        local_dones,
-        local_done_info
-    ) -> DoneDict:
-
-    Parameters
-    ----------
-    observation : np.ndarray
-        np.ndarray describing the current observation
-    action : np.ndarray
-        np.ndarray describing the current action
-    next_observation : np.ndarray
-        np.ndarray describing the incoming observation
-    next_state : np.ndarray
-        np.ndarray describing the incoming state
-    observation_space : gymnasium.spaces.dict.Dict
-        The agent observation space.
-    observation_units : gymnasium.spaces.dict.Dict
-        The units of the observations in the observation space. This may be None.
-    local_dones: DoneDict
-        DoneDict containing name to boolean KVPs representing done statuses of each agent
-    local_done_info: OrderedDict
-        An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
-
-    Returns
-    -------
-    done : DoneDict
-        Dictionary containing the done condition for each agent.
+    A done function that sets all agents to done if one agent
+    is found to be done.
     """
 
     def __call__(
@@ -363,6 +327,31 @@ class SetAllDoneFunction(SharedDoneFuncBase):
         local_dones: DoneDict,
         local_done_info: OrderedDict
     ) -> DoneDict:
+        """
+        Parameters
+        ----------
+        observation : np.ndarray
+            np.ndarray describing the current observation
+        action : np.ndarray
+            np.ndarray describing the current action
+        next_observation : np.ndarray
+            np.ndarray describing the incoming observation
+        next_state : np.ndarray
+            np.ndarray describing the incoming state
+        observation_space : gymnasium.spaces.dict.Dict
+            The agent observation space.
+        observation_units : gymnasium.spaces.dict.Dict
+            The units of the observations in the observation space. This may be None.
+        local_dones: DoneDict
+            DoneDict containing name to boolean KVPs representing done statuses of each agent
+        local_done_info: OrderedDict
+            An OrderedDict containing nested OrderedDicts of done function to done status KVPs for each agent
+
+        Returns
+        -------
+        done : DoneDict
+            Dictionary containing the done condition for each agent.
+        """
 
         # get list of spacecrafts
         platform_names = list(local_dones.keys())

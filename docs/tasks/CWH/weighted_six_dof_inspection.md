@@ -1,19 +1,11 @@
 ---
-title: Multiagent Six DOF Inspection
-subtitle: Multiagent Six DOF Inspection With Illumination
+title: Weighted Six DOF Inspection
+subtitle: Six DOF Inspection With Illumination
 authors:
 date: 2023-10-29
 ---
 
----
-
-# Six DOF Multiagent Spacecraft Inspection With Illumination
-
-POCs: David van Wijk, Kyle Dunlap, Nate Hamilton, and Kerianne Hobbs
-
-Last Updated: Oct 29, 2023
-
----
+# Six DOF Single Spacecraft Inspection With Illumination and Weighted Inspection Points
 
 ## Motivation
 
@@ -23,61 +15,65 @@ The common thread among all the potential applications is the need to gather inf
 
 ## Training
 
-An example training loop for this multiagent six DOF inspection environment can be launched using the `corl.train_rl` training endpoint. This module must be passed the necessary experiment config file at launch.
+An example training loop for this six DOF inspection environment can be launched using the `corl.train_rl` training endpoint. This module must be passed the necessary experiment config file at launch.
 From the root of this repository, execute the following command:
 
 ```commandline
 # from safe-autonomy-sims root
-python -m corl.train_rl --cfg configs/multiagent-six-dof-inspection/experiment.yml
+python -m corl.train_rl --cfg configs/weighted-six-dof-inspection/experiment.yml
 ```
 
 ## Environment
 
-In this inspection environment, the goal is for three deputy spacecraft, controlled by a RL agent, to navigate around and inspect the entire surface of a chief spacecraft.
+In this inspection environment, the goal is for a single deputy spacecraft, controlled by a RL agent, to navigate around and inspect the entire surface of a chief spacecraft. This is shown in the image below.
+
+![Basic Inspection Problem](../../images/inspection_problem.png)
+*Figure: The single spacecraft inspection problem without illumination.*
 
 The chief is covered in 100 inspection points that the agent must observe while they are illuminated by the moving sun. The points are weighted by priority, such that it is more important to inspect some points than others. A unit vector is used to indicate the direction of highest importance, where points are weighted based on their angular distance to this vector. All point weights add up to a value of one. The optimal policy will inspect points whose cumulative weight exceeds 0.95 within 2 revolutions of the sun while using as little fuel as possible. In this six DOF inspection environment, the agent controls its translational and rotational movement, requiring it to orient itself towards the chief for inspection. __Note: the policy selects a new action every 10 seconds__
 
-| Space*         | Details |
+| Space         | Details |
 |--------------|------|
 | Action Space | (3,) |
 | Observation Space | (32,) |
 | Observation High | [$\infty$, $\infty$, $\infty$, $\infty$, 1, 1, 1, $\infty$, $\infty$, $\infty$, $\infty$, 1, 1, 1, $\infty$, $\infty$, $\infty$, $2\pi$, $2\pi$, $2\pi$, $2\pi$, 1, $2\pi$, 100, 1, 1, 1, 1, 1, 1, 1, 1] |
 | Observation Low | [-$\infty$, -$\infty$, -$\infty$, -$\infty$, -1, -1, -1, -$\infty$, -$\infty$, -$\infty$, -$\infty$, -1, -1, -1, -$\infty$, -$\infty$, -$\infty$, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, 0, 0] |
-\* for each agent
 
 ### Observation Space
 
-At each timestep, each agent $i$ receives the observation, $o_i = [x, y, z, |pos|, |x|, |y|, |z|, v_x, v_y, v_z, |v|, |v_x|, |v_y|, |v_z|, \omega_{x}, \omega_{y}, \omega_{z}, \theta_{cam}, \theta_{x}, \theta{y}, \theta_{z}, f, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}, x_{pv}, y_{pv}, z_{pv}, w_{points}, p_o]$, for deputy $i$ where:
+At each timestep, the agent receives the observation, $o = [x, y, z, |pos|, |x|, |y|, |z|, v_x, v_y, v_z, |v|, |v_x|, |v_y|, |v_z|, \omega_{x}, \omega_{y}, \omega_{z}, \theta_{cam}, \theta_{x}, \theta_{y}, \theta_{z}, f, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}, x_{pv}, y_{pv}, z_{pv}, w_{points}, p_o]$, where:
 
 * $x, y,$ and $z$ represent the deputy's position relative to the chief,
-  * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
+    * Normalized using a Gaussian distribution: $\mu=0m, \sigma=100m$,
 * $|pos|, |x|, |y|, |z|$ is the magnorm representation of the deputy's position relative to the chief
-  * Normalized using a Gaussian distribution: $\mu=0m, \sigma=[175, 1, 1, 1,]m$
+    * Normalized using a Gaussian distribution: $\mu=0m, \sigma=[175, 1, 1, 1,]m$
 * $v_x, v_y,$ and $v_z$ represent the deputy's directional velocity relative to the chief,
-  * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=0.5m/s$,
 * $|v|, |v_x|, |v_y|, |v_z|$ is the magnorm representation of the deputy's velocity relative to the chief
-  * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=[0.866, 1, 1, 1,]m/s$
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=[0.866, 1, 1, 1,]m/s$
+* $\omega_x, \omega_y, \omega_z$ are the components of the deputy's angular velocity
+    * Normalized using a Gaussian distribution: $\mu=0m/s, \sigma=[0.05, 0.05, 0.05]rad/s$
 * $\theta_{cam}$ is the camera's orientation in Hill's frame
 * $\theta_{x}, \theta_{y}, \theta_{z}$ are the deputy axis coordinates in Hill's frame
 * $f$ is the dot-product between the camera orientation vector and the relative position between the deputy and the chief. This value is 1 when the camera is pointing at the chief.  
 * $\theta_{sun}$ is the angle of the sun,
 * $n$ is the number of points that have been inspected so far and,
-  * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
+    * Normalized using a Gaussian distribution: $\mu=0, \sigma=100$,
 * $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vector elements pointing to the nearest large cluster of unispected points as determined by the *Uninspected Points Sensor*.
 * $x_{pv}, y_{pv},$ and $z_{pv}$ are the unit vector elements pointing to the priority vector indicating point priority.
 * $w_{points}$ is the cumulative weight of inpsected points
 * $p_o$ is the dot-product between the uninspected points cluster given by the Uninspected Points Sensor and the deputy's position. This signals if the uninspected points are occluded for if the camera is facing the points but they are not being inspected, there is occlusion.
 
 __Uninspected Points Sensor:__
-This sensor activates every time new points are inspected, scanning for a new cluster of uninspected points. The sensor returns an array for a 3d unit vector, indicating the direction of the nearest cluster of uninspected points. A K-means clustering algorithm is used to identify the clusters of uninspected points. The clusters are initialized from the previously identified clusters and the total number of clusters is never more than $num\_uninspected\_points / 10$. This sensor helps guide each agent towards clusters of uninspected points.
+This sensor activates every time new points are inspected, scanning for a new cluster of uninspected points. The sensor returns an array for a 3d unit vector, indicating the direction of the nearest cluster of uninspected points. A K-means clustering algorithm is used to identify the clusters of uninspected points. The clusters are initialized from the previously identified clusters and the total number of clusters is never more than $num\_uninspected\_points / 10$. This sensor helps guide the agent towards clusters of uninspected points.
 
 ### Action Space
 
-The action space in this environment, which is equivalent to the control space, operates each deputy spacecraft's omni-directional thrusters and a reaction wheel abstraction controlling the deputy's x, y, and z moments with scalar values. These controls are able to move and rotate the spacecraft in any direction.
+The action space in this environment, which is equivalent to the control space, operates the deputy spacecraft's omni-directional thrusters and a reaction wheel abstraction controlling the deputy's x, y, and z moments with scalar values. These controls are able to move and rotate the spacecraft in any direction.
 
 ### Dynamics
 
-The relative translational motion between each deputy and chief are linearized Clohessy-Wiltshire equations [[1]](#1), given by
+The relative translational motion between the deputy and chief are linearized Clohessy-Wiltshire equations [[1]](#1), given by
 
 $$
     \dot{\boldsymbol{x}} = A {\boldsymbol{x}} + B\boldsymbol{u},
@@ -108,28 +104,27 @@ $$
 
 and $n = 0.001027 rad/s$ is the mean motion constant.
 
-
 The body frame rotational motion state transition of each spacecraft given its quaternion orientation and angular velocity $[q_1, q_2, q_3, q_4, \omega_x, \omega_y, \omega_z]$ is defined by
 
 $$
 \begin{bmatrix}
-\dot{q_1} \\
-\dot{q_2} \\
-\dot{q_3} \\
-\dot{q_4} \\
-\dot{\omega_x} \\
-\dot{\omega_y} \\
-\dot{\omega_z} \\
-\end{bmatrix}
-=
+    \dot{q_1} \\
+    \dot{q_2} \\
+    \dot{q_3} \\
+    \dot{q_4} \\
+    \dot{\omega_x} \\
+    \dot{\omega_y} \\
+    \dot{\omega_z} \\
+\end{bmatrix} =
+
 \begin{bmatrix}
-\frac{1}{2}(q_4\omega_x - q_3\omega_y + q_2\omega_z) \\
-\frac{1}{2}(q_3\omega_x + q_4\omega_y - q_1\omega_z) \\
-\frac{1}{2}(-q_2\omega_x + q_1\omega_y + q_4\omega_z) \\
-\frac{1}{2}(-q_1\omega_x - q_2\omega_y - q_3\omega_z) \\
-J_1^{-1}((J_2 - J_3)\omega_y\omega_z) \\
-J_2^{-1}((J_3 - J_1)\omega_x\omega_z) \\
-J_3^{-1}((J_1 - J_2)\omega_x\omega_y) \\
+    \frac{1}{2}(q_4\omega_x - q_3\omega_y + q_2\omega_z) \\
+    \frac{1}{2}(q_3\omega_x + q_4\omega_y - q_1\omega_z) \\
+    \frac{1}{2}(-q_2\omega_x + q_1\omega_y + q_4\omega_z) \\
+    \frac{1}{2}(-q_1\omega_x - q_2\omega_y - q_3\omega_z) \\
+    J_1^{-1}((J_2 - J_3)\omega_y\omega_z) \\
+    J_2^{-1}((J_3 - J_1)\omega_x\omega_z) \\
+    J_3^{-1}((J_1 - J_2)\omega_x\omega_y) \\
 \end{bmatrix}
 $$
 
@@ -138,9 +133,9 @@ where
 $$
 J =
 \begin{bmatrix}
-0.0573 & 0.0 & 0.0 \\
-0.0 & 0.0573 & 0.0 \\
-0.0 & 0.0 & 0.0573
+    0.0573 & 0.0 & 0.0 \\
+    0.0 & 0.0573 & 0.0 \\
+    0.0 & 0.0 & 0.0573
 \end{bmatrix}
 $$
 
@@ -150,14 +145,14 @@ is an inertial matrix.
 
 We use a mix of sparse and dense rewards to define the desired behavior. These are described in more detail below. Dense rewards are computed at every timestep, while sparse rewards are only applied when the conditions are met.
 
-* `ObservedPointsReward` is a dense reward that rewards each agent +1.0 multiplied by the point weight for every new point inspected in a timestep, $r_t = 1.0(weight\_inspected\_points_t - weight\_inspected\_points_{t-1})$.
-* `SafeInspectionSuccessReward` is a sparse reward that rewards each agent for successfully inspecting. A Free Flight Trajectory (FFT) is computed for one orbit following successful inspection to determine if the agent would crash once the episode is over, in which case the agent is punished. $r = 1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius \geq crash\_region\_radius$, $r = -1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius < crash\_region\_radius$, else 0.
-* `InspectionCrashReward` is a sparse reward that punishes each agent for crashing with the chief spacecraft. $r = -1$ if $radius < crash\_region\_radius$, else 0.
-* `MaxDistanceDoneReward` is a sparse reward that punishes each agent for moving too far from the chief spacecraft. $r = -1$ if $||pos_{chief} - pos_{deputy}|| > distance_{max}$, else 0.
-* `LiveTimestepReward` is a dense reward that gives a small reward to each agent for each timestep it stays active up until a configurable limit, encouraging the agent to not immediately end the episode. $r_t = 0.001$ if $t < t_{max}$, else 0.
-* `FacingChiefReward` is a dense gaussian decaying reward that rewards each agent for facing the chief. $r_t = 0.0005 * e^{-|\delta_t(f, 1)^2 / \epsilon|}$ where
-  * $\delta_t(f, 1)$ is the difference between the $f$, dot-product between the camera orientation vector and the relative position between the deputy and the chief, and 1.
-  * $\epsilon$ is the length of the reward curve for the exponential decay (configurable)
+* `ObservedPointsReward` is a dense reward that rewards the agent +1.0 multiplied by the point weight for every new point inspected in a timestep, $r_t = 1.0(weight\_inspected\_points_t - weight\_inspected\_points_{t-1})$.
+* `SafeInspectionSuccessReward` is a sparse reward that rewards the agent for successfully inspecting. A Free Flight Trajectory (FFT) is computed for one orbit following successful inspection to determine if the agent would crash once the episode is over, in which case the agent is punished. $r = 1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius \geq crash\_region\_radius$, $r = -1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius < crash\_region\_radius$, else 0.
+* `InspectionCrashReward` is a sparse reward that punishes the agent for crashing with the chief spacecraft. $r = -1$ if $radius < crash\_region\_radius$, else 0.
+* `MaxDistanceDoneReward` is a sparse reward that punishes the agent for moving too far from the chief spacecraft. $r = -1$ if $||pos_{chief} - pos_{deputy}|| > distance_{max}$, else 0.
+* `LiveTimestepReward` is a dense reward that gives a small reward to the agent for each timestep it stays active up until a configurable limit, encouraging the agent to not immediately end the episode. $r_t = 0.001$ if $t < t_{max}$, else 0.
+* `FacingChiefReward` is a dense gaussian decaying reward that rewards the agent for facing the chief. $r_t = 0.0005 * e^{-|\delta_t(f, 1)^2 / \epsilon|}$ where
+    * $\delta_t(f, 1)$ is the difference between the $f$, dot-product between the camera orientation vector and the relative position between the deputy and the chief, and 1.
+    * $\epsilon$ is the length of the reward curve for the exponential decay (configurable)
 * `InspectionDeltaVReward` is a dense reward that assigns a cost to using the thrusters that can be thought of similar to a fuel cost, $r = -0.1||\boldsymbol{u}||$
 
 ### Initial Conditions
@@ -167,35 +162,35 @@ At the start of any episode, the state is randomly initialized with the followin
 * chief $(x,y,z)$ = $(0, 0, 0)$
 * chief radius = $10 m$
 * chief # of points = $100$
-* each deputy's position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
-  * $r \in [50, 100] m$
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $x = r \cos{\psi} \cos{\phi}$
-  * $y = r \sin{\psi} \cos{\phi}$
-  * $z = r \sin{\phi}$
-* each deputy's $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
-  * $v \in [0, 0.3]$ m/s
-  * $\psi \in [0, 2\pi] rad$
-  * $\phi \in [-\pi/2, \pi/2] rad$
-  * $v_x = v \cos{\psi} \cos{\phi}$
-  * $v_y = v \sin{\psi} \cos{\phi}$
-  * $v_z = v \sin{\phi}$
-* each deputy's $(\omega_x, \omega_y, \omega_z)$ is sampled from a uniform distribution between $[-0.01, -0.01, -0.01]$ rad/s and $[0.01, 0.01, 0.01]$ rad/s
+* deputy position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
+    * $r \in [50, 100] m$
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $x = r \cos{\psi} \cos{\phi}$
+    * $y = r \sin{\psi} \cos{\phi}$
+    * $z = r \sin{\phi}$
+* deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
+    * $v \in [0, 0.3]$ m/s
+    * $\psi \in [0, 2\pi] rad$
+    * $\phi \in [-\pi/2, \pi/2] rad$
+    * $v_x = v \cos{\psi} \cos{\phi}$
+    * $v_y = v \sin{\psi} \cos{\phi}$
+    * $v_z = v \sin{\phi}$
+* deputy $(\omega_x, \omega_y, \omega_z)$ is sampled from a uniform distribution between $[-0.01, -0.01, -0.01]$ rad/s and $[0.01, 0.01, 0.01]$ rad/s
 * Initial sun angle is randomly selected using a uniform distribution
-  * $\theta_{sun} \in [0, 2\pi] rad$
-  * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
+    * $\theta_{sun} \in [0, 2\pi] rad$
+    * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
 
 ### Done Conditions
 
 An episode will terminate if any of the following conditions are met:
 
-* any agent exceeds a `max_distance = 800` meter radius away from the chief,
-* any agent moves within a `crash_region_radius = 15` meter radius around the chief,
+* the agent exceeds a `max_distance = 800` meter radius away from the chief,
+* the agent moves within a `crash_region_radius = 15` meter radius around the chief,
 * the cumulative weight of inspected points exceeds 0.95, and/or
 * the maximum number of timesteps, `max_timesteps = 1224`, is reached.
 
-The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95 while all deputies remain on a safe trajectory (not on a collision course with the chief).
+The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95 while the deputy remains on a safe trajectory (not on a collision course with the chief).
 
 ## Related Works/Environments
 
@@ -205,15 +200,15 @@ Similarly, previous work has been done to solve the inspection problem using bot
 
 ## Configuration Files
 
-Written out below are the core configuration files necessary for recreating the environment as described above. These are the *Environment Config* found in `configs/multiagent-six-dof-inspection/environment.yml` and the *Agent Config* found in `configs/multiagent-six-dof-inspection/agent.yml`.
+Written out below are the core configuration files necessary for recreating the environment as described above. These are the *Environment Config* found in `configs/weighted-six-dof-inspection/environment.yml` and the *Agent Config* found in `configs/weighted-six-dof-inspection/agent.yml`.
 
 <details>
 <summary>Environment Config</summary>
 
-From `configs/multiagent-six-dof-inspection/environment.yml`:
+From `configs/weighted-six-dof-inspection/environment.yml`:
 
 ```yaml
- "simulator": {
+   "simulator": {
     "type": "InspectionSimulator",
     "config": {
       "inspection_points_map": {
@@ -294,24 +289,6 @@ From `configs/multiagent-six-dof-inspection/environment.yml`:
   "episode_parameter_provider": {
     "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
   },
-  "dones": {
-    "shared": [
-      {
-        "functor": "safe_autonomy_sims.dones.common_dones.CollisionDoneFunction",
-        "config": { safety_constraint: 10 },
-      },
-      {
-        "functor": "safe_autonomy_sims.dones.common_dones.MultiagentSuccessDoneFunction",
-        "config": {
-          "success_function_name": "SafeSuccessfulInspectionDoneFunction"
-        },
-      },
-      {
-        "functor": "safe_autonomy_sims.dones.common_dones.SetAllDoneFunction",
-        "config": {},
-      },
-    ]
-  }
 ```
 
 </details>
@@ -319,7 +296,7 @@ From `configs/multiagent-six-dof-inspection/environment.yml`:
 <details>
 <summary>Agent Config</summary>
 
-From `configs/multiagent-six-dof-inspection/agent.yml`:
+From `configs/weighted-six-dof-inspection/agent.yml`:
 
 ```yaml
 "agent": "corl.agents.base_agent.TrainableBaseAgent"  # agent class
@@ -346,6 +323,11 @@ From `configs/multiagent-six-dof-inspection/agent.yml`:
         {"part": "Sensor_InspectedPointsScore", "config": {"inspector_entity_name": "blue0"}},
         {"part": "Sensor_Quaternion"},
         {"part": "Sensor_AngularVelocity"},
+        {"part": "Sensor_OrientationUnitVector"},
+        {"part": "Sensor_RotatedAxes"},
+        {"part": "Sensor_OrbitStability"},
+        {"part": "Sensor_RelativePosition", "config": {"name": "Sensor_RelativeChiefPosition", "entity_name": "chief"}},
+        {"part": "Sensor_RelativeVelocity", "config": {"name": "Sensor_RelativeChiefVelocity", "entity_name": "chief"}},
     ],
     "episode_parameter_provider": {
       "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
@@ -446,181 +428,19 @@ From `configs/multiagent-six-dof-inspection/agent.yml`:
     },
     "glues": [
         # CoRL glue configurations. Glues define the action and observation space
-        {
-            # X-Axis Thrust Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config": {
-                "controller": "X Thrust",
-                "training_export_behavior": "EXCLUDE",
-                "normalization": {
-                  "enabled": False,
-                }
-            },
-        },
-        {
-            # Y-Axis Thrust Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-                "controller": "Y Thrust",
-                "training_export_behavior": "EXCLUDE",
-                "normalization": {
-                  "enabled": False,
-                }
-            }
-        },
-        {
-            # Z-Axis Thrust Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Z Thrust",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # X Moment Controller Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "X Moment",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # Y Moment Controller Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Y Moment",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # Z Moment Controller Glue (action space)
-            "functor": "corl.glues.common.controller_glue.ControllerGlue",
-            "config":{
-              "controller": "Z Moment",
-              "training_export_behavior": "EXCLUDE",
-              "normalization": {
-                "enabled": False,
-              }
-            }
-        },
-        {
-            # Position Sensor Glue (observation space)
-            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-            "config": {
-              "sensor": "Sensor_Position",
-              "output_units": "m",
-              "normalization": {
-                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-                "config": {
-                  "mu": 0.0,
-                  "sigma": [100, 100, 100],
-                }
-              }
-            },
-        },
-        {
-            # Velocity Sensor Glue (observation space)
-            "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-            "config": {
-              "sensor": "Sensor_Velocity",
-              "output_units": "m/s",
-              "normalization": {
-                "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-                "config": {
-                  "mu": 0.0,
-                  "sigma": [0.5, 0.5, 0.5],
-              }
-            },
-          },
-        },
-        {
-          # Inspected Points Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_InspectedPoints",
-            "normalization": {
-              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-              "config": {
-                "mu": 0.0,
-                "sigma": [100.0],
-              },
-            },
-          },
-        },
-        {
-          # Uninspected Points Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_UninspectedPoints",
-            "output_units": "m",
-            "normalization": {
-                "enabled": False
-          ``},
-          },
-        },
-        {
-          # Sun Angle Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_SunAngle",
-            "normalization": {
-              "enabled": False
-            },
-          },
-        },
-        {
-          # Priority Vector Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_PriorityVector",
-            "normalization": {
-              "enabled": False
-            },
-          },
-        },
-        {
-          # Inspected Points Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_InspectedPointsScore",
-            "normalization": {
-                "enabled": False
-            },
-          },
-        },
-        {
-          # Orientation Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_Quaternion",
-            "normalization": {
-                "enabled": False
-            },
-          },
-        },
-        {
-          # Angular Velocity Sensor Glue (observation space)
-          "functor": "corl.glues.common.observe_sensor.ObserveSensor",
-          "config": {
-            "sensor": "Sensor_AngularVelocity",
-            "normalization": {
-              "normalizer": "corl.libraries.normalization.StandardNormalNormalizer",
-              "config": {
-                "mu": 0.0,
-                "sigma": [0.05, 0.05, 0.05],
-              }
-            }
-          },
-        },
+
+        # Controller glues
+        !include-extend ./glues/controllers.yml,
+
+        ### Observations ###
+        # Position and Velocity Obs
+        !include-extend ./glues/translation_obs.yml,
+
+        # Orientation Obs
+        !include-extend ./glues/orientation_obs.yml,
+
+        # Inspection-Specific Obs
+        !include-extend ./glues/inspection_obs.yml,
     ],
     "dones": [
         {
@@ -701,11 +521,49 @@ From `configs/multiagent-six-dof-inspection/agent.yml`:
             },
         },
         {
+            "name": "MaxDistanceDoneReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.done_state_rewards.WinLoseDoneReward",
+            "config": {
+                "scale": -1.0,
+                "done_name": "MaxDistanceDoneFunction",
+                "done_status": "lose"
+            },
+        },
+        {
+            "name": "LiveTimestepReward",
+            "functor": "safe_autonomy_sims.rewards.cwh.live_timestep_reward.LiveTimestepReward",
+            "config": {
+                "step_reward": 0.001,  # Can also try 1.0 / (max_time_rewarded / step_size)
+                "max_time_rewarded": 3000.0  # Earn step_reward for every timestep up until this sim_time
+            }
+        },
+        {
+          "name": "FacingChiefReward",
+          "functor": "safe_autonomy_sims.rewards.cwh.gaussian_decay_from_target_value.GaussianDecayFromTargetValue",
+          "config":
+            {
+              "observation":
+                {
+                  "fields":
+                    [
+                      "Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition",
+                      "direct_observation",
+                    ],
+                },
+              "eps": .15,
+              "reward_scale": 0.0005,
+              "index": 0, 
+              "target_value": 1.0,
+              "max_diff": 1.0,
+            },
+        },
+        {
             "name": "InspectionDeltaVReward",
             # See delta-v reward scale parameters in env config
             "functor": "safe_autonomy_sims.rewards.cwh.inspection_rewards.InspectionDeltaVReward",
             "config": {
                 "mode": "scale",
+                "constant_scale": -0.005
             },
             "references": {
                 "step_size": "step_size",
@@ -713,8 +571,9 @@ From `configs/multiagent-six-dof-inspection/agent.yml`:
             },
         },
     ],
-    "reference_store": !include configs/multiagent-six-dof-inspection/parameters.yml
+    "reference_store": !include configs/weighted-six-dof-inspection/parameters.yml
 }
+
 
 ```
 

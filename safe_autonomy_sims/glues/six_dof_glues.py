@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-Glues for the six-dof environments
+This module implements glues for the six-dof environments
 """
 import typing
 from collections import OrderedDict
@@ -61,9 +61,6 @@ class MagNorm3DGlue(BaseWrapperGlue):
     
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
         return self.observation_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
@@ -85,7 +82,15 @@ class MagNorm3DGlue(BaseWrapperGlue):
 
 
 class RotateVectorToLocalRef3dGlueValidator(BaseMultiWrapperGlueValidator):
-    """_summary_
+    """
+    A configuration validator for RotateVectorToLocalRef3d 
+
+    Attributes
+    ----------
+    mode : str
+        the rotation mode, either 'euler' or 'quaternion'
+    apply_inv : bool
+        whether or not to invert the input vector
     """
     mode: str = 'quaternion'
     apply_inv: bool = True
@@ -138,9 +143,6 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
 
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        """
-        passthrough property
-        """
         return self.observation_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
@@ -151,8 +153,6 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
             orientation_wrapped.Fields.DIRECT_OBSERVATION]
         input_vector = input_vector_wrapped.get_observation(other_obs, obs_space, obs_units)[
             input_vector_wrapped.Fields.DIRECT_OBSERVATION]
-
-        # input_vector_units = str(input_vector.units)
 
         if self.config.mode == 'euler':
             orientation = Rotation.from_euler('z', angles=orientation_obs.m[0])

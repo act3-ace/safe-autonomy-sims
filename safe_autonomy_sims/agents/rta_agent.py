@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-A trainable RTA agent class.
+This module implements agents capable of using run-time-assurance.
 """
 
 import typing
@@ -19,7 +19,12 @@ from corl.agents.base_agent import BaseAgentParser, Functor, FunctorWrapper, Tra
 
 class FunctorMultiWrapper(Functor):
     """
-    wrapped: The functor or functor wrapper configuration wrapped by this functor wrapper.
+    A wrapper around one or more functors.
+
+    Attributes
+    ----------
+    wrapped: Functor, FunctorWrapper
+        The functor or functor wrapper configuration wrapped by this functor wrapper.
     """
     wrapped_glues: typing.Union['FunctorMultiWrapper', FunctorWrapper, Functor]
 
@@ -29,13 +34,13 @@ class FunctorMultiWrapper(Functor):
 
         Parameters
         ----------
-        - platform : [type]
+        platform : BasePlatform
             The platform instance to be associated with the glue.
-        - agent_name : [type]
+        agent_name : str
             The name of the agent to be associated with the glue.
-        - local_param_storage : [type]
+        local_param_storage : [type]
             [description]
-        - world_param_storage : [type]
+        world_param_storage : [type]
             [description]
 
         Returns
@@ -59,14 +64,24 @@ FunctorMultiWrapper.update_forward_refs()
 
 class ExtendedAgentParser(BaseAgentParser):
     """
-    glues: List of wrapped glues
+    Agent parser extension which parses glue objects.
+
+    Attributes
+    ----------
+    glues: list
+        List of wrapped glues
     """
     glues: typing.List[typing.Union[FunctorMultiWrapper, FunctorWrapper, Functor]]
 
 
 class RTAAgent(TrainableBaseAgent):
     """
-    Trainable RTA Agent
+    A trainable RTA Agent
+
+    Attributes
+    ----------
+    config: ExtendedAgentParser
+        The agent configuration
     """
 
     def __init__(self, **kwargs) -> None:
