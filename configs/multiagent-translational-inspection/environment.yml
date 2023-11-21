@@ -13,6 +13,7 @@
 ###################################
 
 {
+ "horizon": 1223,  # episode length (2 orbits is 12236 sec)
  "simulator": {
     "type": "InspectionSimulator",
     "config": {
