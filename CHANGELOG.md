@@ -1,3 +1,10 @@
+## [3.2.4](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.3...v3.2.4) (2023-11-21)
+
+
+### Bug Fixes
+
+* Move horizon to env config ([1b26a86](https://github.com/act3-ace/safe-autonomy-sims/commit/1b26a86201eb735ff541b001197e5f77222d1d8e))
+
 ## [3.2.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.2...v3.2.3) (2023-11-13)
 
 
