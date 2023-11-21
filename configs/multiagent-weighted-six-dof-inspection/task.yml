@@ -15,7 +15,6 @@
 experiment_class: corl.experiments.rllib_experiment.RllibExperiment
 config:
   rllib_config_updates: &rllib_config_updates
-    horizon: 1223 # episode length (2 orbits is 12236 sec)
     rollout_fragment_length: 1500
     train_batch_size: 1500  # set to num_workers * rollout_fragment_length
     sgd_minibatch_size: 1500
