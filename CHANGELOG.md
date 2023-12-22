@@ -1,3 +1,10 @@
+## [3.2.5](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.4...v3.2.5) (2023-12-22)
+
+
+### Bug Fixes
+
+* Use rta singleton for rejection sampler ([6c8189a](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/6c8189af9fc1c2bb028d0af41ad539fe213629f8))
+
 ## [3.2.4](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.3...v3.2.4) (2023-11-21)
 
 
