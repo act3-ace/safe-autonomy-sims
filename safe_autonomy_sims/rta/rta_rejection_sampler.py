@@ -92,9 +92,6 @@ class RejectionSampler(ParameterWrapper):
         self.config.rta.args['agent_name'] = 'None'
         self.config.rta.args['state_observation_names'] = ['None']
 
-        # Get RTA module
-        self.rta = self.config.rta.functor(**self.config.rta.args).rta
-
     @staticmethod
     def get_validator() -> type[ParameterWrapperValidator]:
         """Get the validator class for this Parameter"""
@@ -177,11 +174,12 @@ class RejectionSampler(ParameterWrapper):
         bool
             True if state is safe, False if not.
         """
-        assert isinstance(self.rta, ConstraintBasedRTA), ("Must use constraint based rta for rejection sampling.")
+        assert isinstance(self.config.rta.functor(**self.config.rta.args).rta,
+                          ConstraintBasedRTA), ("Must use constraint based rta for rejection sampling.")
         init_state_safe = True
 
         # For each constraint, check if satisfied
-        for c in self.rta.constraints.values():
+        for c in self.config.rta.functor(**self.config.rta.args).rta.constraints.values():
             if c.phi(to_jnp_array_jit(state)) < 0 or c(to_jnp_array_jit(state)) < 0:
                 init_state_safe = False
                 break
