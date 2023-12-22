@@ -44,7 +44,7 @@ class DeltaV(MetricGeneratorTerminalEventScope):
                 continue
             # Create a non terminal metric (Dict) that is comprised of the terminal (Real) actions
             real_dict: typing.Dict[str, Metric] = {key: Real(map_act[key]) for key in map_act.keys()}
-            arr += np.sum([abs(c.value[0]) for c in real_dict.values()]) / 12 * 10  # TODO: HARDCODED
+            arr += np.sum([abs(c.value[0]) for k, c in real_dict.items() if 'thrust' in k]) / 12 * 10  # TODO: HARDCODED
 
         return Real(arr)
 
