@@ -24,9 +24,9 @@ from safe_autonomy_dynamics.base_models import BaseEntity
 
 from safe_autonomy_sims.simulators.initializers.initializer import (
     Accessor,
-    PassThroughInitializer,
     EntityAttributeAccessor,
     SimAttributeAccessor,
+    StripUnitsInitializer,
 )
 from safe_autonomy_sims.utils import KeyCollisionError
 
@@ -37,7 +37,6 @@ class SafeRLSimulatorValidator(
     """
     A validator for the SafeRLSimulator config.
     """
-    ...
 
 
 class InitializerResetValidator(BaseModel):
@@ -119,7 +118,9 @@ class SafeRLSimulatorResetValidator(BaseSimulatorResetValidator):
         Key is entity name, value is entity's initialization dict.
     """
     platforms: typing.Optional[typing.Dict[str, typing.Dict]] = {}
-    default_initializer: InitializerResetValidator = InitializerResetValidator(functor=PassThroughInitializer)
+    # StripUnitsInitializer is the default as package dependencies could be using Pint and CoRL doesn't
+    # use Pint
+    default_initializer: InitializerResetValidator = InitializerResetValidator(functor=StripUnitsInitializer)
     additional_entities: typing.Dict[str, AdditionalEntityValidator] = {}
     init_state: typing.Optional[BaseModel] = None
 
@@ -165,19 +166,19 @@ class SafeRLSimulator(BaseSimulator):
     def platforms(self) -> typing.List:
         return list(self._state.sim_platforms)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict[str, typing.Any]):
         self.config: SafeRLSimulatorValidator
         super().__init__(**kwargs)
         self.agent_sim_entities: typing.Dict[str, BaseEntity] = {}
         self.additional_sim_entities: typing.Dict[str, BaseEntity] = {}
         self.platform_map = self._construct_platform_map()
-        self.sim_entities = {}
+        self.sim_entities: typing.Dict[str, BaseEntity] = {}
         self.clock = 0.0
-        self.last_entity_actions = {}
+        self.last_entity_actions: typing.Dict[typing.Any, typing.Any] = {}
         self.sim_platforms = self.construct_platforms()
         self.init_state = None
 
-        self._state: SafeRLSimulatorState = None
+        self._state: SafeRLSimulatorState
 
     def reset(self, config):
         reset_config = self.get_reset_validator(**config)

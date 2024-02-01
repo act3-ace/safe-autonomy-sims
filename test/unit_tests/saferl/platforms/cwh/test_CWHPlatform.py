@@ -13,9 +13,10 @@ Tests for the CWHPlatform module
 """
 
 import os
-import pint
 import numpy as np
 import pytest
+
+from corl.libraries.units import UnitRegistryConfiguration, corl_set_ureg, corl_get_ureg, Quantity
 
 from test.conftest import delimiter, read_test_cases
 
@@ -29,8 +30,13 @@ def test_CWHPlatform_getAppliedAction_default(cwh_platform):
     """
 
     platform_obj = cwh_platform
-    expected = pint.Quantity(np.array([0., 0., 0.]), "newton")
-    assert np.all(platform_obj.get_applied_action() == expected)
+    expected = corl_get_ureg().Quantity(np.array([0., 0., 0.]), "newton")
+
+    # CoRL Quantity doesn't handle comparisons of np.arrays, so we have to compare
+    # things individually
+    assert platform_obj.get_applied_action()[0] == expected[0]
+    assert platform_obj.get_applied_action()[1] == expected[1]
+    assert platform_obj.get_applied_action()[2] == expected[2]
 
 
 @pytest.fixture(name='applied_action')
@@ -38,7 +44,6 @@ def get_applied_action(request):  # pylint: disable=W0621
     """
     fixture to obtain the parameter 'applied_action' from a list
     """
-    # action = pint.Quantity(, "newtons")
     return request.param[0]
 
 
@@ -46,6 +51,11 @@ class Test_get_applied_action:
     """
     Class to define parameterized applied_action tests and fixtures
     """
+    # CoRL unit registry must be set before we use CoRL Quantity.  It's typically done for us by CoRL, but this
+    # test doesn't call the functionality that would do that
+    unit_reg_config = UnitRegistryConfiguration()
+    ureg = unit_reg_config.create_registry_from_args()
+    corl_set_ureg(ureg)
     # Define test assay
     test_cases_file_path = os.path.join(
         os.path.split(__file__)[0], "../../../../test_cases/platforms/cwh/platform_get_applied_action_test_cases.yaml"
@@ -85,9 +95,9 @@ class Test_save_action_to_platform:
         This is a parametrized test, where the tests are in the action_to_platform_tests
         """
 
-        action0 = pint.Quantity(np.array([applied_action[0]]), "newton")
-        action1 = pint.Quantity(np.array([applied_action[1]]), "newton")
-        action2 = pint.Quantity(np.array([applied_action[2]]), "newton")
+        action0 = corl_get_ureg().Quantity(np.array([applied_action[0]]), "newton")
+        action1 = corl_get_ureg().Quantity(np.array([applied_action[1]]), "newton")
+        action2 = corl_get_ureg().Quantity(np.array([applied_action[2]]), "newton")
 
         cwh_platform.save_action_to_platform(action0, 0)
         cwh_platform.save_action_to_platform(action1, 1)

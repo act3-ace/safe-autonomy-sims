@@ -15,14 +15,14 @@ Author: Kochise Bennett
 """
 import typing
 from collections import OrderedDict
-from pydantic import validator
 from functools import cached_property
 
 import gymnasium
 import numpy as np
 from corl.glues.base_glue import BaseAgentGlue, BaseAgentGlueValidator
+from corl.libraries.property import BoxProp, DictProp
 from corl.libraries.units import corl_get_ureg
-from corl.libraries.property import DictProp, BoxProp
+from pydantic import validator
 
 
 class CoordinateAxisGlueValidator(BaseAgentGlueValidator):
@@ -62,10 +62,8 @@ class CoordinateAxisGlue(BaseAgentGlue):
 
     @cached_property
     def observation_prop(self):
-        prop = BoxProp(low=[-1, -1, -1], high=[1, 1, 1], unit="")
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
+        prop = BoxProp(low=[-1, -1, -1], high=[1, 1, 1], unit="dimensionless")
+        return DictProp(spaces={self.Fields.DIRECT_OBSERVATION: prop})
 
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
@@ -91,6 +89,6 @@ class CoordinateAxisGlue(BaseAgentGlue):
             out = np.array([0.0, 0.0, 1.0], dtype=np.float32)
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(out, "")
+        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(out, "dimensionless")
 
         return d

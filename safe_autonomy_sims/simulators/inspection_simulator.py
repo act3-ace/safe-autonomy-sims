@@ -18,7 +18,7 @@ import typing
 import matplotlib.pyplot as plt
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
-from pint import Quantity
+from corl.libraries.units import Quantity
 from pydantic import BaseModel, validator
 from ray.rllib import BaseEnv
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
@@ -179,7 +179,7 @@ class InspectionPoints:
         ----------
         inspector_entity : PyObject
             sim entity of inspector platform
-        
+
         Returns
         -------
         None
@@ -230,7 +230,7 @@ class InspectionPoints:
 
     def kmeans_find_nearest_cluster(self, position):
         """Finds nearest cluster of uninspected points using kmeans clustering
-        
+
         Parameters
         ----------
         position : list
@@ -281,7 +281,7 @@ class InspectionPoints:
 
     def check_if_illuminated(self, point, position):
         """Check if point is illuminated
-        
+
         Parameters
         ----------
         point : list
@@ -679,10 +679,10 @@ class InspectionSimulator(SafeRLSimulator):
         """Get the initial priority vector for weighting points"""
         azi = config["priority_vector_azimuth_angle"]
         if isinstance(azi, Quantity):
-            azi = azi.magnitude
+            azi = azi.m
         ele = config["priority_vector_elevation_angle"]
         if isinstance(ele, Quantity):
-            ele = ele.magnitude
+            ele = ele.m
 
         self.priority_vector[0] = np.cos(azi) * np.cos(ele)
         self.priority_vector[1] = np.sin(azi) * np.cos(ele)
