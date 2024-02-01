@@ -17,8 +17,8 @@ import typing
 
 import numpy as np
 from corl.libraries.parameters import ParameterWrapper, ParameterWrapperValidator
+from corl.libraries.units import Quantity
 from numpy.random import Generator, RandomState
-from pint import Quantity
 from pydantic import BaseModel, PyObject, create_model
 from run_time_assurance.rta import ConstraintBasedRTA
 from run_time_assurance.utils import to_jnp_array_jit

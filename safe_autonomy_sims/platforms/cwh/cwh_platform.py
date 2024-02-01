@@ -16,8 +16,8 @@ It represents a spacecraft operating under the Clohessy-Wiltshire dynamics model
 import typing
 
 import numpy as np
-from corl.simulators.base_platform import BasePlatformValidator
 from corl.libraries.units import corl_get_ureg
+from corl.simulators.base_platform import BasePlatformValidator
 from safe_autonomy_dynamics.cwh import CWHSpacecraft, SixDOFSpacecraft
 
 from safe_autonomy_sims.platforms.common.platform import BaseSafeRLPlatform
@@ -68,7 +68,7 @@ class CWHPlatform(BaseSafeRLPlatform):
 
         Returns
         -------
-            CWHPlatformValidator -- validator the platform will use to generate a configuration
+        CWHPlatformValidator -- validator the platform will use to generate a configuration
         """
         return CWHPlatformValidator
 
@@ -107,8 +107,10 @@ class CWHPlatform(BaseSafeRLPlatform):
             # action = action.to('newton')
             self._last_applied_action.m[axis] = action.m[0]
         else:
-            raise TypeError(f"Action saved to platform is of incompatible type:\
-                             expected pint.Quantity with numpy.ndarray of length 1, but got {type(action.m)}")
+            raise TypeError(
+                f"Action saved to platform is of incompatible type:\
+                             expected Quantity with numpy.ndarray of length 1, but got {type(action.m)}"
+            )
 
     @property
     def position(self) -> np.ndarray:

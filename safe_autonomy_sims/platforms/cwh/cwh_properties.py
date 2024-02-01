@@ -12,10 +12,10 @@ limitation or restriction. See accompanying README and LICENSE for details.
 This module defines the measurement and control properties for CWH spacecraft sensors and controllers.
 """
 import typing
+
 import gymnasium
 import numpy as np
-
-from corl.libraries.property import BoxProp, Prop, PlainQuantity, NestedQuantity
+from corl.libraries.property import BoxProp, NestedQuantity, Prop, Quantity
 from pydantic import Field, StrictFloat
 from typing_extensions import Annotated
 
@@ -66,7 +66,7 @@ class MomentProp(BoxProp):
     name: str = "moment"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [-0.001]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.001]
-    unit: str = ""
+    unit: str = "dimensionless"
     description: str = "Direct Moment Control"
 
 
@@ -116,7 +116,7 @@ class RelativePositionProp(BoxProp):
     name: str = "relative_position"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-20000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [20000.0] * 3
-    unit:  str = "m"
+    unit: str = "m"
     description: str = "Relative Position Sensor Properties"
 
 
@@ -166,7 +166,7 @@ class RelativeVelocityProp(BoxProp):
     name: str = "relative_velocity"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-2000.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [2000.0] * 3
-    unit:  str = "m/s"
+    unit: str = "m/s"
     description: str = "Relative Velocity Sensor Properties"
 
 
@@ -191,7 +191,7 @@ class InspectedPointProp(BoxProp):
     name: str = "inspected_points"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [100.]
-    unit:  str = ""
+    unit: str = "dimensionless"
     description: str = "Inspected Points Sensor Properties"
 
 
@@ -237,7 +237,7 @@ class SunVectorProp(BoxProp):
     name: str = "SunVector"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
-    unit:  str = "m"
+    unit: str = "m"
     description: str = "Sun Unit Vector Properties"
 
 
@@ -288,7 +288,7 @@ class BoolArrayProp(BoxProp):
     num_points: int = 100
     low: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [0.0] * num_points
     high: Annotated[typing.List[StrictFloat], Field(min_items=num_points, max_items=num_points)] = [1.0] * num_points
-    unit: str = ""
+    unit: str = "dimensionless"
     description: str = "Boolean array"
 
 
@@ -313,7 +313,7 @@ class QuaternionProp(BoxProp):
     name: str = "quaternion"
     low: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [-1.0] * 4
     high: Annotated[typing.List[StrictFloat], Field(min_items=4, max_items=4)] = [1.0] * 4
-    unit: str = ""
+    unit: str = "dimensionless"
     description: str = "Quaternion Sensor Properties"
 
 
@@ -338,7 +338,7 @@ class OrientationVectorProp(BoxProp):
     name: str = "orientation_unit_vector"
     low: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [-1.0] * 3
     high: Annotated[typing.List[StrictFloat], Field(min_items=3, max_items=3)] = [1.0] * 3
-    unit:  str = ""
+    unit: str = "dimensionless"
     description: str = "Orientation Unit Vector Sensor Properties"
 
 
@@ -363,7 +363,7 @@ class RotatedAxesProp(BoxProp):
     name: str = "rotated_axes_unit_vectors"
     low: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [-1.0] * 6
     high: Annotated[typing.List[StrictFloat], Field(min_items=6, max_items=6)] = [1.0] * 6
-    unit:  str = ""
+    unit: str = "dimensionless"
     description: str = "Rotated Axes Unit Vectors Sensor Properties"
 
 
@@ -434,7 +434,7 @@ class PointsScoreProp(BoxProp):
     name: str = "inspected points score"
     low: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [0.]
     high: Annotated[typing.List[StrictFloat], Field(min_items=1, max_items=1)] = [1.]
-    unit: str = ""
+    unit: str = "dimensionless"
     description: str = "Inspected Points Score Sensor Properties"
 
 
@@ -469,15 +469,15 @@ class TupleProp(Prop):
 
     def scale(self, scale) -> Prop:
         raise NotImplementedError
-    
-    def create_quantity(self, value: dict | (float | (int | (list | np.ndarray)))) -> PlainQuantity | NestedQuantity:
+
+    def create_quantity(self, value: dict | (float | (int | (list | np.ndarray)))) -> Quantity | NestedQuantity:
         """
         This function taskes in values and will attempt to create either a Quantity or NestedQuantity
         from it, properly applying units along the way
         """
         raise NotImplementedError
 
-    def create_zero_sample(self) -> PlainQuantity | NestedQuantity:
+    def create_zero_sample(self) -> Quantity | NestedQuantity:
         """
         This function will attempt to return 0 for each leaf node for all properties
         in a tree, as this is usually a safe default.  however if 0 is not in the low
@@ -486,12 +486,13 @@ class TupleProp(Prop):
         """
         raise NotImplementedError
 
-    def create_low_sample(self) -> PlainQuantity | NestedQuantity:
+    def create_low_sample(self) -> Quantity | NestedQuantity:
         """
         This function will attempt to return the lowest possible value for each leaf node
         for all properties in a tree.
         """
         raise NotImplementedError
+
 
 class OrbitStabilityProp(BoxProp):
     """

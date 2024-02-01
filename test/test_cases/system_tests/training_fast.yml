@@ -1,4 +1,4 @@
-# # Test each task
+# Test each task
 - ID: Docking
   experiment_config_path: configs/docking/experiment.yml
 - ID: Multiagent Docking
