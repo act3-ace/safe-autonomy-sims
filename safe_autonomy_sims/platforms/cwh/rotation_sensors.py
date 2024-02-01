@@ -12,11 +12,10 @@ limitation or restriction. See accompanying README and LICENSE for details.
 This module implements rotation sensor for use with the CWHSixDofPlatform
 """
 import numpy as np
-from scipy.spatial.transform import Rotation as R
 from corl.libraries.plugin_library import PluginLibrary
 from corl.libraries.units import corl_get_ureg
+from scipy.spatial.transform import Rotation as R
 
-import numpy as np
 import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
 from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from safe_autonomy_sims.platforms.cwh.cwh_sensors import CWHSensor
@@ -42,7 +41,7 @@ class QuaternionSensor(CWHSensor):
             quaternion of spacecraft.
         """
         quaternion = np.array(self.parent_platform.quaternion, dtype=np.float32)
-        return corl_get_ureg().Quantity(quaternion, "")
+        return corl_get_ureg().Quantity(quaternion, "dimensionless")
 
 
 class AngularVelocitySensor(CWHSensor):
@@ -63,7 +62,7 @@ class AngularVelocitySensor(CWHSensor):
             Angular velocity of spacecraft.
         """
         angular_velocity = np.array(self.parent_platform.angular_velocity, dtype=np.float32)
-        return corl_get_ureg().Quantity(angular_velocity, "radians / second")
+        return corl_get_ureg().Quantity(angular_velocity, "radian / second")
 
 
 class OrientationUnitVectorSensor(CWHSensor):
@@ -92,8 +91,8 @@ class OrientationUnitVectorSensor(CWHSensor):
             initial_orientation = np.array([0.0, 0.0, 0.0])
         if initial_orientation is None:
             initial_orientation = np.array([0.0, 0.0, 0.0])
-        
-        initial_orientation = corl_get_ureg().Quantity(np.array(initial_orientation, dtype=np.float32), "")
+
+        initial_orientation = corl_get_ureg().Quantity(np.array(initial_orientation, dtype=np.float32), "dimensionless")
         return initial_orientation
 
 
@@ -131,7 +130,7 @@ class RotatedAxesSensor(CWHSensor):
         rot_v2 = r.apply(v2)
 
         out = np.concatenate([rot_v1, rot_v2])
-        out = corl_get_ureg().Quantity(np.array(out, dtype=np.float32), "")
+        out = corl_get_ureg().Quantity(np.array(out, dtype=np.float32), "dimensionless")
         return out
 
 

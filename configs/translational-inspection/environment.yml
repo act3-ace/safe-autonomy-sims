@@ -42,7 +42,7 @@
     },
   },
   "simulator_reset_parameters": {
-        "init_state": {
+    "init_state": {
       "type": "safe_autonomy_sims.rta.rta_rejection_sampler.RejectionSampler",
       "config": {
         "initializer": {

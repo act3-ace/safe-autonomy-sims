@@ -13,18 +13,19 @@ This module implements a glue for filtering an agent's action through a Run Time
 """
 import abc
 import typing
-import pint
 from collections import OrderedDict
 from functools import cached_property
 
 import gymnasium
 import numpy as np
-from safe_autonomy_sims.platforms.cwh.cwh_properties import TupleProp
-from corl.libraries.env_space_util import EnvSpaceUtil
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
 from corl.glues.common.controller_glue import ControllerGlue
+from corl.libraries.env_space_util import EnvSpaceUtil
 from corl.libraries.property import Prop
+from corl.libraries.units import corl_get_ureg
 from run_time_assurance.rta import ConstraintBasedRTA, RTAModule
+
+from safe_autonomy_sims.platforms.cwh.cwh_properties import TupleProp
 
 
 def flip_rta(control):
@@ -104,7 +105,7 @@ class RTAGlue(BaseMultiWrapperGlue):
 
     @cached_property
     def action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
-        action_spaces = [gymnasium.spaces.Dict({glue.action_prop.name:glue.action_space}) for glue in self.glues()]
+        action_spaces = [gymnasium.spaces.Dict({glue.action_prop.name: glue.action_space}) for glue in self.glues()]
         return gymnasium.spaces.tuple.Tuple(tuple(action_spaces))
 
     def controller_glue_action_space(self) -> gymnasium.spaces.tuple.Tuple:
@@ -117,8 +118,11 @@ class RTAGlue(BaseMultiWrapperGlue):
         gymnasium.spaces.Space
             The gymnasium Space that defines the actions given to the apply_action function for the wrapped terminal controller glues
         """
-        action_spaces = [{controller_glue.action_prop.name:controller_glue.action_space} for controller_glue in self.controller_glues]
-        return action_spaces
+        action_spaces = [
+            gymnasium.spaces.Dict({controller_glue.action_prop.name: controller_glue.action_space})
+            for controller_glue in self.controller_glues
+        ]
+        return gymnasium.spaces.tuple.Tuple(tuple(action_spaces))
 
     def apply_action(
         self,
@@ -138,7 +142,9 @@ class RTAGlue(BaseMultiWrapperGlue):
         filtered_action = self._filter_action(desired_action, observation)
 
         for controller_glue, controller_filtered_action in zip(self.controller_glues, filtered_action):
-            controller_glue.apply_action(controller_filtered_action[controller_glue.action_prop.name], observation, action_space, obs_space, obs_units)
+            controller_glue.apply_action(
+                controller_filtered_action[controller_glue.action_prop.name], observation, action_space, obs_space, obs_units
+            )
 
     def _filter_action(self, desired_action: tuple, observation: typing.Dict) -> tuple:
         rta_state_vector = self._get_rta_state_vector(observation)
@@ -177,7 +183,7 @@ class RTAGlue(BaseMultiWrapperGlue):
                 action_length = np.prod(action_space.shape)
                 action_value = combined_action_left[:action_length]
                 combined_action_left = combined_action_left[action_length:]
-                controller_action[action_key] = pint.Quantity(action_value, "")
+                controller_action[action_key] = corl_get_ureg().Quantity(action_value, "dimensionless")
             action_list.append(controller_action)
         return tuple(action_list)
 

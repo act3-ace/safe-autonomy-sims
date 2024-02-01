@@ -21,8 +21,8 @@ from functools import cached_property
 import gymnasium
 import numpy as np
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
+from corl.libraries.property import BoxProp, DictProp
 from corl.libraries.units import corl_get_ureg
-from corl.libraries.property import DictProp, BoxProp
 
 
 class DotProductGlueValidator(BaseMultiWrapperGlueValidator):
@@ -34,7 +34,7 @@ class DotProductGlueValidator(BaseMultiWrapperGlueValidator):
     normalize_obs_vectors: bool
         Naormalize vectors before taking dot product
     """
-    normalize_vectors : bool = False
+    normalize_vectors: bool = False
 
 
 class DotProductGlue(BaseMultiWrapperGlue):
@@ -60,10 +60,8 @@ class DotProductGlue(BaseMultiWrapperGlue):
 
     @cached_property
     def observation_prop(self):
-        prop = BoxProp(low=[-100], high=[100], unit="")
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
+        prop = BoxProp(low=[-100], high=[100], unit="dimensionless")
+        return DictProp(spaces={self.Fields.DIRECT_OBSERVATION: prop})
 
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
@@ -75,7 +73,7 @@ class DotProductGlue(BaseMultiWrapperGlue):
     @cached_property
     def observation_space(self):
         d = gymnasium.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(-1.0, 1.0, shape=(1,), dtype=np.float32)
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(-1.0, 1.0, shape=(1, ), dtype=np.float32)
         return d
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
@@ -93,5 +91,5 @@ class DotProductGlue(BaseMultiWrapperGlue):
             dot_product = np.clip(dot_product, -1.0, 1.0)
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(np.array([dot_product], dtype=np.float32), "")
+        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(np.array([dot_product], dtype=np.float32), "dimensionless")
         return d

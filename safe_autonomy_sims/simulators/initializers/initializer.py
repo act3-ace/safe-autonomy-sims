@@ -15,7 +15,7 @@ This module implements the base initializer class.
 import abc
 import typing
 
-import pint
+from corl.libraries.units import Quantity
 from pydantic import BaseModel
 
 
@@ -37,8 +37,8 @@ def strip_units(value) -> typing.Any:
         same as input but with all units stripped
     """
 
-    if isinstance(value, pint.Quantity):
-        return value.magnitude
+    if isinstance(value, Quantity):
+        return value.m
     return value
 
 
@@ -77,7 +77,7 @@ class BaseInitializer(abc.ABC):
     """
     This class defines the template for Initializer classes. Initializers are responsible
     for providing a dictionary complete with all relevant agent_reset_config values. Initializers
-    encapsulate the  initialization of randomized and conditional (dependent) agent state values.
+    encapsulate the initialization of randomized and conditional (dependent) agent state values.
     """
 
     def __init__(self, config):
@@ -111,10 +111,6 @@ class BaseInitializer(abc.ABC):
 class BaseInitializerWithPint(BaseInitializer):
     """Generic initializer that utilize a pint UnitRegistry for quantities and unit conversion
     """
-
-    def __init__(self, config):
-        super().__init__(config)
-        self.ureg: pint.UnitRegistry = pint.get_application_registry()
 
 
 class PassThroughInitializer(BaseInitializer):
@@ -150,7 +146,6 @@ class Accessor(abc.ABC):
         typing.Set
             set of dependency names for this accessor (e.g. names of other entities)
         """
-        ...
 
     @abc.abstractmethod
     def access(self, sim, sim_entities: typing.Dict[str, typing.Any]):
@@ -163,7 +158,6 @@ class Accessor(abc.ABC):
         sim_entities : typing.Dict[str, typing.Any]
             dictionary of already initialized entites from which values may be accessed
         """
-        ...
 
 
 class AttributeAccessor(Accessor):
@@ -176,7 +170,7 @@ class AttributeAccessor(Accessor):
             e.g. "first.second.third" accesses obj.first.second.third
     """
 
-    def __init__(self, attribute_name, **kwargs):
+    def __init__(self, attribute_name):
         super().__init__()
         self.attribute_name = attribute_name
 
@@ -237,7 +231,7 @@ class EntityAttributeAccessor(AttributeAccessor):
         name of entity to retrieve attribute from
     """
 
-    def __init__(self, attribute_name, entity_name, **kwargs):
+    def __init__(self, attribute_name, entity_name):
         super().__init__(attribute_name)
         self.entity_name = entity_name
 
