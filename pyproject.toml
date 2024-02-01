@@ -30,20 +30,20 @@ torch = "1.13.0"
 imageio = "2.25.0"
 imageio-ffmpeg = "0.4.8"
 pint = "^0.22"
-safe-autonomy-dynamics = {version = "0.13.2", source = "sa-dynamics"}
-run-time-assurance = {version = "1.15.3", source = "sa-rta"}
-corl = {version = "3.2.6", source = "dle-corl"}
+safe-autonomy-dynamics = "1.2.0"
+run-time-assurance = "1.15.3"
+corl = {version = "3.6.3", source = "dle-corl"}
 
 [tool.poetry.group.lint.dependencies]
 pylint = "2.15.4"
 flake8 = "3.9.2"
 yapf = "^0.40.0"
-mypy = "0.930"
 isort = "5.9.3"
 bashate = "^2.1.0"
 velin = "^0.0.11"
 blacken-docs = "^1.12.1"
 detect-secrets = "1.1.0"
+mypy = "^1.8.0"
 
 [tool.poetry.group.test]
 optional = true
@@ -78,16 +78,6 @@ pymdown-extensions = "^9.5"
 ipykernel = "^6.25.2"
 mkdocs-markdownextradata-plugin = "^0.2.5"
 mkdocstrings-python = "^1.7.3"
-
-[[tool.poetry.source]]
-name = "sa-dynamics"
-url = "https://git.act3-ace.com/api/v4/projects/826/packages/pypi/simple"
-priority = "supplemental"
-
-[[tool.poetry.source]]
-name = "sa-rta"
-url = "https://git.act3-ace.com/api/v4/projects/804/packages/pypi/simple"
-priority = "supplemental"
 
 [[tool.poetry.source]]
 name = "dle-corl"

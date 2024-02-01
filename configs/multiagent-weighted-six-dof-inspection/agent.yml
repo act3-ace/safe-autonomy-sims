@@ -254,7 +254,7 @@
             "output_units": "m",
             "normalization": {
                 "enabled": False
-          ``},
+            },
           },
         },
         {
