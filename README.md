@@ -108,6 +108,10 @@ Same as translational-inspection environment, but agent can control attitude (do
 - **Multiagent Weighted Six DoF Inspection**
 Same as weighted-six-dof-inspection environment, with multiple agent controlled deputy spacecraft.
 
+## Public Release
+
+Approved for public release; distribution is unlimited. Case Number: AFRL-2023-6156
+
 ## Team
 
 Jamie Cunningham,
