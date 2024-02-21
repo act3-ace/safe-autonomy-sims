@@ -149,9 +149,9 @@ class InspectionPoints:
             dict of points_dict[cartesian_point] = initial_inspected_state
         """
         if self.config.points_algorithm == "cmu":
-            points_alg = self.points_on_sphere_cmu
+            points_alg = InspectionPoints.points_on_sphere_cmu
         else:
-            points_alg = self.points_on_sphere_fibonacci
+            points_alg = InspectionPoints.points_on_sphere_fibonacci
         points = points_alg(self.config.num_points, self.config.radius)  # TODO: HANDLE POSITION UNITS*
         points_position_dict = {}
         points_inspected_dict = {}
@@ -307,7 +307,8 @@ class InspectionPoints:
             illuminated = illum.evaluate_RGB(RGB)
         return illuminated
 
-    def points_on_sphere_fibonacci(self, num_points: int, radius: float) -> list:
+    @staticmethod
+    def points_on_sphere_fibonacci(num_points: int, radius: float) -> list:
         """
         Generate a set of equidistant points on sphere using the
         Fibonacci Sphere algorithm: https://arxiv.org/pdf/0912.4540.pdf
@@ -340,7 +341,8 @@ class InspectionPoints:
 
         return points
 
-    def points_on_sphere_cmu(self, num_points: int, radius: float) -> list:
+    @staticmethod
+    def points_on_sphere_cmu(num_points: int, radius: float) -> list:
         """
         Generate a set of equidistant points on a sphere using the algorithm
         in https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf. Number

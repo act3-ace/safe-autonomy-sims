@@ -20,6 +20,8 @@ from scipy.spatial.transform import Rotation
 from safe_autonomy_sims.simulators.initializers.initializer import BaseInitializerWithPint, InitializerValidator, strip_units_from_dict
 from safe_autonomy_sims.utils import velocity_limit
 
+from corl.libraries.units import Quantity
+
 
 class CWH3DRadialInitializer(BaseInitializerWithPint):
     """
@@ -257,6 +259,14 @@ class Docking3DRadialInitializer(BaseInitializerWithPint):
         typing.Dict
             initial conditions of platform
         """
+        # contend with corl Quantities
+        radius = radius.value if isinstance(radius, Quantity) else radius
+        azimuth_angle = azimuth_angle.value if isinstance(azimuth_angle, Quantity) else azimuth_angle
+        elevation_angle = elevation_angle.value if isinstance(elevation_angle, Quantity) else elevation_angle
+        vel_max_ratio = vel_max_ratio.value if isinstance(vel_max_ratio, Quantity) else vel_max_ratio
+        vel_azimuth_angle = vel_azimuth_angle.value if isinstance(vel_azimuth_angle, Quantity) else vel_azimuth_angle
+        vel_elevation_angle = vel_elevation_angle.value if isinstance(vel_elevation_angle, Quantity) else vel_elevation_angle
+
         x = radius * np.cos(azimuth_angle) * np.cos(elevation_angle)
         y = radius * np.sin(azimuth_angle) * np.cos(elevation_angle)
         z = radius * np.sin(elevation_angle)

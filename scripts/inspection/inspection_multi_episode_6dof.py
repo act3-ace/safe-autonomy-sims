@@ -63,7 +63,7 @@ class BaseMultiEpisodeAnimation(abc.ABC):
         points_algorithm: str
             points algorithm to use. Either "cmu" or "fibonacci"
         fig_prefix: str
-            String to prepend to the 
+            String to prepend to the
         """
 
         tmp_dir = '/tmp/eval_results/animation_plots'
@@ -84,9 +84,9 @@ class BaseMultiEpisodeAnimation(abc.ABC):
 
         # Calculate values
         if points_algorithm == "cmu":
-            points = InspectionPoints.points_on_sphere_cmu(InspectionPoints, num_points, radius)
+            points = InspectionPoints.points_on_sphere_cmu(num_points, radius)
         elif points_algorithm == "fibonacci":
-            points = InspectionPoints.points_on_sphere_fibonacci(InspectionPoints, num_points, radius)
+            points = InspectionPoints.points_on_sphere_fibonacci(num_points, radius)
         total_time = times[-1]
         step_size = times[1] - times[0]
         max_pos = []

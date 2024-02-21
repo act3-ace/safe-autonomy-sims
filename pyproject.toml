@@ -30,9 +30,9 @@ torch = "1.13.0"
 imageio = "2.25.0"
 imageio-ffmpeg = "0.4.8"
 pint = "^0.22"
-safe-autonomy-dynamics = "1.2.0"
+safe-autonomy-dynamics = "1.2.2"
 run-time-assurance = "1.15.3"
-corl = "3.6.3"
+corl = "3.14.6"
 
 [tool.poetry.group.lint.dependencies]
 pylint = "2.15.4"
@@ -44,6 +44,7 @@ velin = "^0.0.11"
 blacken-docs = "^1.12.1"
 detect-secrets = "1.1.0"
 mypy = "^1.8.0"
+types-pyyaml = "^6.0.12.20240311"
 
 [tool.poetry.group.test]
 optional = true
