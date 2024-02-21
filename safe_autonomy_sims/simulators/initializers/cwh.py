@@ -17,7 +17,7 @@ import typing
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from safe_autonomy_sims.simulators.initializers.initializer import InitializerValidator, BaseInitializerWithPint, strip_units_from_dict
+from safe_autonomy_sims.simulators.initializers.initializer import BaseInitializerWithPint, InitializerValidator, strip_units_from_dict
 from safe_autonomy_sims.utils import velocity_limit
 
 from corl.libraries.units import Quantity
@@ -42,7 +42,7 @@ class CWH3DRadialInitializer(BaseInitializerWithPint):
     def compute(self, **kwargs):
         return self._compute_with_units(**strip_units_from_dict(kwargs))
 
-    #TODO: change name or function to reflect unit use. Currently, no units used.
+    # TODO: change name or function to reflect unit use. Currently, no units used.
     def _compute_with_units(
         self,
         radius: float,
@@ -63,7 +63,7 @@ class CWH3DRadialInitializer(BaseInitializerWithPint):
         elevation_angle : float
             location elevation angle from x-y plane. Positive angles = positive z. rad
         vel_mag : float
-            magnitude of velocity vector. meters/second
+            magnitude of velocity vector. meter/second
         vel_azimuth_angle : float
             velocity vector azimuthal angle in spherical coordinates (right hand convention). rad
         vel_elevation_angle : float
@@ -307,9 +307,9 @@ class CWHSixDOFRadialInitializer(BaseInitializerWithPint):
         'vel_mag': 'meter/second',
         'vel_azimuth_angle': 'radians',
         'vel_elevation_angle': 'radians',
-        'wx': 'radians/second',
-        'wy': 'radians/second',
-        'wz': 'radians/second',
+        'wx': 'radian/second',
+        'wy': 'radian/second',
+        'wz': 'radian/second',
     }
 
     def compute(self, **kwargs):
@@ -338,7 +338,7 @@ class CWHSixDOFRadialInitializer(BaseInitializerWithPint):
         elevation_angle : float
             location elevation angle from x-y plane. Positive angles = positive z. rad
         vel_mag : float
-            magnitude of velocity vector. meters/second
+            magnitude of velocity vector. meter/second
         vel_azimuth_angle : float
             velocity vector azimuthal angle in spherical coordinates (right hand convention). rad
         vel_elevation_angle : float
@@ -419,7 +419,7 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
         elevation_angle : float
             location elevation angle from x-y plane. Positive angles = positive z. rad
         vel_mag : float
-            magnitude of velocity vector. meters/second
+            magnitude of velocity vector. meter/second
         vel_azimuth_angle : float
             velocity vector azimuthal angle in spherical coordinates (right hand convention). rad
         vel_elevation_angle : float

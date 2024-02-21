@@ -13,17 +13,16 @@ This module implements glues for the six-dof environments
 """
 import typing
 from collections import OrderedDict
-from pydantic import validator
 from functools import cached_property
-from pint import Quantity
 
 import gymnasium
 import numpy as np
 from corl.glues.base_multi_wrapper import BaseMultiWrapperGlue, BaseMultiWrapperGlueValidator
 from corl.glues.base_wrapper import BaseWrapperGlue
-from scipy.spatial.transform import Rotation
+from corl.libraries.property import BoxProp, DictProp
 from corl.libraries.units import corl_get_ureg
-from corl.libraries.property import DictProp, BoxProp
+from pydantic import validator
+from scipy.spatial.transform import Rotation
 
 
 class MagNorm3DGlue(BaseWrapperGlue):
@@ -41,10 +40,8 @@ class MagNorm3DGlue(BaseWrapperGlue):
     @cached_property
     def observation_prop(self):
         # unit = self.glue().observation_space[self.glue().Fields.DIRECT_OBSERVATION].unit
-        prop = BoxProp(low=[-10000, -1, -1, -1], high=[10000, 1, 1, 1], unit="")
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
+        prop = BoxProp(low=[-10000, -1, -1, -1], high=[10000, 1, 1, 1], unit="dimensionless")
+        return DictProp(spaces={self.Fields.DIRECT_OBSERVATION: prop})
 
     @cached_property
     def observation_space(self) -> gymnasium.spaces.Space:
@@ -58,15 +55,13 @@ class MagNorm3DGlue(BaseWrapperGlue):
         d = gymnasium.spaces.dict.Dict()
         d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(low=low, high=high, dtype=np.float32)
         return d
-    
+
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
         return self.observation_space
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):
         obs = self.glue().get_observation(other_obs, obs_space, obs_units)[self.glue().Fields.DIRECT_OBSERVATION]
-        obs_units = str(obs.units)
-
         mag = np.linalg.norm(obs.m)
 
         # if mag == 0:
@@ -76,14 +71,14 @@ class MagNorm3DGlue(BaseWrapperGlue):
             output = np.concatenate([[mag], obs.m / mag], dtype=np.float32)  # pylint: disable=unexpected-keyword-arg
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(output, obs_units)
+        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(output, obs.units)
 
         return d
 
 
 class RotateVectorToLocalRef3dGlueValidator(BaseMultiWrapperGlueValidator):
     """
-    A configuration validator for RotateVectorToLocalRef3d 
+    A configuration validator for RotateVectorToLocalRef3d
 
     Attributes
     ----------
@@ -128,9 +123,7 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         # unit = self.glues()[1].observation_space[self.glues()[1].Fields.DIRECT_OBSERVATION].unit
         unit = ""
         prop = BoxProp(low=[-10000, -10000, -10000], high=[10000, 10000, 10000], unit=unit)
-        return DictProp(
-            spaces={self.Fields.DIRECT_OBSERVATION: prop}
-        )
+        return DictProp(spaces={self.Fields.DIRECT_OBSERVATION: prop})
 
     @cached_property
     def observation_space(self) -> gymnasium.spaces.Space:
@@ -149,10 +142,9 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
         orientation_wrapped = self.glues()[0]
         input_vector_wrapped = self.glues()[1]
 
-        orientation_obs = orientation_wrapped.get_observation(other_obs, obs_space, obs_units)[
-            orientation_wrapped.Fields.DIRECT_OBSERVATION]
-        input_vector = input_vector_wrapped.get_observation(other_obs, obs_space, obs_units)[
-            input_vector_wrapped.Fields.DIRECT_OBSERVATION]
+        orientation_obs = orientation_wrapped.get_observation(other_obs, obs_space,
+                                                              obs_units)[orientation_wrapped.Fields.DIRECT_OBSERVATION]
+        input_vector = input_vector_wrapped.get_observation(other_obs, obs_space, obs_units)[input_vector_wrapped.Fields.DIRECT_OBSERVATION]
 
         if self.config.mode == 'euler':
             orientation = Rotation.from_euler('z', angles=orientation_obs.m[0])
@@ -165,7 +157,7 @@ class RotateVectorToLocalRef3d(BaseMultiWrapperGlue):
             rotated_vector = orientation.apply(input_vector.m).astype(np.float32)
 
         d = OrderedDict()
-        d[self.Fields.DIRECT_OBSERVATION] =  corl_get_ureg().Quantity(rotated_vector, "")
+        d[self.Fields.DIRECT_OBSERVATION] = corl_get_ureg().Quantity(rotated_vector, "dimensionless")
 
         return d
 
@@ -182,10 +174,10 @@ class AngleToUnitVector(BaseWrapperGlue):
     def get_unique_name(self) -> str:
         return self.glue().get_unique_name() + "_AngleToUnitVector"
 
-    @cached_property 
+    @cached_property
     def observation_space(self) -> gymnasium.spaces.Space:
         d = gymnasium.spaces.dict.Dict()
-        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(shape=(3,), low=-1.0, high=1.0, dtype=np.float32)
+        d.spaces[self.Fields.DIRECT_OBSERVATION] = gymnasium.spaces.Box(shape=(3, ), low=-1.0, high=1.0, dtype=np.float32)
         return d
 
     def get_observation(self, other_obs: OrderedDict, obs_space: OrderedDict, obs_units: OrderedDict):

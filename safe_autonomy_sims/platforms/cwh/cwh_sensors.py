@@ -15,14 +15,13 @@ import typing
 
 import numpy as np
 from corl.libraries.plugin_library import PluginLibrary
+from corl.libraries.units import corl_get_ureg
 from corl.simulators.base_parts import BasePlatformPartValidator, BaseSensor
 
 import safe_autonomy_sims.platforms.cwh.cwh_properties as cwh_props
 from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from safe_autonomy_sims.simulators.cwh_simulator import CWHSimulator
 from safe_autonomy_sims.simulators.inspection_simulator import InspectionSimulator
-
-from corl.libraries.units import corl_get_ureg
 
 
 class CWHSensor(BaseSensor):
@@ -56,7 +55,7 @@ class PositionSensor(CWHSensor):
 
         Returns
         -------
-        pint.Quantity
+        Quantity
             Position of spacecraft.
         """
         position = np.array(self.parent_platform.position, dtype=np.float32)
@@ -237,7 +236,7 @@ class InspectedPointsSensor(CWHSensor):
             for points in state.inspection_points_map.values():
                 num_points_inspected += points.get_num_points_inspected(inspector_entity=inspector_entity)
 
-        return corl_get_ureg().Quantity(np.array([num_points_inspected], dtype=np.float32), "")
+        return corl_get_ureg().Quantity(np.array([num_points_inspected], dtype=np.float32), "dimensionless")
 
 
 class SunAngleSensor(CWHSensor):
@@ -486,8 +485,8 @@ class BoolArraySensor(CWHSensor):
             bool_array = np.array([float(bool(a)) for a in inspection_points.points_inspected_dict.values()])
             if len(bool_array) == 99:  # TODO: Remove hardcoded value
                 bool_array = np.concatenate((bool_array, np.zeros(1)))
-        
-        return corl_get_ureg().Quantity(bool_array, "")
+
+        return corl_get_ureg().Quantity(bool_array, "dimensionless")
 
 
 class PriorityVectorSensor(CWHSensor):
@@ -553,7 +552,7 @@ class InspectedPointsScoreSensor(CWHSensor):
             # raise error if not initialization
             if state.sim_time != 0.0:
                 raise ValueError(f"{self.config.inspector_entity_name} not found in simulator state!")
-            return corl_get_ureg().Quantity(np.array([0.]), "")
+            return corl_get_ureg().Quantity(np.array([0.]), "dimensionless")
 
         # get inspector entity object
         inspector_entity = state.sim_entities[self.config.inspector_entity_name]
@@ -563,7 +562,7 @@ class InspectedPointsScoreSensor(CWHSensor):
         for points in state.inspection_points_map.values():
             weight += points.get_total_weight_inspected(inspector_entity=inspector_entity)
 
-        return corl_get_ureg().Quantity(np.array([weight], dtype=np.float32), "")
+        return corl_get_ureg().Quantity(np.array([weight], dtype=np.float32), "dimensionless")
 
 
 class OrbitStabilitySensor(CWHSensor):
@@ -591,7 +590,7 @@ class OrbitStabilitySensor(CWHSensor):
 
         orbit_stability = 2 * pos[0] * n + vel[1]
 
-        return corl_get_ureg().Quantity(np.array([orbit_stability], dtype=np.float32), "")
+        return corl_get_ureg().Quantity(np.array([orbit_stability], dtype=np.float32), "dimensionless")
 
 
 for sim in [CWHSimulator, InspectionSimulator]:
