@@ -360,7 +360,7 @@ class SafeRLSimulator(BaseSimulator):
             for sensor in plat.sensors.values():
                 sensor.calculate_and_cache_measurement(state=self._state)
 
-    def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict):
+    def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict, metadata: dict | None = None):
         """
         Takes in the done_info specifying how the episode completed
         and does any book keeping around ending an episode

@@ -132,7 +132,7 @@ class VelocitySensor(CWHSensor):
             Velocity of spacecraft.
         """
         velocity = np.array(self.parent_platform.velocity, dtype=np.float32)
-        return corl_get_ureg().Quantity(velocity, "meters/second")
+        return corl_get_ureg().Quantity(velocity, "meter/second")
 
 
 class RelativeVelocitySensorValidator(BasePlatformPartValidator):
@@ -434,7 +434,7 @@ class EntityVelocitySensor(CWHSensor):
         list of floats
             Position of spacecraft.
         """
-        return corl_get_ureg().Quantity(state.sim_entities[self.config.entity_name].velocity, "meters/second")
+        return corl_get_ureg().Quantity(state.sim_entities[self.config.entity_name].velocity, "meter/second")
 
 
 class BoolArraySensorValidator(BasePlatformPartValidator):

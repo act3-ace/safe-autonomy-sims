@@ -43,12 +43,12 @@ from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import
 from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
 from corl.evaluation.runners.section_factories.plugins.plugins import Plugins
 from corl.evaluation.runners.section_factories.task import Task
-from corl.evaluation.runners.section_factories.teams import Agent, Platform, Teams
-from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
+from corl.evaluation.runners.section_factories.teams import LoadableCorlAgent, Teams
+from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseStrategy
 from corl.evaluation.visualization.print import Print
 from corl.parsers.yaml_loader import load_file
 from ray.tune.analysis.experiment_analysis import ExperimentAnalysis
-
+import ray
 
 def evaluate(
     task_config_path: str,
@@ -449,6 +449,7 @@ def run_ablation_study(
         for experiment_index, experiment_state_path in enumerate(experiment_states):
 
             # append index to evaluation_output path
+            ray.init()
             experiment_analysis = ExperimentAnalysis(experiment_state_path)
 
             if trial_indices is None:

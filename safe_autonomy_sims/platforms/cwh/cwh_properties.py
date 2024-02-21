@@ -15,7 +15,7 @@ import typing
 import gymnasium
 import numpy as np
 
-from corl.libraries.property import BoxProp, Prop, PlainQuantity, NestedQuantity
+from corl.libraries.property import BoxProp, Prop, NestedQuantity
 from pydantic import Field, StrictFloat
 from typing_extensions import Annotated
 
@@ -470,14 +470,14 @@ class TupleProp(Prop):
     def scale(self, scale) -> Prop:
         raise NotImplementedError
     
-    def create_quantity(self, value: dict | (float | (int | (list | np.ndarray)))) -> PlainQuantity | NestedQuantity:
+    def create_quantity(self, value: dict | (float | (int | (list | np.ndarray)))) ->  NestedQuantity:
         """
         This function taskes in values and will attempt to create either a Quantity or NestedQuantity
         from it, properly applying units along the way
         """
         raise NotImplementedError
 
-    def create_zero_sample(self) -> PlainQuantity | NestedQuantity:
+    def create_zero_sample(self) ->  NestedQuantity:
         """
         This function will attempt to return 0 for each leaf node for all properties
         in a tree, as this is usually a safe default.  however if 0 is not in the low
@@ -486,7 +486,7 @@ class TupleProp(Prop):
         """
         raise NotImplementedError
 
-    def create_low_sample(self) -> PlainQuantity | NestedQuantity:
+    def create_low_sample(self) ->  NestedQuantity:
         """
         This function will attempt to return the lowest possible value for each leaf node
         for all properties in a tree.
