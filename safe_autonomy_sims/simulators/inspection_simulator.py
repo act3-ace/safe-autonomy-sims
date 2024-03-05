@@ -121,6 +121,7 @@ class InspectionPoints:
         self.clock = 0.0
         self.parent_entity = parent_entity
         self.priority_vector = priority_vector
+        self.init_priority_vector = copy.deepcopy(self.priority_vector)
         (self._default_points_position_dict, self.points_position_dict, self.points_inspected_dict,
          self.points_weights_dict) = self._add_points()
         self.last_points_inspected = 0
@@ -391,7 +392,7 @@ class InspectionPoints:
         parent_position = self.parent_entity.position
         parent_orientation = self.parent_entity.orientation
 
-        self.priority_vector = parent_orientation.apply(self.priority_vector)
+        self.priority_vector = parent_orientation.apply(self.init_priority_vector)
 
         for point_id, default_position in self._default_points_position_dict.items():
             # rotate about origin
@@ -697,6 +698,7 @@ class InspectionSimulator(SafeRLSimulator):
             points.update_points_position()
             # TODO: assign priority vector to specific agent
             self.priority_vector = points.priority_vector
+            self._state.priority_vector = points.priority_vector
 
         # illuminate
         if self.config.illumination_params:
