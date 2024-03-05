@@ -1,3 +1,10 @@
+## 3.2.7 (2024-03-05)
+
+
+### Bug Fixes
+
+* inspection - rotate initial priority vector
+
 ## 3.2.6 (2024-02-01)
 
 
