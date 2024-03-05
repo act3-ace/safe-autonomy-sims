@@ -1,3 +1,10 @@
+## [3.2.7](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.6...v3.2.7) (2024-03-05)
+
+
+### Bug Fixes
+
+* inspection - rotate initial priority vector ([9ca5075](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/9ca507586523b5b0d8db1b2115a1e2c0559bf9ae))
+
 ## [3.2.6](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.5...v3.2.6) (2024-02-01)
 
 
