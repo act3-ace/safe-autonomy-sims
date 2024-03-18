@@ -18,7 +18,7 @@ import gymnasium
 import numpy as np
 from corl.dones.done_func_base import DoneFuncBase, DoneFuncBaseValidator, DoneStatusCodes
 from corl.simulators.common_platform_utils import get_platform_by_name
-from pydantic import PyObject
+from pydantic.types import PyObject
 
 from safe_autonomy_sims.utils import VelocityConstraintValidator, get_relative_position, get_relative_velocity, max_vel_violation
 
@@ -277,7 +277,7 @@ class TerminalRewardSaturationDoneFunction(DoneFuncBase):
         Returns
         -------
         TerminalRewardSaturationDoneFunctionValidator
-            Config validator for the TerminalRewardSaturationDoneFunction. 
+            Config validator for the TerminalRewardSaturationDoneFunction.
         """
 
         return TerminalRewardSaturationDoneFunctionValidator

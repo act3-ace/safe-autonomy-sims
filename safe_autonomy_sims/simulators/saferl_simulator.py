@@ -19,7 +19,8 @@ from graphlib import CycleError, TopologicalSorter
 
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from corl.simulators.base_simulator_state import BaseSimulatorState
-from pydantic import BaseModel, PyObject, validator
+from pydantic import BaseModel, validator
+from pydantic.types import PyObject
 from safe_autonomy_dynamics.base_models import BaseEntity
 
 from safe_autonomy_sims.simulators.initializers.initializer import (

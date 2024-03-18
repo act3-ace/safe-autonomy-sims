@@ -11,6 +11,7 @@ limitation or restriction. See accompanying README and LICENSE for details.
 """
 
 import math
+import typing
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,7 +57,7 @@ class InspectionAnimation(BaseAnimationModule):
         **kwargs,
     ):
 
-        with open(parameters_path, 'r') as file:
+        with open(parameters_path, 'r', encoding='utf-8') as file:
             parameters = yaml.safe_load(file)
 
         if 'step_size' in parameters:
@@ -87,13 +88,13 @@ class InspectionAnimation(BaseAnimationModule):
         self.bool_array_locations = False
         self.delta_v = 0.0
         self.ffts = np.array([])
-        self.temp_elements = []
+        self.temp_elements: list[typing.Any] = []
 
         # Calculate values
         if self.points_algorithm == "cmu":
-            self.points = InspectionPoints.points_on_sphere_cmu(InspectionPoints, self.num_points, radius)
+            self.points = InspectionPoints.points_on_sphere_cmu(self.num_points, radius)
         elif self.points_algorithm == "fibonacci":
-            self.points = InspectionPoints.points_on_sphere_fibonacci(InspectionPoints, self.num_points, radius)
+            self.points = InspectionPoints.points_on_sphere_fibonacci(self.num_points, radius)
         else:
             raise ValueError('Points algorithm must be either "cmu" or "fibonacci"')
 
@@ -133,24 +134,24 @@ class InspectionAnimation(BaseAnimationModule):
         bool_arrays = []
         scores = []
         for state in dataframe["ObservationVector"][0]:
-            positions.append(state.data['ObserveSensor_Sensor_Position'].value['direct_observation'])
-            velocities.append(state.data['ObserveSensor_Sensor_Velocity'].value['direct_observation'])
+            positions.append(state.data['Obs_Sensor_Position'].value['direct_observation'].value)
+            velocities.append(state.data['Obs_Sensor_Velocity'].value['direct_observation'].value)
             try:
-                score = state.data['ObserveSensor_Sensor_InspectedPointsScore'].value['direct_observation']
+                score = state.data['Obs_Sensor_InspectedPointsScore'].value['direct_observation']
             except KeyError:
                 score = np.NAN
             scores.append(score)
             try:
-                th = state.data['ObserveSensor_Sensor_SunAngle'].value['direct_observation'][0]
+                th = state.data['Obs_Sensor_SunAngle'].value['direct_observation'].value[0]
             except KeyError:
                 th = 0.
             sun = np.array([np.cos(th), -np.sin(th), 0])
             sun_vectors.append(sun)
             try:
-                new_bool = state.data['ObserveSensor_Sensor_BoolArray'].value['direct_observation']
+                new_bool = state.data['Obs_Sensor_BoolArray'].value['direct_observation']
                 self.bool_array_locations = True
             except KeyError:
-                ins_pts = int(state.data['ObserveSensor_Sensor_InspectedPoints'].value['direct_observation'])
+                ins_pts = int(state.data['Obs_Sensor_InspectedPoints'].value['direct_observation'].value)
                 new_bool = np.zeros(self.num_points)
                 new_bool[0:ins_pts] = 1
             bool_arrays.append(new_bool)

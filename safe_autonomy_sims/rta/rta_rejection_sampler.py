@@ -14,12 +14,14 @@ If chosen initial parameters violate safety, they are rejected and resampled.
 """
 
 import typing
+from collections import OrderedDict
 
 import numpy as np
 from corl.libraries.parameters import ParameterWrapper, ParameterWrapperValidator
 from corl.libraries.units import Quantity
 from numpy.random import Generator, RandomState
-from pydantic import BaseModel, PyObject, create_model
+from pydantic import BaseModel, ConfigDict, create_model
+from pydantic.types import PyObject
 from run_time_assurance.rta import ConstraintBasedRTA
 from run_time_assurance.utils import to_jnp_array_jit
 
@@ -111,9 +113,15 @@ class RejectionSampler(ParameterWrapper):
             safe_state = self.check_if_safe_state(state)
 
         # TODO: fixes callback error
-        sample['m'] = 0.0  # type: ignore
+        sample['m'] = 0.0
 
-        return create_model('init_state', **sample)(**sample)  # type: ignore
+        # We create a dynamic model since the rejection sampler can wrap any parameter as defined
+        # in configuration files
+        field_defs = OrderedDict({k: (type(v), v) for k, v in sample.items()})
+        model_config = ConfigDict(arbitrary_types_allowed=True)
+        params_model = create_model('init_state', **field_defs, __config__=model_config)(**sample)
+
+        return params_model  # type: ignore
 
     def get_sample_value(self, rng: Randomness, other_vars: OtherVars, initializer: BaseInitializer) -> typing.Dict:
         """

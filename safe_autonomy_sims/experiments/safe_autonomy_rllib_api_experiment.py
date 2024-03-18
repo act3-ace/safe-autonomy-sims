@@ -34,9 +34,10 @@ from corl.experiments.rllib_utils.policy_mapping_functions import PolicyIsAgent
 from corl.libraries.factory import Factory
 from corl.parsers.yaml_loader import apply_patches
 from corl.policies.base_policy import BasePolicyValidator
-from pydantic import BaseModel, PyObject, validator
+from pydantic import BaseModel, validator
+from pydantic.types import PyObject
 from ray import tune
-from ray.rllib.algorithms.callbacks import MultiCallbacks
+from ray.rllib.algorithms.callbacks import make_multi_callbacks
 from ray.rllib.env.env_context import EnvContext
 from ray.tune.registry import get_trainable_cls
 
@@ -48,7 +49,7 @@ class RllibPolicyMappingValidator(BaseModel):
     ----------
     functor: PyObject
         policy mapping functor
-    config: dict    
+    config: dict
         configuration parameters for policy mapping functor
     """
     functor: PyObject = PolicyIsAgent
@@ -165,8 +166,8 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
     def get_validator() -> typing.Type[SafeAutonomyRllibExperimentValidator]:
         return SafeAutonomyRllibExperimentValidator
 
-    @staticmethod
-    def get_policy_validator() -> typing.Type[RllibPolicyValidator]:
+    @property
+    def get_policy_validator(self) -> typing.Type[RllibPolicyValidator]:
         """Return validator"""
         return RllibPolicyValidator
 
@@ -184,8 +185,6 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
             self.config.ray_config['local_mode'] = True
 
         ray.init(**self.config.ray_config)
-
-        ray_resources = ray.available_resources()
 
         self.config.env_config["agents"], self.config.env_config["agent_platforms"] = self.create_agents(
             args.platform_config, args.agent_config
@@ -274,7 +273,7 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
         callback_list = [self.get_callbacks()]
         if self.config.extra_callbacks:
             callback_list.extend(self.config.extra_callbacks)  # type: ignore[arg-type]
-        rllib_config["callbacks"] = MultiCallbacks(callback_list)
+        rllib_config["callbacks"] = make_multi_callbacks(callback_list)
         rllib_config["env_config"] = self.config.env_config
         now = datetime.now()
         rllib_config["env_config"]["output_date_string"] = f"{now.strftime('%Y%m%d_%H%M%S')}_{socket.gethostname()}"
@@ -349,8 +348,10 @@ class SafeAutonomyRllibExperiment(BaseExperiment):
                                 rllib_config["env_config"]["git_hash"][env_hash_key] = githash
                                 self._logger.info(f"{module0} hash: {githash}")
                             else:
-                                self._logger.warning((f"module: {module0}, repopath: {repo_path}" "is invalid git repo\n"))
-                                sys.stderr.write((f"module: {module0}, repopath: {repo_path}" "is invalid git repo\n"))
+                                self._logger.warning((f"module: {module0}, repopath: {repo_path}"
+                                                      "is invalid git repo\n"))
+                                sys.stderr.write((f"module: {module0}, repopath: {repo_path}"
+                                                  "is invalid git repo\n"))
         except ValueError:
             warnings.warn("Unable to add the gitlab hash to experiment!!!")
 
