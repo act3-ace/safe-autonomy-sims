@@ -1,3 +1,10 @@
+## 3.2.8 (2024-03-21)
+
+
+### Bug Fixes
+
+* **dependencies:** upgrade to CoRL 3.14.7
+
 ## 3.2.7 (2024-03-05)
 
 
