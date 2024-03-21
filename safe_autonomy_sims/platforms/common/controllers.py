@@ -16,7 +16,8 @@ import numpy as np
 from corl.libraries.plugin_library import PluginLibrary  # pylint: disable=E0401
 from corl.libraries.units import corl_get_ureg
 from corl.simulators.base_parts import BaseController, BasePlatformPartValidator  # pylint: disable=E0401
-from pydantic import BaseModel, PyObject
+from pydantic import BaseModel
+from pydantic.types import PyObject
 
 from safe_autonomy_sims.platforms.cwh.cwh_available_platforms import CWHAvailablePlatformTypes
 from safe_autonomy_sims.simulators.cwh_simulator import CWHSimulator
@@ -84,7 +85,7 @@ class RateController(CommonController):
     ):  # pylint: disable=W0102
         self.config: RateControllerValidator
         self.prop_config: ControllerPropValidator = self.get_prop_validator(**config)  # get property class
-        #TODO: there must be a better way to get unit info
+        # TODO: there must be a better way to get unit info
         self.unit = self.prop_config.property_class().unit
         super().__init__(property_class=self.prop_config.property_class, parent_platform=parent_platform, config=config)
 
@@ -106,7 +107,9 @@ class RateController(CommonController):
         self.parent_platform.save_action_to_platform(action=control, axis=self.config.axis)
 
     def get_applied_control(self) -> np.ndarray:
-        return corl_get_ureg().Quantity(np.array([self.parent_platform.get_applied_action().m[self.config.axis]], dtype=np.float32), self.unit)
+        return corl_get_ureg().Quantity(
+            np.array([self.parent_platform.get_applied_action().m[self.config.axis]], dtype=np.float32), self.unit
+        )
 
 
 for sim in [CWHSimulator, InspectionSimulator]:

@@ -19,6 +19,7 @@ import imageio.v2 as imageio
 import matplotlib.pyplot as plt
 import pandas as pd
 from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
+from numpy.typing import ArrayLike
 
 from safe_autonomy_sims.evaluation.evaluation_api import run_one_evaluation
 
@@ -71,8 +72,8 @@ class BaseAnimationModule(abc.ABC):
 
         os.makedirs(self.tmp_dir, exist_ok=True)
         os.makedirs(self.save_dir, exist_ok=True)
-        self.filenames = []
-        self.filetype = None
+        self.filenames: list[str] = []
+        self.filetype = 'png'
 
         self.metrics_config = {
             "agent": {
@@ -96,7 +97,7 @@ class BaseAnimationModule(abc.ABC):
         }
 
         self.default_test_case_manager_config = {
-            "class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
+            "type": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
             "config": {
                 "num_test_cases": 1
             }
@@ -144,7 +145,7 @@ class BaseAnimationModule(abc.ABC):
             # Print progress
             var = (i + 1) / len(dataframe['ObservationVector'].values[0])
             sys.stdout.write('\r')
-            sys.stdout.write("[%-20s] %d%%" % ('=' * int(var * 20), var * 100))
+            sys.stdout.write(f"[{'=' * int(var * 20) : <20}] {var * 100}%")
             sys.stdout.flush()
 
             if self.filetype != 'png':
@@ -166,10 +167,8 @@ class BaseAnimationModule(abc.ABC):
             plt.savefig(os.path.join(self.save_dir, 'episode_plot.png'))
         else:
             # Make video
-            with imageio.get_writer(os.path.join(self.save_dir, 'episode_animation.' + self.filetype), mode='I', fps=30) as writer:
-                for filename in self.filenames:
-                    image = imageio.imread(filename)
-                    writer.append_data(image)
+            images: list[ArrayLike] = [imageio.imread(filename) for filename in self.filenames]
+            imageio.mimwrite(os.path.join(self.save_dir, 'episode_animation.' + self.filetype), ims=images, fps=30)
 
             # Remove temp files
             for filename in set(self.filenames):

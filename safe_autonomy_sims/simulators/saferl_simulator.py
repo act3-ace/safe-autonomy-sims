@@ -19,7 +19,8 @@ from graphlib import CycleError, TopologicalSorter
 
 from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetValidator, BaseSimulatorValidator
 from corl.simulators.base_simulator_state import BaseSimulatorState
-from pydantic import BaseModel, PyObject, validator
+from pydantic import BaseModel, validator
+from pydantic.types import PyObject
 from safe_autonomy_dynamics.base_models import BaseEntity
 
 from safe_autonomy_sims.simulators.initializers.initializer import (
@@ -361,7 +362,7 @@ class SafeRLSimulator(BaseSimulator):
             for sensor in plat.sensors.values():
                 sensor.calculate_and_cache_measurement(state=self._state)
 
-    def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict):
+    def mark_episode_done(self, done_info: typing.OrderedDict, episode_state: typing.OrderedDict, metadata: dict | None = None):
         """
         Takes in the done_info specifying how the episode completed
         and does any book keeping around ending an episode

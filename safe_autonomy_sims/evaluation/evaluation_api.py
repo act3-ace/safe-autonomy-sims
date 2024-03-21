@@ -21,14 +21,16 @@ streamline visualization and analysis of comparative RL test assays.
 
 import os
 import pickle
+import re
 import sys
 import typing
-import re
 from glob import glob
 
+import jsonargparse
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import ray
 import seaborn as sns
 from corl.evaluation.default_config_updates import DoNothingConfigUpdate
 from corl.evaluation.evaluation_artifacts import (
@@ -43,9 +45,9 @@ from corl.evaluation.runners.section_factories.engine.rllib.rllib_trainer import
 from corl.evaluation.runners.section_factories.plugins.platform_serializer import PlatformSerializer
 from corl.evaluation.runners.section_factories.plugins.plugins import Plugins
 from corl.evaluation.runners.section_factories.task import Task
-from corl.evaluation.runners.section_factories.teams import Agent, Platform, Teams
-from corl.evaluation.runners.section_factories.test_cases.test_case_manager import TestCaseManager
+from corl.evaluation.runners.section_factories.teams import LoadableCorlAgent, Teams
 from corl.evaluation.visualization.print import Print
+from corl.parsers.agent_and_platform import CorlPlatformConfigArgs
 from corl.parsers.yaml_loader import load_file
 from ray.tune.analysis.experiment_analysis import ExperimentAnalysis
 
@@ -57,8 +59,8 @@ def evaluate(
     experiment_config_path: str,
     launch_dir_of_experiment: str,
     platform_serializer_class: PlatformSerializer,
-    test_case_manager_config: dict = None,
-    rl_algorithm_name: str = None,
+    test_case_manager_config: dict | None = None,
+    rl_algorithm_name: str | None = None,
     num_workers: int = 1
 ):
     """
@@ -86,7 +88,7 @@ def evaluate(
     # handle default test_case_manager
     if test_case_manager_config is None:
         test_case_manager_config = {
-            "class_path": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
+            "type": "corl.evaluation.runners.section_factories.test_cases.default_strategy.DefaultStrategy",
             "config": {
                 "num_test_cases": 3
             }
@@ -106,7 +108,6 @@ def evaluate(
 
     # instantiate eval objects
     task = Task(config_yaml_file=task_config_path)
-    test_case_manager = TestCaseManager(**test_case_manager_config)
     plugins = Plugins(**plugins_args)
     plugins.eval_config_update = eval_config_updates
 
@@ -135,9 +136,7 @@ def evaluate(
     namespace = {
         "teams": teams,
         "task": task,
-        "test_cases": {
-            "test_case_manager": test_case_manager
-        },
+        "test_case_manager": test_case_manager_config,
         "plugins": plugins,
         "engine": {
             "rllib": engine
@@ -146,8 +145,10 @@ def evaluate(
         "tmpdir_base": '/tmp/'
     }
 
+    args = jsonargparse.dict_to_namespace({"include_dashboard": False, "tmpdir_base": "/tmp", "cfg": "./generated_config.yml"})
+
     # call main
-    launch_evaluate.main(namespace)
+    launch_evaluate.main(instantiated_args=args, config=namespace)
 
 
 def generate_metrics(evaluate_output_path: str, metrics_config: dict):
@@ -268,12 +269,13 @@ def construct_teams(experiment_config_path: str, launch_dir_of_experiment: str, 
         platform_config_path = os.path.join(launch_dir_of_experiment, platform_config_path)
         policy_config_path = os.path.join(launch_dir_of_experiment, policy_config_path)
 
-        agent_checkpoint = checkpoint_path.format(agent_name)  # put policy ID in path
-        agent_loader = PolicyCheckpoint(checkpoint_filename=agent_checkpoint, )
+        agent_loader = PolicyCheckpoint(checkpoint_filename=checkpoint_path, trained_agent_id=agent_name)
 
-        teams_platforms_config.append(Platform(name=platform_name, config=platform_config_path))
+        teams_platforms_config.append(CorlPlatformConfigArgs(name=platform_name, config=platform_config_path))
         teams_agents_config.append(
-            Agent(name=agent_name, config=agent_config_path, platforms=platforms, policy=policy_config_path, agent_loader=agent_loader)
+            LoadableCorlAgent(
+                name=agent_name, config=agent_config_path, platforms=platforms, policy=policy_config_path, agent_loader=agent_loader
+            )
         )
 
     return Teams(agent_config=teams_agents_config, platform_config=teams_platforms_config)
@@ -377,12 +379,12 @@ def run_ablation_study(
     launch_dir_of_experiment: str,
     metrics_config: dict,
     platfrom_serializer_class: PlatformSerializer,
-    plot_output_path: str = None,
-    plot_config: dict = None,
+    plot_output_path: str | None = None,
+    plot_config: dict | None = None,
     create_plot: bool = False,
-    test_case_manager_config: dict = None,
-    trial_indices: list = None,
-    rl_algorithm_name: str = None
+    test_case_manager_config: dict | None = None,
+    trial_indices: list | None = None,
+    rl_algorithm_name: str | None = None
 ):  # pylint:disable=too-many-locals
     """
     This function serves as a high level interface for users conducting ablative studies using CoRL. It is
@@ -449,6 +451,7 @@ def run_ablation_study(
         for experiment_index, experiment_state_path in enumerate(experiment_states):
 
             # append index to evaluation_output path
+            ray.init()
             experiment_analysis = ExperimentAnalysis(experiment_state_path)
 
             if trial_indices is None:
@@ -502,9 +505,9 @@ def run_evaluations(
     checkpoint_paths: list,
     output_paths: list,
     platfrom_serializer_class: PlatformSerializer,
-    test_case_manager_config: dict = None,
+    test_case_manager_config: dict | None = None,
     visualize_metrics: bool = False,
-    rl_algorithm_name: str = None,
+    rl_algorithm_name: str | None = None,
     experiment_name: str = "",
     num_workers: int = 1
 ):
@@ -540,12 +543,12 @@ def run_evaluations(
         The name of the experiment. Used for standard output progress updates.
     """
 
-    kwargs = {}
+    kwargs: dict[str, typing.Any] = {}
     if test_case_manager_config:
         kwargs['test_case_manager_config'] = test_case_manager_config
 
     # rl algorithm
-    if rl_algorithm_name:
+    if rl_algorithm_name is not None:
         kwargs['rl_algorithm_name'] = rl_algorithm_name
 
     kwargs["num_workers"] = num_workers
@@ -554,31 +557,33 @@ def run_evaluations(
     for index, ckpt_path in enumerate(checkpoint_paths):
         # print progress
         ckpt_num_regex = re.search(r'(checkpoint_)\w+', ckpt_path)
-        ckpt_num = ckpt_path[ckpt_num_regex.start():ckpt_num_regex.end()]
-        if experiment_name:
-            print("\nExperiment: " + experiment_name)
-        print("Evaluating " + ckpt_num + ". " + str(index + 1) + " of " + str(len(checkpoint_paths)) + " checkpoints.")
 
-        # run evaluation episodes
-        try:
-            evaluate(
-                task_config_path,
-                ckpt_path,
-                output_paths[index],
-                experiemnt_config_path,
-                launch_dir_of_experiment,
-                platfrom_serializer_class,
-                **kwargs
-            )
-        except SystemExit:
-            print(sys.exc_info()[0])
+        if ckpt_num_regex is not None:
+            ckpt_num = ckpt_path[ckpt_num_regex.start():ckpt_num_regex.end()]
+            if experiment_name:
+                print("\nExperiment: " + experiment_name)
+            print("Evaluating " + ckpt_num + ". " + str(index + 1) + " of " + str(len(checkpoint_paths)) + " checkpoints.")
 
-        # generate evaluation metrics
-        generate_metrics(output_paths[index], metrics_config)
+            # run evaluation episodes
+            try:
+                evaluate(
+                    task_config_path,
+                    ckpt_path,
+                    output_paths[index],
+                    experiemnt_config_path,
+                    launch_dir_of_experiment,
+                    platfrom_serializer_class,
+                    **kwargs
+                )
+            except SystemExit:
+                print(sys.exc_info()[0])
 
-        if visualize_metrics:
-            # generate visualizations
-            visualize(output_paths[index])
+            # generate evaluation metrics
+            generate_metrics(output_paths[index], metrics_config)
+
+            if visualize_metrics:
+                # generate visualizations
+                visualize(output_paths[index])
 
 
 def run_one_evaluation(
@@ -588,8 +593,8 @@ def run_one_evaluation(
     metrics_config: dict,
     checkpoint_path: str,
     platfrom_serializer_class: PlatformSerializer,
-    test_case_manager_config: dict = None,
-    rl_algorithm_name: str = None,
+    test_case_manager_config: dict | None = None,
+    rl_algorithm_name: str | None = None,
     num_workers: int = 1
 ):
     """
@@ -616,7 +621,7 @@ def run_one_evaluation(
         The kwargs passed to the TestCaseManager constructor. This must define the TestCaseStrategy class and its config
     """
 
-    kwargs = {}
+    kwargs: dict[str, typing.Any] = {}
     if test_case_manager_config:
         kwargs['test_case_manager_config'] = test_case_manager_config
 
@@ -628,7 +633,6 @@ def run_one_evaluation(
 
     metrics_config = add_required_metrics(metrics_config)
 
-    checkpoint_path += "/policies/{}/policy_state.pkl"
     exp_name = 'single_episode__0__0'
     output_path = '/tmp/eval_results/' + exp_name
 
@@ -739,7 +743,7 @@ def construct_dataframe(results: dict, metrics_config: dict):  # pylint: disable
 
                     # collect agent's metric values on each trial in eval
                     for metric_name in metric_names['agent']['__default__']:  # type: ignore
-                        assert metric_name in event.metrics, "{} not an available metric!".format(metric_name)
+                        assert metric_name in event.metrics, f"{metric_name} not an available metric!"
                         # add metric value to row
                         if hasattr(event.metrics[metric_name], "value"):
                             row.append(event.metrics[metric_name].value)
@@ -753,9 +757,6 @@ def construct_dataframe(results: dict, metrics_config: dict):  # pylint: disable
 
                     # add row to dataset [experiment name, iteration, num_episodes, num_interactions, episode ID/trial, **custom_metrics]
                     data.append(row)
-
-                # collect world metrics per ckpt
-                ...
 
         # create experiment dataframe
         expr_dataframe = pd.DataFrame(data, columns=columns)
