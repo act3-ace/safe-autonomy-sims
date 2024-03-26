@@ -1,0 +1,137 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+site_name: Safe-Autonomy-Sims
+site_author: Safe-Autonomy Team
+repo_url: https://github.com/act3-ace/safe-autonomy-sims
+docs_dir: "docs"
+site_url: https://github.com/act3-ace/
+edit_uri: blob/main/docs/
+site_dir: site
+site_description: "The following python project contains RL training environments for research into safe autonomous control in the air and space domain."
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            docstring_style: numpy
+  - autorefs
+  - gen-files:
+      scripts:
+        - docs/gen_ref_nav.py  # or any other name or path
+  - literate-nav:
+      nav_file: SUMMARY.txt
+  - section-index
+  - pdf-export:
+      verbose: false
+      media_type: print
+      enabled_if_env: ENABLE_PDF_EXPORT
+      combined: true
+  - markdownextradata: {}
+
+
+extra:
+  sas_url: https://github.com/act3-ace/safe-autonomy-sims/-/tree/main
+  git_url: https://github.com/act3-ace
+  corl_url: https://github.com/act3-ace/act3-rl
+  git_ssh: git@github.com:act3-ace
+  corl_ssh: git@github.com/act3-ace:act3-rl
+  corl_docs_url: https://act3-rl.github.com/act3-ace/corl
+
+
+theme:
+  name: material
+  icon:
+    logo: material/currency-sign
+  features:
+  - navigation.tabs
+  - navigation.top
+  palette:
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: teal
+    accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+
+
+extra_css:
+  - css/images.css
+  - css/style.css
+  - css/material.css
+  - css/mkdocstrings.css
+
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
+  - toc:
+      permalink: "¤"
+  - codehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.arithmatex:  # MathJax (latex)
+      generic: true
+
+extra_javascript:
+  # Mermaid
+  - https://unpkg.com/mermaid@8.4.2/dist/mermaid.min.js
+  # MathJax (latex)
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - "Introduction": index.md
+  - "Install": install.md
+  - "Configuration": configuration.md
+  - "Tasks":
+      - tasks/index.md
+      - "CWH":
+        - tasks/CWH/index.md
+        - "Docking":
+          - tasks/CWH/docking.md
+        - "Translational Inspection":
+          - tasks/CWH/translational_inspection.md
+        - "Weighted Translational Inspection":
+          - tasks/CWH/weighted_translational_inspection.md
+        - "Weighted Six DoF Inspection":
+          - tasks/CWH/weighted_six_dof_inspection.md
+        - "Multiagent Docking":
+          - tasks/CWH/multiagent_docking.md
+        - "Multiagent Translational Inspection":
+          - tasks/CWH/multiagent_translational_inspection.md
+        - "Multiagent Weighted Translational Inspection":
+          - tasks/CWH/multiagent_weighted_translational_inspection.md
+        - "Multiagent Weighted Six DoF Inspection":
+          - tasks/CWH/multiagent_weighted_six_dof_inspection.md
+  - "API":
+      - API Reference: reference/
+  - "Experiments": experiments.md

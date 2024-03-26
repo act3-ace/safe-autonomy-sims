@@ -1,0 +1,16 @@
+# Simple boundary testing
+- ID: within max sim time
+  sim_time: 9
+  max_sim_time: 10
+  expected_value: False
+  expected_status: None
+- ID: at max sim time
+  sim_time: 10
+  max_sim_time: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.LOSE
+- ID: beyond max sim time
+  sim_time: 11
+  max_sim_time: 10
+  expected_value: True
+  expected_status: DoneStatusCodes.LOSE

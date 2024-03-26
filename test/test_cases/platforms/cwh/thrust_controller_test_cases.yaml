@@ -1,0 +1,7 @@
+# Tests for ThrustController
+- ID: config 1
+  config: "{'name': 'X Thrust', 'axis': 0, 'properties': {'name': 'x_thrust'}}"
+- ID: config 2
+  config: "{'name': 'Y Thrust', 'axis': 1, 'properties': {'name': 'y_thrust'}}"
+- ID: config 3
+  config: "{'name': 'Z Thrust', 'axis': 2, 'properties': {'name': 'z_thrust'}}"

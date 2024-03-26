@@ -1,0 +1,25 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning (RL) Core  Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+########################
+# Environment Parameters
+########################
+
+{
+  "timeout": 2000,  # seconds
+  "max_distance": 10000,  # meters
+  "docking_region_radius": 0.5,  # meters
+  "velocity_threshold": 0.2,  # m/s
+  "threshold_distance": 0.5,  # meters
+  "mean_motion": 0.001027,
+  "lower_bound": False,
+  "reference_position_sensor_name": "reference_position",
+  "reference_velocity_sensor_name": "reference_velocity",
+}

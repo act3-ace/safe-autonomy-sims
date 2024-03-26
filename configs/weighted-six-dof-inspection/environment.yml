@@ -1,0 +1,99 @@
+#--------------------------------------------------------------------------
+#Air Force Research Laboratory (AFRL) Autonomous Capabilities Team (ACT3)
+#Reinforcement Learning Core (CoRL) Safe Autonomy Extension.
+#
+#This is a US Government Work not subject to copyright protection in the US.
+#
+#The use, dissemination or disclosure of data in this file is subject to
+#limitation or restriction. See accompanying README and LICENSE for details.
+#---------------------------------------------------------------------------
+
+###################################
+# Environment configuration options
+###################################
+
+{
+  "horizon": 1223,  # episode length (2 orbits is 12236 sec)
+  "simulator": {
+    "type": "InspectionSimulator",
+    "config": {
+      "inspection_points_map": {
+        "chief": {
+          "num_points": 100,
+          "radius": 10,
+          "points_algorithm": "fibonacci",
+        },
+      },
+      "illumination_params":{
+          "mean_motion" : 0.001027,
+          "avg_rad_Earth2Sun": 150000000000,
+          "light_properties" : {'ambient': [1, 1, 1], 'diffuse': [1, 1, 1], 'specular': [1, 1, 1]},
+          "chief_properties" : {'ambient': [.1, 0, 0], 'diffuse': [0.7, 0, 0], 'specular': [1, 1, 1], 'shininess': 100, 'reflection': 0.5}, # [.1, 0, 0] = red, [0.753, 0.753, 0.753] = silver
+          "resolution" : [200, 200],
+          "focal_length" : 9.6e-3,
+          "pixel_pitch" : 5.6e-3,
+          "bin_ray_flag": True,
+          "render_flag_3d": False,
+          "render_flag_subplots": False,
+      },
+      "steps_until_update": 1500,  # Steps between updates to delta-v reward scale
+      "delta_v_scale_bounds": [-0.1, -0.001],  # Lower and upper bounds for delta-v reward scale
+      "delta_v_scale_step": -0.00005,  # Step value for delta-v reward scale
+      "inspected_points_update_bounds": [0.8, 0.9],  # Bounds to increase/decrease delta-v reward scale by step
+      "delta_v_updater_criteria": "score",
+    },
+  },
+  "simulator_reset_parameters": {
+    "priority_vector_azimuth_angle": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "priority_vector_azimuth_angle",
+        "units": "radians",
+        "low": 0,
+        "high": 6.283,
+      }
+    },
+    "priority_vector_elevation_angle": {
+      "type": "corl.libraries.parameters.UniformParameter",
+      "config": {
+        "name": "priority_vector_elevation_angle",
+        "units": "radians",
+        "low": -1.57,
+        "high": 1.57,
+      }
+    },
+    "additional_entities": {
+      "chief": { 
+        "platform": "cwh",
+        "config":{
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "x_dot": 0,
+          "y_dot": 0,
+          "z_dot": 0,
+        }
+      },
+      "sun": { 
+        "entity_class": "safe_autonomy_dynamics.cwh.sun_model.SunEntity",
+        "config":{
+          "theta": {
+            "type": "corl.libraries.parameters.UniformParameter",
+            "config": {
+              "name": "sun_angle",
+              "units": "radians",
+              "low": 0,
+              "high": 6.283,
+            }
+          },
+        }
+      }
+    }
+  },
+  "platforms": "CWHSimulator_Platforms",
+  "plugin_paths": ["safe_autonomy_sims.platforms", "safe_autonomy_sims.simulators"],
+  "episode_parameter_provider": {
+    "type": "corl.episode_parameter_providers.simple.SimpleParameterProvider"
+  },
+}
+

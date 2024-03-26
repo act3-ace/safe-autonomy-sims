@@ -53,7 +53,7 @@ poetry run mkdocs serve
 
 ### Training
 
-Training experiments are conducted in safe-autonomy-sims via [configuration files](configs). These files can be manipulated to define experiment parameters, agent configurations, environments, tasks, policies, and platforms.
+Training experiments are conducted in safe-autonomy-sims via configuration files. These files can be manipulated to define experiment parameters, agent configurations, environments, tasks, policies, and platforms.
 
 The `corl` package provides a training endpoint script which uses the RLLib reinforcement learning library to train agents in an environment.
 
@@ -64,20 +64,20 @@ As an example, you can launch a training loop for the provided Docking  environm
 python -m corl.train_rl --cfg configs/docking/experiment.yml
 ```
 
-Further information on training and experiment configuration can be found [here](docs/configuration.md).
+Further information on training and experiment configuration can be found [here](configuration.md).
 
 ## Environments
 
 This package includes the following environments:
 
-- [Docking](docs/tasks/CWH/docking.md)
-- [Multiagent Docking](docs/tasks/CWH/multiagent_docking.md)
-- [Translational Inspection](docs/tasks/CWH/translational_inspection.md)
-- [Multiagent Translational Inspection](docs/tasks/CWH/multiagent_translational_inspection.md)
-- [Weighted Translational Inspection](docs/tasks/CWH/weighted_translational_inspection.md)
-- [Multiagent Weighted Translational Inspection](docs/tasks/CWH/multiagent_weighted_translational_inspection.md)
-- [Weighted Six DoF Inspection](docs/tasks/CWH/six_dof_inspection.md)
-- [Multiagent Weighted Six DoF Inspection](docs/tasks/CWH/multiagent_six_dof_inspection.md)
+- [Docking](tasks/CWH/docking.md)
+- [Multiagent Docking](tasks/CWH/multiagent_docking.md)
+- [Translational Inspection](tasks/CWH/translational_inspection.md)
+- [Multiagent Translational Inspection](tasks/CWH/multiagent_translational_inspection.md)
+- [Weighted Translational Inspection](tasks/CWH/weighted_translational_inspection.md)
+- [Multiagent Weighted Translational Inspection](tasks/CWH/multiagent_weighted_translational_inspection.md)
+- [Weighted Six DoF Inspection](tasks/CWH/weighted_six_dof_inspection.md)
+- [Multiagent Weighted Six DoF Inspection](tasks/CWH/multiagent_weighted_six_dof_inspection.md)
 
 ### Docking
 
@@ -108,10 +108,6 @@ Same as translational-inspection environment, but agent can control attitude (do
 - **Multiagent Weighted Six DoF Inspection**
 Same as weighted-six-dof-inspection environment, with multiple agent controlled deputy spacecraft.
 
-## Public Release
-
-Approved for public release; distribution is unlimited. Case Number: AFRL-2023-6156
-
 ## Team
 
 Jamie Cunningham,
@@ -122,4 +118,5 @@ Nate Hamilton,
 Charles Keating,
 Kochise Bennett,
 Aditesh Kumar,
+David van Wijk,
 Kerianne Hobbs

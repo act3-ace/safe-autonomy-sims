@@ -1,0 +1,16 @@
+/* Set custom image css */
+
+/* Inspection Image */
+img[alt="Basic Inspection Problem"] {
+     max-width: 100%;
+     height: auto;
+     padding-top: 5%;
+     padding-left: 15%;
+     padding-right: 15%;
+}
+
+/* Figure captions */
+img + em {
+    display: block;
+    text-align: center;
+}

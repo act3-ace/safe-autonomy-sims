@@ -1,0 +1,17 @@
+# Test each task
+- ID: Docking
+  experiment_config_path: configs/docking/experiment.yml
+- ID: Multiagent Docking
+  experiment_config_path: configs/multiagent-docking/experiment.yml
+- ID: Translational Inspection
+  experiment_config_path: configs/translational-inspection/experiment.yml
+- ID: Multiagent Translational Inspection
+  experiment_config_path: configs/multiagent-translational-inspection/experiment.yml
+- ID: Weighted Translational Inspection
+  experiment_config_path: configs/weighted-translational-inspection/experiment.yml
+- ID: Multiagent Weighted Translational Inspection
+  experiment_config_path: configs/multiagent-weighted-translational-inspection/experiment.yml
+- ID: Weighted Six DoF Inspection
+  experiment_config_path: configs/weighted-six-dof-inspection/experiment.yml
+- ID: Multiagent Weighted Six DoF Inspection
+  experiment_config_path: configs/multiagent-weighted-six-dof-inspection/experiment.yml

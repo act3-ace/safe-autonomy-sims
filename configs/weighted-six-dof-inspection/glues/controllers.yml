@@ -1,0 +1,68 @@
+[
+{
+  # X-Axis Thrust Glue (action space)
+  functor: "corl.glues.common.controller_glue.ControllerGlue",
+  config: {
+    controller: "X Thrust",
+    training_export_behavior: "EXCLUDE",
+    normalization: {
+      enabled: False,
+    },
+  },
+},
+{
+  # Y-Axis Thrust Glue (action space)
+  functor: "corl.glues.common.controller_glue.ControllerGlue",
+  config: {
+    controller: "Y Thrust",
+    training_export_behavior: "EXCLUDE",
+    normalization: {
+      enabled: False,
+    },
+  },
+},
+{
+  # Z-Axis Thrust Glue (action space)
+  functor: "corl.glues.common.controller_glue.ControllerGlue",
+  config: {
+    controller: "Z Thrust",
+    training_export_behavior: "EXCLUDE",
+    normalization: {
+      enabled: False,
+    },
+  },
+},
+{
+  # X Moment Controller Glue (action space)
+  functor: "corl.glues.common.controller_glue.ControllerGlue",
+  config: {
+    controller: "X Moment",
+    training_export_behavior: "EXCLUDE",
+    normalization: {
+      enabled: True,
+    }
+  }
+},
+{
+  # Y Moment Controller Glue (action space)
+  functor: "corl.glues.common.controller_glue.ControllerGlue",
+  config: {
+    controller: "Y Moment",
+    training_export_behavior: "EXCLUDE",
+    normalization: {
+      enabled: True,
+    },
+  },
+},
+{
+  # Z Moment Controller Glue (action space)
+  functor: "corl.glues.common.controller_glue.ControllerGlue",
+  config: {
+    controller: "Z Moment",
+    training_export_behavior: "EXCLUDE",
+    normalization: {
+      enabled: True,
+    },
+  },
+},
+]
