@@ -1,3 +1,10 @@
+## [3.2.9](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.8...v3.2.9) (2024-03-26)
+
+
+### Bug Fixes
+
+* **dependencies:** update CoRL to publicly released 3.14.13 ([ea1266e](https://github.com/act3-ace/safe-autonomy-sims/commit/ea1266ecf28135d13309b3ac7656baa324421553))
+
 ## 3.2.8 (2024-03-21)
 
 
