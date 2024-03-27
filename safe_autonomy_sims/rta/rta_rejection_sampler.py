@@ -188,7 +188,7 @@ class RejectionSampler(ParameterWrapper):
 
         # For each constraint, check if satisfied
         for c in self.config.rta.functor(**self.config.rta.args).rta.constraints.values():
-            if c.phi(to_jnp_array_jit(state)) < 0 or c(to_jnp_array_jit(state)) < 0:
+            if c.phi(to_jnp_array_jit(state), c.params) < 0 or c(to_jnp_array_jit(state), c.params) < 0:
                 init_state_safe = False
                 break
         return init_state_safe
