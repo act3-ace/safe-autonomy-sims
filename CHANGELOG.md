@@ -1,3 +1,10 @@
+## [3.2.10](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.9...v3.2.10) (2024-03-27)
+
+
+### Bug Fixes
+
+* **dependencies:** Updated RTA to 1.16.0 ([70a0372](https://github.com/act3-ace/safe-autonomy-sims/commit/70a0372cad0d98ccc080e71ad0163911d8355905))
+
 ## [3.2.9](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.8...v3.2.9) (2024-03-26)
 
 
