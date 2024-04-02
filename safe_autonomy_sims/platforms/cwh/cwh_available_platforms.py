@@ -9,7 +9,7 @@ The use, dissemination or disclosure of data in this file is subject to
 limitation or restriction. See accompanying README and LICENSE for details.
 ---------------------------------------------------------------------------
 
-This module defines and registers the available CWH platform types to the proper simulators. 
+This module defines and registers the available CWH platform types to the proper simulators.
 """
 
 from __future__ import annotations
@@ -35,6 +35,7 @@ class CWHAvailablePlatformTypes(BasePlatformType):
         if config["name"] == "CWHSixDOF":
             return True
         return False
+
 
 PluginLibrary.add_platform_to_sim(CWHAvailablePlatformTypes, CWHSimulator)
 PluginLibrary.add_platform_to_sim(CWHAvailablePlatformTypes, InspectionSimulator)
