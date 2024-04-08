@@ -32,7 +32,7 @@ imageio-ffmpeg = "0.4.8"
 pint = "^0.22"
 safe-autonomy-dynamics = "1.2.3"
 run-time-assurance = "1.16.1"
-corl = "3.14.13"
+corl = "3.16.2"
 
 [tool.poetry.group.lint.dependencies]
 pylint = "2.15.4"

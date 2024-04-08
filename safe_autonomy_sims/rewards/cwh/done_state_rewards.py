@@ -11,23 +11,23 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 This module implements reward functions based on done status
 """
+import typing
 from collections import OrderedDict
 from functools import partial
-import typing
-from pydantic import validator
 
 from corl.dones.done_func_base import DoneStatusCodes
-from corl.rewards.episode_done import EpisodeDoneStateReward, EpisodeDoneStateRewardValidator
 from corl.libraries.state_dict import StateDict
+from corl.rewards.episode_done import EpisodeDoneStateReward, EpisodeDoneStateRewardValidator
+from pydantic import validator
 
 
 class WinLoseDoneRewardValidator(EpisodeDoneStateRewardValidator):
     """A configuration validator for WinLoseDoneReward
-    
+
     Attributes
     ----------
     done_name : str
-        name of done to generate reward from 
+        name of done to generate reward from
     done_status : str
         done status code to generate reward from
     scale : float
