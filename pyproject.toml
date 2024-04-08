@@ -30,8 +30,8 @@ torch = "1.13.0"
 imageio = "2.25.0"
 imageio-ffmpeg = "0.4.8"
 pint = "^0.22"
-safe-autonomy-dynamics = "1.2.2"
-run-time-assurance = "1.16.0"
+safe-autonomy-dynamics = "1.2.3"
+run-time-assurance = "1.16.1"
 corl = "3.14.13"
 
 [tool.poetry.group.lint.dependencies]
