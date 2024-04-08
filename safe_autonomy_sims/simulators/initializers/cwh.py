@@ -15,11 +15,12 @@ This module implements initializers for CWH platforms.
 import typing
 
 import numpy as np
-from corl.libraries.units import Quantity
 from scipy.spatial.transform import Rotation
 
 from safe_autonomy_sims.simulators.initializers.initializer import BaseInitializerWithPint, InitializerValidator, strip_units_from_dict
 from safe_autonomy_sims.utils import velocity_limit
+
+from corl.libraries.units import Quantity
 
 
 class CWH3DRadialInitializer(BaseInitializerWithPint):

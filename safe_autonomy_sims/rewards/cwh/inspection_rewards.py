@@ -210,7 +210,7 @@ class InspectionDeltaVReward(RewardFuncBase):
         d_v: float
             The agent's change in velocity
         """
-        deputy = get_platform_by_name(state, self.config.platform_names[0])  # TODO: assuming 1:1 agent:platform
+        deputy = get_platform_by_name(state, self.config.platform_names[0])     # TODO: assuming 1:1 agent:platform
         control_vec = deputy.get_applied_action().m
         d_v = np.sum(np.abs(control_vec)) / self.mass * self.step_size
         return d_v
@@ -236,7 +236,7 @@ class InspectionDeltaVReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> float:
-
+        
         if self.constant_scale is None:
             self.scale = state.delta_v_scale
         else:
@@ -429,7 +429,7 @@ class InspectionCrashReward(RewardFuncBase):
             reward = self.config.scale
 
         return reward
-
+    
 
 class MaxDistanceRewardValidator(RewardFuncBaseValidator):
     """

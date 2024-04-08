@@ -117,7 +117,7 @@ class DockingDistanceChangeReward(RewardFuncBase):
         distance = np.linalg.norm(relative_position)
 
         self._dist_buffer.append(distance)
-
+        
         reward = 0.0
 
         # TODO intialize distance buffer from initial state
@@ -400,6 +400,7 @@ class DockingVelocityConstraintReward(RewardFuncBase):
         observation_space: StateDict,
         observation_units: StateDict,
     ) -> float:
+
 
         # Get relative position and velocity
         # Assumes one platfrom per agent!

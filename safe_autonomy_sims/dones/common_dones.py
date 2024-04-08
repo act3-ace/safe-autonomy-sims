@@ -44,7 +44,7 @@ class TimeoutDoneFunction(DoneFuncBase):
     Attributes
     ----------
     config: TimeoutDoneValidator
-        The function's validated configuration parameters
+        The function's validated configuration parameters 
     """
 
     def __init__(self, **kwargs) -> None:
@@ -122,7 +122,7 @@ class CollisionDoneFunction(SharedDoneFuncBase):
     Attributes
     ----------
     config: CollisionDoneFunctionValidator
-        The function's validated configuration parameters
+        The function's validated configuration parameters 
     """
 
     @staticmethod
@@ -237,7 +237,7 @@ class MultiagentSuccessDoneFunction(SharedDoneFuncBase):
     Attributes
     ----------
     config: MultiagentSuccessDoneFunctionValidator
-        The function's validated configuration parameters
+        The function's validated configuration parameters 
     """
 
     @staticmethod

@@ -157,7 +157,7 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
         Returns
         -------
         SafeSuccessfulInspectionDoneValidator
-            Config validator for the SafeSuccessfulInspectionDoneFunction."""
+            Config validator for the SafeSuccessfulInspectionDoneFunction.        """
         return SafeSuccessfulInspectionDoneValidator
 
     def __call__(
@@ -203,7 +203,7 @@ class SafeSuccessfulInspectionDoneFunction(SuccessfulInspectionDoneFunction):
             if dist >= self.config.crash_region_radius:
                 next_state.episode_state[self.config.platform_name][self.name] = DoneStatusCodes.WIN
             else:
-                # TODO: why is done set to False if deputy is within crash radius? Would crash not end episode?
+                #TODO: why is done set to False if deputy is within crash radius? Would crash not end episode?
                 done = False
 
         return done

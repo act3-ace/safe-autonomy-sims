@@ -11,16 +11,16 @@ limitation or restriction. See accompanying README and LICENSE for details.
 
 Wrapper glue which returns a velocity constraint based on position and velocity sensor data as an observation.
 """
-import typing
 from collections import OrderedDict
-from functools import cached_property
 
+import typing
 import gymnasium
 import numpy as np
+from functools import cached_property
 from corl.glues.base_glue import BaseAgentGlueNormalizationValidator
 from corl.glues.common.observe_sensor import ObserveSensor, ObserveSensorValidator
 from corl.libraries.normalization import StandardNormalNormalizer
-from corl.libraries.property import BoxProp, DictProp
+from corl.libraries.property import DictProp, BoxProp
 from corl.libraries.units import corl_get_ureg
 
 
@@ -66,7 +66,9 @@ class VelocityLimitGlue(ObserveSensor):
     @cached_property
     def observation_prop(self):
         prop = BoxProp(low=[-10000], high=[10000], unit='m/s')
-        return DictProp(spaces={self.Fields.DIRECT_OBSERVATION: prop})
+        return DictProp(
+            spaces={self.Fields.DIRECT_OBSERVATION: prop}
+        )
 
     @cached_property
     def observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
@@ -87,7 +89,7 @@ class VelocityLimitGlue(ObserveSensor):
     @cached_property
     def normalized_action_space(self) -> typing.Optional[gymnasium.spaces.Space]:
         return self.action_space
-
+    
     @cached_property
     def normalized_observation_space(self) -> typing.Optional[gymnasium.spaces.Space]:
         return self.observation_space
