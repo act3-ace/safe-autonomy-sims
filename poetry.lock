@@ -954,13 +954,13 @@ test-no-images = ["pytest", "pytest-cov", "pytest-xdist", "wurlitzer"]
 
 [[package]]
 name = "corl"
-version = "3.14.13"
+version = "3.15.0"
 description = "Core ACT3 Reinforcement Learning (RL) Library - Core framework and base implementations of common things such as controllers, glues, observes, sensors, evaluation, and etc"
 optional = false
-python-versions = "<3.12,>=3.10"
+python-versions = ">=3.10,<3.12"
 files = [
-    {file = "corl-3.14.13-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha256:fc233a18dd6726a1632dca4c38dacf1ee61d23810b9151898e96668d7f38b9eb"},
-    {file = "corl-3.14.13.tar.gz", hash = "sha256:d30fa7f0e07357b903e2000c35ba52327e8a73ff1e98a7667e347b4acdeef598"},
+    {file = "corl-3.15.0-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:cbd25061d5676c01ff243960a408a54dd4b3af663755137254be1181b39115d3"},
+    {file = "corl-3.15.0.tar.gz", hash = "sha256:ade4744cc7874f91c0dddc2ed75599d104aca4dddc6e7c38fc4e9bcbef5c5d0e"},
 ]
 
 [package.dependencies]
@@ -969,10 +969,11 @@ codetiming = ">=1.4.0,<2.0.0"
 deepmerge = "0.3.0"
 fastapi = ">=0.104.1,<0.105.0"
 flatten-dict = "0.4.1"
-GitPython = "3.1.41"
+GitPython = "3.1.27"
 gymnasium = "0.28.1"
 h5py = ">=3.7"
 jsonargparse = {version = ">=4,<5", extras = ["argcomplete", "signatures"]}
+jsonlines = ">=4.0.0,<5.0.0"
 matplotlib = ">=3.7.2,<4.0.0"
 numpy = ">=1.24.0,<2.0.0"
 numpy-ringbuffer = ">=0.2.2,<0.3.0"
@@ -983,13 +984,18 @@ pygifsicle = ">=1.0.7,<2.0.0"
 ray = {version = ">=2.9.0,<2.10.0", extras = ["all"]}
 scipy = ">=1.10.1,<2.0.0"
 stqdm = ">=0.0.5,<0.0.6"
-streamlit = ">=1.30.0,<2.0.0"
+streamlit = ">=1.22.0,<2.0.0"
 tabulate = ">=0.9.0,<0.10.0"
 tensorboard = ">=2.10,<3.0"
 tensorflow = "2.15.0"
 tensorflow-probability = ">=0.23.0,<0.24.0"
 types-tabulate = ">=0.9.0.2,<0.10.0.0"
 uvicorn = ">=0.24.0.post1,<0.25.0"
+
+[package.source]
+type = "legacy"
+url = "https://git.act3-ace.com/api/v4/projects/1287/packages/pypi/simple"
+reference = "dle-corl"
 
 [[package]]
 name = "coverage"
@@ -1750,20 +1756,17 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "gitpython"
-version = "3.1.41"
-description = "GitPython is a Python library used to interact with Git repositories"
+version = "3.1.27"
+description = "GitPython is a python library used to interact with Git repositories"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "GitPython-3.1.41-py3-none-any.whl", hash = "sha256:c36b6634d069b3f719610175020a9aed919421c87552185b085e04fbbdb10b7c"},
-    {file = "GitPython-3.1.41.tar.gz", hash = "sha256:ed66e624884f76df22c8e16066d567aaa5a37d5b5fa19db2c6df6f7156db9048"},
+    {file = "GitPython-3.1.27-py3-none-any.whl", hash = "sha256:5b68b000463593e05ff2b261acff0ff0972df8ab1b70d3cdbd41b546c8b8fc3d"},
+    {file = "GitPython-3.1.27.tar.gz", hash = "sha256:1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"},
 ]
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
-
-[package.extras]
-test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock", "mypy", "pre-commit", "pytest (>=7.3.1)", "pytest-cov", "pytest-instafail", "pytest-mock", "pytest-sugar", "sumtypes"]
 
 [[package]]
 name = "google-api-core"
@@ -2516,13 +2519,13 @@ ansicon = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "joblib"
-version = "1.3.2"
+version = "1.4.0"
 description = "Lightweight pipelining with Python functions"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "joblib-1.3.2-py3-none-any.whl", hash = "sha256:ef4331c65f239985f3f2220ecc87db222f08fd22097a3dd5698f693875f8cbb9"},
-    {file = "joblib-1.3.2.tar.gz", hash = "sha256:92f865e621e17784e7955080b6d042489e3b8e294949cc44c6eac304f59772b1"},
+    {file = "joblib-1.4.0-py3-none-any.whl", hash = "sha256:42942470d4062537be4d54c83511186da1fc14ba354961a2114da91efa9a4ed7"},
+    {file = "joblib-1.4.0.tar.gz", hash = "sha256:1eb0dc091919cd384490de890cb5dfd538410a6d4b3b54eef09fb8c50b409b1c"},
 ]
 
 [[package]]
@@ -7551,4 +7554,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "83cd5ec0a7128a507d6242f718b16bc8e49bb3006768efb87fb2979d1231be5d"
+content-hash = "594fb9915f46783aae6438581dfc24a5a79976b7dd06a29a46bf6ed8501f4534"
