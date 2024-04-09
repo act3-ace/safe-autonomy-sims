@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def rel_dist(state):
+def rel_dist(state: dict):
     """The relative distance between the chief and the deputy.
 
     Parameters
@@ -21,7 +21,8 @@ def rel_dist(state):
     rel_d = np.linalg.norm(chief_pos, deputy_pos)
     return rel_d
 
-def rel_vel(state):
+
+def rel_vel(state: dict):
     """The relative velocity between the chief and the deputy.
 
     Parameters
@@ -39,7 +40,8 @@ def rel_vel(state):
     rel_v = np.linalg.norm(chief_v, deputy_v)
     return rel_v
 
-def delta_v(state, prev_state):
+
+def delta_v(state: dict, prev_state: dict):
     """The change in velocity of the deputy.
 
     Parameters
@@ -58,12 +60,19 @@ def delta_v(state, prev_state):
     prev_v = np.linalg.norm(prev_state["deputy"][3:6])
     return v - prev_v
 
-def v_limit(state, a=2.0, n=0.001027, v_max=0.2, docking_radius=0.5):
+
+def v_limit(
+    state: dict,
+    a: float = 2.0,
+    n: float = 0.001027,
+    v_max: float = 0.2,
+    docking_radius: float = 0.5,
+):
     """A linear velocity limit based on the distance between the chief
     and the deputy.
 
     $v_{limit} = v_{max} + an(d-r)$
-    
+
     where:
     * $v_max$ is a maximum allowable velocity
     * $a$ is the slope of the linear velocity limit
@@ -88,5 +97,5 @@ def v_limit(state, a=2.0, n=0.001027, v_max=0.2, docking_radius=0.5):
     float
         velocity limit
     """
-    v_limit = v_max + (a * n * (dist(state=state) - docking_radius))
+    v_limit = v_max + (a * n * (rel_dist(state=state) - docking_radius))
     return v_limit
