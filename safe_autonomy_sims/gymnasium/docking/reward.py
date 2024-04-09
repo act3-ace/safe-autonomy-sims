@@ -4,7 +4,13 @@ import math
 from safe_autonomy_sims.gymnasium.docking.utils import rel_dist, rel_vel, delta_v
 
 
-def distance_pivot_reward(state, prev_state, c=2.0, pivot_ratio=2.0, pivot=100):
+def distance_pivot_reward(
+    state: dict,
+    prev_state: dict,
+    c: float = 2.0,
+    pivot_ratio: float = 2.0,
+    pivot: float = 100,
+):
     """A dense exponential reward based on the distance
     between the chief and the deputy.
 
@@ -47,7 +53,7 @@ def distance_pivot_reward(state, prev_state, c=2.0, pivot_ratio=2.0, pivot=100):
     return r
 
 
-def delta_v_reward(state, prev_state, m=12.0, b=0.0):
+def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.0):
     """A dense reward based on the deputy's fuel
     use (change in velocity).
 
@@ -68,7 +74,7 @@ def delta_v_reward(state, prev_state, m=12.0, b=0.0):
         deputy mass, by default 12.0
     b : float, optional
         bias term, by default 0.0
-    
+
     Returns
     -------
     float
@@ -78,7 +84,7 @@ def delta_v_reward(state, prev_state, m=12.0, b=0.0):
     return r
 
 
-def velocity_constraint_reward(state, v_limit):
+def velocity_constraint_reward(state: dict, v_limit: float):
     """A dense reward that punishes the deputy
     for violating a distance-based velocity constraint.
 
@@ -104,7 +110,13 @@ def velocity_constraint_reward(state, v_limit):
     return r
 
 
-def docking_success_reward(state, t, vel_limit, docking_radius=0.2, max_time=2000):
+def docking_success_reward(
+    state: dict,
+    t: float,
+    vel_limit: float,
+    docking_radius: float = 0.2,
+    max_time: float = 2000,
+):
     """A sparse reward based on the amount of time
     it took the deputy to successfully dock with
     the chief.
@@ -141,7 +153,7 @@ def docking_success_reward(state, t, vel_limit, docking_radius=0.2, max_time=200
     return r
 
 
-def timeout_reward(t, max_time=2000):
+def timeout_reward(t: float, max_time: float = 2000):
     """A sparse reward that punishes the agent
     for not completing the task within the time
     limit.
@@ -163,7 +175,8 @@ def timeout_reward(t, max_time=2000):
         r = -1.0
     return r
 
-def crash_reward(state, vel_limit, docking_radius=0.2):
+
+def crash_reward(state: dict, vel_limit: float, docking_radius: float = 0.2):
     """A sparse reward that punishes the agent
     for entering the docking region at an unsafe velocity
     (crashing).
@@ -188,10 +201,10 @@ def crash_reward(state, vel_limit, docking_radius=0.2):
         r = -1.0
     else:
         r = 0
-    return r 
+    return r
 
 
-def out_of_bounds_reward(state, max_distance=10000):
+def out_of_bounds_reward(state: float, max_distance: float = 10000):
     """A sparse reward that punishes the agent
     for going out of bounds.
 
