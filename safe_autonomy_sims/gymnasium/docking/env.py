@@ -144,8 +144,9 @@ class DockingEnv(gym.Env):
         crash = in_docking and not safe_v
         max_v_violation = self.episode_v_violations > self.max_v_violation
         timeout = self.simulator.sim_time > self.max_time
+        docked = in_docking and safe_v
 
-        return oob or crash or max_v_violation or timeout
+        return oob or crash or max_v_violation or timeout or docked
 
     @property
     def sim_state(self) -> dict:
