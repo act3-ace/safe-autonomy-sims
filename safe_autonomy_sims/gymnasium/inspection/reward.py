@@ -1,6 +1,7 @@
 """Reward functions for the inspection tasks"""
 
-from safe_autonomy_sims.gymnasium.inspection.utils import delta_v, rel_dist, rel_vel
+import numpy as np
+from safe_autonomy_sims.gymnasium.inspection.utils import delta_v, rel_dist
 
 
 def observed_points_reward(state: dict, num_inspected: int) -> float:
@@ -30,6 +31,34 @@ def observed_points_reward(state: dict, num_inspected: int) -> float:
     return r
 
 
+def weighted_observed_points_reward(state: dict, weight_inspected: float) -> float:
+    """A dense reward which rewards the agent for inspecting
+    new points during each step of the episode conditioned by
+    individual point weights.
+
+    $r_t = 1.0 * (w_t - w_{t-1})$
+
+    where $w_t$ is the total weight of inspected points at
+    time $t$.
+
+    Parameters
+    ----------
+    state : dict
+        current simulation state
+    weight_inspected : float
+        weight of previously inspected points
+
+    Returns
+    -------
+    float
+        reward value
+    """
+    current_weight_inspected = state["inspection_points"].get_total_weight_inspected()
+    step_inspected = weight_inspected - current_weight_inspected
+    r = 1.0 * step_inspected
+    return r
+
+
 def inspection_success_reward(state: dict, total_points: int) -> float:
     """A sparse reward applied when the agent successfully
     inspects every point.
@@ -54,6 +83,36 @@ def inspection_success_reward(state: dict, total_points: int) -> float:
     """
     num_inspected = state["inspection_points"].get_num_points_inspected()
     if num_inspected == total_points:
+        r = 1.0
+    else:
+        r = 0.0
+    return r
+
+
+def weighted_inspection_success_reward(state: dict, total_weight: float):
+    """A sparse reward applied when the agent successfully inspects
+    point weights above the given threshold.
+
+    $r_t = 1 if w_t \geq w_s else 0$
+
+    where $w_t$ is the total weight of inspected points at time $t$
+    and $w_s$ is the total weight of inspected points required for
+    successful inspection.
+
+    Parameters
+    ----------
+    state : dict
+        current simulation state
+    total_weight : float
+        inspected weight threshold for success
+
+    Returns
+    -------
+    float
+        reward value
+    """
+    weight_inspected = state["inspection_points"].get_total_weight_inspected()
+    if weight_inspected >= total_weight:
         r = 1.0
     else:
         r = 0.0
@@ -117,3 +176,63 @@ def crash_reward(state: dict, crash_radius: float):
     else:
         r = 0
     return r
+
+
+def facing_chief_reward(state: dict, cam: list, epsilon: float):
+    """A dense gaussian decaying reward which reward the agent
+    for facing the chief.
+
+    $r_t = 0.0005 * e^(-|\delta(f, 1)^2 / \espilon|)$
+
+    where
+    * $\delta(f, 1)$ is the difference between 1 and the dot
+    product of the camera orientation and the relative position
+    between the deputy and the chief
+    * $\epsilon$ is the length of the exponential decay curve
+
+    Parameters
+    ----------
+    state : dict
+        current simulation state
+    cam : list
+        camera orientation unit vector
+    epsilon : float
+        length of gaussian decay curve
+
+    Returns
+    -------
+    float
+        reward value
+    """
+    rel_pos = state["chief"][0:3] - state["deputy"][0:3]
+    rel_pos = rel_pos / np.linalg.norm(rel_pos)
+    gaussian_decay = np.exp(-np.abs(((np.dot(cam, rel_pos) - 1) ** 2) / epsilon))
+    reward = 0.0005 * gaussian_decay
+    return reward
+
+
+def live_timestep_reward(t: int, t_max: int):
+    """A dense reward which rewards the agent for
+    each timestep it remains active in the simulation.
+
+    $r_t = 0.001 if t < t_{max}$
+
+    where $t$ is the current time step and $t_{max}$
+    is the maximum allowable time for the episode.
+
+    Parameters
+    ----------
+    t : int
+        current time step
+    t_max : int
+        max time step allowed for episode
+
+    Returns
+    -------
+    float
+        reward value
+    """
+    reward = 0
+    if t < t_max:
+        reward = 0.001
+    return reward

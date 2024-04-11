@@ -99,3 +99,40 @@ def v_limit(
     """
     v_limit = v_max + (a * n * (rel_dist(state=state) - docking_radius))
     return v_limit
+
+
+def closest_fft_distance(state: dict, n: float = 0.001027, time_step: int = 1) -> float:
+    """
+    Get the closest Free Flight Trajectory (FFT) distance between the deputy
+    and the chief over one orbit using closed form CWH dynamics to calculate
+    future states
+
+    Parameters
+    ----------
+    state: dict
+        current simulation state
+    n: float, optional
+        orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027
+    time_step: int
+        time step in seconds to calculate FFT over, by default 1
+
+    Returns
+    -------
+    float
+        closest relative distance between deputy and chief during the FFT
+    """
+    def get_pos(platform: str, t: int):
+        plat_state = state[platform]
+        x = (4 - 3 * np.cos(n * t)) * plat_state[0] + np.sin(n * t) * plat_state[3] / n + 2 / n * (1 - np.cos(n * t)) * plat_state[4]
+        y = 6 * (np.sin(n * t) - n * t) * plat_state[0] + plat_state[1] - 2 / n * (1 - np.cos(n * t)) * plat_state[3] + (4 * np.sin(n * t) -
+                                                                                                          3 * n * t) * plat_state[4] / n
+        z = plat_state[2] * np.cos(n * t) + plat_state[5] / n * np.sin(n * t)
+        return x, y, z
+
+    distances = []
+    times = np.arange(0, 2 * np.pi / n, time_step)
+    for time in times:
+        dep_pos = get_pos(platform="deputy", t=time)
+        chief_pos = get_pos(platform="chief", t=time)
+        distances.append(np.linalg.norm(chief_pos, dep_pos))
+    return float(min(distances))
