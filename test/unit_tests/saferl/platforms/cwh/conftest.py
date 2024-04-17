@@ -13,7 +13,7 @@ Conftest file for the CWH platform tests
 """
 
 import pytest
-from safe_autonomy_dynamics.cwh import CWHSpacecraft
+from safe_autonomy_simulation.spacecraft import CWHSpacecraft
 
 from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform
 

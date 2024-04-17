@@ -24,8 +24,8 @@ from ray.rllib import BaseEnv
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
 from ray.rllib.policy import Policy
 from ray.rllib.utils.typing import PolicyID
-from safe_autonomy_dynamics.base_models import BaseEntity
-from safe_autonomy_dynamics.cwh import CWHSpacecraft, SixDOFSpacecraft
+from safe_autonomy_simulation.base_models import BaseEntity
+from safe_autonomy_simulation.spacecraft import CWHSpacecraft, SixDOFSpacecraft
 from sklearn.cluster import KMeans
 
 import safe_autonomy_sims.simulators.illumination_functions as illum
