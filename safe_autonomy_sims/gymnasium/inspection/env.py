@@ -4,7 +4,7 @@ from typing import Any, SupportsFloat
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
-from safe_autonomy_simulation.inspection_simulator import InspectionSimulator
+from safe_autonomy_simulation.inspection.inspection_simulator import InspectionSimulator
 from safe_autonomy_simulation.spacecraft.point_model import CWHSpacecraft
 import safe_autonomy_sims.gymnasium.inspection.reward as r
 from safe_autonomy_sims.gymnasium.inspection.utils import (
