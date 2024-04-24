@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-autonomy-sims"
-version = "4.0.0"
+version = "3.2.11"
 description = "The Safe-Autonomy-Sims library provides the components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA)"
 authors = [
     "Charles Keating <Charles.Keating@udri.udayton.edu>",
@@ -32,7 +32,7 @@ imageio-ffmpeg = "0.4.8"
 pint = "^0.22"
 safe-autonomy-dynamics = "1.2.3"
 run-time-assurance = "1.16.1"
-corl = {version = "3.15.0", source = "dle-corl"}
+corl = "3.16.2"
 
 [tool.poetry.group.lint.dependencies]
 pylint = "2.15.4"
