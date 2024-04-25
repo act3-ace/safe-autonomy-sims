@@ -21,13 +21,14 @@ import typing
 from datetime import datetime
 
 import ray
-# import ray.rllib.agents.ppo as ppo
-from ray.rllib.algorithms.ppo import ppo
 import tqdm
 from corl.environment.multi_agent_env import ACT3MultiAgentEnv, ACT3MultiAgentEnvValidator
 from corl.episode_parameter_providers.remote import RemoteEpisodeParameterProvider
 from corl.experiments.rllib_experiment import RllibExperiment, RllibExperimentValidator
 from corl.libraries.factory import Factory
+
+# import ray.rllib.agents.ppo as ppo
+from ray.rllib.algorithms.ppo import ppo
 
 
 class RllibAPIExperimentValidator(RllibExperimentValidator):
@@ -39,7 +40,7 @@ class RllibAPIExperimentValidator(RllibExperimentValidator):
     serialized_ray_config_path: str
         path to params.pkl file
     trained_models_checkpoint_path: str
-        path to checkpoint directory 
+        path to checkpoint directory
     """
     serialized_ray_config_path: str
     trained_models_checkpoint_path: str

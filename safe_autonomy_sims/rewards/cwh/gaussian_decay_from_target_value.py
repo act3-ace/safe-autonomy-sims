@@ -14,15 +14,15 @@ This module implements a gaussian decay reward function.
 
 import logging
 import typing
-import numpy as np
 
+import numpy as np
 from corl.libraries.utils import get_wrap_diff
 from corl.rewards.base_measurement_operation import BaseMeasurementOperation, BaseMeasurementOperationValidator
 
 
 class GaussianDecayFromTargetValueValidator(BaseMeasurementOperationValidator):
     """
-    A configuration validator for GaussianDecayFromTargetValue 
+    A configuration validator for GaussianDecayFromTargetValue
 
     Attributes
     ----------

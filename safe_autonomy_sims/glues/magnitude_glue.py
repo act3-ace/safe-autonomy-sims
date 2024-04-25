@@ -13,8 +13,10 @@ This module implements an extension of the CoRL Magnitude Glue with the observat
 """
 
 from functools import cached_property
+
 from corl.glues.common.magnitude import MagnitudeGlue
-from corl.libraries.property import DictProp, BoxProp
+from corl.libraries.property import BoxProp, DictProp
+
 
 class SimsMagnitudeGlue(MagnitudeGlue):
 
@@ -22,4 +24,3 @@ class SimsMagnitudeGlue(MagnitudeGlue):
     def observation_prop(self):
         prop = DictProp(name=self._uname, spaces={self.Fields.MAG: BoxProp(low=[-10000], high=[10000], unit='m/s')})
         return prop
-
