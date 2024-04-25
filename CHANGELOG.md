@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.11...v4.0.0) (2024-04-25)
+
+
+### Bug Fixes
+
+* **dependencies:** update CoRL to 3.16.2, which absorbs some evaluation API ([1cfc057](https://github.com/act3-ace/safe-autonomy-sims/commit/1cfc057f3bfeb702a6d4b628550603c3d1a730a7))
+
+
+### BREAKING CHANGES
+
+* **dependencies:** Some evaluation API functions previously available from safe-autonomy-sims are now in the CoRL package and are no longer in the public API of safe-autonomy-sims
+
 ## [3.2.11](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.10...v3.2.11) (2024-04-08)
 
 
