@@ -30,27 +30,16 @@ class DockingEnv(gym.Env):
         )
 
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, s, v_limit]
-        self.observation_space = spaces.Dict(
-            {
-                "chief": spaces.Box(
-                    [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0, 0],
-                    np.inf,
-                    shape=(8,),
-                ),
-                "deputy": spaces.Box(
-                    [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0, 0],
-                    np.inf,
-                    shape=(8,),
-                ),
-            }
+        self.observation_space = (
+            spaces.Box(
+                [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0, 0],
+                np.inf,
+                shape=(8,),
+            ),
         )
 
         # Each spacecraft is controlled by [xdot, ydot, zdot]
-        self.action_space = spaces.Dict(
-            {
-                "deputy": spaces.Box(-1, 1, shape=(3,))  # only the deputy is controlled
-            }
-        )
+        self.action_space = spaces.Box(-1, 1, shape=(3,))
 
         # Environment parameters
         self.docking_radius = docking_radius
@@ -91,7 +80,14 @@ class DockingEnv(gym.Env):
         return observation, reward, terminated, truncated, info
 
     def _get_obs(self):
-        obs = self.simulator.info
+        deputy = self.simulator.entities["deputy"]
+        v_lim = v_limit(state=self.sim_state)
+        s = np.linalg.norm(deputy.velocity)
+        obs = self.observation_space.sample()
+        obs[:3] = deputy.position
+        obs[3:6] = deputy.velocity
+        obs[6] = s
+        obs[7] = v_lim
         return obs
 
     def _get_info(self):

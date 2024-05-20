@@ -36,75 +36,40 @@ class TranslationalInspectionEnv(gym.Env):
         )
 
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, theta_sun, n, x_ups, y_ups, z_ups]
-        self.observation_space = spaces.Dict(
-            {
-                "chief": spaces.Box(
-                    [
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        0,
-                        0,
-                        -1,
-                        -1,
-                        -1,
-                    ],
-                    [
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        2 * np.pi,
-                        100,
-                        1,
-                        1,
-                        1,
-                    ],
-                    shape=(8,),
-                ),
-                "deputy": spaces.Box(
-                    [
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        -np.inf,
-                        0,
-                        0,
-                        -1,
-                        -1,
-                        -1,
-                    ],
-                    [
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        np.inf,
-                        2 * np.pi,
-                        100,
-                        1,
-                        1,
-                        1,
-                    ],
-                    shape=(8,),
-                ),
-            }
+        self.observation_space = spaces.Box(
+            [
+                -np.inf,
+                -np.inf,
+                -np.inf,
+                -np.inf,
+                -np.inf,
+                -np.inf,
+                0,
+                0,
+                -1,
+                -1,
+                -1,
+            ],
+            [
+                np.inf,
+                np.inf,
+                np.inf,
+                np.inf,
+                np.inf,
+                np.inf,
+                2 * np.pi,
+                100,
+                1,
+                1,
+                1,
+            ],
+            shape=(11,),
         )
 
         # Each spacecraft is controlled by [xdot, ydot, zdot]
-        self.action_space = spaces.Dict(
-            {
-                "deputy": spaces.Box(-1, 1, shape=(3,))  # only the deputy is controlled
-            }
-        )
+        self.action_space = spaces.Box(
+            -1, 1, shape=(3,)
+        )  # only the deputy is controlled
 
         # Environment parameters
         self.crash_radius = crash_radius
@@ -148,7 +113,13 @@ class TranslationalInspectionEnv(gym.Env):
         return observation, reward, terminated, truncated, info
 
     def _get_obs(self):
-        obs = self.simulator.info
+        deputy = self.simulator.entities["deputy"]
+        obs = self.observation_space.sample()
+        obs[:3] = deputy.position
+        obs[3:6] = deputy.velocity
+        obs[6] = deputy.theta_sun
+        obs[7] = self.sim_state["inspection_points"].get_num_points_inspected()
+        obs[8:11] = uninspected_points_sensor
         return obs
 
     def _get_info(self):
@@ -188,7 +159,12 @@ class TranslationalInspectionEnv(gym.Env):
 
     @property
     def sim_state(self) -> dict:
-        return self.simulator.info
+        state = {
+            "chief": self.simulator.entities["chief"].state,
+            "deputy": self.simulator.entities["deputy"].state,
+            "inspection_points": self.simulator.inspection_points,
+        }
+        return state
 
 
 class WeightedTranslationalInspectionEnv(TranslationalInspectionEnv):
