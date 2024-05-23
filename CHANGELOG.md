@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.0.0...v4.0.1) (2024-05-23)
+
+
+### Bug Fixes
+
+* six-dof field of view ([61403c7](https://github.com/act3-ace/safe-autonomy-sims/commit/61403c762cc2decf909083e2a4284d0573ecafd2))
+
 # [4.0.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v3.2.11...v4.0.0) (2024-04-25)
 
 
