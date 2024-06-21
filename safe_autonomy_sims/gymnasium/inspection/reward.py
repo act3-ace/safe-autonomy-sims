@@ -2,9 +2,10 @@
 
 import numpy as np
 from safe_autonomy_sims.gymnasium.inspection.utils import delta_v, rel_dist
+from safe_autonomy_simulation.sims.inspection import Target, Inspector
 
 
-def observed_points_reward(state: dict, num_inspected: int) -> float:
+def observed_points_reward(chief: Target, num_inspected: int) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode.
 
@@ -15,8 +16,8 @@ def observed_points_reward(state: dict, num_inspected: int) -> float:
 
     Parameters
     ----------
-    state : dict
-        current simulation state
+    chief : Target
+        chief spacecraft under inspection
     num_inspected : int
         number of previously inspected points
 
@@ -25,13 +26,13 @@ def observed_points_reward(state: dict, num_inspected: int) -> float:
     float
         reward value
     """
-    current_num_inspected = state["inspection_points"].get_num_points_inspected()
+    current_num_inspected = chief.get_num_points_inspected()
     step_inspected = num_inspected - current_num_inspected
     r = 0.01 * step_inspected
     return r
 
 
-def weighted_observed_points_reward(state: dict, weight_inspected: float) -> float:
+def weighted_observed_points_reward(chief: Target, weight_inspected: float) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode conditioned by
     individual point weights.
@@ -43,8 +44,8 @@ def weighted_observed_points_reward(state: dict, weight_inspected: float) -> flo
 
     Parameters
     ----------
-    state : dict
-        current simulation state
+    chief : Target
+        chief spacecraft under inspected
     weight_inspected : float
         weight of previously inspected points
 
@@ -53,13 +54,13 @@ def weighted_observed_points_reward(state: dict, weight_inspected: float) -> flo
     float
         reward value
     """
-    current_weight_inspected = state["inspection_points"].get_total_weight_inspected()
+    current_weight_inspected = chief.get_total_weight_inspected()
     step_inspected = weight_inspected - current_weight_inspected
     r = 1.0 * step_inspected
     return r
 
 
-def inspection_success_reward(state: dict, total_points: int) -> float:
+def inspection_success_reward(chief: Target, total_points: int) -> float:
     """A sparse reward applied when the agent successfully
     inspects every point.
 
@@ -71,8 +72,8 @@ def inspection_success_reward(state: dict, total_points: int) -> float:
 
     Parameters
     ----------
-    state : dict
-        current simulation state
+    chief : Target
+        chief spacecraft under inspection
     total_points : int
         total number of points to be inspected
 
@@ -81,7 +82,7 @@ def inspection_success_reward(state: dict, total_points: int) -> float:
     float
         reward value
     """
-    num_inspected = state["inspection_points"].get_num_points_inspected()
+    num_inspected = chief.get_num_points_inspected()
     if num_inspected == total_points:
         r = 1.0
     else:
@@ -89,7 +90,7 @@ def inspection_success_reward(state: dict, total_points: int) -> float:
     return r
 
 
-def weighted_inspection_success_reward(state: dict, total_weight: float):
+def weighted_inspection_success_reward(chief: Target, total_weight: float):
     """A sparse reward applied when the agent successfully inspects
     point weights above the given threshold.
 
@@ -101,8 +102,8 @@ def weighted_inspection_success_reward(state: dict, total_weight: float):
 
     Parameters
     ----------
-    state : dict
-        current simulation state
+    chief : Target
+        spacecraft under inspection
     total_weight : float
         inspected weight threshold for success
 
@@ -111,7 +112,7 @@ def weighted_inspection_success_reward(state: dict, total_weight: float):
     float
         reward value
     """
-    weight_inspected = state["inspection_points"].get_total_weight_inspected()
+    weight_inspected = chief.get_total_weight_inspected()
     if weight_inspected >= total_weight:
         r = 1.0
     else:
@@ -178,7 +179,7 @@ def crash_reward(state: dict, crash_radius: float):
     return r
 
 
-def facing_chief_reward(state: dict, cam: list, epsilon: float):
+def facing_chief_reward(chief: Target, deputy: Inspector, epsilon: float):
     """A dense gaussian decaying reward which reward the agent
     for facing the chief.
 
@@ -192,10 +193,10 @@ def facing_chief_reward(state: dict, cam: list, epsilon: float):
 
     Parameters
     ----------
-    state : dict
-        current simulation state
-    cam : list
-        camera orientation unit vector
+    chief : Target
+        chief spacecraft under inspection
+    deputy : Inspector
+        deputy spacecraft performing inspection
     epsilon : float
         length of gaussian decay curve
 
@@ -204,9 +205,11 @@ def facing_chief_reward(state: dict, cam: list, epsilon: float):
     float
         reward value
     """
-    rel_pos = state["chief"][0:3] - state["deputy"][0:3]
+    rel_pos = chief.position - deputy.position
     rel_pos = rel_pos / np.linalg.norm(rel_pos)
-    gaussian_decay = np.exp(-np.abs(((np.dot(cam, rel_pos) - 1) ** 2) / epsilon))
+    gaussian_decay = np.exp(
+        -np.abs(((np.dot(deputy.camera.orientation, rel_pos) - 1) ** 2) / epsilon)
+    )
     reward = 0.0005 * gaussian_decay
     return reward
 
