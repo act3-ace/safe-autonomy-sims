@@ -3,9 +3,8 @@
 from typing import Any, SupportsFloat
 import numpy as np
 import gymnasium as gym
+import safe_autonomy_simulation
 from gymnasium import spaces
-from safe_autonomy_simulation.docking_simulator import DockingSimulator
-from safe_autonomy_simulation.spacecraft.point_model import CWHSpacecraft
 import safe_autonomy_sims.gymnasium.docking.reward as r
 from safe_autonomy_sims.gymnasium.docking.utils import v_limit, rel_dist, rel_vel
 
@@ -13,22 +12,11 @@ from safe_autonomy_sims.gymnasium.docking.utils import v_limit, rel_dist, rel_ve
 class DockingEnv(gym.Env):
     def __init__(
         self,
-        chief_init: dict,
-        deputy_init: dict,
         docking_radius: float = 0.2,
         max_time: int = 2000,
         max_distance: float = 10000,
         max_v_violation: int = 5,
     ) -> None:
-        # Initialize simulator with chief and deputy spacecraft
-        self.simulator = DockingSimulator(
-            entities={
-                "chief": CWHSpacecraft(name="chief", **chief_init),
-                "deputy": CWHSpacecraft(name="deputy", **deputy_init),
-            },
-            frame_rate=1,
-        )
-
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, s, v_limit]
         self.observation_space = (
             spaces.Box(
@@ -55,6 +43,7 @@ class DockingEnv(gym.Env):
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[Any, dict[str, Any]]:
         super().reset(seed=seed, options=options)
+        self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
@@ -68,7 +57,7 @@ class DockingEnv(gym.Env):
         self.prev_state = self.sim_state.copy()
 
         # Update simulator state
-        self.simulator.add_controls(action)
+        self.deputy.add_control(action)
         self.simulator.step()
 
         # Get info from simulator
@@ -79,13 +68,26 @@ class DockingEnv(gym.Env):
         truncated = False  # used to signal episode ended unexpectedly
         return observation, reward, terminated, truncated, info
 
+    def _init_sim(self):
+        # Initialize simulator with chief and deputy spacecraft
+        self.chief = safe_autonomy_simulation.sims.spacecraft.CWHSpacecraft(
+            name="chief"
+        )
+        self.deputy = safe_autonomy_simulation.sims.spacecraft.CWHSpacecraft(
+            name="deputy",
+            position=self.np_random.uniform(-100, 100, size=3),
+            velocity=self.np_random.uniform(-1, 1, size=3),
+        )
+        self.simulator = safe_autonomy_simulation.Simulator(
+            frame_rate=1, entities=[self.chief, self.deputy]
+        )
+
     def _get_obs(self):
-        deputy = self.simulator.entities["deputy"]
         v_lim = v_limit(state=self.sim_state)
-        s = np.linalg.norm(deputy.velocity)
+        s = np.linalg.norm(self.deputy.velocity)
         obs = self.observation_space.sample()
-        obs[:3] = deputy.position
-        obs[3:6] = deputy.velocity
+        obs[:3] = self.deputy.position
+        obs[3:6] = self.deputy.velocity
         obs[6] = s
         obs[7] = v_lim
         return obs
@@ -100,7 +102,7 @@ class DockingEnv(gym.Env):
         reward += r.distance_pivot_reward(
             state=self.sim_state, prev_state=self.prev_state
         )
-        reward += r.delta_v_reward(state=self.sim_state)
+        reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
         reward += r.velocity_constraint_reward(
             state=self.sim_state, v_limit=v_limit(self.sim_state)
         )
@@ -146,4 +148,4 @@ class DockingEnv(gym.Env):
 
     @property
     def sim_state(self) -> dict:
-        return self.simulator.info
+        return {"chief": self.chief.state, "deputy": self.deputy.state}
