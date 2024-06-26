@@ -18,12 +18,10 @@ class DockingEnv(gym.Env):
         max_v_violation: int = 5,
     ) -> None:
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, s, v_limit]
-        self.observation_space = (
-            spaces.Box(
-                [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0, 0],
-                np.inf,
-                shape=(8,),
-            ),
+        self.observation_space = spaces.Box(
+            np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0, 0]),
+            np.inf,
+            shape=(8,),
         )
 
         # Each spacecraft is controlled by [xdot, ydot, zdot]
