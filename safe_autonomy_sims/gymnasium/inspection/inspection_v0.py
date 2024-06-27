@@ -114,7 +114,7 @@ class InspectionEnv(gym.Env):
 
     ## Rewards
 
-    The reward is the sum of the following terms:
+    The reward $r_t$ at each time step is the sum of the following terms:
     * $r_t += 0.01(num\_inspected\_points_t - num\_inspected\_points_{t-1})$
         * a dense reward for observing new points
     * $r $= 1$ if $num\_inspected\_points_i == 100$, else 0
@@ -205,32 +205,20 @@ class InspectionEnv(gym.Env):
     ) -> None:
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, theta_sun, n, x_ups, y_ups, z_ups]
         self.observation_space = spaces.Box(
-            [
-                -np.inf,
-                -np.inf,
-                -np.inf,
-                -np.inf,
-                -np.inf,
-                -np.inf,
-                0,
-                0,
-                -1,
-                -1,
-                -1,
-            ],
-            [
-                np.inf,
-                np.inf,
-                np.inf,
-                np.inf,
-                np.inf,
-                np.inf,
-                2 * np.pi,
-                100,
-                1,
-                1,
-                1,
-            ],
+            np.concatenate(
+                [-np.inf] * 3,  # position
+                [-np.inf] * 3,  # velocity
+                [0],  # sun angle
+                [0],  # num inspected
+                [-1] * 3,  # nearest cluster
+            ),
+            np.concatenate(
+                [np.inf] * 3,  # position
+                [np.inf] * 3,  # velocity
+                [2 * np.pi],  # sun angle
+                [100],  # num inspected
+                [1] * 3,  # nearest cluster
+            ),
             shape=(11,),
         )
 
