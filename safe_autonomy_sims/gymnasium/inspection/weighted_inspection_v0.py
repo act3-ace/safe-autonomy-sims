@@ -18,7 +18,7 @@ from safe_autonomy_sims.gymnasium.inspection.utils import (
 
 class WeightedInspectionEnv(gym.Env):
     """
-    In this inspection environment, the goal is for a single deputy spacecraft 
+    In this weighted inspection environment, the goal is for a single deputy spacecraft 
     to navigate around and inspect the entire surface of a chief spacecraft.
     This is shown in the image below.
 
@@ -32,9 +32,10 @@ class WeightedInspectionEnv(gym.Env):
     points are weighted based on their angular distance to this vector. All
     point weights add up to a value of one. The optimal policy will inspect
     points whose cumulative weight exceeds 0.95 within 2 revolutions of the sun
-    while using as little fuel as possible. In this weighted inspection
-    environment, the agent only controls its translational motion and is
-    always assumed to be pointing at the chief spacecraft.
+    while using as little fuel as possible.
+    
+    In this weighted inspection environment, the agent only controls its
+    translational motion and is always assumed to be pointing at the chief spacecraft.
     
     __Note: the policy selects a new action every 10 seconds__
 
