@@ -1,7 +1,7 @@
 """Reward functions for the docking environment"""
 
 import math
-from safe_autonomy_sims.gymnasium.docking.utils import rel_dist, rel_vel, delta_v
+from safe_autonomy_sims.gym.docking.utils import rel_dist, rel_vel, delta_v
 
 
 def distance_pivot_reward(

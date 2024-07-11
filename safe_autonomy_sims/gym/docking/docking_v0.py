@@ -5,8 +5,8 @@ import numpy as np
 import gymnasium as gym
 import safe_autonomy_simulation
 from gymnasium import spaces
-import safe_autonomy_sims.gymnasium.docking.reward as r
-from safe_autonomy_sims.gymnasium.docking.utils import v_limit, rel_dist, rel_vel
+import safe_autonomy_sims.gym.docking.reward as r
+from safe_autonomy_sims.gym.docking.utils import v_limit, rel_dist, rel_vel
 
 
 class DockingEnv(gym.Env):

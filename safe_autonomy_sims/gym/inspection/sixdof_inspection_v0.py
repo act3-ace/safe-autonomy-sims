@@ -9,8 +9,8 @@ from safe_autonomy_simulation.sims.inspection import (
     Camera,
     Sun,
 )
-import safe_autonomy_sims.gymnasium.inspection.reward as r
-from safe_autonomy_sims.gymnasium.inspection.utils import rel_dist, closest_fft_distance
+import safe_autonomy_sims.gym.inspection.reward as r
+from safe_autonomy_sims.gym.inspection.utils import rel_dist, closest_fft_distance
 
 
 class WeightedSixDofInspectionEnv(gym.Env):

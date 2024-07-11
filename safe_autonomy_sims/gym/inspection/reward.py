@@ -1,7 +1,7 @@
 """Reward functions for the inspection tasks"""
 
 import numpy as np
-from safe_autonomy_sims.gymnasium.inspection.utils import delta_v, rel_dist
+from safe_autonomy_sims.gym.inspection.utils import delta_v, rel_dist
 from safe_autonomy_simulation.sims.inspection import Target, Inspector
 
 

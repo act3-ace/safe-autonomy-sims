@@ -1,5 +1,3 @@
-"""A gymnasium environment for training agents to dock a deputy spacecraft onto a chief spacecraft"""
-
 from typing import Any, SupportsFloat
 import numpy as np
 import gymnasium as gym
@@ -11,28 +9,33 @@ from safe_autonomy_simulation.sims.inspection import (
     Camera,
     Sun,
 )
-import safe_autonomy_sims.gymnasium.inspection.reward as r
-from safe_autonomy_sims.gymnasium.inspection.utils import rel_dist
+import safe_autonomy_sims.gym.inspection.reward as r
+from safe_autonomy_sims.gym.inspection.utils import (
+    rel_dist,
+    closest_fft_distance,
+)
 
 
-class InspectionEnv(gym.Env):
+class WeightedInspectionEnv(gym.Env):
     """
-    ## Description
-
-    This environment represents a spacecraft inspection problem
-    The goal is for a single deputy spacecraft to navigate around and inspect
-    the entire surface of a chief spacecraft as shown in the image below.
+    In this weighted inspection environment, the goal is for a single deputy spacecraft 
+    to navigate around and inspect the entire surface of a chief spacecraft.
+    This is shown in the image below.
 
     ![Basic Inspection Problem](../../images/inspection_problem.png)
     *Figure: The single spacecraft inspection problem without illumination.*
 
-    The chief is covered in 100 inspection points that the agent must
-    observe while they are illuminated by the moving sun. The optimal
-    policy will inspect all 100 points within 2 revolutions of the sun
+    The chief is covered in 100 inspection points that the agent must observe
+    while they are illuminated by the moving sun. The points are weighted by
+    priority, such that it is more important to inspect some points than others.
+    A unit vector is used to indicate the direction of highest importance, where
+    points are weighted based on their angular distance to this vector. All
+    point weights add up to a value of one. The optimal policy will inspect
+    points whose cumulative weight exceeds 0.95 within 2 revolutions of the sun
     while using as little fuel as possible.
     
-    In this inspection environment, the agent only controls its translational
-    motion and is always assumed to be pointing at the chief spacecraft.
+    In this weighted inspection environment, the agent only controls its
+    translational motion and is always assumed to be pointing at the chief spacecraft.
     
     __Note: the policy selects a new action every 10 seconds__
 
@@ -52,13 +55,16 @@ class InspectionEnv(gym.Env):
 
     ## Observation Space
 
-    At each timestep, the agent receives the observation, $o = [x, y, z, v_x, v_y, v_z, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}]$, where:
+    At each timestep, the agent receives the observation,
+    $o = [x, y, z, v_x, v_y, v_z, \theta_{sun}, n, x_{ups}, y_{ups}, z_{ups}, x_{pv}, y_{pv}, z_{pv}, w_{points}]$, where:
 
     * $x, y,$ and $z$ represent the deputy's position in the Hill's frame,
     * $v_x, v_y,$ and $v_z$ represent the deputy's directional velocity in the Hill's frame,
     * $\theta_{sun}$ is the angle of the sun,
-    * $n$ is the number of points that have been inspected so far and,
-    * $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vectors pointing to the nearest large cluster of unispected points (found via k-means)
+    * $n$ is the number of points that have been inspected so far
+    * $x_{ups}, y_{ups},$ and $z_{ups}$ are the unit vector elements pointing to the nearest large cluster of unispected points
+    * $x_{pv}, y_{pv},$ and $z_{pv}$ are the unit vector elements pointing to the priority vector indicating point priority
+    * $w_{points}$ is the cumulative weight of inpsected points
 
     The observation space is a `Box` with the following bounds:
 
@@ -75,6 +81,10 @@ class InspectionEnv(gym.Env):
     | 8     | x component of unit vector pointing to nearest cluster | -1   | 1      | scalar         |
     | 9     | y component of unit vector pointing to nearest cluster | -1   | 1      | scalar         |
     | 10    | z component of unit vector pointing to nearest cluster | -1   | 1      | scalar         |
+    | 11    | x component of unit vector pointing to priority vector | -1   | 1      | scalar         |
+    | 12    | y component of unit vector pointing to priority vector | -1   | 1      | scalar         |
+    | 13    | z component of unit vector pointing to priority vector | -1   | 1      | scalar         |
+    | 14    | cumulative weight of inspected points                  | 0    | 1      | scalar         |
 
     ## State Transition Dynamics
 
@@ -115,15 +125,17 @@ class InspectionEnv(gym.Env):
     ## Rewards
 
     The reward $r_t$ at each time step is the sum of the following terms:
-    * $r_t += 0.01(num\_inspected\_points_t - num\_inspected\_points_{t-1})$
-        * a dense reward for observing new points
-    * $r $= 1$ if $num\_inspected\_points_i == 100$, else 0
-        * a sparse reward for successfully inspecting all points
+    * $r_t += 1.0(weight\_inspected\_points_t - weight\_inspected\_points_{t-1})$
+        * a dense reward for observing inspection points
+    * $r += 1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius \geq crash\_region\_radius$, $r = -1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius < crash\_region\_radius$, else 0
+        * a sparse reward for successfully inspecting the chief spacecraft
+        * positive reward if the agent inspects 95% of the points and is on a safe trajectory
+        * negative reward if the agent inspects 95% of the points and is on a collision course with the chief spacecraft
     * $r += -1$ if $radius < crash\_region\_radius$, else 0
-        * a sparse reward punishing the agent for crashing with the chief
+        * a sparse reward punishing the agent for crashing with the chief spacecraft
     * $r += -0.1||\boldsymbol{u}||$
-        * a dense reward for minimizing fuel cost
-        * fuel cost is represented as the norm of the control input (action)
+        * a dense reward for minimizing fuel usage
+        * fuel use is represented by the norm of the control input (action)
 
     ## Starting State
 
@@ -132,6 +144,9 @@ class InspectionEnv(gym.Env):
     * chief $(x,y,z)$ = $(0, 0, 0)$
     * chief radius = $10 m$
     * chief # of points = $100$
+    * priority unit vector orientation for point weighting is randomly sampled from a uniform distribution using polar notation $(\phi, \psi)$
+        * $\psi \in [0, 2\pi] rad$
+        * $\phi \in [-\pi/2, \pi/2] rad$
     * deputy position $(x, y, z)$ is converted after randomly selecting the position in polar notation $(r, \phi, \psi)$ using a uniform distribution with
         * $r \in [50, 100] m$
         * $\psi \in [0, 2\pi] rad$
@@ -140,7 +155,7 @@ class InspectionEnv(gym.Env):
         * $y = r \sin{\psi} \cos{\phi}$
         * $z = r \sin{\phi}$
     * deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
-        * $v \in [0, 0.8] * v_{\rm max}, \quad v_{\rm max} = 2nr$ m/s
+        * $v \in [0, 0.3]$ m/s
         * $\psi \in [0, 2\pi] rad$
         * $\phi \in [-\pi/2, \pi/2] rad$
         * $v_x = v \cos{\psi} \cos{\phi}$
@@ -148,17 +163,18 @@ class InspectionEnv(gym.Env):
         * $v_z = v \sin{\phi}$
     * Initial sun angle is randomly selected using a uniform distribution
         * $\theta_{sun} \in [0, 2\pi] rad$
+        * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
 
     ## Episode End
 
     An episode will end if any of the following conditions are met:
 
-    * Termination: the agent exceeds a `max_distance = 800` meter radius away from the chief
-    * Termination: the agent moves within a `crash_region_radius = 10` meter radius around the chief
-    * Termination: all 100 points around the chief have been inspected
-    * Truncation: the maximum number of timesteps, `max_timesteps = 1224`, is reached
+    * Terminated: the agent exceeds a `max_distance = 800` meter radius away from the chief
+    * Terminated: the agent moves within a `crash_region_radius = 10` meter radius around the chief
+    * Terminated: the cumulative weight of inspected points exceeds 0.95
+    * Truncated: the maximum number of timesteps, `max_timesteps = 1224`
 
-    The episode is considered done and successful if and only if all 100 points have been inspected.
+    The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95.
 
     ## References
 
@@ -196,36 +212,37 @@ class InspectionEnv(gym.Env):
     Brandonisio, A., Lavagna, M., and Guzzetti, D., “Reinforcement Learning for Uncooperative Space Objects Smart Imaging
     Path-Planning,” The *Journal of the Astronautical Sciences*, Vol. 68, No. 4, 2021, pp. 1145–1169. [https://doi.org/10.1007/s40295-021-00288-7](https://doi.org/10.1007/s40295-021-00288-7).
     """
+
     def __init__(
         self,
-        success_threshold: float = 100,
+        success_threshold: float = 0.95,
         crash_radius: float = 15,
         max_distance: float = 800,
         max_time: float = 1000,
     ) -> None:
-        # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, theta_sun, n, x_ups, y_ups, z_ups]
         self.observation_space = spaces.Box(
             np.concatenate(
                 [-np.inf] * 3,  # position
                 [-np.inf] * 3,  # velocity
                 [0],  # sun angle
                 [0],  # num inspected
-                [-1] * 3,  # nearest cluster
+                [-1] * 3,  # nearest cluster unit vector
+                [-1] * 3,  # priority vector unit vector
+                [0],  # weight inspected
             ),
             np.concatenate(
                 [np.inf] * 3,  # position
                 [np.inf] * 3,  # velocity
                 [2 * np.pi],  # sun angle
                 [100],  # num inspected
-                [1] * 3,  # nearest cluster
+                [1] * 3,  # nearest cluster unit vector
+                [1] * 3,  # priority vector unit vector
+                [1],  # weight inspected
             ),
-            shape=(11,),
+            shape=(15,),
         )
 
-        # Each spacecraft is controlled by [xdot, ydot, zdot]
-        self.action_space = spaces.Box(
-            -1, 1, shape=(3,)
-        )  # only the deputy is controlled
+        self.action_space = spaces.Box(-1, 1, shape=(3,))
 
         # Environment parameters
         self.crash_radius = crash_radius
@@ -236,6 +253,7 @@ class InspectionEnv(gym.Env):
         # Episode level information
         self.prev_state = None
         self.prev_num_inspected = 0
+        self.prev_weight_inspected = 0.0
 
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
@@ -246,35 +264,18 @@ class InspectionEnv(gym.Env):
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
+        self.prev_weight_inspected = 0.0
         return obs, info
-
-    def step(
-        self, action: Any
-    ) -> tuple[Any, SupportsFloat, bool, bool, dict[str, Any]]:
-        # Store previous simulator state
-        self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
-
-        # Update simulator state
-        self.deputy.add_control(action)
-        self.simulator.step()
-
-        # Get info from simulator
-        observation = self._get_obs()
-        reward = self._get_reward()
-        info = self._get_info()
-        terminated = self._get_terminated()
-        truncated = False  # used to signal episode ended unexpectedly
-        return observation, reward, terminated, truncated, info
 
     def _init_sim(self):
         # Initialize spacecraft, sun, and simulator
+        priority_vector = self.np_random.uniform(-1, 1, size=3)
+        priority_vector /= np.linalg.norm(priority_vector)  # convert to unit vector
         self.chief = Target(
             name="chief",
             num_points=100,
             radius=1,
+            priority_vector=priority_vector,
         )
         self.deputy = Inspector(
             name="deputy",
@@ -289,11 +290,35 @@ class InspectionEnv(gym.Env):
         )
         self.sun = Sun(theta=self.np_random.uniform(0, 2 * np.pi))
         self.simulator = InspectionSimulator(
-            frame_rate=1,
+            frame_rate=10,
             inspectors=[self.deputy],
             targets=[self.chief],
             sun=self.sun,
         )
+
+    def step(
+        self, action: Any
+    ) -> tuple[Any, SupportsFloat, bool, bool, dict[str, Any]]:
+        # Store previous simulator state
+        self.prev_state = self.sim_state.copy()
+        self.prev_num_inspected = (
+            self.chief.inspection_points.get_num_points_inspected()
+        )
+        self.prev_weight_inspected += (
+            self.chief.inspection_points.get_total_weight_inspected()
+        )
+
+        # Update simulator state
+        self.deputy.add_control(action)
+        self.simulator.step()
+
+        # Get info from simulator
+        observation = self._get_obs()
+        reward = self._get_reward()
+        info = self._get_info()
+        terminated = self._get_terminated()
+        truncated = False  # used to signal episode ended unexpectedly
+        return observation, reward, terminated, truncated, info
 
     def _get_obs(self):
         obs = self.observation_space.sample()
@@ -304,6 +329,8 @@ class InspectionEnv(gym.Env):
         obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(
             camera=self.deputy.camera, sun=self.sun
         )
+        obs[11:14] = self.chief.inspection_points.priority_vector
+        obs[14] = self.chief.inspection_points.get_total_weight_inspected()
         return obs
 
     def _get_info(self):
@@ -313,20 +340,21 @@ class InspectionEnv(gym.Env):
         reward = 0
 
         # Dense rewards
-        reward += r.observed_points_reward(
-            chief=self.chief, num_inspected=self.num_inspected
+        reward += r.weighted_observed_points_reward(
+            state=self.sim_state, weight_inspected=self.prev_weight_inspected
         )
         reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
 
         # Sparse rewards
-        reward += r.inspection_success_reward(
-            chief=self.chief,
-            total_points=self.success_threshold,
+        reward += (
+            r.weighted_inspection_success_reward(
+                state=self.sim_state, total_weight=self.success_threshold
+            )
+            if closest_fft_distance(state=self.sim_state) < self.crash_radius
+            else -1.0
         )
-        reward += r.crash_reward(
-            state=self.sim_state,
-            crash_radius=self.crash_radius,
-        )
+        reward += r.crash_reward(state=self.sim_state, crash_radius=self.crash_radius)
+
         return reward
 
     def _get_terminated(self):
@@ -337,7 +365,7 @@ class InspectionEnv(gym.Env):
         oob = d > self.max_distance
         crash = d < self.crash_radius
         timeout = self.simulator.sim_time > self.max_time
-        all_inspected = self.num_inspected == self.success_threshold
+        all_inspected = self.prev_weight_inspected >= self.success_threshold
 
         return oob or crash or timeout or all_inspected
 
