@@ -241,7 +241,7 @@ class DockingEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        pass
+        return {}
 
     def _get_reward(self):
         reward = 0

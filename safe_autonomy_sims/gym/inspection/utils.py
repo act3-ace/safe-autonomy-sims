@@ -18,7 +18,7 @@ def rel_dist(state: dict):
     """
     chief_pos = state["chief"][:3]
     deputy_pos = state["deputy"][:3]
-    rel_d = np.linalg.norm(chief_pos, deputy_pos)
+    rel_d = np.linalg.norm(chief_pos - deputy_pos)
     return rel_d
 
 
@@ -37,7 +37,7 @@ def rel_vel(state: dict):
     """
     chief_v = state["chief"][3:6]
     deputy_v = state["deputy"][3:6]
-    rel_v = np.linalg.norm(chief_v, deputy_v)
+    rel_v = np.linalg.norm(chief_v - deputy_v)
     return rel_v
 
 
@@ -121,18 +121,27 @@ def closest_fft_distance(state: dict, n: float = 0.001027, time_step: int = 1) -
     float
         closest relative distance between deputy and chief during the FFT
     """
+
     def get_pos(platform: str, t: int):
         plat_state = state[platform]
-        x = (4 - 3 * np.cos(n * t)) * plat_state[0] + np.sin(n * t) * plat_state[3] / n + 2 / n * (1 - np.cos(n * t)) * plat_state[4]
-        y = 6 * (np.sin(n * t) - n * t) * plat_state[0] + plat_state[1] - 2 / n * (1 - np.cos(n * t)) * plat_state[3] + (4 * np.sin(n * t) -
-                                                                                                          3 * n * t) * plat_state[4] / n
+        x = (
+            (4 - 3 * np.cos(n * t)) * plat_state[0]
+            + np.sin(n * t) * plat_state[3] / n
+            + 2 / n * (1 - np.cos(n * t)) * plat_state[4]
+        )
+        y = (
+            6 * (np.sin(n * t) - n * t) * plat_state[0]
+            + plat_state[1]
+            - 2 / n * (1 - np.cos(n * t)) * plat_state[3]
+            + (4 * np.sin(n * t) - 3 * n * t) * plat_state[4] / n
+        )
         z = plat_state[2] * np.cos(n * t) + plat_state[5] / n * np.sin(n * t)
-        return x, y, z
+        return np.array([x, y, z])
 
     distances = []
     times = np.arange(0, 2 * np.pi / n, time_step)
     for time in times:
         dep_pos = get_pos(platform="deputy", t=time)
         chief_pos = get_pos(platform="chief", t=time)
-        distances.append(np.linalg.norm(chief_pos, dep_pos))
+        distances.append(np.linalg.norm(chief_pos - dep_pos))
     return float(min(distances))

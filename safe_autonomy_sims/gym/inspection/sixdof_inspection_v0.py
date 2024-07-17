@@ -2,11 +2,11 @@ from typing import Any, SupportsFloat
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
+import scipy.spatial.transform as transform
 from safe_autonomy_simulation.sims.inspection import (
     InspectionSimulator,
     SixDOFInspector,
     SixDOFTarget,
-    Camera,
     Sun,
 )
 import safe_autonomy_sims.gym.inspection.reward as r
@@ -362,41 +362,47 @@ class WeightedSixDofInspectionEnv(gym.Env):
     ) -> None:
         self.observation_space = spaces.Box(
             np.concatenate(
-                [-np.inf] * 3,  # deputy position
-                [-np.inf] * 4,  # deputy position magnorm
-                [-np.inf] * 3,  # deputy velocity
-                [-np.inf] * 4,  # deputy velocity magnorm
-                [-np.inf] * 3,  # deputy angular velocity
-                [0] * 3,  # deputy orientation
-                [-1],  # facing chief dot product
-                [0],  # sun angle
-                [0],  # number of inspected points
-                [-1] * 3,  # nearest cluster unit vector
-                [-1] * 3,  # priority vector unit vector
-                [0],  # cumulative weight of inspected points
-                [-1],  # facing cluster dot product
+                (
+                    [-np.inf] * 3,  # deputy position
+                    [-np.inf] * 4,  # deputy position magnorm
+                    [-np.inf] * 3,  # deputy velocity
+                    [-np.inf] * 4,  # deputy velocity magnorm
+                    [-np.inf] * 3,  # deputy angular velocity
+                    [-2 * np.pi] * 3,  # deputy orientation (euler)
+                    [-1],  # facing chief dot product
+                    [0],  # sun angle
+                    [0],  # number of inspected points
+                    [-1] * 3,  # nearest cluster unit vector
+                    [-1] * 3,  # priority vector unit vector
+                    [0],  # cumulative weight of inspected points
+                    [-1],  # facing cluster dot product
+                )
             ),
             np.concatenate(
-                [np.inf] * 3,  # deputy position
-                [np.inf] * 4,  # deputy position magnorm
-                [np.inf] * 3,  # deputy velocity
-                [np.inf] * 4,  # deputy velocity magnorm
-                [np.inf] * 3,  # deputy angular velocity
-                [2 * np.pi] * 3,  # deputy orientation
-                [1],  # facing chief dot product
-                [2 * np.pi],  # sun angle
-                [100],  # number of inspected points
-                [1] * 3,  # nearest cluster unit vector
-                [1] * 3,  # priority vector unit vector
-                [1],  # cumulative weight of inspected points
-                [1],  # facing cluster dot product
+                (
+                    [np.inf] * 3,  # deputy position
+                    [np.inf] * 4,  # deputy position magnorm
+                    [np.inf] * 3,  # deputy velocity
+                    [np.inf] * 4,  # deputy velocity magnorm
+                    [np.inf] * 3,  # deputy angular velocity
+                    [2 * np.pi] * 3,  # deputy orientation
+                    [1],  # facing chief dot product
+                    [2 * np.pi],  # sun angle
+                    [100],  # number of inspected points
+                    [1] * 3,  # nearest cluster unit vector
+                    [1] * 3,  # priority vector unit vector
+                    [1],  # cumulative weight of inspected points
+                    [1],  # facing cluster dot product
+                )
             ),
             shape=(31,),
+            dtype=np.float64,
         )
         self.action_space = spaces.Box(
-            [-1, -1, -1, -0.001, -0.001, -0.001],
-            [1, 1, 1, 0.001, 0.001, 0.001],
+            np.array([-1, -1, -1, -0.001, -0.001, -0.001]),
+            np.array([1, 1, 1, 0.001, 0.001, 0.001]),
             shape=(6,),
+            dtype=np.float64,
         )
 
         # Environment parameters
@@ -440,6 +446,10 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
         # Get info from simulator
         observation = self._get_obs()
+        if not self.observation_space.contains(observation):
+            raise ValueError(
+                f"Observation {observation} is not in the observation space"
+            )
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
@@ -458,12 +468,6 @@ class WeightedSixDofInspectionEnv(gym.Env):
         )
         self.deputy = SixDOFInspector(
             name="deputy",
-            camera=Camera(
-                name="deputy_camera",
-                fov=90,
-                resolution=(640, 480),
-                pixel_pitch=1e-6,
-            ),
             position=self.np_random.uniform(-100, 100, size=3),
             velocity=self.np_random.uniform(-1, 1, size=3),
         )
@@ -484,10 +488,15 @@ class WeightedSixDofInspectionEnv(gym.Env):
         obs[10] = np.linalg.norm(self.deputy.velocity)
         obs[11:14] = np.abs(self.deputy.velocity)
         obs[14:17] = self.deputy.angular_velocity
-        obs[17:20] = self.deputy.orientation
+        obs[17:20] = transform.Rotation.from_quat(self.deputy.orientation).as_euler(
+            "XYZ"
+        )
         obs[20] = np.dot(
-            self.deputy.camera.orientation,
-            self.chief.position - self.deputy.position,
+            transform.Rotation.from_quat(self.deputy.camera.orientation).as_euler(
+                "XYZ"
+            ),
+            (self.chief.position - self.deputy.position)
+            / np.linalg.norm(self.chief.position - self.deputy.position),
         )
         obs[21] = self.sun.theta
         obs[22] = self.chief.inspection_points.get_num_points_inspected()
@@ -497,7 +506,9 @@ class WeightedSixDofInspectionEnv(gym.Env):
         obs[26:29] = self.chief.inspection_points.priority_vector
         obs[29] = self.chief.inspection_points.get_total_weight_inspected()
         obs[30] = np.dot(
-            self.deputy.camera.orientation,
+            transform.Rotation.from_quat(self.deputy.camera.orientation).as_euler(
+                "XYZ"
+            ),
             self.chief.inspection_points.kmeans_find_nearest_cluster(
                 camera=self.deputy.camera, sun=self.sun
             ),
@@ -505,14 +516,14 @@ class WeightedSixDofInspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        pass
+        return {}
 
     def _get_reward(self):
         reward = 0
 
         # Dense rewards
         reward += r.weighted_observed_points_reward(
-            state=self.sim_state, weight_inspected=self.prev_weight_inspected
+            chief=self.chief, weight_inspected=self.prev_weight_inspected
         )
         reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
 
@@ -524,7 +535,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         # Sparse rewards
         reward += (
             r.weighted_inspection_success_reward(
-                state=self.sim_state, total_weight=self.success_threshold
+                chief=self.chief, total_weight=self.success_threshold
             )
             if closest_fft_distance(state=self.sim_state) < self.crash_radius
             else -1.0

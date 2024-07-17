@@ -5,20 +5,20 @@ from gymnasium.envs.registration import register
 
 register(
     id="Docking-v0",
-    entry_point="safe_autonomy_sims.gymnasium.docking.docking_v0:DockingEnv",
+    entry_point="safe_autonomy_sims.gym.docking.docking_v0:DockingEnv",
 )
 
 register(
     id="Inspection-v0",
-    entry_point="safe_autonomy_sims.gymnasium.inspection.inspection_v0:InspectionEnv",
+    entry_point="safe_autonomy_sims.gym.inspection.inspection_v0:InspectionEnv",
 )
 
 register(
     id="WeightedInspection-v0",
-    entry_point="safe_autonomy_sims.gymnasium.inspection.weighted_inspection_v0:WeightedInspectionEnv",
+    entry_point="safe_autonomy_sims.gym.inspection.weighted_inspection_v0:WeightedInspectionEnv",
 )
 
 register(
     id="SixDofInspection-v0",
-    entry_point="safe_autonomy_sims.gymnasium.inspection.sixdof_inspection_v0:SixDofInspectionEnv",
+    entry_point="safe_autonomy_sims.gym.inspection.sixdof_inspection_v0:WeightedSixDofInspectionEnv",
 )

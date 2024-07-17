@@ -18,7 +18,7 @@ def rel_dist(state: dict):
     """
     chief_pos = state["chief"][:3]
     deputy_pos = state["deputy"][:3]
-    rel_d = np.linalg.norm(chief_pos, deputy_pos)
+    rel_d = np.linalg.norm(chief_pos - deputy_pos)
     return rel_d
 
 
@@ -37,7 +37,7 @@ def rel_vel(state: dict):
     """
     chief_v = state["chief"][3:6]
     deputy_v = state["deputy"][3:6]
-    rel_v = np.linalg.norm(chief_v, deputy_v)
+    rel_v = np.linalg.norm(chief_v - deputy_v)
     return rel_v
 
 

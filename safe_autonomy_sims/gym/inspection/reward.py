@@ -1,6 +1,7 @@
 """Reward functions for the inspection tasks"""
 
 import numpy as np
+import scipy.spatial.transform as transform
 from safe_autonomy_sims.gym.inspection.utils import delta_v, rel_dist
 from safe_autonomy_simulation.sims.inspection import Target, Inspector
 
@@ -26,7 +27,7 @@ def observed_points_reward(chief: Target, num_inspected: int) -> float:
     float
         reward value
     """
-    current_num_inspected = chief.get_num_points_inspected()
+    current_num_inspected = chief.inspection_points.get_num_points_inspected()
     step_inspected = num_inspected - current_num_inspected
     r = 0.01 * step_inspected
     return r
@@ -54,7 +55,7 @@ def weighted_observed_points_reward(chief: Target, weight_inspected: float) -> f
     float
         reward value
     """
-    current_weight_inspected = chief.get_total_weight_inspected()
+    current_weight_inspected = chief.inspection_points.get_total_weight_inspected()
     step_inspected = weight_inspected - current_weight_inspected
     r = 1.0 * step_inspected
     return r
@@ -82,7 +83,7 @@ def inspection_success_reward(chief: Target, total_points: int) -> float:
     float
         reward value
     """
-    num_inspected = chief.get_num_points_inspected()
+    num_inspected = chief.inspection_points.get_num_points_inspected()
     if num_inspected == total_points:
         r = 1.0
     else:
@@ -112,7 +113,7 @@ def weighted_inspection_success_reward(chief: Target, total_weight: float):
     float
         reward value
     """
-    weight_inspected = chief.get_total_weight_inspected()
+    weight_inspected = chief.inspection_points.get_total_weight_inspected()
     if weight_inspected >= total_weight:
         r = 1.0
     else:
@@ -208,7 +209,21 @@ def facing_chief_reward(chief: Target, deputy: Inspector, epsilon: float):
     rel_pos = chief.position - deputy.position
     rel_pos = rel_pos / np.linalg.norm(rel_pos)
     gaussian_decay = np.exp(
-        -np.abs(((np.dot(deputy.camera.orientation, rel_pos) - 1) ** 2) / epsilon)
+        -np.abs(
+            (
+                (
+                    np.dot(
+                        transform.Rotation.from_quat(
+                            deputy.camera.orientation
+                        ).as_euler("XYZ"),
+                        rel_pos,
+                    )
+                    - 1
+                )
+                ** 2
+            )
+            / epsilon
+        )
     )
     reward = 0.0005 * gaussian_decay
     return reward

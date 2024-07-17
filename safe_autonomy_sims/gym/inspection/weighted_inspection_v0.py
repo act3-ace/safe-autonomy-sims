@@ -6,7 +6,6 @@ from safe_autonomy_simulation.sims.inspection import (
     InspectionSimulator,
     Inspector,
     Target,
-    Camera,
     Sun,
 )
 import safe_autonomy_sims.gym.inspection.reward as r
@@ -222,22 +221,26 @@ class WeightedInspectionEnv(gym.Env):
     ) -> None:
         self.observation_space = spaces.Box(
             np.concatenate(
-                [-np.inf] * 3,  # position
-                [-np.inf] * 3,  # velocity
-                [0],  # sun angle
-                [0],  # num inspected
-                [-1] * 3,  # nearest cluster unit vector
-                [-1] * 3,  # priority vector unit vector
-                [0],  # weight inspected
+                (
+                    [-np.inf] * 3,  # position
+                    [-np.inf] * 3,  # velocity
+                    [0],  # sun angle
+                    [0],  # num inspected
+                    [-1] * 3,  # nearest cluster unit vector
+                    [-1] * 3,  # priority vector unit vector
+                    [0],  # weight inspected
+                )
             ),
             np.concatenate(
-                [np.inf] * 3,  # position
-                [np.inf] * 3,  # velocity
-                [2 * np.pi],  # sun angle
-                [100],  # num inspected
-                [1] * 3,  # nearest cluster unit vector
-                [1] * 3,  # priority vector unit vector
-                [1],  # weight inspected
+                (
+                    [np.inf] * 3,  # position
+                    [np.inf] * 3,  # velocity
+                    [2 * np.pi],  # sun angle
+                    [100],  # num inspected
+                    [1] * 3,  # nearest cluster unit vector
+                    [1] * 3,  # priority vector unit vector
+                    [1],  # weight inspected
+                )
             ),
             shape=(15,),
         )
@@ -279,12 +282,6 @@ class WeightedInspectionEnv(gym.Env):
         )
         self.deputy = Inspector(
             name="deputy",
-            camera=Camera(
-                name="deputy_camera",
-                fov=90,
-                resolution=(640, 480),
-                pixel_pitch=1e-6,
-            ),
             position=self.np_random.uniform(-100, 100, size=3),
             velocity=self.np_random.uniform(-1, 1, size=3),
         )
@@ -334,14 +331,14 @@ class WeightedInspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        pass
+        return {}
 
     def _get_reward(self):
         reward = 0
 
         # Dense rewards
         reward += r.weighted_observed_points_reward(
-            state=self.sim_state, weight_inspected=self.prev_weight_inspected
+            chief=self.chief, weight_inspected=self.prev_weight_inspected
         )
         reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
 

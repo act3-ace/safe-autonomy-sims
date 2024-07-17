@@ -8,7 +8,6 @@ from safe_autonomy_simulation.sims.inspection import (
     InspectionSimulator,
     Inspector,
     Target,
-    Camera,
     Sun,
 )
 import safe_autonomy_sims.gym.inspection.reward as r
@@ -196,6 +195,7 @@ class InspectionEnv(gym.Env):
     Brandonisio, A., Lavagna, M., and Guzzetti, D., “Reinforcement Learning for Uncooperative Space Objects Smart Imaging
     Path-Planning,” The *Journal of the Astronautical Sciences*, Vol. 68, No. 4, 2021, pp. 1145–1169. [https://doi.org/10.1007/s40295-021-00288-7](https://doi.org/10.1007/s40295-021-00288-7).
     """
+
     def __init__(
         self,
         success_threshold: float = 100,
@@ -206,18 +206,22 @@ class InspectionEnv(gym.Env):
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, theta_sun, n, x_ups, y_ups, z_ups]
         self.observation_space = spaces.Box(
             np.concatenate(
-                [-np.inf] * 3,  # position
-                [-np.inf] * 3,  # velocity
-                [0],  # sun angle
-                [0],  # num inspected
-                [-1] * 3,  # nearest cluster
+                (
+                    [-np.inf] * 3,  # position
+                    [-np.inf] * 3,  # velocity
+                    [0],  # sun angle
+                    [0],  # num inspected
+                    [-1] * 3,  # nearest cluster
+                )
             ),
             np.concatenate(
-                [np.inf] * 3,  # position
-                [np.inf] * 3,  # velocity
-                [2 * np.pi],  # sun angle
-                [100],  # num inspected
-                [1] * 3,  # nearest cluster
+                (
+                    [np.inf] * 3,  # position
+                    [np.inf] * 3,  # velocity
+                    [2 * np.pi],  # sun angle
+                    [100],  # num inspected
+                    [1] * 3,  # nearest cluster
+                )
             ),
             shape=(11,),
         )
@@ -278,12 +282,6 @@ class InspectionEnv(gym.Env):
         )
         self.deputy = Inspector(
             name="deputy",
-            camera=Camera(
-                name="deputy_camera",
-                fov=90,
-                resolution=(640, 480),
-                pixel_pitch=1e-6,
-            ),
             position=self.np_random.uniform(-100, 100, size=3),
             velocity=self.np_random.uniform(-1, 1, size=3),
         )
@@ -307,14 +305,14 @@ class InspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        pass
+        return {}
 
     def _get_reward(self):
         reward = 0
 
         # Dense rewards
         reward += r.observed_points_reward(
-            chief=self.chief, num_inspected=self.num_inspected
+            chief=self.chief, num_inspected=self.prev_num_inspected
         )
         reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
 
@@ -337,7 +335,10 @@ class InspectionEnv(gym.Env):
         oob = d > self.max_distance
         crash = d < self.crash_radius
         timeout = self.simulator.sim_time > self.max_time
-        all_inspected = self.num_inspected == self.success_threshold
+        all_inspected = (
+            self.chief.inspection_points.get_num_points_inspected()
+            == self.success_threshold
+        )
 
         return oob or crash or timeout or all_inspected
 
