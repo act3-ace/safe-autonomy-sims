@@ -446,10 +446,6 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
         # Get info from simulator
         observation = self._get_obs()
-        if not self.observation_space.contains(observation):
-            raise ValueError(
-                f"Observation {observation} is not in the observation space"
-            )
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
