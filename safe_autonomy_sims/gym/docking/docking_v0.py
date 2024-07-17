@@ -6,7 +6,7 @@ import gymnasium as gym
 import safe_autonomy_simulation
 from gymnasium import spaces
 import safe_autonomy_sims.gym.docking.reward as r
-from safe_autonomy_sims.gym.docking.utils import v_limit, rel_dist, rel_vel
+from safe_autonomy_sims.gym.docking.utils import v_limit, rel_dist, rel_vel, polar_to_cartesian
 
 
 class DockingEnv(gym.Env):
@@ -132,7 +132,7 @@ class DockingEnv(gym.Env):
         * $x = r \cos{\psi} \cos{\phi}$
         * $y = r \sin{\psi} \cos{\phi}$
         * $z = r \sin{\phi}$
-    * deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(r, \phi, \psi)$ using a Gaussian distribution with
+    * deputy $(v_x, v_y, v_z)$ is converted after randomly selecting the velocity in polar notation $(v, \phi, \psi)$ using a Gaussian distribution with
         * $v \in [0, 0.8]$ m/s
         * $\psi \in [0, 2\pi] rad$
         * $\phi \in [-\pi/2, \pi/2] rad$
@@ -223,8 +223,16 @@ class DockingEnv(gym.Env):
         )
         self.deputy = safe_autonomy_simulation.sims.spacecraft.CWHSpacecraft(
             name="deputy",
-            position=self.np_random.uniform(-100, 100, size=3),
-            velocity=self.np_random.uniform(-1, 1, size=3),
+            position=polar_to_cartesian(
+                r=self.np_random.uniform(100, 150),
+                phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
+                theta=self.np_random.uniform(0, 2 * np.pi),
+            ),
+            velocity=polar_to_cartesian(
+                r=self.np_random.uniform(0, 0.8),
+                phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
+                theta=self.np_random.uniform(0, 2 * np.pi),
+            )
         )
         self.simulator = safe_autonomy_simulation.Simulator(
             frame_rate=1, entities=[self.chief, self.deputy]

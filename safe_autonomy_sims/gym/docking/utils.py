@@ -3,6 +3,29 @@
 import numpy as np
 
 
+def polar_to_cartesian(r: float, theta: float, phi: float) -> np.ndarray:
+    """Convert polar coordinates to cartesian coordinates.
+
+    Parameters
+    ----------
+    r : float
+        radial distance
+    theta : float
+        azimuthal angle
+    phi : float
+        polar angle
+
+    Returns
+    -------
+    np.ndarray
+        cartesian coordinates
+    """
+    x = r * np.sin(phi) * np.cos(theta)
+    y = r * np.sin(phi) * np.sin(theta)
+    z = r * np.cos(phi)
+    return np.array([x, y, z])
+
+
 def rel_dist(state: dict):
     """The relative distance between the chief and the deputy.
 

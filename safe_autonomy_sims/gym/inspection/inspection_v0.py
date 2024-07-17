@@ -11,7 +11,7 @@ from safe_autonomy_simulation.sims.inspection import (
     Sun,
 )
 import safe_autonomy_sims.gym.inspection.reward as r
-from safe_autonomy_sims.gym.inspection.utils import rel_dist
+from safe_autonomy_sims.gym.inspection.utils import rel_dist, polar_to_cartesian
 
 
 class InspectionEnv(gym.Env):
@@ -282,8 +282,16 @@ class InspectionEnv(gym.Env):
         )
         self.deputy = Inspector(
             name="deputy",
-            position=self.np_random.uniform(-100, 100, size=3),
-            velocity=self.np_random.uniform(-1, 1, size=3),
+            position=polar_to_cartesian(
+                r=self.np_random.uniform(50, 100),
+                theta=self.np_random.uniform(0, 2 * np.pi),
+                phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
+            ),
+            velocity=polar_to_cartesian(
+                r=self.np_random.uniform(0, 0.8),
+                theta=self.np_random.uniform(0, 2 * np.pi),
+                phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
+            ),
         )
         self.sun = Sun(theta=self.np_random.uniform(0, 2 * np.pi))
         self.simulator = InspectionSimulator(
