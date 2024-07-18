@@ -183,7 +183,6 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
     def reset(
         self, seed: int | None = None, options: dict[str, typing.Any] | None = None
     ) -> tuple[typing.Any, dict[str, typing.Any]]:
-        super().reset(seed=seed, options=options)
         self.rng = np.random.default_rng(seed)
         self.agents = copy.copy(self.possible_agents)
         self._init_sim()  # sim is light enough we just reconstruct it
@@ -214,8 +213,10 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
             a: False for a in self.agents
         }  # used to signal episode ended unexpectedly
 
-        # End episode if any agent terminates
-        if any(terminations.values()) or all(truncations.values()):
+        # End episode if any agent is terminated or truncated
+        if any(terminations.values() or any(truncations.values())):
+            truncations = {a: True for a in self.agents}
+            terminations = {a: True for a in self.agents}
             self.agents = []
 
         return observations, rewards, terminations, truncations, infos
@@ -247,7 +248,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
     def _get_obs(self, agent: str) -> typing.Any:
         deputy = self.deputies[agent]
-        v_lim = utils.v_limit(state=self.sim_state)
+        v_lim = utils.v_limit(chief_pos=self.chief.position, deputy_pos=deputy.position)
         s = np.linalg.norm(deputy.velocity)
         obs = self.observation_space(agent=agent).sample()
         obs[:3] = deputy.position
