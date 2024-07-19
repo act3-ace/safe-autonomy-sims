@@ -262,34 +262,33 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
     def _get_reward(self, agent: str) -> float:
         reward = 0
+        deputy = self.deputies[agent]
 
         # Dense rewards
         reward += r.distance_pivot_reward(
-            rel_dist=utils.rel_dist(
-                pos1=self.chief.position, pos2=self.deputies[agent].position
-            ),
+            rel_dist=utils.rel_dist(pos1=self.chief.position, pos2=deputy.position),
             rel_dist_prev=utils.rel_dist(
                 pos1=self.prev_state["chief"][0:3], pos2=self.prev_state[agent][0:3]
             ),
         )
         reward += r.delta_v_reward(
-            v=self.deputies[agent].velocity, prev_v=self.prev_state[agent][3:6]
+            v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
         reward += r.velocity_constraint_reward(
-            v1=self.deputies[agent].velocity,
+            v1=deputy.velocity,
             v2=self.chief.velocity,
             v_limit=utils.v_limit(
-                chief_pos=self.chief.position, deputy_pos=self.deputies[agent].position
+                chief_pos=self.chief.position, deputy_pos=deputy.position
             ),
         )
 
         # Sparse rewards
         reward += r.docking_success_reward(
             chief=self.chief,
-            deputy=self.deputies[agent],
+            deputy=deputy,
             t=self.simulator.sim_time,
             vel_limit=utils.v_limit(
-                chief_pos=self.chief.position, deputy_pos=self.deputies[agent].position
+                chief_pos=self.chief.position, deputy_pos=deputy.position
             ),
             docking_radius=self.docking_radius,
             max_time=self.max_time,
@@ -297,30 +296,31 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         reward += r.timeout_reward(t=self.simulator.sim_time, max_time=self.max_time)
         reward += r.crash_reward(
             chief=self.chief,
-            deputy=self.deputies[agent],
+            deputy=deputy,
             vel_limit=utils.v_limit(
-                chief_pos=self.chief.position, deputy_pos=self.deputies[agent].position
+                chief_pos=self.chief.position, deputy_pos=deputy.position
             ),
             docking_radius=self.docking_radius,
         )
         reward += r.out_of_bounds_reward(
             chief_pos=self.chief.position,
-            deputy_pos=self.deputies[agent].position,
+            deputy_pos=deputy.position,
             max_distance=self.max_distance,
         )
         return reward
 
     def _get_terminated(self, agent: str) -> bool:
+        deputy = self.deputies[agent]
         # Get state info
-        d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputies[agent].position)
-        v = utils.rel_vel(vel1=self.chief.velocity, vel2=self.deputies[agent].velocity)
+        d = utils.rel_dist(pos1=self.chief.position, pos2=deputy.position)
+        v = utils.rel_vel(vel1=self.chief.velocity, vel2=deputy.velocity)
         vel_limit = utils.v_limit(
-            chief_pos=self.chief.position, deputy_pos=self.deputies[agent].position
+            chief_pos=self.chief.position, deputy_pos=deputy.position
         )
         in_docking = d < self.docking_radius
         safe_v = v < vel_limit
         self.episode_v_violations += -r.velocity_constraint_reward(
-            v1=self.deputies[agent].velocity, v2=self.chief.velocity, v_limit=vel_limit
+            v1=deputy.velocity, v2=self.chief.velocity, v_limit=vel_limit
         )
 
         # Determine if in terminal state
