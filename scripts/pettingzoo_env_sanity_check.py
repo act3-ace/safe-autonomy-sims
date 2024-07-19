@@ -3,7 +3,12 @@ import safe_autonomy_sims.pettingzoo as sa_zoo
 
 
 def main():
-    envs = [sa_zoo.MultiDockingEnv]
+    envs = [
+        sa_zoo.MultiDockingEnv,
+        sa_zoo.MultiInspectionEnv,
+        sa_zoo.WeightedMultiInspectionEnv,
+        sa_zoo.WeightedSixDofMultiInspectionEnv,
+    ]
 
     for env in envs:
         print(f"Testing {env}...")
