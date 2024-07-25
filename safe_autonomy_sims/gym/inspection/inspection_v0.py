@@ -1,17 +1,11 @@
 """A gymnasium environment for training agents to dock a deputy spacecraft onto a chief spacecraft"""
 
-from typing import Any, SupportsFloat
+import typing
 import numpy as np
 import gymnasium as gym
-from gymnasium import spaces
-from safe_autonomy_simulation.sims.inspection import (
-    InspectionSimulator,
-    Inspector,
-    Target,
-    Sun,
-)
+import safe_autonomy_simulation.sims.inspection as sim
 import safe_autonomy_sims.gym.inspection.reward as r
-from safe_autonomy_sims.gym.inspection.utils import rel_dist, polar_to_cartesian
+import safe_autonomy_sims.gym.inspection.utils as utils
 
 
 class InspectionEnv(gym.Env):
@@ -204,7 +198,7 @@ class InspectionEnv(gym.Env):
         max_time: float = 1000,
     ) -> None:
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, theta_sun, n, x_ups, y_ups, z_ups]
-        self.observation_space = spaces.Box(
+        self.observation_space = gym.spaces.Box(
             np.concatenate(
                 (
                     [-np.inf] * 3,  # position
@@ -227,7 +221,7 @@ class InspectionEnv(gym.Env):
         )
 
         # Each spacecraft is controlled by [xdot, ydot, zdot]
-        self.action_space = spaces.Box(
+        self.action_space = gym.spaces.Box(
             -1, 1, shape=(3,)
         )  # only the deputy is controlled
 
@@ -242,8 +236,8 @@ class InspectionEnv(gym.Env):
         self.prev_num_inspected = 0
 
     def reset(
-        self, *, seed: int | None = None, options: dict[str, Any] | None = None
-    ) -> tuple[Any, dict[str, Any]]:
+        self, *, seed: int | None = None, options: dict[str, typing.Any] | None = None
+    ) -> tuple[typing.Any, dict[str, typing.Any]]:
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
@@ -253,8 +247,8 @@ class InspectionEnv(gym.Env):
         return obs, info
 
     def step(
-        self, action: Any
-    ) -> tuple[Any, SupportsFloat, bool, bool, dict[str, Any]]:
+        self, action: typing.Any
+    ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
         self.prev_num_inspected = (
@@ -275,26 +269,26 @@ class InspectionEnv(gym.Env):
 
     def _init_sim(self):
         # Initialize spacecraft, sun, and simulator
-        self.chief = Target(
+        self.chief = sim.Target(
             name="chief",
             num_points=100,
             radius=1,
         )
-        self.deputy = Inspector(
+        self.deputy = sim.Inspector(
             name="deputy",
-            position=polar_to_cartesian(
+            position=utils.polar_to_cartesian(
                 r=self.np_random.uniform(50, 100),
                 theta=self.np_random.uniform(0, 2 * np.pi),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
             ),
-            velocity=polar_to_cartesian(
+            velocity=utils.polar_to_cartesian(
                 r=self.np_random.uniform(0, 0.8),
                 theta=self.np_random.uniform(0, 2 * np.pi),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
             ),
         )
-        self.sun = Sun(theta=self.np_random.uniform(0, 2 * np.pi))
-        self.simulator = InspectionSimulator(
+        self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))
+        self.simulator = sim.InspectionSimulator(
             frame_rate=1,
             inspectors=[self.deputy],
             targets=[self.chief],
@@ -322,7 +316,9 @@ class InspectionEnv(gym.Env):
         reward += r.observed_points_reward(
             chief=self.chief, num_inspected=self.prev_num_inspected
         )
-        reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
+        reward += r.delta_v_reward(
+            v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
+        )
 
         # Sparse rewards
         reward += r.inspection_success_reward(
@@ -330,14 +326,15 @@ class InspectionEnv(gym.Env):
             total_points=self.success_threshold,
         )
         reward += r.crash_reward(
-            state=self.sim_state,
+            chief=self.chief,
+            deputy=self.deputy,
             crash_radius=self.crash_radius,
         )
         return reward
 
     def _get_terminated(self):
         # Get state info
-        d = rel_dist(state=self.sim_state)
+        d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
 
         # Determine if in terminal state
         oob = d > self.max_distance

@@ -2,11 +2,11 @@
 
 import numpy as np
 import scipy.spatial.transform as transform
-from safe_autonomy_sims.gym.inspection.utils import delta_v, rel_dist
-from safe_autonomy_simulation.sims.inspection import Target, Inspector
+import safe_autonomy_sims.pettingzoo.inspection.utils as utils
+import safe_autonomy_simulation.sims.inspection as sim
 
 
-def observed_points_reward(chief: Target, num_inspected: int) -> float:
+def observed_points_reward(chief: sim.Target, num_inspected: int) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode.
 
@@ -33,7 +33,7 @@ def observed_points_reward(chief: Target, num_inspected: int) -> float:
     return r
 
 
-def weighted_observed_points_reward(chief: Target, weight_inspected: float) -> float:
+def weighted_observed_points_reward(chief: sim.Target, weight_inspected: float) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode conditioned by
     individual point weights.
@@ -61,7 +61,7 @@ def weighted_observed_points_reward(chief: Target, weight_inspected: float) -> f
     return r
 
 
-def inspection_success_reward(chief: Target, total_points: int) -> float:
+def inspection_success_reward(chief: sim.Target, total_points: int) -> float:
     """A sparse reward applied when the agent successfully
     inspects every point.
 
@@ -91,7 +91,7 @@ def inspection_success_reward(chief: Target, total_points: int) -> float:
     return r
 
 
-def weighted_inspection_success_reward(chief: Target, total_weight: float):
+def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
     """A sparse reward applied when the agent successfully inspects
     point weights above the given threshold.
 
@@ -121,11 +121,11 @@ def weighted_inspection_success_reward(chief: Target, total_weight: float):
     return r
 
 
-def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.0):
+def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
     """A dense reward based on the deputy's fuel
     use (change in velocity).
 
-    $r_t = -0.1((\deltav / m) + b)$
+    $r_t = -((\deltav / m) + b)$
 
     where
     * $\deltav$ is the change in velocity
@@ -134,10 +134,10 @@ def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.
 
     Parameters
     ----------
-    state : dict
-        current simulation state
-    prev_state : dict
-        previous simulation state
+    v : np.ndarray
+        current velocity
+    prev_v : np.ndarray
+        previous velocity
     m : float, optional
         deputy mass, by default 12.0
     b : float, optional
@@ -148,11 +148,11 @@ def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.
     float
         reward value
     """
-    r = -0.1 * ((delta_v(state, prev_state) / m) + b)
+    r = -((utils.delta_v(v=v, prev_v=prev_v) / m) + b)
     return r
 
 
-def crash_reward(state: dict, crash_radius: float):
+def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
     """A sparse reward that punishes the agent
     for intersecting with the chief (crashing).
 
@@ -163,8 +163,10 @@ def crash_reward(state: dict, crash_radius: float):
 
     Parameters
     ----------
-    state : dict
-        current simulation state
+    chief : Target
+        chief spacecraft under inspection
+    deputy : Inspector
+        deputy spacecraft performing inspection
     crash_radius : float
         distance from chief which triggers a crash
 
@@ -173,14 +175,14 @@ def crash_reward(state: dict, crash_radius: float):
     float
         reward value
     """
-    if rel_dist(state=state) < crash_radius:
+    if utils.rel_dist(pos1=chief.position, pos2=deputy.position) < crash_radius:
         r = -1.0
     else:
         r = 0
     return r
 
 
-def facing_chief_reward(chief: Target, deputy: Inspector, epsilon: float):
+def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float):
     """A dense gaussian decaying reward which reward the agent
     for facing the chief.
 

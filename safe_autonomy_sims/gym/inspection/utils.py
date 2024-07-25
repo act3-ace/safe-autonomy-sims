@@ -1,6 +1,8 @@
 """Utility functions for the inspection environment"""
 
 import numpy as np
+import safe_autonomy_simulation.entities as e
+import safe_autonomy_simulation.sims.inspection as sim
 
 
 def polar_to_cartesian(r: float, theta: float, phi: float) -> np.ndarray:
@@ -11,81 +13,82 @@ def polar_to_cartesian(r: float, theta: float, phi: float) -> np.ndarray:
     r : float
         radial distance
     theta : float
-        azimuthal angle
-    phi : float
         polar angle
+    phi : float
+        azimuthal angle
 
     Returns
     -------
     np.ndarray
         cartesian coordinates
     """
-    x = r * np.sin(phi) * np.cos(theta)
-    y = r * np.sin(phi) * np.sin(theta)
-    z = r * np.cos(phi)
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
     return np.array([x, y, z])
 
 
-def rel_dist(state: dict):
-    """The relative distance between the chief and the deputy.
+def rel_dist(pos1: np.ndarray, pos2: np.ndarray) -> float:
+    """The relative distance between two positions.
 
     Parameters
     ----------
-    state : dict
-        the current state of the system
+    pos1 : np.ndarray
+        the first position
+    pos2 : np.ndarray
+        the second position
 
     Returns
     -------
     float
-        the euclidean distance between the chief and the deputy
+        the euclidean distance between the two positions
     """
-    chief_pos = state["chief"][:3]
-    deputy_pos = state["deputy"][:3]
-    rel_d = np.linalg.norm(chief_pos - deputy_pos)
+    rel_d = np.linalg.norm(pos1 - pos2)
     return rel_d
 
 
-def rel_vel(state: dict):
-    """The relative velocity between the chief and the deputy.
+def rel_vel(vel1: np.ndarray, vel2: np.ndarray) -> float:
+    """The relative velocity between two velocities.
 
     Parameters
     ----------
-    state : dict
-        the current state of the system
+    vel1 : np.ndarray
+        the first velocity
+    vel2 : np.ndarray
+        the second velocity
 
     Returns
     -------
     float
-        the relative velocity between the chief and the deputy
+        the relative velocity between the two velocities
     """
-    chief_v = state["chief"][3:6]
-    deputy_v = state["deputy"][3:6]
-    rel_v = np.linalg.norm(chief_v - deputy_v)
+    rel_v = np.linalg.norm(vel1 - vel2)
     return rel_v
 
 
-def delta_v(state: dict, prev_state: dict):
-    """The change in velocity of the deputy.
+def delta_v(v: np.ndarray, prev_v: np.ndarray) -> np.ndarray:
+    """The change in velocity
 
     Parameters
     ----------
-    state : dict
-        the current simulation state
-    prev_state : dict
-        the previous simulation state
+    v : np.ndarray
+        the current velocity
+    prev_v : np.ndarray
+        the previous velocity
 
     Returns
     -------
     float
-        the deputy's change in velocity
+        the change in velocity
     """
-    v = np.linalg.norm(state["deputy"][3:6])
-    prev_v = np.linalg.norm(prev_state["deputy"][3:6])
-    return v - prev_v
+    v_norm = np.linalg.norm(v)
+    prev_v_norm = np.linalg.norm(prev_v)
+    return v_norm - prev_v_norm
 
 
 def v_limit(
-    state: dict,
+    chief_pos: np.ndarray,
+    deputy_pos: np.ndarray,
     a: float = 2.0,
     n: float = 0.001027,
     v_max: float = 0.2,
@@ -104,8 +107,10 @@ def v_limit(
 
     Parameters
     ----------
-    state : dict
-        the current simulation state
+    chief_pos : np.ndarray
+        the position of the chief
+    deputy_pos : np.ndarray
+        the position of the deputy
     a : float, optional
         slope of the linear velocity limit, by default 2.0
     n : float, optional
@@ -120,11 +125,15 @@ def v_limit(
     float
         velocity limit
     """
-    v_limit = v_max + (a * n * (rel_dist(state=state) - docking_radius))
+    v_limit = v_max + (
+        a * n * (rel_dist(pos1=chief_pos, pos2=deputy_pos) - docking_radius)
+    )
     return v_limit
 
 
-def closest_fft_distance(state: dict, n: float = 0.001027, time_step: int = 1) -> float:
+def closest_fft_distance(
+    chief: sim.Target, deputy: sim.Inspector, n: float = 0.001027, time_step: int = 1
+) -> float:
     """
     Get the closest Free Flight Trajectory (FFT) distance between the deputy
     and the chief over one orbit using closed form CWH dynamics to calculate
@@ -132,8 +141,10 @@ def closest_fft_distance(state: dict, n: float = 0.001027, time_step: int = 1) -
 
     Parameters
     ----------
-    state: dict
-        current simulation state
+    chief : sim.Target
+        chief spacecraft under inspection
+    deputy : sim.Inspector
+        deputy spacecraft performing inspection
     n: float, optional
         orbital mean motion of Hill's reference frame's circular orbit in rad/s, by default 0.001027
     time_step: int
@@ -145,26 +156,25 @@ def closest_fft_distance(state: dict, n: float = 0.001027, time_step: int = 1) -
         closest relative distance between deputy and chief during the FFT
     """
 
-    def get_pos(platform: str, t: int):
-        plat_state = state[platform]
+    def get_pos(platform: e.PhysicalEntity, t: int):
         x = (
-            (4 - 3 * np.cos(n * t)) * plat_state[0]
-            + np.sin(n * t) * plat_state[3] / n
-            + 2 / n * (1 - np.cos(n * t)) * plat_state[4]
+            (4 - 3 * np.cos(n * t)) * platform.x
+            + np.sin(n * t) * platform.x_dot / n
+            + 2 / n * (1 - np.cos(n * t)) * platform.y_dot
         )
         y = (
-            6 * (np.sin(n * t) - n * t) * plat_state[0]
-            + plat_state[1]
-            - 2 / n * (1 - np.cos(n * t)) * plat_state[3]
-            + (4 * np.sin(n * t) - 3 * n * t) * plat_state[4] / n
+            6 * (np.sin(n * t) - n * t) * platform.x
+            + platform.y
+            - 2 / n * (1 - np.cos(n * t)) * platform.x_dot
+            + (4 * np.sin(n * t) - 3 * n * t) * platform.y_dot / n
         )
-        z = plat_state[2] * np.cos(n * t) + plat_state[5] / n * np.sin(n * t)
+        z = platform.z * np.cos(n * t) + platform.z_dot / n * np.sin(n * t)
         return np.array([x, y, z])
 
     distances = []
     times = np.arange(0, 2 * np.pi / n, time_step)
     for time in times:
-        dep_pos = get_pos(platform="deputy", t=time)
-        chief_pos = get_pos(platform="chief", t=time)
+        dep_pos = get_pos(platform=deputy, t=time)
+        chief_pos = get_pos(platform=chief, t=time)
         distances.append(np.linalg.norm(chief_pos - dep_pos))
     return float(min(distances))

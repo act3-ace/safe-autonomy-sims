@@ -1,16 +1,10 @@
-from typing import Any, SupportsFloat
+import typing
 import numpy as np
 import gymnasium as gym
-from gymnasium import spaces
 import scipy.spatial.transform as transform
-from safe_autonomy_simulation.sims.inspection import (
-    InspectionSimulator,
-    SixDOFInspector,
-    SixDOFTarget,
-    Sun,
-)
+import safe_autonomy_simulation.sims.inspection as sim
 import safe_autonomy_sims.gym.inspection.reward as r
-from safe_autonomy_sims.gym.inspection.utils import rel_dist, closest_fft_distance
+import safe_autonomy_sims.gym.inspection.utils as utils
 
 
 class WeightedSixDofInspectionEnv(gym.Env):
@@ -360,7 +354,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         max_distance: float = 800,
         max_time: float = 1000,
     ) -> None:
-        self.observation_space = spaces.Box(
+        self.observation_space = gym.spaces.Box(
             np.concatenate(
                 (
                     [-np.inf] * 3,  # deputy position
@@ -398,7 +392,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
             shape=(31,),
             dtype=np.float64,
         )
-        self.action_space = spaces.Box(
+        self.action_space = gym.spaces.Box(
             np.array([-1, -1, -1, -0.001, -0.001, -0.001]),
             np.array([1, 1, 1, 0.001, 0.001, 0.001]),
             shape=(6,),
@@ -417,8 +411,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.prev_weight_inspected = 0.0
 
     def reset(
-        self, *, seed: int | None = None, options: dict[str, Any] | None = None
-    ) -> tuple[Any, dict[str, Any]]:
+        self, *, seed: int | None = None, options: dict[str, typing.Any] | None = None
+    ) -> tuple[typing.Any, dict[str, typing.Any]]:
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
@@ -429,8 +423,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         return obs, info
 
     def step(
-        self, action: Any
-    ) -> tuple[Any, SupportsFloat, bool, bool, dict[str, Any]]:
+        self, action: typing.Any
+    ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
         self.prev_num_inspected = (
@@ -456,19 +450,27 @@ class WeightedSixDofInspectionEnv(gym.Env):
         # Initialize spacecraft, sun, and simulator
         priority_vector = self.np_random.uniform(-1, 1, size=3)
         priority_vector /= np.linalg.norm(priority_vector)  # convert to unit vector
-        self.chief = SixDOFTarget(
+        self.chief = sim.SixDOFTarget(
             name="chief",
             num_points=100,
             radius=1,
             priority_vector=priority_vector,
         )
-        self.deputy = SixDOFInspector(
+        self.deputy = sim.SixDOFInspector(
             name="deputy",
-            position=self.np_random.uniform(-100, 100, size=3),
-            velocity=self.np_random.uniform(-1, 1, size=3),
+            position=utils.polar_to_cartesian(
+                r=self.np_random.uniform(50, 100),
+                phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
+                theta=self.np_random.uniform(0, 2 * np.pi),
+            ),
+            velocity=utils.polar_to_cartesian(
+                r=self.np_random.uniform(0, 0.3),
+                phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
+                theta=self.np_random.uniform(0, 2 * np.pi),
+            ),
         )
-        self.sun = Sun(theta=self.np_random.uniform(0, 2 * np.pi))
-        self.simulator = InspectionSimulator(
+        self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))
+        self.simulator = sim.InspectionSimulator(
             frame_rate=10,
             inspectors=[self.deputy],
             targets=[self.chief],
@@ -521,7 +523,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         reward += r.weighted_observed_points_reward(
             chief=self.chief, weight_inspected=self.prev_weight_inspected
         )
-        reward += r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
+        reward += r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
 
         reward += r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
         reward += r.facing_chief_reward(
@@ -533,16 +535,19 @@ class WeightedSixDofInspectionEnv(gym.Env):
             r.weighted_inspection_success_reward(
                 chief=self.chief, total_weight=self.success_threshold
             )
-            if closest_fft_distance(state=self.sim_state) < self.crash_radius
+            if utils.closest_fft_distance(chief=self.chief, deputy=self.deputy)
+            < self.crash_radius
             else -1.0
         )
-        reward += r.crash_reward(state=self.sim_state, crash_radius=self.crash_radius)
+        reward += r.crash_reward(
+            chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius
+        )
 
         return reward
 
     def _get_terminated(self):
         # Get state info
-        d = rel_dist(state=self.sim_state)
+        d = utils.rel_dist(pos1=self.deputy.position, pos2=self.chief.position)
 
         # Determine if in terminal state
         oob = d > self.max_distance
