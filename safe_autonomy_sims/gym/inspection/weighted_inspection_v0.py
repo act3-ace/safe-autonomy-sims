@@ -162,10 +162,10 @@ class WeightedInspectionEnv(gym.Env):
 
     An episode will end if any of the following conditions are met:
 
-    * Terminated: the agent exceeds a `max_distance = 800` meter radius away from the chief
     * Terminated: the agent moves within a `crash_region_radius = 10` meter radius around the chief
     * Terminated: the cumulative weight of inspected points exceeds 0.95
     * Truncated: the maximum number of timesteps, `max_timesteps = 12236`
+    * Truncated: the agent exceeds a `max_distance = 800` meter radius away from the chief
 
     The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95.
 
@@ -368,11 +368,16 @@ class WeightedInspectionEnv(gym.Env):
         d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
 
         # Determine if in terminal state
-        oob = d > self.max_distance
         crash = d < self.crash_radius
         all_inspected = self.prev_weight_inspected >= self.success_threshold
 
-        return oob or crash or all_inspected
+        return crash or all_inspected
+
+    def _get_truncated(self):
+        d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
+        oob = d > self.max_distance
+        timeout = self.simulator.sim_time > self.max_time
+        return oob or timeout
 
     @property
     def sim_state(self) -> dict:

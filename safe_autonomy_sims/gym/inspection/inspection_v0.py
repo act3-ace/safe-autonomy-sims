@@ -150,12 +150,12 @@ class InspectionEnv(gym.Env):
 
     An episode will end if any of the following conditions are met:
 
-    * Termination: the agent exceeds a `max_distance = 800` meter radius away from the chief
-    * Termination: the agent moves within a `crash_region_radius = 10` meter radius around the chief
-    * Termination: all 100 points around the chief have been inspected
-    * Truncation: the maximum number of timesteps, `max_timesteps = 12236`, is reached
+    * Terminated: all points around the chief have been inspected
+    * Terminated: the agent moves within a `crash_region_radius = 10` meter radius around the chief
+    * Truncated: the agent exceeds a `max_distance = 800` meter radius away from the chief
+    * Truncated: the maximum number of timesteps, `max_timesteps = 12236`, is reached
 
-    The episode is considered done and successful if and only if all 100 points have been inspected.
+    The episode is considered done and successful if and only if all points have been inspected.
 
     ## References
 
@@ -267,7 +267,7 @@ class InspectionEnv(gym.Env):
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
-        truncated = self.simulator.sim_time > self.max_time
+        truncated = self._get_truncated()
         return observation, reward, terminated, truncated, info
 
     def _init_sim(self):
@@ -342,14 +342,19 @@ class InspectionEnv(gym.Env):
         d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
 
         # Determine if in terminal state
-        oob = d > self.max_distance
         crash = d < self.crash_radius
         all_inspected = (
             self.chief.inspection_points.get_num_points_inspected()
             >= self.success_threshold
         )
 
-        return oob or crash or all_inspected
+        return crash or all_inspected
+
+    def _get_truncated(self):
+        d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
+        timeout = self.simulator.sim_time > self.max_time
+        oob = d > self.max_distance
+        return timeout or oob
 
     @property
     def sim_state(self) -> dict:

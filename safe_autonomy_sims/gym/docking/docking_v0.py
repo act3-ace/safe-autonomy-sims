@@ -144,9 +144,10 @@ class DockingEnv(gym.Env):
 
     An episode will end if any of the following conditions are met:
 
-    * Termination: the agent exceeds a `max_distance = 10000` meter radius away from the chief,
+    * Termination: the agent enters the docking region at a safe velocity (docked),
     * Termination: the agent violates the velocity constraint within the docking region (crash),
-    * Termination: the velocity limit penalty exceeds -5
+    * Truncation: the agent exceeds a `max_distance = 10000` meter radius away from the chief,
+    * Truncation: the velocity limit penalty exceeds -5
     * Truncation: the maximum number of timesteps, `max_timesteps = 2000`, is reached
 
     The episode is considered done and successful if and only if the agent maneuvers the deputy
@@ -212,7 +213,7 @@ class DockingEnv(gym.Env):
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
-        truncated = False  # used to signal episode ended unexpectedly
+        truncated = self._get_truncated()
         return observation, reward, terminated, truncated, info
 
     def _init_sim(self):
@@ -293,13 +294,16 @@ class DockingEnv(gym.Env):
         )
 
         # Determine if in terminal state
-        oob = d > self.max_distance
         crash = in_docking and not safe_v
-        max_v_violation = self.episode_v_violations > self.max_v_violation
-        timeout = self.simulator.sim_time > self.max_time
         docked = in_docking and safe_v
 
-        return oob or crash or max_v_violation or timeout or docked
+        return crash or docked
+
+    def _get_truncated(self):
+        max_time = self.simulator.sim_time > self.max_time
+        oob = rel_dist(state=self.sim_state) > self.max_distance
+        max_v_violation = self.episode_v_violations > self.max_v_violation
+        return max_time or oob or max_v_violation
 
     @property
     def sim_state(self) -> dict:

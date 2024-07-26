@@ -304,10 +304,10 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
     An episode will terminate if any of the following conditions are met:
 
-    * Termination: the agent exceeds a `max_distance = 800` meter radius away from the chief
     * Termination: the agent moves within a `crash_region_radius = 15` meter radius around the chief
     * Termination: the cumulative weight of inspected points exceeds 0.95
     * Truncation: the maximum number of timesteps, `max_timesteps = 12236`
+    * Truncation: the agent exceeds a `max_distance = 800` meter radius away from the chief
 
     The episode is considered done and successful if and only if the cumulative weight of
     inspected points exceeds 0.95 while the deputy remains on a safe trajectory
@@ -446,7 +446,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
-        truncated = self.simulator.sim_time > self.max_time
+        truncated = self._get_truncated()
         return observation, reward, terminated, truncated, info
 
     def _init_sim(self):
@@ -555,11 +555,16 @@ class WeightedSixDofInspectionEnv(gym.Env):
         d = utils.rel_dist(pos1=self.deputy.position, pos2=self.chief.position)
 
         # Determine if in terminal state
-        oob = d > self.max_distance
         crash = d < self.crash_radius
         all_inspected = self.prev_weight_inspected >= self.success_threshold
 
-        return oob or crash or all_inspected
+        return crash or all_inspected
+
+    def _get_truncated(self):
+        d = utils.rel_dist(pos1=self.deputy.position, pos2=self.chief.position)
+        oob = d > self.max_distance
+        timeout = self.simulator.sim_time > self.max_time
+        return oob or timeout
 
     @property
     def sim_state(self) -> dict:
