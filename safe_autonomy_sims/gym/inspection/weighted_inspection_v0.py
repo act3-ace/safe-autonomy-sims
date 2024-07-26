@@ -151,9 +151,12 @@ class WeightedInspectionEnv(gym.Env):
         * $v_x = v \cos{\psi} \cos{\phi}$
         * $v_y = v \sin{\psi} \cos{\phi}$
         * $v_z = v \sin{\phi}$
+    * deputy camera parameters:
+        * field of view = $\pi$ rad
+        * focal length = $1 m$
     * Initial sun angle is randomly selected using a uniform distribution
         * $\theta_{sun} \in [0, 2\pi] rad$
-        * If the deputy is initialized where it's sensor points within 60 degrees of the sun, its position is negated such that the sensor points away from the sun.
+    * Simulator frame rate = $0.1 Hz$
 
     ## Episode End
 
@@ -162,7 +165,7 @@ class WeightedInspectionEnv(gym.Env):
     * Terminated: the agent exceeds a `max_distance = 800` meter radius away from the chief
     * Terminated: the agent moves within a `crash_region_radius = 10` meter radius around the chief
     * Terminated: the cumulative weight of inspected points exceeds 0.95
-    * Truncated: the maximum number of timesteps, `max_timesteps = 1224`
+    * Truncated: the maximum number of timesteps, `max_timesteps = 12236`
 
     The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95.
 
@@ -208,7 +211,7 @@ class WeightedInspectionEnv(gym.Env):
         success_threshold: float = 0.95,
         crash_radius: float = 15,
         max_distance: float = 800,
-        max_time: float = 1000,
+        max_time: float = 12236,
     ) -> None:
         self.observation_space = gym.spaces.Box(
             np.concatenate(
@@ -283,10 +286,12 @@ class WeightedInspectionEnv(gym.Env):
                 theta=self.np_random.uniform(0, 2 * np.pi),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
             ),
+            fov=np.pi,
+            focal_length=1,
         )
         self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
-            frame_rate=10,
+            frame_rate=0.1,
             inspectors=[self.deputy],
             targets=[self.chief],
             sun=self.sun,
@@ -313,7 +318,7 @@ class WeightedInspectionEnv(gym.Env):
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
-        truncated = False  # used to signal episode ended unexpectedly
+        truncated = self.simulator.sim_time > self.max_time
         return observation, reward, terminated, truncated, info
 
     def _get_obs(self):
@@ -365,10 +370,9 @@ class WeightedInspectionEnv(gym.Env):
         # Determine if in terminal state
         oob = d > self.max_distance
         crash = d < self.crash_radius
-        timeout = self.simulator.sim_time > self.max_time
         all_inspected = self.prev_weight_inspected >= self.success_threshold
 
-        return oob or crash or timeout or all_inspected
+        return oob or crash or all_inspected
 
     @property
     def sim_state(self) -> dict:

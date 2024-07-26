@@ -139,8 +139,12 @@ class InspectionEnv(gym.Env):
         * $v_x = v \cos{\psi} \cos{\phi}$
         * $v_y = v \sin{\psi} \cos{\phi}$
         * $v_z = v \sin{\phi}$
+    * deputy camera parameters:
+        * field of view = $\pi$ rad
+        * focal length = $1 m$
     * Initial sun angle is randomly selected using a uniform distribution
         * $\theta_{sun} \in [0, 2\pi] rad$
+    * Simulator frame rate = $0.1 Hz$
 
     ## Episode End
 
@@ -149,7 +153,7 @@ class InspectionEnv(gym.Env):
     * Termination: the agent exceeds a `max_distance = 800` meter radius away from the chief
     * Termination: the agent moves within a `crash_region_radius = 10` meter radius around the chief
     * Termination: all 100 points around the chief have been inspected
-    * Truncation: the maximum number of timesteps, `max_timesteps = 1224`, is reached
+    * Truncation: the maximum number of timesteps, `max_timesteps = 12236`, is reached
 
     The episode is considered done and successful if and only if all 100 points have been inspected.
 
@@ -192,10 +196,10 @@ class InspectionEnv(gym.Env):
 
     def __init__(
         self,
-        success_threshold: float = 100,
+        success_threshold: float = 99,
         crash_radius: float = 15,
         max_distance: float = 800,
-        max_time: float = 1000,
+        max_time: float = 12236,
     ) -> None:
         # Each spacecraft obs = [x, y, z, v_x, v_y, v_z, theta_sun, n, x_ups, y_ups, z_ups]
         self.observation_space = gym.spaces.Box(
@@ -264,7 +268,7 @@ class InspectionEnv(gym.Env):
         reward = self._get_reward()
         info = self._get_info()
         terminated = self._get_terminated()
-        truncated = False  # used to signal episode ended unexpectedly
+        truncated = self.simulator.sim_time > self.max_time
         return observation, reward, terminated, truncated, info
 
     def _init_sim(self):
@@ -286,10 +290,12 @@ class InspectionEnv(gym.Env):
                 theta=self.np_random.uniform(0, 2 * np.pi),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
             ),
+            fov=np.pi,
+            focal_length=1,
         )
         self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
-            frame_rate=1,
+            frame_rate=0.1,
             inspectors=[self.deputy],
             targets=[self.chief],
             sun=self.sun,
@@ -339,13 +345,12 @@ class InspectionEnv(gym.Env):
         # Determine if in terminal state
         oob = d > self.max_distance
         crash = d < self.crash_radius
-        timeout = self.simulator.sim_time > self.max_time
         all_inspected = (
             self.chief.inspection_points.get_num_points_inspected()
-            == self.success_threshold
+            >= self.success_threshold
         )
 
-        return oob or crash or timeout or all_inspected
+        return oob or crash or all_inspected
 
     @property
     def sim_state(self) -> dict:
