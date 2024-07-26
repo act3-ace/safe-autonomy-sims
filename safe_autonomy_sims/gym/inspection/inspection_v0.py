@@ -224,7 +224,6 @@ class InspectionEnv(gym.Env):
             shape=(11,),
         )
 
-        # Each spacecraft is controlled by [xdot, ydot, zdot]
         self.action_space = gym.spaces.Box(
             -1, 1, shape=(3,)
         )  # only the deputy is controlled

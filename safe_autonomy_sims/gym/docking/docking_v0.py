@@ -174,7 +174,6 @@ class DockingEnv(gym.Env):
             shape=(8,),
         )
 
-        # Each spacecraft is controlled by [xdot, ydot, zdot]
         self.action_space = spaces.Box(-1, 1, shape=(3,))
 
         # Environment parameters
