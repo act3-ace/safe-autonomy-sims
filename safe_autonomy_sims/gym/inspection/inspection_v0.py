@@ -108,7 +108,7 @@ class InspectionEnv(gym.Env):
     ## Rewards
 
     The reward $r_t$ at each time step is the sum of the following terms:
-    * $r_t += 0.01(num\_inspected\_points_t - num\_inspected\_points_{t-1})$
+    * $r_t += 0.1(num\_inspected\_points_t - num\_inspected\_points_{t-1})$
         * a dense reward for observing new points
     * $r $= 1$ if $num\_inspected\_points_i == 100$, else 0
         * a sparse reward for successfully inspecting all points

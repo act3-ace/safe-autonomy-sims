@@ -29,7 +29,7 @@ def observed_points_reward(chief: sim.Target, num_inspected: int) -> float:
     """
     current_num_inspected = chief.inspection_points.get_num_points_inspected()
     step_inspected = num_inspected - current_num_inspected
-    r = 0.01 * step_inspected
+    r = 0.1 * step_inspected
     return r
 
 
