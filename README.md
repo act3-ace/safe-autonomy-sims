@@ -29,7 +29,7 @@ These environments can be built using the `gymnasium.make()` function:
 
 ```python
 import gymnasium
-import safe_autonomy_sims
+import safe_autonomy_sims.gym
 
 # Build the Docking-v0 environment
 env = gymnasium.make("Docking-v0")
