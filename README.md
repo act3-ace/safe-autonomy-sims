@@ -1,55 +1,20 @@
 # safe-autonomy-sims
 
-## Intro
-
-The `safe-autonomy-sims` package provides components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA). This repo is designed to work hand-in-glove with the `corl`, `safe-autonomy-dynamics`, and `run-time-assurance` packages.
-
-These instructions assumes project installation and management using [Poetry](https://python-poetry.org/docs/), a tool for dependency management and packaging in Python. If you don't wish to use Poetry, any `poetry install` commands can be safely replaced by a standard `pip install` command.
+The `safe-autonomy-sims` package provides components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA). This repo is designed to work hand-in-glove with the [`corl`](https://github.com/act3-ace/CoRL), [`safe-autonomy-simulation`](https://github.com/act3-ace/safe-autonomy-simulation), and [`run-time-assurance`](https://github.com/act3-ace/run-time-assurance) packages.
 
 ## Installation
 
-The following instructions detail how to install
-the safe-autonomy-sims library on your local system. It is recommended to install the python modules within a virtual environment. If you are using Poetry, a virtual environment will be created for you during installation if one does not already exist.
+The following instructions detail how to install the `safe-autonomy-sims` library on your local system. It is recommended to install the python modules within a virtual environment.
 
-### Installing safe-autonomy-sims
-
-Install the safe-autonomy-sims module into your
-environment using `poetry`:
+The easiest way to install `safe-autonomy-sims` into your environment is via `pip`:
 
 ```shell
-cd safe-autonomy-sims
-poetry install
-```
-
-Poetry will handle installing appropriate dependencies into your environment, if they aren't already installed.  Poetry will also install an editable version of safe-autonomy-sims to the environment. For more information on managing Poetry environments see the [official documentation](https://python-poetry.org/docs/managing-environments/).
-
-## Local Documentation
-
-This repository is setup to use [MkDocs](https://www.mkdocs.org/) which is a static site generator geared towards building project documentation. Documentation source files are written in Markdown, and configured with a single YAML configuration file.
-
-**NOTE**: In order to properly build the documentation locally, you must first have `safe-autonomy-sims` and its dependencies installed in your container/environment!
-
-Install the MkDocs modules in a container/virtual environment via Poetry:
-
-```shell
-poetry install --with docs
-```
-
-To build the documentation locally without serving it, use
-the following command from within your container/virtual environment:
-
-```shell
-poetry run mkdocs build
-```
-
-To serve the documentation on a local port, use the following
-command from within your container/virtual environment:
-
-```shell
-poetry run mkdocs serve 
+pip install safe-autonomy-sims
 ```
 
 ## Usage
+
+The `safe-autonomy-sims` package provides RL training environments and example training configurations using [Gymnasium](https://gymnasium.farama.org/), [PettingZoo](https://pettingzoo.farama.org/), and [CoRL](https://github.com/act3-ace/CoRL). These environments are designed to provide challenge problems for safe autonomous control.
 
 ### Gym
 
@@ -152,6 +117,46 @@ Same as translational-inspection environment, but agent can control attitude (do
 
 * **Multiagent Weighted Six DoF Inspection**
 Same as weighted-six-dof-inspection environment, with multiple agent controlled deputy spacecraft.
+
+## Development
+
+If you are interested in contributing to the development of `safe-autonomy-sims`, the following sections outline the recommended process for setting up a development environment and building the package documentation.
+
+### Developer Installation
+
+The `safe-autonomy-sims` library was developed using the python packaging tool `poetry`. It is recommended to perform a local development installation of this project using `poetry` if you plan on contributing.
+
+```shell
+git clone <safe-autonomy-sims-url>
+cd safe-autonomy-sims
+poetry install
+```
+
+Poetry will handle installing appropriate dependencies into your environment, if they aren't already installed.  Poetry will also install an editable version of `safe-autonomy-sims` into the environment. For more information on managing Poetry environments see the [official documentation](https://python-poetry.org/docs/managing-environments/).
+
+### Local Documentation
+
+This repository is setup to use [MkDocs](https://www.mkdocs.org/) which is a static site generator geared towards building project documentation. Documentation source files are written in Markdown, and configured with a single YAML configuration file.
+
+**NOTE**: In order to properly build the documentation locally, you must first have `safe-autonomy-sims` and its dependencies installed in your container/environment!
+
+Install the MkDocs modules in a container/virtual environment via Poetry:
+
+```shell
+poetry install --with docs
+```
+
+To build the documentation locally without serving it, use the following command from within your container/virtual environment:
+
+```shell
+poetry run mkdocs build
+```
+
+To serve the documentation on a local port, use the following command from within your container/virtual environment:
+
+```shell
+poetry run mkdocs serve 
+```
 
 ## Team
 
