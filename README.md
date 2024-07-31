@@ -51,9 +51,54 @@ poetry run mkdocs serve
 
 ## Usage
 
-### Training
+### Gym
 
-Training experiments are conducted in safe-autonomy-sims via [configuration files](configs). These files can be manipulated to define experiment parameters, agent configurations, environments, tasks, policies, and platforms.
+This package provides the following single-agent Gymnasium environments:
+
+* [`Docking-v0`](safe_autonomy_sims/gym/docking/docking_v0.py)
+* [`Inspection-v0`](safe_autonomy_sims/gym/inspection/inspection_v0.py)
+* [`WeightedInspection-v0`](safe_autonomy_sims/gym/inspection/weighted_inspection_v0.py)
+* [`SixDofInspection-v0`](safe_autonomy_sims/gym/inspection/sixdof_inspection_v0.py)
+
+These environments can be built using the `gymnasium.make()` function:
+
+```python
+import gymnasium
+import safe_autonomy_sims
+
+# Build the Docking-v0 environment
+env = gymnasium.make("Docking-v0")
+```
+
+See the [Gymnasium documentation](https://gymnasium.farama.org/) for more information.
+
+### PettingZoo
+
+This package also provides the following multi-agent PettingZoo environments:
+
+* [`MultiDocking-v0`](safe_autonomy_sims/pettingzoo/docking/multidocking_v0.py)
+* [`MultiInspection-v0`](safe_autonomy_sims/pettingzoo/inspection/multi_inspection_v0.py)
+* [`MultiWeightedInspection-v0`](safe_autonomy_sims/pettingzoo/inspection/weighted_multi_inspection_v0.py)
+* [`SixDofMultiInspection-v0`](safe_autonomy_sims/pettingzoo/inspection/sixdof_multi_inspection_v0.py)
+
+These environments can be built using the following syntax:
+
+```python
+import safe_autonomy_sims
+
+# Build the MultiDocking-v0 environment
+env = safe_autonomy_sims.pettingzoo.MultiDockingEnv()
+```
+
+See the [PettingZoo documentation](https://pettingzoo.farama.org/) for more information.
+
+### CoRL
+
+This package provides several environments designed to use the [CoRL](https://github.com/act3-ace/CoRL) library for RL training. The following sections give an overview on using CoRL for training and the provided CoRL-compatible environments.
+
+#### Training
+
+Training experiments using CoRL are conducted in safe-autonomy-sims via [configuration files](configs). These files can be manipulated to define experiment parameters, agent configurations, environments, tasks, policies, and platforms.
 
 The `corl` package provides a training endpoint script which uses the RLLib reinforcement learning library to train agents in an environment.
 
@@ -66,46 +111,46 @@ python -m corl.train_rl --cfg configs/docking/experiment.yml
 
 Further information on training and experiment configuration can be found [here](docs/configuration.md).
 
-## Environments
+#### Environments
 
-This package includes the following environments:
+This package includes the following CoRL-compatible environments:
 
-- [Docking](docs/tasks/CWH/docking.md)
-- [Multiagent Docking](docs/tasks/CWH/multiagent_docking.md)
-- [Translational Inspection](docs/tasks/CWH/translational_inspection.md)
-- [Multiagent Translational Inspection](docs/tasks/CWH/multiagent_translational_inspection.md)
-- [Weighted Translational Inspection](docs/tasks/CWH/weighted_translational_inspection.md)
-- [Multiagent Weighted Translational Inspection](docs/tasks/CWH/multiagent_weighted_translational_inspection.md)
-- [Weighted Six DoF Inspection](docs/tasks/CWH/six_dof_inspection.md)
-- [Multiagent Weighted Six DoF Inspection](docs/tasks/CWH/multiagent_six_dof_inspection.md)
+* [Docking](docs/tasks/CWH/docking.md)
+* [Multiagent Docking](docs/tasks/CWH/multiagent_docking.md)
+* [Translational Inspection](docs/tasks/CWH/translational_inspection.md)
+* [Multiagent Translational Inspection](docs/tasks/CWH/multiagent_translational_inspection.md)
+* [Weighted Translational Inspection](docs/tasks/CWH/weighted_translational_inspection.md)
+* [Multiagent Weighted Translational Inspection](docs/tasks/CWH/multiagent_weighted_translational_inspection.md)
+* [Weighted Six DoF Inspection](docs/tasks/CWH/six_dof_inspection.md)
+* [Multiagent Weighted Six DoF Inspection](docs/tasks/CWH/multiagent_six_dof_inspection.md)
 
-### Docking
+##### Docking
 
 Spacecraft docking scenario where an agent controlled deputy spacecraft must dock with a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching the chief to within a predefined docking distance while maintaining a safe relative velocity within that distance. The motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model. Comes in the following flavors:
 
-- **Docking**
+* **Docking**
 Static 1N thrusters in $\pm x, \pm y, \pm z$.
 
-- **Multiagent Docking**
+* **Multiagent Docking**
 Multiple agent controlled deputy spaceraft. Each controlled by static 1N thrusters in $\pm x, \pm y, \pm z$.
 
-### Inspection
+##### Inspection
 
 Spacecraft inspection scenario where an agent controlled deputy spacecraft must inspect points on a stationary chief spacecraft while both orbit a central body. This is accomplished by approaching and navigating around the chief to view all points on a sphere. Points on the sphere can be illuminated by the sun, and only illuminated points can be inspected. Inspection 3D environments assume the deputy always points a sensor towards the chief, while Inspection Six DoF environments allow the deputy to control the orientation of the sensor. The translational motion of the deputy spacecraft is governed by the Clohessy-Wiltshire linearized dynamics model, and the Six DoF environments use a quaternion formulation to model attitude. All have static 1N thrusters in $\pm x, \pm y, \pm z$, and Six DoF environments also have moment controllers in $\pm x, \pm y, \pm z$. Comes in the following flavors:
 
-- **Translational Inspection**
+* **Translational Inspection**
 Agent can only control its translational motion. Orientation is assumed to be pointing at the chief. All points are weighted equally.
 
-- **Weighted Translational Inspection**
+* **Weighted Translational Inspection**
 Agent can only control its translational motion. Points are prioritizied through a directional unit vector, and are assigned weights/scores based on their angular distance to this vector. Inspected points are rewarded based on score. Success is determined by reaching a score threshold, rather than all points inspected.
 
-- **Multiagent Translational Inspection**
+* **Multiagent Translational Inspection**
 Same as translational-inspection environment, with multiple agent controlled deputy spacecraft.
 
-- **Weighted Six DoF Inspection**
+* **Weighted Six DoF Inspection**
 Same as translational-inspection environment, but agent can control attitude (does not always point at chief).
 
-- **Multiagent Weighted Six DoF Inspection**
+* **Multiagent Weighted Six DoF Inspection**
 Same as weighted-six-dof-inspection environment, with multiple agent controlled deputy spacecraft.
 
 ## Team
