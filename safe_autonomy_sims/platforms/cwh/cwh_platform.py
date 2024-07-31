@@ -18,7 +18,7 @@ import typing
 import numpy as np
 from corl.libraries.units import corl_get_ureg
 from corl.simulators.base_platform import BasePlatformValidator
-from safe_autonomy_simulation.spacecraft import CWHSpacecraft, SixDOFSpacecraft
+from safe_autonomy_simulation.sims.spacecraft import CWHSpacecraft, SixDOFSpacecraft
 
 from safe_autonomy_sims.platforms.common.platform import BaseSafeRLPlatform
 
