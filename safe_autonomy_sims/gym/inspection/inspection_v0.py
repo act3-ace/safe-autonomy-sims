@@ -9,15 +9,12 @@ import safe_autonomy_sims.gym.inspection.utils as utils
 
 
 class InspectionEnv(gym.Env):
-    """
+    r"""
     ## Description
 
     This environment represents a spacecraft inspection problem
     The goal is for a single deputy spacecraft to navigate around and inspect
-    the entire surface of a chief spacecraft as shown in the image below.
-
-    ![Basic Inspection Problem](../../images/inspection_problem.png)
-    *Figure: The single spacecraft inspection problem without illumination.*
+    the entire surface of a chief spacecraft.
 
     The chief is covered in 100 inspection points that the agent must
     observe while they are illuminated by the moving sun. The optimal
@@ -108,6 +105,7 @@ class InspectionEnv(gym.Env):
     ## Rewards
 
     The reward $r_t$ at each time step is the sum of the following terms:
+
     * $r_t += 0.1(num\_inspected\_points_t - num\_inspected\_points_{t-1})$
         * a dense reward for observing new points
     * $r $= 1$ if $num\_inspected\_points_i == 100$, else 0

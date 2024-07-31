@@ -7,14 +7,10 @@ import safe_autonomy_sims.gym.inspection.utils as utils
 
 
 class WeightedInspectionEnv(gym.Env):
-    """
+    r"""
     In this weighted inspection environment, the goal is for a single deputy spacecraft 
     to navigate around and inspect the entire surface of a chief spacecraft.
-    This is shown in the image below.
-
-    ![Basic Inspection Problem](../../images/inspection_problem.png)
-    *Figure: The single spacecraft inspection problem without illumination.*
-
+ 
     The chief is covered in 100 inspection points that the agent must observe
     while they are illuminated by the moving sun. The points are weighted by
     priority, such that it is more important to inspect some points than others.
@@ -86,6 +82,7 @@ class WeightedInspectionEnv(gym.Env):
     $$
 
     where:
+
     * state $\boldsymbol{x}=[x,y,z,\dot{x},\dot{y},\dot{z}]^T \in \mathcal{X}=\mathbb{R}^6$
     * control $\boldsymbol{u}= [F_x,F_y,F_z]^T \in \mathcal{U} = [-1N, 1N]^3$
 
@@ -115,6 +112,7 @@ class WeightedInspectionEnv(gym.Env):
     ## Rewards
 
     The reward $r_t$ at each time step is the sum of the following terms:
+
     * $r_t += 1.0(weight\_inspected\_points_t - weight\_inspected\_points_{t-1})$
         * a dense reward for observing inspection points
     * $r += 1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius \geq crash\_region\_radius$, $r = -1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius < crash\_region\_radius$, else 0

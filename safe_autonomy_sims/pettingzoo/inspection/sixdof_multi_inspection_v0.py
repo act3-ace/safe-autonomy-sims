@@ -11,15 +11,11 @@ import safe_autonomy_sims.pettingzoo.inspection.utils as utils
 
 
 class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
-    """
+    r"""
     ## Environment
 
     In this weighted six dof inspection environment, the goal is for a single deputy spacecraft 
     to navigate around and inspect the entire surface of a chief spacecraft.
-    This is shown in the image below.
-
-    ![Basic Inspection Problem](../../images/inspection_problem.png)
-    *Figure: The single spacecraft inspection problem without illumination.*
 
     The chief is covered in 100 inspection points that the agent must observe
     while they are illuminated by the moving sun. The points are weighted by
@@ -153,23 +149,23 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     $$
     \begin{bmatrix}
-        \dot{q_1} \\
-        \dot{q_2} \\
-        \dot{q_3} \\
-        \dot{q_4} \\
-        \dot{\omega_x} \\
-        \dot{\omega_y} \\
-        \dot{\omega_z} \\
-    \end{bmatrix} =
-
+    \dot{q_1} \\
+    \dot{q_2} \\
+    \dot{q_3} \\
+    \dot{q_4} \\
+    \dot{\omega_x} \\
+    \dot{\omega_y} \\
+    \dot{\omega_z} \\
+    \end{bmatrix}
+    =
     \begin{bmatrix}
-        \frac{1}{2}(q_4\omega_x - q_3\omega_y + q_2\omega_z) \\
-        \frac{1}{2}(q_3\omega_x + q_4\omega_y - q_1\omega_z) \\
-        \frac{1}{2}(-q_2\omega_x + q_1\omega_y + q_4\omega_z) \\
-        \frac{1}{2}(-q_1\omega_x - q_2\omega_y - q_3\omega_z) \\
-        J_1^{-1}((J_2 - J_3)\omega_y\omega_z) \\
-        J_2^{-1}((J_3 - J_1)\omega_x\omega_z) \\
-        J_3^{-1}((J_1 - J_2)\omega_x\omega_y) \\
+    \frac{1}{2}(q_4\omega_x - q_3\omega_y + q_2\omega_z) \\
+    \frac{1}{2}(q_3\omega_x + q_4\omega_y - q_1\omega_z) \\
+    \frac{1}{2}(-q_2\omega_x + q_1\omega_y + q_4\omega_z) \\
+    \frac{1}{2}(-q_1\omega_x - q_2\omega_y - q_3\omega_z) \\
+    J_1^{-1}((J_2 - J_3)\omega_y\omega_z) \\
+    J_2^{-1}((J_3 - J_1)\omega_x\omega_z) \\
+    J_3^{-1}((J_1 - J_2)\omega_x\omega_y) \\
     \end{bmatrix}
     $$
 
@@ -178,78 +174,12 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
     $$
     J =
     \begin{bmatrix}
-        0.0573 & 0.0 & 0.0 \\
-        0.0 & 0.0573 & 0.0 \\
-        0.0 & 0.0 & 0.0573
-    \end{bmatrix}
-    $$   The relative translational motion between the deputy and chief are linearized Clohessy-Wiltshire equations [[1]](#1), given by
-
-    $$
-        \dot{\boldsymbol{x}} = A {\boldsymbol{x}} + B\boldsymbol{u},
-    $$
-
-    where the state $\boldsymbol{x}=[x,y,z,\dot{x},\dot{y},\dot{z}]^T \in \mathcal{X}=\mathbb{R}^6$, the control (same as actions) $\boldsymbol{u}= [F_x,F_y,F_z]^T \in \mathcal{U} = [-1N, 1N]^3$,
-
-    $$
-        A =
-    \begin{bmatrix}
-    0 & 0 & 0 & 1 & 0 & 0 \\
-    0 & 0 & 0 & 0 & 1 & 0 \\
-    0 & 0 & 0 & 0 & 0 & 1 \\
-    3n^2 & 0 & 0 & 0 & 2n & 0 \\
-    0 & 0 & 0 & -2n & 0 & 0 \\
-    0 & 0 & -n^2 & 0 & 0 & 0 \\
-    \end{bmatrix},
-        B =
-    \begin{bmatrix}
-    0 & 0 & 0 \\
-    0 & 0 & 0 \\
-    0 & 0 & 0 \\
-    \frac{1}{m} & 0 & 0 \\
-    0 & \frac{1}{m} & 0 \\
-    0 & 0 & \frac{1}{m} \\
-    \end{bmatrix},
-    $$
-
-    and $n = 0.001027 rad/s$ is the mean motion constant.
-
-    The body frame rotational motion state transition of each spacecraft
-    given its quaternion orientation and angular velocity
-    $[q_1, q_2, q_3, q_4, \omega_x, \omega_y, \omega_z]$ is defined by
-
-    $$
-    \begin{bmatrix}
-        \dot{q_1} \\
-        \dot{q_2} \\
-        \dot{q_3} \\
-        \dot{q_4} \\
-        \dot{\omega_x} \\
-        \dot{\omega_y} \\
-        \dot{\omega_z} \\
-    \end{bmatrix} =
-
-    \begin{bmatrix}
-        \frac{1}{2}(q_4\omega_x - q_3\omega_y + q_2\omega_z) \\
-        \frac{1}{2}(q_3\omega_x + q_4\omega_y - q_1\omega_z) \\
-        \frac{1}{2}(-q_2\omega_x + q_1\omega_y + q_4\omega_z) \\
-        \frac{1}{2}(-q_1\omega_x - q_2\omega_y - q_3\omega_z) \\
-        J_1^{-1}((J_2 - J_3)\omega_y\omega_z) \\
-        J_2^{-1}((J_3 - J_1)\omega_x\omega_z) \\
-        J_3^{-1}((J_1 - J_2)\omega_x\omega_y) \\
+    0.0573 & 0.0 & 0.0 \\
+    0.0 & 0.0573 & 0.0 \\
+    0.0 & 0.0 & 0.0573
     \end{bmatrix}
     $$
-
-    where
-
-    $$
-    J =
-    \begin{bmatrix}
-        0.0573 & 0.0 & 0.0 \\
-        0.0 & 0.0573 & 0.0 \\
-        0.0 & 0.0 & 0.0573
-    \end{bmatrix}
-    $$
-
+    
     is an inertial matrix.
 
     ## Rewards

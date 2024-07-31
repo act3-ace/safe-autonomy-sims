@@ -10,13 +10,9 @@ import safe_autonomy_sims.pettingzoo.inspection.utils as utils
 
 
 class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
-    """
+    r"""
     In this weighted inspection environment, the goal is for a single deputy spacecraft 
     to navigate around and inspect the entire surface of a chief spacecraft.
-    This is shown in the image below.
-
-    ![Basic Inspection Problem](../../images/inspection_problem.png)
-    *Figure: The single spacecraft inspection problem without illumination.*
 
     The chief is covered in 100 inspection points that the agent must observe
     while they are illuminated by the moving sun. The points are weighted by
@@ -118,6 +114,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
     ## Rewards
 
     The reward $r_t$ at each time step is the sum of the following terms:
+
     * $r_t += 1.0(weight\_inspected\_points_t - weight\_inspected\_points_{t-1})$
         * a dense reward for observing inspection points
     * $r += 1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius \geq crash\_region\_radius$, $r = -1$ if $weight\_inspected\_points_i \geq 0.95$ and $FFT_radius < crash\_region\_radius$, else 0

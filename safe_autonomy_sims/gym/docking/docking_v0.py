@@ -10,7 +10,7 @@ from safe_autonomy_sims.gym.docking.utils import v_limit, rel_dist, rel_vel, pol
 
 
 class DockingEnv(gym.Env):
-    """
+    r"""
     ## Description
 
     This environment is a spacecraft docking problem.
@@ -99,6 +99,7 @@ class DockingEnv(gym.Env):
     ## Rewards
 
     The reward is the sum of the following terms:
+
     * $r_t += c(e^{-ad_t} - e^{-ad_{t-1}})$
         * this is a dense reward for approaching the chief
         * $c$ is a scale factor
