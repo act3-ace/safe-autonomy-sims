@@ -30,9 +30,9 @@ torch = "1.13.0"
 imageio = "2.25.0"
 imageio-ffmpeg = "0.4.8"
 corl = {version = "3.15.0", source = "dle-corl"}
-run-time-assurance = {version = "^1.18.0", source = "sa-rta"}
-safe-autonomy-simulation = {version = "^2.0.5", source = "sa-simulation"}
 pettingzoo = "^1.24.3"
+safe-autonomy-simulation = "^2.0.12"
+run-time-assurance = "^1.16.2"
 
 [tool.poetry.group.lint.dependencies]
 ruff = "^0.5.2"
@@ -91,23 +91,6 @@ priority = "supplemental"
 name = "PyPI"
 priority = "primary"
 
-
-[[tool.poetry.source]]
-name = "safe-autonomy-simulation"
-url = "https://git.act3-ace.com/api/v4/projects/1247/packages/pypi/simple"
-priority = "supplemental"
-
-
-[[tool.poetry.source]]
-name = "sa-rta"
-url = "https://git.act3-ace.com/api/v4/projects/804/packages/pypi/simple"
-priority = "supplemental"
-
-
-[[tool.poetry.source]]
-name = "sa-simulation"
-url = "https://git.act3-ace.com/api/v4/projects/1247/packages/pypi/simple"
-priority = "supplemental"
 
 [build-system]
 requires = ["poetry-core"]
