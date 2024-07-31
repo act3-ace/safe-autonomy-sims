@@ -5,11 +5,11 @@ description = "The Safe-Autonomy-Sims library provides the components and tools 
 authors = [
     "Charles Keating <Charles.Keating@udri.udayton.edu>",
 ]
-license = "Distribution C"
+license = ""
 readme = "README.md"
-homepage = "https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims.git"
-repository = "https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims.git"
-documentation = 'https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/docs'
+homepage = "https://github.com/act3-ace/safe-autonomy-sims.git"
+repository = "https://github.com/act3-ace/safe-autonomy-sims.git"
+documentation = 'https://github.com/act3-ace/safe-autonomy-sims/docs'
 keywords = []
 include = ["docs/*"]
 classifiers = [
