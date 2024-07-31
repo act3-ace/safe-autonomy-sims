@@ -1,3 +1,32 @@
+## [4.0.1](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v4.0.0...v4.0.1) (2024-05-20)
+
+
+### Bug Fixes
+
+* six-dof field of view ([01d4a12](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/01d4a12fae25769f4035d0f2f76d2d87cd4639f7))
+
+# [4.0.0](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.11...v4.0.0) (2024-04-24)
+
+
+### Bug Fixes
+
+* **dependencies:** update CoRL to 3.15.0, which absorbs some evaluation API ([61fb646](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/61fb646e8347d01eaa39fbc20b4657365a7d75c5))
+* **deps:** update CoRL to 3.16.2 ([9cba245](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/9cba2450a8290e5cb767c46555cda3258f03ddb8))
+
+
+### BREAKING CHANGES
+
+* **dependencies:** Some evaluation API functions previously available from safe-autonomy-sims are now in the CoRL package and are no longer in the public API of safe-autonomy-sims
+
+This reverts commit 2d816672d36cab79b638dca6b9a4b8ff0de1d132.
+
+## [3.2.11](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.10...v3.2.11) (2024-04-08)
+
+
+### Bug Fixes
+
+* **dependencies:** updated dynamics to 1.2.3 and rta to 1.16.1 ([731a436](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/commit/731a436ac991c6cd65bdc6ea6d4f35e61d882dff))
+
 ## [3.2.10](https://git.act3-ace.com/rta/safe-autonomy-stack/safe-autonomy-sims/compare/v3.2.9...v3.2.10) (2024-03-27)
 
 

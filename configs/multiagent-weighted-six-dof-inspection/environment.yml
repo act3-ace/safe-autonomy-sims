@@ -41,6 +41,7 @@
       "delta_v_scale_step": -0.00005,  # Step value for delta-v reward scale
       "inspected_points_update_bounds": [0.8, 0.9],  # Bounds to increase/decrease delta-v reward scale by step
       "delta_v_updater_criteria": "score",
+      "sensor_fov": 1.0471975511965976,  # 60 degrees
     },
   },
   "simulator_reset_parameters": {

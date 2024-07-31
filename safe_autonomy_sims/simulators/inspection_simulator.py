@@ -87,6 +87,7 @@ class InspectionPointsValidator(BaseModel):
         The name of the algorithm used to generate initial point positions.
     sensor_fov: float
         The field of view of the inspector's camera sensor in radians.
+        Default is 2 * pi (everything is in view).
     initial_sensor_unit_vec: list
         The initial direction the inspector's camera sensor is pointing.
     illumination_params: typing.Union[IlluminationValidator, None]
@@ -95,7 +96,7 @@ class InspectionPointsValidator(BaseModel):
     num_points: int
     radius: float
     points_algorithm: str = "cmu"
-    sensor_fov: float = np.pi
+    sensor_fov: float = 2 * np.pi
     initial_sensor_unit_vec: list = [1., 0., 0.]
     illumination_params: typing.Union[IlluminationValidator, None] = None
 
@@ -203,10 +204,10 @@ class InspectionPoints:
             # check that point hasn't already been inspected
             if not self.points_inspected_dict[point_id]:
                 p = point_position - position
-                p_rc = np.dot(p, r_c) * r_c
-                d = np.linalg.norm(p - p_rc)
-                c_r = np.linalg.norm(p_rc) * np.tan(self.config.sensor_fov / 2)
-                if c_r >= d:
+                cos_theta = np.dot(p / np.linalg.norm(p), r_c)
+                angle_to_point = np.arccos(cos_theta)
+                # If the point can be inspected (within FOV)
+                if angle_to_point <= self.config.sensor_fov / 2:
                     # if no illumination params detected
                     if not self.config.illumination_params:
                         # project point onto inspection zone axis and check if in inspection zone
@@ -501,7 +502,8 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
         if inspected_points_value >= inspected_points_update_bounds[1], delta_v_scale is advanced by delta_v_scale_step
         if inspected_points_value <= inspected_points_update_bounds[0], delta_v_scale is retracted by delta_v_scale_step
     sensor_fov: float
-        field of view of the sensor (radians). By default pi (180 degrees)
+        field of view of the sensor (radians).
+        Default is 2 * pi (everything is in view).
     initial_sensor_unit_vec: list
         If using the 6DOF spacecraft model, initial unit vector along sensor boresight.
         By default [1., 0., 0.]
@@ -515,7 +517,7 @@ class InspectionSimulatorValidator(SafeRLSimulatorValidator):
     delta_v_scale_bounds: list
     delta_v_scale_step: float
     inspected_points_update_bounds: list
-    sensor_fov: float = np.pi
+    sensor_fov: float = 2 * np.pi
     initial_sensor_unit_vec: list = [1., 0., 0.]
     inspection_points_map: typing.Dict[str, InspectionPointsValidator]
 
