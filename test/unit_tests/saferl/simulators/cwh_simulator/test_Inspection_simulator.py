@@ -20,7 +20,7 @@ import os
 from unittest.mock import Mock
 from test.conftest import delimiter, read_test_cases
 from safe_autonomy_sims.simulators.inspection_simulator import InspectionPoints
-from safe_autonomy_dynamics.cwh import SixDOFSpacecraft
+from safe_autonomy_simulation.sims.spacecraft import SixDOFSpacecraft
 
 
 # Define test assay
@@ -76,13 +76,8 @@ def inspector_entity(inspector_position, inspector_orientation):
     """Create a fixture for the parent_entity class."""
     mock_entity = SixDOFSpacecraft(
         name='blue0',
-        x=inspector_position[0],
-        y=inspector_position[1],
-        z=inspector_position[2],
-        q1=inspector_orientation[0],
-        q2=inspector_orientation[1],
-        q3=inspector_orientation[2],
-        q4=inspector_orientation[3],
+        position=np.array(inspector_position),
+        orientation=np.array(inspector_orientation),
     )
     return mock_entity
 

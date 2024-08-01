@@ -220,7 +220,7 @@ From `configs/multiagent-weighted-translational-inspection/environment.yml`:
         }
       },
       "sun": { 
-        "entity_class": "safe_autonomy_dynamics.cwh.sun_model.SunEntity",
+        "entity_class": "safe_autonomy_simulation.sims.inspection.sun_model.SunEntity",
         "config":{
           "theta": {
             "type": "corl.libraries.parameters.UniformParameter",

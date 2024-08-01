@@ -300,7 +300,7 @@ From `configs/translational-inspection/environment.yml`:
         }
       },
       "sun": { 
-        "entity_class": "safe_autonomy_dynamics.cwh.sun_model.SunEntity",
+        "entity_class": "safe_autonomy_simulation.sims.inspection.sun_model.SunEntity",
         "config":{
           "theta": {
             "type": "safe_autonomy_sims.simulators.initializers.initializer.SimAttributeAccessor",

@@ -340,8 +340,8 @@ The controllers are defined in safe_autonomy_sims, platorms. For example [safe-a
 
 If the user wants to implement a new dynamics model:
 
-1. To create the state transistion dynamics, extend `BaseDynamics` (or `BaseODEDynamics` if using A,B matrices) from `safe_autonomy_dynamics.base_models`. The child class must generate A and B matrices in its **init**() method and pass them to its super's constructor. See `safe_autonomy_dynamics.cwh.point_model.CWHDynamics` for an example.
-2. To create the entity containing the new Dynamics, extend `safe_autonomy_dynamics.base_models.BaseEntity` and pass an instance of the new Dynamics class to super() constructor inside the Entity's **init**() method. See `safe_autonomy_dynamics.cwh.point_model.CWHSpacecraft` for an example.
+1. To create the state transistion dynamics, extend `Dynamics` (or `ODEDynamics` if using A,B matrices) from `safe_autonomy_simulation.dynamics`. The child class must generate A and B matrices in its **init**() method and pass them to its super's constructor. See `safe_autonomy_simulation.sims.spacecraft.point_model.CWHDynamics` for an example.
+2. To create the entity containing the new Dynamics, extend `safe_autonomy_simulation.entities.Entity` and pass an instance of the new Dynamics class to super() constructor inside the Entity's **init**() method. See `safe_autonomy_simulation.sims.spacecraft.point_model.CWHSpacecraft` for an example.
 3. To encapsulate the new dynamics model in a simulator (and link specific Platform types with transition dynamics), extend `safe_autonomy_sims.simulators.saferl_simulator.SafeRLSimulator` and implement the private method \_construct_platform_map. This method returns a mapping from Platform to Entity, linking CoRL's Platform classes to unique transition dynamics. See `safe_autonomy_sims.simulators.inspection_simulator.InspectionSimulator` for an example.
 
 If the user wants to use a different simulator with different backend dynamics:

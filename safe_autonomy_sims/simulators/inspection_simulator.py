@@ -24,8 +24,9 @@ from ray.rllib import BaseEnv
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
 from ray.rllib.policy import Policy
 from ray.rllib.utils.typing import PolicyID
-from safe_autonomy_dynamics.base_models import BaseEntity
-from safe_autonomy_dynamics.cwh import CWHSpacecraft, SixDOFSpacecraft
+from safe_autonomy_simulation import Entity
+from safe_autonomy_simulation.sims.spacecraft import CWHSpacecraft, SixDOFSpacecraft
+from scipy.spatial.transform import Rotation
 from sklearn.cluster import KMeans
 
 import safe_autonomy_sims.simulators.illumination_functions as illum
@@ -189,7 +190,8 @@ class InspectionPoints:
         # calculate h of the spherical cap (inspection zone)
         position = inspector_entity.position
         if isinstance(inspector_entity, SixDOFSpacecraft):
-            r_c = inspector_entity.orientation.apply(self.config.initial_sensor_unit_vec)
+            rotation = Rotation.from_quat(inspector_entity.orientation)
+            r_c = rotation.apply(self.config.initial_sensor_unit_vec)
         else:
             r_c = -position
         r_c = r_c / np.linalg.norm(r_c)
@@ -405,7 +407,7 @@ class InspectionPoints:
             self.points_position_dict[point_id] = new_position
 
     # getters / setters
-    def get_num_points_inspected(self, inspector_entity: BaseEntity = None):
+    def get_num_points_inspected(self, inspector_entity: Entity = None):
         """Get total number of points inspected"""
         num_points = 0
         if inspector_entity:
@@ -419,7 +421,7 @@ class InspectionPoints:
 
         return num_points
 
-    def get_percentage_of_points_inspected(self, inspector_entity: BaseEntity = None):
+    def get_percentage_of_points_inspected(self, inspector_entity: Entity = None):
         """Get the percentage of points inspected"""
         total_num_points = len(self.points_inspected_dict.keys())
 
@@ -433,7 +435,7 @@ class InspectionPoints:
         """Get the location of the nearest cluster of uninspected points"""
         return self._kmeans_find_nearest(inspector_position)
 
-    def get_total_weight_inspected(self, inspector_entity: BaseEntity = None):
+    def get_total_weight_inspected(self, inspector_entity: Entity = None):
         """Get total weight of points inspected"""
         weights = 0
         if inspector_entity:
@@ -611,7 +613,7 @@ class InspectionSimulator(SafeRLSimulator):
         return points_map
 
     def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator,
-                                entity_init_map: typing.Dict[str, typing.Dict]) -> typing.Dict[str, BaseEntity]:
+                                entity_init_map: typing.Dict[str, typing.Dict]) -> typing.Dict[str, Entity]:
         sim_entities = super()._construct_sim_entities(reset_config, entity_init_map)
 
         for _, entity in self.agent_sim_entities.items():

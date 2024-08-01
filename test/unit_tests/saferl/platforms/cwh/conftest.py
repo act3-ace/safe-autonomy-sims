@@ -13,7 +13,8 @@ Conftest file for the CWH platform tests
 """
 
 import pytest
-from safe_autonomy_dynamics.cwh import CWHSpacecraft
+import numpy as np
+from safe_autonomy_simulation.sims.spacecraft import CWHSpacecraft
 
 from safe_autonomy_sims.platforms.cwh.cwh_platform import CWHPlatform
 
@@ -64,7 +65,7 @@ def setup_CWHSpacecraft_pos(pos_input):
     """
     based off a certain position construct a CWHSpacecraft at a certain position
     """
-    add_args = {'name': 'CWH', 'x': pos_input[0], 'y': pos_input[1], 'z': pos_input[2]}
+    add_args = {'name': 'CWH', 'position': np.array(pos_input)}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft
@@ -105,7 +106,7 @@ def setup_CWHSpacecraft_vel(vel_input):
     """
     setup a CWHSpacecraft at a certain velocity
     """
-    add_args = {'name': 'CWH', 'x_dot': vel_input[0], 'y_dot': vel_input[1], 'z_dot': vel_input[2]}
+    add_args = {'name': 'CWH', 'velocity': np.array(vel_input)}
     spcft = CWHSpacecraft(**add_args)
 
     return spcft

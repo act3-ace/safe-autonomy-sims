@@ -12,7 +12,7 @@
 
 import factory
 
-from safe_autonomy_dynamics import cwh as e
+import safe_autonomy_simulation.sims.spacecraft as e
 
 
 class CWHSpacecraftFactory(factory.Factory):
