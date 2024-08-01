@@ -21,7 +21,7 @@ from corl.simulators.base_simulator import BaseSimulator, BaseSimulatorResetVali
 from corl.simulators.base_simulator_state import BaseSimulatorState
 from pydantic import BaseModel, validator
 from pydantic.types import PyObject
-from safe_autonomy_dynamics.base_models import BaseEntity
+from safe_autonomy_simulation.entities import Entity
 
 from safe_autonomy_sims.simulators.initializers.initializer import (
     Accessor,
@@ -170,10 +170,10 @@ class SafeRLSimulator(BaseSimulator):
     def __init__(self, **kwargs: dict[str, typing.Any]):
         self.config: SafeRLSimulatorValidator
         super().__init__(**kwargs)
-        self.agent_sim_entities: typing.Dict[str, BaseEntity] = {}
-        self.additional_sim_entities: typing.Dict[str, BaseEntity] = {}
+        self.agent_sim_entities: typing.Dict[str, Entity] = {}
+        self.additional_sim_entities: typing.Dict[str, Entity] = {}
         self.platform_map = self._construct_platform_map()
-        self.sim_entities: typing.Dict[str, BaseEntity] = {}
+        self.sim_entities: typing.Dict[str, Entity] = {}
         self.clock = 0.0
         self.last_entity_actions: typing.Dict[typing.Any, typing.Any] = {}
         self.sim_platforms = self.construct_platforms()
@@ -300,7 +300,7 @@ class SafeRLSimulator(BaseSimulator):
         self,
         reset_config: SafeRLSimulatorResetValidator,  # pylint: disable=unused-argument
         entity_init_map: typing.Dict[str, typing.Dict]
-    ) -> typing.Dict[str, BaseEntity]:
+    ) -> typing.Dict[str, Entity]:
         """Constructs the simulator
 
         Parameters
@@ -391,7 +391,8 @@ class SafeRLSimulator(BaseSimulator):
 
         for entity_name, entity in self.sim_entities.items():
             action = entity_actions.get(entity_name, None)
-            entity.step(action=action, step_size=step_size)
+            entity.add_control(action)
+            entity.step(step_size=step_size)
 
     def _step_get_entity_actions(
         self,

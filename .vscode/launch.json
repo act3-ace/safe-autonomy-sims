@@ -52,5 +52,11 @@
             "args": ["--cfg", "${workspaceFolder}/configs/translational-inspection/experiment.yml"],
             "justMyCode": true
         },
+        {
+            "name": "Debug Unit Test",
+            "type": "debugpy",
+            "purpose": ["debug-test"],
+            "justMyCode": false,
+        }
     ]
 }

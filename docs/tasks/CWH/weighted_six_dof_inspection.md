@@ -34,7 +34,7 @@ The chief is covered in 100 inspection points that the agent must observe while 
 
 | Space         | Details |
 |--------------|------|
-| Action Space | (3,) |
+| Action Space | (6,) |
 | Observation Space | (32,) |
 | Observation High | [$\infty$, $\infty$, $\infty$, $\infty$, 1, 1, 1, $\infty$, $\infty$, $\infty$, $\infty$, 1, 1, 1, $\infty$, $\infty$, $\infty$, $2\pi$, $2\pi$, $2\pi$, $2\pi$, 1, $2\pi$, 100, 1, 1, 1, 1, 1, 1, 1, 1] |
 | Observation Low | [-$\infty$, -$\infty$, -$\infty$, -$\infty$, -1, -1, -1, -$\infty$, -$\infty$, -$\infty$, -$\infty$, -1, -1, -1, -$\infty$, -$\infty$, -$\infty$, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, 0, 0] |
@@ -269,7 +269,7 @@ From `configs/weighted-six-dof-inspection/environment.yml`:
         }
       },
       "sun": { 
-        "entity_class": "safe_autonomy_dynamics.cwh.sun_model.SunEntity",
+        "entity_class": "safe_autonomy_simulation.sims.inspection.sun_model.SunEntity",
         "config":{
           "theta": {
             "type": "corl.libraries.parameters.UniformParameter",
