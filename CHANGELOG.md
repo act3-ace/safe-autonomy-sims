@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.0.1...v4.1.0) (2024-08-01)
+
+
+### Features
+
+* add gymnasium environments ([9664825](https://github.com/act3-ace/safe-autonomy-sims/commit/9664825c07e42a328d36dd58924a8b61f4e09ef8))
+
 ## [4.0.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.0.0...v4.0.1) (2024-05-23)
 
 
