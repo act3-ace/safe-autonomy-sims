@@ -188,7 +188,7 @@ From `configs/multiagent-translational-inspection/environment.yml`:
         },
         "rta": {
           "functor": "safe_autonomy_sims.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
-          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot", "sun_angle"],
+          "states": ["position", "velocity", "sun_angle"],
           "args": !include configs/translational-inspection/parameters.yml,
           "arg_map": {
             "step_size": "step_size",
@@ -363,7 +363,7 @@ From `configs/multiagent-translational-inspection/agent.yml`:
         # Rejects sampled initial conditions if they produce unsafe initial states
         "functor": "safe_autonomy_sims.rta.rta_rejection_sampler.RejectionSamplerInitializer",
         "config": {
-          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot"],
+          "states": ["position", "velocity"],
         }
       },
       "config": {

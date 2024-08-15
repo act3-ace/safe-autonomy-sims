@@ -279,7 +279,7 @@ From `configs/weighted-translational-inspection/agent.yml`:
         # Rejects sampled initial conditions if they produce unsafe initial states
         "functor": "safe_autonomy_sims.rta.rta_rejection_sampler.RejectionSamplerInitializer",
         "config": {
-          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot"],
+          "states": ["position", "velocity"],
         }
       },
       "config": {

@@ -50,7 +50,7 @@
         },
         "rta": {
           "functor": "safe_autonomy_sims.rta.cwh.inspection_rta_1v1.RTAGlueCWHInspection1v1",
-          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot", "sun_angle"],
+          "states": ["position", "velocity", "sun_angle"],
           "args": !include configs/translational-inspection/parameters.yml,
           "arg_map": {
             "step_size": "step_size",
