@@ -33,6 +33,7 @@ In this docking environment, the goal is for three deputy spacecraft, each contr
 | Observation Space | (8,) |
 | Observation High | [$\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $\infty$,] |
 | Observation Low | [-$\infty$, -$\infty$, -$\infty$, -$\infty$, -$\infty$, -$\infty$, 0, 0,] |
+
 \* _identical for each agent_
 
 ### Observation Space

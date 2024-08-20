@@ -6,7 +6,7 @@ import safe_autonomy_sims.pettingzoo.inspection.utils as utils
 import safe_autonomy_simulation.sims.inspection as sim
 
 
-def observed_points_reward(chief: sim.Target, num_inspected: int) -> float:
+def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode.
 
@@ -19,7 +19,7 @@ def observed_points_reward(chief: sim.Target, num_inspected: int) -> float:
     ----------
     chief : Target
         chief spacecraft under inspection
-    num_inspected : int
+    prev_num_inspected : int
         number of previously inspected points
 
     Returns
@@ -28,12 +28,12 @@ def observed_points_reward(chief: sim.Target, num_inspected: int) -> float:
         reward value
     """
     current_num_inspected = chief.inspection_points.get_num_points_inspected()
-    step_inspected = num_inspected - current_num_inspected
+    step_inspected = current_num_inspected - prev_num_inspected
     r = 0.1 * step_inspected
     return r
 
 
-def weighted_observed_points_reward(chief: sim.Target, weight_inspected: float) -> float:
+def weighted_observed_points_reward(chief: sim.Target, prev_weight_inspected: float) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode conditioned by
     individual point weights.
@@ -47,7 +47,7 @@ def weighted_observed_points_reward(chief: sim.Target, weight_inspected: float) 
     ----------
     chief : Target
         chief spacecraft under inspected
-    weight_inspected : float
+    prev_weight_inspected : float
         weight of previously inspected points
 
     Returns
@@ -56,7 +56,7 @@ def weighted_observed_points_reward(chief: sim.Target, weight_inspected: float) 
         reward value
     """
     current_weight_inspected = chief.inspection_points.get_total_weight_inspected()
-    step_inspected = weight_inspected - current_weight_inspected
+    step_inspected = current_weight_inspected - prev_weight_inspected
     r = 1.0 * step_inspected
     return r
 
