@@ -37,6 +37,7 @@ The chief is covered in 100 inspection points that the agents must collectively 
 | Observation Space | (15,) |
 | Observation High | [$\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $\infty$, $2\pi$, 100, 1, 1, 1, 1, 1, 1, 1] |
 | Observation Low | [-$\infty$, -$\infty$, -$\infty$, -$\infty$, -$\infty$, -$\infty$, 0, 0, -1, -1, -1, -1, -1, -1, 0] |
+
 \* _identical for each agent_
 
 ### Observation Space
@@ -555,7 +556,7 @@ Docking,” _Journal of Aerospace Information Systems_, Vol. 20, No. 1, 2023, pp
 
 <a id="3">[3]</a>
 Gaudet, B., Linares, R., and Furfaro, R., “Adaptive Guidance and Integrated Navigation with Reinforcement Meta-Learning,”
-*CoRR*, Vol. abs/1904.09865, 2019. URL [http://arxiv.org/abs/1904.09865](http://arxiv.org/abs/1904.09865).
+_CoRR_, Vol. abs/1904.09865, 2019. URL [http://arxiv.org/abs/1904.09865](http://arxiv.org/abs/1904.09865).
 
 <a id="4">[4]</a>
 Battin, R. H., “An introduction to the mathematics and methods of astrodynamics,” 1987.

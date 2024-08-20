@@ -317,7 +317,7 @@ class InspectionEnv(gym.Env):
 
         # Dense rewards
         reward += r.observed_points_reward(
-            chief=self.chief, num_inspected=self.prev_num_inspected
+            chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
         reward += r.delta_v_reward(
             v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]

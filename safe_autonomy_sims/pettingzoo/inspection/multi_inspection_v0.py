@@ -307,7 +307,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Dense rewards
         reward += r.observed_points_reward(
-            chief=self.chief, num_inspected=self.prev_num_inspected
+            chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
         reward += r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]

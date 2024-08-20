@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.0...v4.1.1) (2024-08-20)
+
+
+### Bug Fixes
+
+* fixed negative inspected points reward bug ([#15](https://github.com/act3-ace/safe-autonomy-sims/issues/15)) ([4cf82bc](https://github.com/act3-ace/safe-autonomy-sims/commit/4cf82bc4f756b6da3fe5ec8f63d896b0d9a62102))
+
 # [4.1.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.0.1...v4.1.0) (2024-08-01)
 
 
