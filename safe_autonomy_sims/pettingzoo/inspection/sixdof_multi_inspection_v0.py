@@ -423,7 +423,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Dense rewards
         reward += r.weighted_observed_points_reward(
-            chief=self.chief, weight_inspected=self.prev_weight_inspected
+            chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
         )
         reward += r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
