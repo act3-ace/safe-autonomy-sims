@@ -396,6 +396,7 @@ class InspectionPoints:
         # get parent entity info
         parent_position = self.parent_entity.position
         parent_orientation = self.parent_entity.orientation
+        parent_orientation = Rotation.from_quat(parent_orientation)
 
         self.priority_vector = parent_orientation.apply(self.init_priority_vector)
 
