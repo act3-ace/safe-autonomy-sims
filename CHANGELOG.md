@@ -1,3 +1,10 @@
+## [4.1.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.1...v4.1.2) (2024-09-09)
+
+
+### Bug Fixes
+
+* remove bad addition in previous weight attribute update ([39026b3](https://github.com/act3-ace/safe-autonomy-sims/commit/39026b357e48fa0e45a87cbdb311649f16920842))
+
 ## [4.1.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.0...v4.1.1) (2024-08-20)
 
 

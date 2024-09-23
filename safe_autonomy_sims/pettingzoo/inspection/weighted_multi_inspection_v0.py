@@ -280,7 +280,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.prev_num_inspected = (
             self.chief.inspection_points.get_num_points_inspected()
         )
-        self.prev_weight_inspected += (
+        self.prev_weight_inspected = (
             self.chief.inspection_points.get_total_weight_inspected()
         )
 
