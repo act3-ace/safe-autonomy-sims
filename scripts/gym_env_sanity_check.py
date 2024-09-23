@@ -1,3 +1,4 @@
+import tqdm
 import gymnasium as gym
 import safe_autonomy_sims.gym
 
@@ -9,11 +10,12 @@ def main():
         print(f"Testing {env}...")
         env = gym.make(env)
         env.reset()
-        for i in range(100):
+        for i in tqdm.tqdm(range(100)):
             action = env.action_space.sample()
             obs, reward, terminated, truncated, info = env.step(action)
-            if terminated:
-                break
+            if terminated or truncated:
+                print("Terminated. Resetting...")
+                env.reset()
         env.close()
         print(f"{env} passed!")
     print("All envs passed!")
