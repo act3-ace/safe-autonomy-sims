@@ -1,4 +1,5 @@
 import tqdm
+import numpy as np
 import gymnasium as gym
 import safe_autonomy_sims.gym
 
@@ -12,12 +13,13 @@ def main():
     ]
 
     SEED = 1232143124
+    np.random.seed(SEED)
 
     for env in envs:
         print(f"Testing {env}...")
         env = gym.make(env)
         env.reset(seed=SEED)
-        for i in tqdm.tqdm(range(100)):
+        for i in tqdm.tqdm(range(1000)):
             action = env.action_space.sample()
             obs, reward, terminated, truncated, info = env.step(action)
             if terminated or truncated:
