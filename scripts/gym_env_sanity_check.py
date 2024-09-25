@@ -6,9 +6,9 @@ import safe_autonomy_sims.gym
 
 def main():
     envs = [
-        # "Docking-v0",
-        # "Inspection-v0",
-        # "WeightedInspection-v0",
+        "Docking-v0",
+        "Inspection-v0",
+        "WeightedInspection-v0",
         "SixDofInspection-v0",
     ]
 
@@ -23,7 +23,6 @@ def main():
             action = env.action_space.sample()
             obs, reward, terminated, truncated, info = env.step(action)
             if terminated or truncated:
-                print("Terminated. Resetting...")
                 env.reset(seed=SEED)
         env.close()
         print(f"{env} passed!")
