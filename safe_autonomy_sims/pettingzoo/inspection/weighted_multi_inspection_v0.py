@@ -225,7 +225,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.prev_weight_inspected = 0.0
 
     def reset(
-        self,  seed: int | None = None, options: dict[str, typing.Any] | None = None
+        self, seed: int | None = None, options: dict[str, typing.Any] | None = None
     ) -> tuple[typing.Any, dict[str, typing.Any]]:
         self.agents = copy.copy(self.possible_agents)
         self.rng = np.random.default_rng(seed)
@@ -337,14 +337,16 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         )
 
         # Sparse rewards
-        reward += (
-            r.weighted_inspection_success_reward(
-                chief=self.chief, total_weight=self.success_threshold
-            )
-            if utils.closest_fft_distance(chief=self.chief, deputy=deputy)
-            < self.crash_radius
-            else -1.0
+        success_reward = r.weighted_inspection_success_reward(
+            chief=self.chief, total_weight=self.success_threshold
         )
+        if (
+            success_reward > 0
+            and utils.closest_fft_distance(chief=self.chief, deputy=deputy)
+            < self.crash_radius
+        ):
+            success_reward = -1.0
+        reward += success_reward
         reward += r.crash_reward(
             chief=self.chief, deputy=deputy, crash_radius=self.crash_radius
         )

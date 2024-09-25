@@ -347,14 +347,16 @@ class WeightedInspectionEnv(gym.Env):
         )
 
         # Sparse rewards
-        reward += (
-            r.weighted_inspection_success_reward(
-                chief=self.chief, total_weight=self.success_threshold
-            )
-            if utils.closest_fft_distance(chief=self.chief, deputy=self.deputy)
-            < self.crash_radius
-            else -1.0
+        success_reward = r.weighted_inspection_success_reward(
+            chief=self.chief, total_weight=self.success_threshold
         )
+        if (
+            success_reward > 0
+            and utils.closest_fft_distance(chief=self.chief, deputy=self.deputy)
+            < self.crash_radius
+        ):
+            success_reward = -1.0
+        reward += success_reward
         reward += r.crash_reward(
             chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius
         )
