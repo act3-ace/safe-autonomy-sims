@@ -211,6 +211,9 @@ From `configs/multiagent-weighted-translational-inspection/environment.yml`:
     "additional_entities": {
       "chief": { 
         "platform": "cwh",
+        "initializer": {
+          "functor": "safe_autonomy_sims.simulators.initializers.cwh.PositionVelocityInitializer",
+        },
         "config":{
           "x": 0,
           "y": 0,
@@ -221,7 +224,7 @@ From `configs/multiagent-weighted-translational-inspection/environment.yml`:
         }
       },
       "sun": { 
-        "entity_class": "safe_autonomy_simulation.sims.inspection.sun_model.SunEntity",
+        "entity_class": "safe_autonomy_simulation.sims.inspection.sun.Sun",
         "config":{
           "theta": {
             "type": "corl.libraries.parameters.UniformParameter",
@@ -292,7 +295,7 @@ From `configs/multiagent-weighted-translational-inspection/agent.yml`:
         # Rejects sampled initial conditions if they produce unsafe initial states
         "functor": "safe_autonomy_sims.rta.rta_rejection_sampler.RejectionSamplerInitializer",
         "config": {
-          "states": ["x", "y", "z", "x_dot", "y_dot", "z_dot"],
+          "states": ["position", "velocity"],
         }
       },
       "config": {

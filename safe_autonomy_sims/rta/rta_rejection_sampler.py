@@ -165,8 +165,9 @@ class RejectionSampler(ParameterWrapper):
         """
         array = []
         for k in self.config.rta.states:
-            array.append(value[k])
-        return np.array(array)
+            v = value[k] if isinstance(value[k], np.ndarray) else [value[k]]
+            array.append(v)
+        return np.concatenate(array)
 
     def check_if_safe_state(self, state: np.ndarray):
         """
