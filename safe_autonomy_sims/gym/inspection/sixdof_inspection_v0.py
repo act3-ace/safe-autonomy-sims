@@ -459,7 +459,9 @@ class WeightedSixDofInspectionEnv(gym.Env):
         reward += r.weighted_observed_points_reward(
             chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
         )
-        reward += r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        reward += r.delta_v_reward(
+            v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
+        )
 
         reward += r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
         reward += r.facing_chief_reward(
@@ -467,14 +469,16 @@ class WeightedSixDofInspectionEnv(gym.Env):
         )
 
         # Sparse rewards
-        reward += (
-            r.weighted_inspection_success_reward(
-                chief=self.chief, total_weight=self.success_threshold
-            )
-            if utils.closest_fft_distance(chief=self.chief, deputy=self.deputy)
-            < self.crash_radius
-            else -1.0
+        success_reward = r.weighted_inspection_success_reward(
+            chief=self.chief, total_weight=self.success_threshold
         )
+        if (
+            success_reward > 0
+            and utils.closest_fft_distance(chief=self.chief, deputy=self.deputy)
+            < self.crash_radius
+        ):
+            success_reward = -1.0
+        reward += success_reward
         reward += r.crash_reward(
             chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius
         )
