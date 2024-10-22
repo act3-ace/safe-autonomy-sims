@@ -613,15 +613,6 @@ class InspectionSimulator(SafeRLSimulator):
 
         return points_map
 
-    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator,
-                                entity_init_map: typing.Dict[str, typing.Dict]) -> typing.Dict[str, Entity]:
-        sim_entities = super()._construct_sim_entities(reset_config, entity_init_map)
-
-        for _, entity in self.agent_sim_entities.items():
-            entity.set_sim(self)
-
-        return sim_entities
-
     def _construct_simulator_state(self) -> dict:
         return InspectionSimulatorState(
             sim_platforms=self.sim_platforms,
