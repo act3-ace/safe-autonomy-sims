@@ -1,3 +1,10 @@
+## [4.1.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.2...v4.1.3) (2024-10-22)
+
+
+### Bug Fixes
+
+* apply fft on sparse reward ([7a12fbb](https://github.com/act3-ace/safe-autonomy-sims/commit/7a12fbb527a16400c44ee42c7fee512105e5ae7c)), closes [#19](https://github.com/act3-ace/safe-autonomy-sims/issues/19)
+
 ## [4.1.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.1...v4.1.2) (2024-09-09)
 
 
