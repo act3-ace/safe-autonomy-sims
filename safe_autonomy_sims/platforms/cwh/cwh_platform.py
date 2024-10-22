@@ -227,7 +227,7 @@ class CWHSixDOFPlatform(CWHPlatform):
         np.ndarray
             The quaternion vector of the platform.
         """
-        return self._platform.quaternion
+        return self._platform.orientation
 
     @property
     def angular_velocity(self):
