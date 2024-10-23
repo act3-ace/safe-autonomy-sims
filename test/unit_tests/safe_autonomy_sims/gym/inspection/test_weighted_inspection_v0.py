@@ -30,5 +30,3 @@ def testWeightedInspectionEnvTerminatesOnInspectionThresholdMet():
     _, _, terminated, _, _ = env.step(action=None)
 
     assert terminated, "environment should be terminated after points inspected"
-
-    assert False
