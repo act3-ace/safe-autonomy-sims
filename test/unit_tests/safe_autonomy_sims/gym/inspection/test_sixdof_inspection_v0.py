@@ -2,15 +2,15 @@
 
 from test.unit_tests.safe_autonomy_sims.mock import MockInspectionPointSet, StaticDynamics
 
-from safe_autonomy_sims.gym.inspection.weighted_inspection_v0 import WeightedInspectionEnv
+from safe_autonomy_sims.gym.inspection.sixdof_inspection_v0 import WeightedSixDofInspectionEnv
 
 
-def testWeightedInspectionEnvTerminatesOnInspectionThresholdMet():
-    """Given a weighted inspection environment and all other variables kept static, when the environment
+def testWeighted6DOFInspectionEnvTerminatesOnInspectionThresholdMet():
+    """Given a weighted 6DOF inspection environment and all other variables kept static, when the environment
     is stepped and the threshold for inspection success is met, the environment will report a termination
     event
     """
-    env = WeightedInspectionEnv()
+    env = WeightedSixDofInspectionEnv()
     env.reset()
 
     # This isn't great because we're modifying the internal via a non-public interface, but Python allows it
