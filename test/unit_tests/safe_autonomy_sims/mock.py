@@ -3,10 +3,10 @@
 import typing
 
 import numpy as np
-from safe_autonomy_simulation.dynamics.dynamics import Dynamics
 from safe_autonomy_simulation.entities.entity import Entity
-from safe_autonomy_simulation.entities.physical import PhysicalEntity
 from safe_autonomy_simulation.sims.inspection.inspection_points import InspectionPointSet
+from safe_autonomy_simulation.sims.spacecraft.point_model import CWHDynamics
+from safe_autonomy_simulation.sims.spacecraft.sixdof_model import SixDOFDynamics
 
 
 class MockInspectionPointSet(InspectionPointSet):
@@ -14,8 +14,8 @@ class MockInspectionPointSet(InspectionPointSet):
     points are inspected
     """
 
-    def __init__(self, parent: PhysicalEntity):
-        super().__init__("inspection_points", parent, 100, 1, np.array([1, 0, 0]))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._steps_before_inspection_toggle = 2
         self._all_points_inspected = False
 
@@ -29,8 +29,16 @@ class MockInspectionPointSet(InspectionPointSet):
         return 1.0 if self._all_points_inspected else 0.0
 
 
-class StaticDynamics(Dynamics):
-    """A dynamics class for testing that keeps the state static to simplify testing
+class StaticSixDOFDynamics(SixDOFDynamics):
+    """A 6DOF dynamics class for testing that keeps the state static to simplify testing
+    """
+
+    def _step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:
+        return (state, np.zeros(len(state)))
+
+
+class StaticCWHDynamics(CWHDynamics):
+    """A CWH dynamics class for testing that keeps the state static to simplify testing
     """
 
     def _step(self, step_size: float, state: np.ndarray, control: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:

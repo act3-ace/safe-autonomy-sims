@@ -6,25 +6,19 @@ from safe_autonomy_simulation.sims.inspection.target import Target
 from safe_autonomy_sims.gym.inspection.reward import observed_points_reward, weighted_observed_points_reward
 
 
-def testObservedPointsRewardEnforcesInspectedPointsCannotBeUninspected():
+def test_observed_points_reward_enforces_inspected_points_cannot_be_uninspected():
     """Given a target being inspected, when determining the reward for inspected points and the target
     has fewer points inspected than previously, then an assertion error is raised"""
     target = Target("test_target", 2, 1)
 
-    try:
+    with pytest.raises(AssertionError):
         observed_points_reward(target, 1)
-        pytest.fail("no assertion error raised when observed point is no longer observed")
-    except AssertionError:
-        pass
 
 
-def testWeightedObservedPointsRewardEnforcesInspectedPointsCannotBeUninspected():
+def test_weighted_observed_points_reward_enforces_inspected_points_cannot_be_uninspected():
     """Given a target being inspected, when determining the reward for weighted inspected points and the target
     has fewer points inspected than previously, then an assertion error is raised"""
     target = Target("test_target", 2, 1)
 
-    try:
+    with pytest.raises(AssertionError):
         weighted_observed_points_reward(target, 0.5)
-        pytest.fail("no assertion error raised when observed point is no longer observed")
-    except AssertionError:
-        pass

@@ -1,26 +1,20 @@
 """Unit tests for the weighted inspection environment"""
 
-from test.unit_tests.safe_autonomy_sims.mock import MockInspectionPointSet, StaticDynamics
+from test.unit_tests.safe_autonomy_sims.mock import MockInspectionPointSet, StaticSixDOFDynamics
 
 from safe_autonomy_sims.gym.inspection.sixdof_inspection_v0 import WeightedSixDofInspectionEnv
 
 
-def testWeighted6DOFInspectionEnvTerminatesOnInspectionThresholdMet():
+def test_weighted_6DOF_inspection_env_terminates_on_inspection_threshold_met(mocker):
     """Given a weighted 6DOF inspection environment and all other variables kept static, when the environment
     is stepped and the threshold for inspection success is met, the environment will report a termination
     event
     """
+    mocker.patch('safe_autonomy_simulation.sims.inspection.inspection_points.InspectionPointSet', MockInspectionPointSet)
+    mocker.patch('safe_autonomy_simulation.sims.spacecraft.sixdof_model.SixDOFDynamics', StaticSixDOFDynamics)
+
     env = WeightedSixDofInspectionEnv()
     env.reset()
-
-    # This isn't great because we're modifying the internal via a non-public interface, but Python allows it
-    # To do this via a public interface, we'd either have to expose things we don't actually want to expose
-    # just for testing or rearchitect to allow more modularity, but increases complexity.  Neither option
-    # is particularly great right now, so we can live with swapping out internals.  However, this will make
-    # this test brittle if the internal workings of the environment changes, such as lazy initialization
-    # being done by some other func that is called after reset.
-    env.chief._inspection_points = MockInspectionPointSet(parent=env.chief)  # pylint: disable=W0212
-    env.deputy._dynamics = StaticDynamics()  # pylint: disable=W0212
 
     # First step, the environment should not be terminated so we can tell what's causing
     # the environment to terminate on the next step
