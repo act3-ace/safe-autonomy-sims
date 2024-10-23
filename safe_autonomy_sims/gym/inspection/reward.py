@@ -101,7 +101,7 @@ def inspection_success_reward(chief: sim.Target, total_points: int) -> float:
 
 # pylint:disable=W1401
 def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
-    """A sparse reward applied when the agent successfully inspects
+    r"""A sparse reward applied when the agent successfully inspects
     point weights above the given threshold.
 
     $r_t = 1 if w_t \geq w_s else 0$
@@ -121,7 +121,7 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
     -------
     float
         reward value
-    """  # noqa: W605
+    """
     weight_inspected = chief.inspection_points.get_total_weight_inspected()
     if weight_inspected >= total_weight:
         r = 1.0
@@ -132,7 +132,7 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
 
 # pylint:disable=W1401
 def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
-    """A dense reward based on the deputy's fuel
+    r"""A dense reward based on the deputy's fuel
     use (change in velocity).
 
     $r_t = -((\deltav / m) + b)$
@@ -157,7 +157,7 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     -------
     float
         reward value
-    """  # noqa: W605
+    """
     r = -((delta_v(v=v, prev_v=prev_v) / m) + b)
     return r
 
@@ -194,7 +194,7 @@ def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
 
 # pylint:disable=W1401
 def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float):
-    """A dense gaussian decaying reward which reward the agent
+    r"""A dense gaussian decaying reward which reward the agent
     for facing the chief.
 
     $r_t = 0.0005 * e^(-|\delta(f, 1)^2 / \espilon|)$
@@ -218,7 +218,7 @@ def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float
     -------
     float
         reward value
-    """  # noqa: W605
+    """
     rel_pos = chief.position - deputy.position
     rel_pos = rel_pos / np.linalg.norm(rel_pos)
     gaussian_decay = np.exp(-np.abs(((np.dot(
