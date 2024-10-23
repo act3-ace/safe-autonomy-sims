@@ -11,11 +11,8 @@ def testObservedPointsRewardEnforcesInspectedPointsCannotBeUninspected():
     has fewer points inspected than previously, then an assertion error is raised"""
     target = Target("test_target", 2, 1)
 
-    # A better way would be to figure out how to get a single point marked as inspected
-    target.inspection_points._points[0].inspected = True  # pylint: disable=W0212
-
     try:
-        observed_points_reward(target, 0)
+        observed_points_reward(target, 1)
         pytest.fail("no assertion error raised when observed point is no longer observed")
     except AssertionError:
         pass
@@ -26,11 +23,8 @@ def testWeightedObservedPointsRewardEnforcesInspectedPointsCannotBeUninspected()
     has fewer points inspected than previously, then an assertion error is raised"""
     target = Target("test_target", 2, 1)
 
-    # A better way would be to figure out how to get a single point marked as inspected
-    target.inspection_points._points[0].inspected = True  # pylint: disable=W0212
-
     try:
-        weighted_observed_points_reward(target, 0)
+        weighted_observed_points_reward(target, 0.5)
         pytest.fail("no assertion error raised when observed point is no longer observed")
     except AssertionError:
         pass
