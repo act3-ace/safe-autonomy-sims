@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import os
 import yaml
-from safe_autonomy_sims.gym.inspection.utils import delta_v
+from safe_autonomy_sims.gym.docking.utils import delta_v
 
 
 # test case parsing (TODO: import from saferl.conftest)
@@ -126,19 +126,21 @@ def read_test_cases(file_path, parameter_keywords):
 
     return test_cases, IDs
 
-@pytest.fixture(name='prev_v')
-def fixture_prev_v(request):
-    prev_v = request.param
-    assert isinstance(prev_v, np.ndarray)
-    assert prev_v.shape == (3,)
-    return prev_v
+@pytest.fixture(name='prev_state')
+def fixture_prev_state(request):
+    prev_state = request.param
+    assert isinstance(prev_state, dict)
+    assert 'deputy' in prev_state
+    assert prev_state['deputy'].shape == (6,)
+    return prev_state
 
-@pytest.fixture(name='v')
-def fixture_v(request):
-    v = request.param
-    assert isinstance(v, np.ndarray)
-    assert v.shape == (3,)
-    return v
+@pytest.fixture(name='state')
+def fixture_state(request):
+    state = request.param
+    assert isinstance(state, dict)
+    assert 'deputy' in state
+    assert state['deputy'].shape == (6,)
+    return state
 
 @pytest.fixture(name='expected_value')
 def fixture_expected_value(request):
@@ -150,13 +152,12 @@ def fixture_expected_value(request):
 # test delta v function
 test_cases_dir = os.path.split(__file__)[0]
 test_cases_file_path = os.path.join(test_cases_dir, "delta_v_test_cases.yml")
-parameterized_fixture_keywords = ["prev_v", "v", "expected_value"]
+parameterized_fixture_keywords = ["prev_state", "state", "expected_value"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
-
 @pytest.mark.parametrize(delimiter.join(parameterized_fixture_keywords), test_configs, ids=IDs, indirect=True)
-def test_delta_v(prev_v, v, expected_value):
-    dv = delta_v(v, prev_v)
+def test_delta_v(prev_state, state, expected_value):
+    dv = delta_v(state, prev_state)
     print(dv)
     print(expected_value)
     assert dv == expected_value

@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import os
 import yaml
-from safe_autonomy_sims.gym.inspection.utils import delta_v
+from safe_autonomy_sims.pettingzoo.docking.utils import delta_v
 
 
 # test case parsing (TODO: import from saferl.conftest)

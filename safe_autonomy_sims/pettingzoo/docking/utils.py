@@ -81,7 +81,7 @@ def delta_v(v: np.ndarray, prev_v: np.ndarray) -> np.ndarray:
     """
     v_norm = np.linalg.norm(v)
     prev_v_norm = np.linalg.norm(prev_v)
-    return v_norm - prev_v_norm
+    return np.abs(v_norm - prev_v_norm)
 
 
 def v_limit(

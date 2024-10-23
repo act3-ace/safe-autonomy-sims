@@ -149,7 +149,7 @@ def fixture_expected_value(request):
 
 # test delta v function
 test_cases_dir = os.path.split(__file__)[0]
-test_cases_file_path = os.path.join(test_cases_dir, "test_cases.yml")
+test_cases_file_path = os.path.join(test_cases_dir, "delta_v_test_cases.yml")
 parameterized_fixture_keywords = ["prev_v", "v", "expected_value"]
 test_configs, IDs = read_test_cases(test_cases_file_path, parameterized_fixture_keywords)
 
