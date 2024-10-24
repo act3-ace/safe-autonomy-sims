@@ -235,6 +235,8 @@ class InspectionEnv(gym.Env):
         # Episode level information
         self.prev_state = None
         self.prev_num_inspected = 0
+        self.reward_components = {}
+        self.status = "Running"
 
     def reset(
         self, *, seed: int | None = None, options: dict[str, typing.Any] | None = None
@@ -310,29 +312,43 @@ class InspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {}
+        return {
+            "reward_components": self.reward_components,
+            "status": self.status
+        }
 
     def _get_reward(self):
         reward = 0
 
         # Dense rewards
-        reward += r.observed_points_reward(
+        points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        reward += r.delta_v_reward(
+        self.reward_components["observed_points"] = points_reward
+        reward += points_reward
+
+        delta_v_reward = r.delta_v_reward(
             v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
         )
+        self.reward_components["delta_v"] = delta_v_reward
+        reward += delta_v_reward
 
         # Sparse rewards
-        reward += r.inspection_success_reward(
+        success_reward = r.inspection_success_reward(
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        reward += r.crash_reward(
+        self.reward_components["success"] = success_reward
+        reward += success_reward
+
+        crash_reward = r.crash_reward(
             chief=self.chief,
             deputy=self.deputy,
             crash_radius=self.crash_radius,
         )
+        self.reward_components["crash"] = crash_reward
+        reward += crash_reward
+
         return reward
 
     def _get_terminated(self):
@@ -346,12 +362,25 @@ class InspectionEnv(gym.Env):
             >= self.success_threshold
         )
 
+        # Update Status
+        if crash:
+            self.status = "Crash"
+        elif all_inspected:
+            self.status = "Success"
+
         return crash or all_inspected
 
     def _get_truncated(self):
         d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
         timeout = self.simulator.sim_time > self.max_time
         oob = d > self.max_distance
+
+        # Update Status
+        if oob:
+            self.status = "Out of Bounds"
+        elif timeout:
+            self.status = "Timeout"
+
         return timeout or oob
 
     @property

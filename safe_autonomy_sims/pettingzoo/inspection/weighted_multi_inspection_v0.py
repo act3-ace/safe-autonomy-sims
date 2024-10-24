@@ -231,6 +231,8 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.prev_state: dict[typing.Any, typing.Any] = {}
         self.prev_num_inspected = 0
         self.prev_weight_inspected = 0.0
+        self.reward_components = {a: {} for a in self.possible_agents}
+        self.status = {a: "Running" for a in self.possible_agents}
 
         # Lazy initialized items
         self.rng: np.random.Generator
@@ -327,25 +329,37 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict:
-        return {agent: None}
+        return {
+            "reward_components": self.reward_components,
+            "status": self.status
+        }
 
     def _get_reward(self, agent: typing.Any) -> float:
         reward = 0.0
         deputy = self.deputies[agent]
 
         # Dense rewards
-        reward += r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
-        reward += r.delta_v_reward(
+        points_reward = r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
+        self.reward_components[agent]["observed_points"] = points_reward
+        reward += points_reward
+
+        delta_v_reward = r.delta_v_reward(
             v=deputy.velocity,
             prev_v=self.prev_state[agent][3:6],
         )
+        self.reward_components[agent]["delta_v"] = delta_v_reward
+        reward += delta_v_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
         if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=deputy) < self.crash_radius):
             success_reward = -1.0
+        self.reward_components[agent]["success"] = success_reward
         reward += success_reward
-        reward += r.crash_reward(chief=self.chief, deputy=deputy, crash_radius=self.crash_radius)
+
+        crash_reward = r.crash_reward(chief=self.chief, deputy=deputy, crash_radius=self.crash_radius)
+        self.reward_components[agent]["crash"] = crash_reward
+        reward += crash_reward
 
         return reward
 
@@ -360,7 +374,17 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         crash = d < self.crash_radius
         timeout = self.simulator.sim_time > self.max_time
         all_inspected = self.chief.inspection_points.get_total_weight_inspected() >= self.success_threshold
-
+        
+        # Update Status
+        if crash:
+            self.status[agent] = "Crash"
+        elif all_inspected:
+            self.status[agent] = "Success"
+        elif oob:
+            self.status[agent] = "Out of Bounds"
+        elif timeout:
+            self.status[agent] = "Timeout"
+        
         return oob or crash or timeout or all_inspected
 
     # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment

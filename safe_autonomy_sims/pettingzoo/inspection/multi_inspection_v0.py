@@ -210,6 +210,8 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         # Episode level information
         self.prev_state = None
         self.prev_num_inspected = 0
+        self.reward_components = {a: {} for a in self.possible_agents}
+        self.status = {a: "Running" for a in self.possible_agents}
 
     def reset(
         self, seed: int | None = None, options: dict[str, typing.Any] | None = None
@@ -299,30 +301,44 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         return obs
 
     def _get_info(self, agent):
-        return {}
+        return {
+            "reward_components": self.reward_components,
+            "status": self.status
+        }
 
     def _get_reward(self, agent):
         reward = 0
         deputy = self.deputies[agent]
 
         # Dense rewards
-        reward += r.observed_points_reward(
+        points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        reward += r.delta_v_reward(
+        self.reward_components[agent]["observed_points"] = points_reward
+        reward += points_reward
+
+        delta_v_reward = r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
+        self.reward_components[agent]["delta_v"] = delta_v_reward
+        reward += delta_v_reward
 
         # Sparse rewards
-        reward += r.inspection_success_reward(
+        success_reward = r.inspection_success_reward(
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        reward += r.crash_reward(
+        self.reward_components[agent]["success"] = success_reward
+        reward += success_reward
+
+        crash_reward = r.crash_reward(
             chief=self.chief,
             deputy=deputy,
             crash_radius=self.crash_radius,
         )
+        self.reward_components[agent]["crash"] = crash_reward
+        reward += crash_reward
+
         return reward
 
     def _get_terminated(self, agent):
@@ -339,6 +355,16 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             self.chief.inspection_points.get_num_points_inspected()
             == self.success_threshold
         )
+
+        # Update Status
+        if crash:
+            self.status[agent] = "Crash"
+        elif all_inspected:
+            self.status[agent] = "Success"
+        elif oob:
+            self.status[agent] = "Out of Bounds"
+        elif timeout:
+            self.status[agent] = "Timeout"
 
         return oob or crash or timeout or all_inspected
 
