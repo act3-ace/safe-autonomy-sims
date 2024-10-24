@@ -14,8 +14,6 @@ This module implements Run Time Assurance for Clohessy-Wiltshire spacecraft.
 
 from run_time_assurance.controller import RTABackupController
 from run_time_assurance.zoo.cwh.docking_3d import (
-    M_DEFAULT,
-    N_DEFAULT,
     V0_DEFAULT,
     V1_COEF_DEFAULT,
     X_VEL_LIMIT_DEFAULT,
@@ -26,6 +24,7 @@ from run_time_assurance.zoo.cwh.docking_3d import (
     Docking3dImplicitOptimizationRTA,
     Docking3dImplicitSwitchingRTA,
 )
+from safe_autonomy_simulation.sims.spacecraft.defaults import M_DEFAULT, N_DEFAULT
 
 from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator, RTASingleton
 

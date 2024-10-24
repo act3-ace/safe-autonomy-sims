@@ -107,7 +107,7 @@ class RelativePositionSensor(CWHSensor):
                 raise ValueError(f"{self.config.entity_name} not found in simulator state!")
             relative_position = np.array([0.0, 0.0, 0.0])
         else:
-            relative_position = self.parent_platform.entity_relative_position(self.config.entity_name)
+            relative_position = self.parent_platform.entity_relative_position(state.sim_entities[self.config.entity_name])
 
         return corl_get_ureg().Quantity(np.array(relative_position, dtype=np.float32), "m")
 
@@ -180,7 +180,7 @@ class RelativeVelocitySensor(CWHSensor):
                 raise ValueError(f"{self.config.entity_name} not found in simulator state!")
             relative_velocity = np.array([0.0, 0.0, 0.0])
         else:
-            relative_velocity = self.parent_platform.entity_relative_velocity(self.config.entity_name)
+            relative_velocity = self.parent_platform.entity_relative_velocity(state.sim_entities[self.config.entity_name])
 
         return corl_get_ureg().Quantity(np.array(relative_velocity, dtype=np.float32), "m/s")
 

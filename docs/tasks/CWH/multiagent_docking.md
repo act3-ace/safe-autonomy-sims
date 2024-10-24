@@ -174,6 +174,9 @@ From `configs/multiagent-docking/environment.yml`:
           "chief":
             {
               "platform": "cwh",
+              "initializer": {
+                "functor": "safe_autonomy_sims.simulators.initializers.cwh.PositionVelocityInitializer",
+              },
               "config":
                 { "x": 0, "y": 0, "z": 0, "x_dot": 0, "y_dot": 0, "z_dot": 0 },
             },

@@ -167,6 +167,9 @@ From `configs/docking/environment.yml`:
         # Additional simulation entities in the environment not controlled by an agent
         "chief": { 
             "platform": "cwh",
+            "initializer": {
+              "functor": "safe_autonomy_sims.simulators.initializers.cwh.PositionVelocityInitializer",
+            },
             "config":{
                 "x": 0,
                 "y": 0,

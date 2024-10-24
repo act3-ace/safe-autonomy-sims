@@ -1,6 +1,6 @@
 - ID: identity case
   position: np.array([0, 0, 0])
-  orientation: Rotation.from_quat([0, 0, 0, 1])
+  orientation: np.array([0, 0, 0, 1])
   inspector_position: np.array([-10, -10, -10])
   inspector_orientation: np.array([0, 0, 0, 1])
   expected_positions:
@@ -205,7 +205,7 @@
     98: False
 - ID: translational case
   position: np.array([-23.38581, 4.93428, 102.11111])
-  orientation: Rotation.from_quat([0, 0, 0, 1])
+  orientation: np.array([0, 0, 0, 1])
   inspector_position: np.array([100, 0, 0])
   inspector_orientation: np.array([0, 1, 0, 0])
   expected_positions:
@@ -410,7 +410,7 @@
     98: False
 - ID: identity case
   position: np.array([0, 0, 0])
-  orientation: Rotation.from_quat([-0.29454644,  0.93373203, -0.06744704,  0.19193173])
+  orientation: np.array([-0.29454644,  0.93373203, -0.06744704,  0.19193173])
   inspector_position: np.array([10, 10, 10])
   inspector_orientation: np.array([-0.29454644,  0.93373203, -0.06744704,  0.19193173])
   expected_positions:

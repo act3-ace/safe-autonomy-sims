@@ -19,6 +19,7 @@ import numpy as np
 from corl.libraries.units import corl_get_ureg
 from corl.simulators.base_platform import BasePlatformValidator
 from safe_autonomy_simulation.sims.spacecraft import CWHSpacecraft, SixDOFSpacecraft
+from safe_autonomy_simulation.entities import PhysicalEntity
 
 from safe_autonomy_sims.platforms.common.platform import BaseSafeRLPlatform
 
@@ -140,27 +141,37 @@ class CWHPlatform(BaseSafeRLPlatform):
     def operable(self):
         return True
 
-    def entity_relative_position(self, entity_name):
+    def entity_relative_position(self, target_entity: PhysicalEntity):
         """
-        The position of entity_name relative to self (without rotation)
+        The position of target_entity relative to self (without rotation)
+
+        Parameters
+        ----------
+        target_entity: Entity
+            Entity to compute relative position from
 
         Returns
         -------
         np.ndarray
-            The relative position of entity_name
+            The relative position of target_entity
         """
-        return self._platform.entity_relative_position(entity_name)
+        return target_entity.position - self._platform.position
 
-    def entity_relative_velocity(self, entity_name):
+    def entity_relative_velocity(self, target_entity: PhysicalEntity):
         """
-        The velocity of entity_name relative to self (without rotation)
+        The velocity of target_entity relative to self (without rotation)
+
+        Parameters
+        ----------
+        target_entity: Entity
+            Entity to compute relative velocity from
 
         Returns
         -------
         np.ndarray
-            The relative velocity of entity_name
+            The relative velocity of target_entity
         """
-        return self._platform.entity_relative_velocity(entity_name)
+        return target_entity.velocity - self._platform.velocity
 
 
 class CWHSixDOFPlatformValidator(BasePlatformValidator):
@@ -227,7 +238,7 @@ class CWHSixDOFPlatform(CWHPlatform):
         np.ndarray
             The quaternion vector of the platform.
         """
-        return self._platform.quaternion
+        return self._platform.orientation
 
     @property
     def angular_velocity(self):
