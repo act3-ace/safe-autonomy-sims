@@ -1,9 +1,10 @@
 """Reward functions for the inspection tasks"""
 
 import numpy as np
-import scipy.spatial.transform as transform
-import safe_autonomy_sims.pettingzoo.inspection.utils as utils
 import safe_autonomy_simulation.sims.inspection as sim
+from scipy.spatial.transform import Rotation
+
+from safe_autonomy_sims.pettingzoo.inspection.utils import delta_v, rel_dist
 
 
 def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
@@ -28,6 +29,9 @@ def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
         reward value
     """
     current_num_inspected = chief.inspection_points.get_num_points_inspected()
+
+    assert current_num_inspected >= prev_num_inspected, "previously inspected points cannot be uninspected"
+
     step_inspected = current_num_inspected - prev_num_inspected
     r = 0.1 * step_inspected
     return r
@@ -56,7 +60,11 @@ def weighted_observed_points_reward(chief: sim.Target, prev_weight_inspected: fl
         reward value
     """
     current_weight_inspected = chief.inspection_points.get_total_weight_inspected()
+
+    assert current_weight_inspected >= prev_weight_inspected, "previously inspected points cannot be uninspected"
+
     step_inspected = current_weight_inspected - prev_weight_inspected
+
     r = 1.0 * step_inspected
     return r
 
@@ -91,8 +99,9 @@ def inspection_success_reward(chief: sim.Target, total_points: int) -> float:
     return r
 
 
+# pylint:disable=W1401
 def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
-    """A sparse reward applied when the agent successfully inspects
+    r"""A sparse reward applied when the agent successfully inspects
     point weights above the given threshold.
 
     $r_t = 1 if w_t \geq w_s else 0$
@@ -121,8 +130,9 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
     return r
 
 
+# pylint:disable=W1401
 def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
-    """A dense reward based on the deputy's fuel
+    r"""A dense reward based on the deputy's fuel
     use (change in velocity).
 
     $r_t = -((\deltav / m) + b)$
@@ -148,7 +158,7 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     float
         reward value
     """
-    r = -((utils.delta_v(v=v, prev_v=prev_v) / m) + b)
+    r = -((delta_v(v=v, prev_v=prev_v) / m) + b)
     return r
 
 
@@ -175,15 +185,16 @@ def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
     float
         reward value
     """
-    if utils.rel_dist(pos1=chief.position, pos2=deputy.position) < crash_radius:
+    if rel_dist(pos1=chief.position, pos2=deputy.position) < crash_radius:
         r = -1.0
     else:
         r = 0
     return r
 
 
+# pylint:disable=W1401
 def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float):
-    """A dense gaussian decaying reward which reward the agent
+    r"""A dense gaussian decaying reward which reward the agent
     for facing the chief.
 
     $r_t = 0.0005 * e^(-|\delta(f, 1)^2 / \espilon|)$
@@ -210,23 +221,10 @@ def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float
     """
     rel_pos = chief.position - deputy.position
     rel_pos = rel_pos / np.linalg.norm(rel_pos)
-    gaussian_decay = np.exp(
-        -np.abs(
-            (
-                (
-                    np.dot(
-                        transform.Rotation.from_quat(
-                            deputy.camera.orientation
-                        ).as_euler("XYZ"),
-                        rel_pos,
-                    )
-                    - 1
-                )
-                ** 2
-            )
-            / epsilon
-        )
-    )
+    gaussian_decay = np.exp(-np.abs(((np.dot(
+        Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
+        rel_pos,
+    ) - 1)**2) / epsilon))
     reward = 0.0005 * gaussian_decay
     return reward
 
@@ -252,7 +250,7 @@ def live_timestep_reward(t: int, t_max: int):
     float
         reward value
     """
-    reward = 0
+    reward = 0.0
     if t < t_max:
         reward = 0.001
     return reward

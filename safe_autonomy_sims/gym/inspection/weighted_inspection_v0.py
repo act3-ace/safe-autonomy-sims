@@ -1,16 +1,21 @@
+"""Module for the V0 version of the Weighted Inspection environment"""
 import typing
-import numpy as np
+
 import gymnasium as gym
+import numpy as np
 import safe_autonomy_simulation.sims.inspection as sim
+from gymnasium.core import RenderFrame
+
 import safe_autonomy_sims.gym.inspection.reward as r
-import safe_autonomy_sims.gym.inspection.utils as utils
+from safe_autonomy_sims.gym.inspection.utils import closest_fft_distance, polar_to_cartesian, rel_dist
 
 
 class WeightedInspectionEnv(gym.Env):
+    # pylint:disable=C0301
     r"""
-    In this weighted inspection environment, the goal is for a single deputy spacecraft 
+    In this weighted inspection environment, the goal is for a single deputy spacecraft
     to navigate around and inspect the entire surface of a chief spacecraft.
- 
+
     The chief is covered in 100 inspection points that the agent must observe
     while they are illuminated by the moving sun. The points are weighted by
     priority, such that it is more important to inspect some points than others.
@@ -19,10 +24,10 @@ class WeightedInspectionEnv(gym.Env):
     point weights add up to a value of one. The optimal policy will inspect
     points whose cumulative weight exceeds 0.95 within 2 revolutions of the sun
     while using as little fuel as possible.
-    
+
     In this weighted inspection environment, the agent only controls its
     translational motion and is always assumed to be pointing at the chief spacecraft.
-    
+
     __Note: the policy selects a new action every 10 seconds__
 
     ## Action Space
@@ -202,7 +207,9 @@ class WeightedInspectionEnv(gym.Env):
     <a id="9">[9]</a>
     Brandonisio, A., Lavagna, M., and Guzzetti, D., “Reinforcement Learning for Uncooperative Space Objects Smart Imaging
     Path-Planning,” The *Journal of the Astronautical Sciences*, Vol. 68, No. 4, 2021, pp. 1145–1169. [https://doi.org/10.1007/s40295-021-00288-7](https://doi.org/10.1007/s40295-021-00288-7).
-    """
+    """  # noqa:E501
+
+    # pylint:enable=C0301
 
     def __init__(
         self,
@@ -234,10 +241,10 @@ class WeightedInspectionEnv(gym.Env):
                     [1],  # weight inspected
                 )
             ),
-            shape=(15,),
+            shape=(15, ),
         )
 
-        self.action_space = gym.spaces.Box(-1, 1, shape=(3,))
+        self.action_space = gym.spaces.Box(-1, 1, shape=(3, ))
 
         # Environment parameters
         self.crash_radius = crash_radius
@@ -246,13 +253,17 @@ class WeightedInspectionEnv(gym.Env):
         self.success_threshold = success_threshold
 
         # Episode level information
-        self.prev_state = None
+        self.prev_state: dict[typing.Any, typing.Any] | None = None
         self.prev_num_inspected = 0
         self.prev_weight_inspected = 0.0
 
-    def reset(
-        self, *, seed: int | None = None, options: dict[str, typing.Any] | None = None
-    ) -> tuple[typing.Any, dict[str, typing.Any]]:
+        # Lazy initialized
+        self.chief: sim.Target
+        self.deputy: sim.Inspector
+        self.sun: sim.Sun
+        self.simulator: sim.InspectionSimulator
+
+    def reset(self, *, seed: int | None = None, options: dict[str, typing.Any] | None = None) -> tuple[typing.Any, dict[str, typing.Any]]:
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
@@ -274,12 +285,12 @@ class WeightedInspectionEnv(gym.Env):
         )
         self.deputy = sim.Inspector(
             name="deputy",
-            position=utils.polar_to_cartesian(
+            position=polar_to_cartesian(
                 r=self.np_random.uniform(50, 100),
                 theta=self.np_random.uniform(0, 2 * np.pi),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
             ),
-            velocity=utils.polar_to_cartesian(
+            velocity=polar_to_cartesian(
                 r=self.np_random.uniform(0, 0.3),
                 theta=self.np_random.uniform(0, 2 * np.pi),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
@@ -295,17 +306,11 @@ class WeightedInspectionEnv(gym.Env):
             sun=self.sun,
         )
 
-    def step(
-        self, action: typing.Any
-    ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
+    def step(self, action: typing.Any) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
-        self.prev_weight_inspected = (
-            self.chief.inspection_points.get_total_weight_inspected()
-        )
+        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
+        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -325,9 +330,7 @@ class WeightedInspectionEnv(gym.Env):
         obs[3:6] = self.deputy.velocity
         obs[6] = self.sun.theta
         obs[7] = self.chief.inspection_points.get_num_points_inspected()
-        obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(
-            camera=self.deputy.camera, sun=self.sun
-        )
+        obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun)
         obs[11:14] = self.chief.inspection_points.priority_vector
         obs[14] = self.chief.inspection_points.get_total_weight_inspected()
         return obs
@@ -339,50 +342,48 @@ class WeightedInspectionEnv(gym.Env):
         reward = 0
 
         # Dense rewards
-        reward += r.weighted_observed_points_reward(
-            chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
-        )
-        reward += r.delta_v_reward(
-            v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
-        )
+        reward += r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
+        reward += r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
 
         # Sparse rewards
-        success_reward = r.weighted_inspection_success_reward(
-            chief=self.chief, total_weight=self.success_threshold
-        )
-        if (
-            success_reward > 0
-            and utils.closest_fft_distance(chief=self.chief, deputy=self.deputy)
-            < self.crash_radius
-        ):
+        success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
+        if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=self.deputy) < self.crash_radius):
             success_reward = -1.0
         reward += success_reward
-        reward += r.crash_reward(
-            chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius
-        )
+        reward += r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
 
         return reward
 
     def _get_terminated(self):
         # Get state info
-        d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
+        d = rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
 
         # Determine if in terminal state
         crash = d < self.crash_radius
-        all_inspected = self.prev_weight_inspected >= self.success_threshold
+        all_inspected = self.chief.inspection_points.get_total_weight_inspected() >= self.success_threshold
 
         return crash or all_inspected
 
     def _get_truncated(self):
-        d = utils.rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
+        d = rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
         oob = d > self.max_distance
         timeout = self.simulator.sim_time > self.max_time
         return oob or timeout
 
     @property
     def sim_state(self) -> dict:
+        """Provides the state of the simulator
+
+        Returns
+        -------
+        dict
+            A dictionary containing the state of the deputy and the state of the chief
+        """
         state = {
             "deputy": self.deputy.state,
             "chief": self.chief.state,
         }
         return state
+
+    def render(self) -> RenderFrame | list[RenderFrame] | None:
+        raise NotImplementedError
