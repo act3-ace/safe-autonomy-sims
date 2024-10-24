@@ -5,4 +5,4 @@
 - ID: negative velocity change
   prev_v: np.array([1,1,1])
   v: np.array([0.5,0.5,0.5])
-  expected_value: 0.8660254037844386
+  expected_value: -0.8660254037844386

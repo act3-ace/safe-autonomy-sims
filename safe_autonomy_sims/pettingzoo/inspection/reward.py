@@ -148,7 +148,7 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     float
         reward value
     """
-    r = -((utils.delta_v(v=v, prev_v=prev_v) / m) + b)
+    r = -((abs(utils.delta_v(v=v, prev_v=prev_v)) / m) + b)
     return r
 
 
