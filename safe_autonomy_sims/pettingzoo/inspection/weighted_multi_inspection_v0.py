@@ -1,17 +1,21 @@
+"""Module for the V0 version of the Weighted Multiagent Inspection environment"""
 import copy
-import typing
 import functools
-import pettingzoo
-import numpy as np
+import typing
+
 import gymnasium as gym
+import numpy as np
+import pettingzoo
 import safe_autonomy_simulation.sims.inspection as sim
+
 import safe_autonomy_sims.pettingzoo.inspection.reward as r
-import safe_autonomy_sims.pettingzoo.inspection.utils as utils
+from safe_autonomy_sims.gym.inspection.utils import closest_fft_distance, polar_to_cartesian, rel_dist
 
 
 class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
+    # pylint:disable=C0301
     r"""
-    In this weighted inspection environment, the goal is for a single deputy spacecraft 
+    In this weighted inspection environment, the goal is for a single deputy spacecraft
     to navigate around and inspect the entire surface of a chief spacecraft.
 
     The chief is covered in 100 inspection points that the agent must observe
@@ -22,10 +26,10 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
     point weights add up to a value of one. The optimal policy will inspect
     points whose cumulative weight exceeds 0.95 within 2 revolutions of the sun
     while using as little fuel as possible.
-    
+
     In this weighted inspection environment, the agent only controls its
     translational motion and is always assumed to be pointing at the chief spacecraft.
-    
+
     __Note: the policy selects a new action every 10 seconds__
 
     ## Action Space
@@ -201,7 +205,9 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
     <a id="9">[9]</a>
     Brandonisio, A., Lavagna, M., and Guzzetti, D., “Reinforcement Learning for Uncooperative Space Objects Smart Imaging
     Path-Planning,” The *Journal of the Astronautical Sciences*, Vol. 68, No. 4, 2021, pp. 1145–1169. [https://doi.org/10.1007/s40295-021-00288-7](https://doi.org/10.1007/s40295-021-00288-7).
-    """
+    """  # noqa:E501
+
+    # pylint:enable=C0301
 
     def __init__(
         self,
@@ -220,20 +226,27 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.success_threshold = success_threshold
 
         # Episode level information
-        self.prev_state = None
+        # For some reason, mypy complains about prev_state possibly being None in the multi inspection environments
+        # but not single agent.
+        self.prev_state: dict[typing.Any, typing.Any] = {}
         self.prev_num_inspected = 0
         self.prev_weight_inspected = 0.0
 
-    def reset(
-        self, seed: int | None = None, options: dict[str, typing.Any] | None = None
-    ) -> tuple[typing.Any, dict[str, typing.Any]]:
+        # Lazy initialized items
+        self.rng: np.random.Generator
+        self.chief: sim.SixDOFTarget
+        self.deputies: dict[str, sim.SixDOFInspector]
+        self.sun: sim.Sun
+        self.simulator: sim.InspectionSimulator
+
+    def reset(self, seed: int | None = None, options: dict[str, typing.Any] | None = None) -> tuple[typing.Any, dict[str, typing.Any]]:
         self.agents = copy.copy(self.possible_agents)
         self.rng = np.random.default_rng(seed)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(a) for a in self.agents}
         infos = {a: self._get_info(a) for a in self.agents}
-        self.prev_state = None
+        self.prev_state = {}
         self.prev_num_inspected = 0
         self.prev_weight_inspected = 0.0
         return observations, infos
@@ -249,14 +262,15 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
             priority_vector=priority_vector,
         )
         self.deputies = {
-            a: sim.Inspector(
+            a:
+            sim.Inspector(
                 name=a,
-                position=utils.polar_to_cartesian(
+                position=polar_to_cartesian(
                     r=self.rng.uniform(50, 100),
                     phi=self.rng.uniform(-np.pi / 2, np.pi / 2),
                     theta=self.rng.uniform(0, 2 * np.pi),
                 ),
-                velocity=utils.polar_to_cartesian(
+                velocity=polar_to_cartesian(
                     r=self.rng.uniform(0, 0.3),
                     phi=self.rng.uniform(-np.pi / 2, np.pi / 2),
                     theta=self.rng.uniform(0, 2 * np.pi),
@@ -274,15 +288,11 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def step(
         self, actions: dict[str, typing.Any]
-    ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
+    ) -> tuple[dict[str, typing.Any], dict[str, float], dict[str, bool], dict[str, bool], dict[str, dict]]:
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
-        self.prev_weight_inspected = (
-            self.chief.inspection_points.get_total_weight_inspected()
-        )
+        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
+        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
 
         # Update simulator state
         for agent, action in actions.items():
@@ -294,12 +304,10 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         rewards = {a: self._get_reward(a) for a in self.agents}
         infos = {a: self._get_info(a) for a in self.agents}
         terminations = {a: self._get_terminated(a) for a in self.agents}
-        truncations = {
-            a: False for a in self.agents
-        }  # used to signal episode ended unexpectedly
+        truncations = {a: False for a in self.agents}  # used to signal episode ended unexpectedly
 
         # End episode if any agent is terminated or truncated
-        if any(terminations.values() or any(truncations.values())):
+        if any(terminations.values()) or any(truncations.values()):
             truncations = {a: True for a in self.agents}
             terminations = {a: True for a in self.agents}
             self.agents = []
@@ -313,43 +321,31 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         obs[3:6] = deputy.velocity
         obs[6] = self.sun.theta
         obs[7] = self.chief.inspection_points.get_num_points_inspected()
-        obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(
-            camera=deputy.camera, sun=self.sun
-        )
+        obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=deputy.camera, sun=self.sun)
         obs[11:14] = self.chief.inspection_points.priority_vector
         obs[14] = self.chief.inspection_points.get_total_weight_inspected()
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict:
-        return {}
+        return {agent: None}
 
     def _get_reward(self, agent: typing.Any) -> float:
-        reward = 0
+        reward = 0.0
         deputy = self.deputies[agent]
 
         # Dense rewards
-        reward += r.weighted_observed_points_reward(
-            chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
-        )
+        reward += r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
         reward += r.delta_v_reward(
             v=deputy.velocity,
             prev_v=self.prev_state[agent][3:6],
         )
 
         # Sparse rewards
-        success_reward = r.weighted_inspection_success_reward(
-            chief=self.chief, total_weight=self.success_threshold
-        )
-        if (
-            success_reward > 0
-            and utils.closest_fft_distance(chief=self.chief, deputy=deputy)
-            < self.crash_radius
-        ):
+        success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
+        if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=deputy) < self.crash_radius):
             success_reward = -1.0
         reward += success_reward
-        reward += r.crash_reward(
-            chief=self.chief, deputy=deputy, crash_radius=self.crash_radius
-        )
+        reward += r.crash_reward(chief=self.chief, deputy=deputy, crash_radius=self.crash_radius)
 
         return reward
 
@@ -357,17 +353,19 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         deputy = self.deputies[agent]
 
         # Get state info
-        d = utils.rel_dist(pos1=self.chief.position, pos2=deputy.position)
+        d = rel_dist(pos1=self.chief.position, pos2=deputy.position)
 
         # Determine if in terminal state
         oob = d > self.max_distance
         crash = d < self.crash_radius
         timeout = self.simulator.sim_time > self.max_time
-        all_inspected = self.prev_weight_inspected >= self.success_threshold
+        all_inspected = self.chief.inspection_points.get_total_weight_inspected() >= self.success_threshold
 
         return oob or crash or timeout or all_inspected
 
-    @functools.lru_cache(maxsize=None)
+    # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment
+    # should never be garabage collected when used
+    @functools.lru_cache(maxsize=None)  # pylint:disable=W1518
     def observation_space(self, agent: typing.Any) -> gym.Space:
         return gym.spaces.Box(
             np.concatenate(
@@ -392,18 +390,34 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
                     [1],  # weight inspected
                 )
             ),
-            shape=(15,),
+            shape=(15, ),
         )
 
-    @functools.lru_cache(maxsize=None)
+    # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment
+    # should never be garabage collected when used
+    @functools.lru_cache(maxsize=None)  # pylint:disable=W1518
     def action_space(self, agent: typing.Any) -> gym.Space:
-        return gym.spaces.Box(-1, 1, shape=(3,))
+        return gym.spaces.Box(-1, 1, shape=(3, ))
 
     @property
-    def sim_state(self) -> dict:
+    def sim_state(self) -> dict[str, np.ndarray]:
+        """Provides the state of the simulator
+
+        Returns
+        -------
+        dict
+            A dictionary containing the state of the deputies and the state of the chief
+        """
         state = {
             "chief": self.chief.state,
         }
         for a in self.agents:
             state[a] = self.deputies[a].state
         return state
+
+    def render(self) -> None | np.ndarray | str | list:
+        raise NotImplementedError
+
+    def state(self) -> np.ndarray:
+        agent_states = [deputy.state for deputy in list(self.deputies.values())]
+        return np.vstack((self.chief.state, agent_states))

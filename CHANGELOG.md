@@ -1,3 +1,12 @@
+## [4.1.4](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.3...v4.1.4) (2024-10-24)
+
+
+### Bug Fixes
+
+* observed point rewards, both weighted and unweighted, now verify that the current number of inspected points or inspected weight is not less than the previous value ([58e71ea](https://github.com/act3-ace/safe-autonomy-sims/commit/58e71ea543f5df5adc7d92704783a72281d67d07))
+* Weighted 6DOF single and multiagent inspection environments and weighted multiagent inspection environment now use the current inspection status to determine termination ([b777b1e](https://github.com/act3-ace/safe-autonomy-sims/commit/b777b1e99e6fedc7524d9de884e6f390e4ea5d5f))
+* weighted inspection environment now uses the current inspection point state to determine termination rather than the previous state ([0b79406](https://github.com/act3-ace/safe-autonomy-sims/commit/0b79406ae8d83ae6bd0e4bf3f9665f2a9a015161))
+
 ## [4.1.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.2...v4.1.3) (2024-10-22)
 
 

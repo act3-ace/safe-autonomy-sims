@@ -1,9 +1,10 @@
 """Reward functions for the inspection tasks"""
 
 import numpy as np
-import scipy.spatial.transform as transform
-import safe_autonomy_sims.pettingzoo.inspection.utils as utils
 import safe_autonomy_simulation.sims.inspection as sim
+from scipy.spatial.transform import Rotation
+
+from safe_autonomy_sims.pettingzoo.inspection.utils import delta_v, rel_dist
 
 
 def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
@@ -92,7 +93,7 @@ def inspection_success_reward(chief: sim.Target, total_points: int) -> float:
 
 
 def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
-    """A sparse reward applied when the agent successfully inspects
+    r"""A sparse reward applied when the agent successfully inspects
     point weights above the given threshold.
 
     $r_t = 1 if w_t \geq w_s else 0$
@@ -122,7 +123,7 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
 
 
 def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
-    """A dense reward based on the deputy's fuel
+    r"""A dense reward based on the deputy's fuel
     use (change in velocity).
 
     $r_t = -((\deltav / m) + b)$
@@ -148,7 +149,7 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     float
         reward value
     """
-    r = -((abs(utils.delta_v(v=v, prev_v=prev_v)) / m) + b)
+    r = -((abs(delta_v(v=v, prev_v=prev_v)) / m) + b)
     return r
 
 
@@ -175,7 +176,7 @@ def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
     float
         reward value
     """
-    if utils.rel_dist(pos1=chief.position, pos2=deputy.position) < crash_radius:
+    if rel_dist(pos1=chief.position, pos2=deputy.position) < crash_radius:
         r = -1.0
     else:
         r = 0
@@ -183,7 +184,7 @@ def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
 
 
 def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float):
-    """A dense gaussian decaying reward which reward the agent
+    r"""A dense gaussian decaying reward which reward the agent
     for facing the chief.
 
     $r_t = 0.0005 * e^(-|\delta(f, 1)^2 / \espilon|)$
@@ -210,28 +211,15 @@ def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float
     """
     rel_pos = chief.position - deputy.position
     rel_pos = rel_pos / np.linalg.norm(rel_pos)
-    gaussian_decay = np.exp(
-        -np.abs(
-            (
-                (
-                    np.dot(
-                        transform.Rotation.from_quat(
-                            deputy.camera.orientation
-                        ).as_euler("XYZ"),
-                        rel_pos,
-                    )
-                    - 1
-                )
-                ** 2
-            )
-            / epsilon
-        )
-    )
+    gaussian_decay = np.exp(-np.abs(((np.dot(
+        Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
+        rel_pos,
+    ) - 1)**2) / epsilon))
     reward = 0.0005 * gaussian_decay
     return reward
 
 
-def live_timestep_reward(t: int, t_max: int):
+def live_timestep_reward(t: float, t_max: float):
     """A dense reward which rewards the agent for
     each timestep it remains active in the simulation.
 
@@ -242,9 +230,9 @@ def live_timestep_reward(t: int, t_max: int):
 
     Parameters
     ----------
-    t : int
+    t : float
         current time step
-    t_max : int
+    t_max : float
         max time step allowed for episode
 
     Returns
@@ -252,7 +240,7 @@ def live_timestep_reward(t: int, t_max: int):
     float
         reward value
     """
-    reward = 0
+    reward = 0.0
     if t < t_max:
         reward = 0.001
     return reward
