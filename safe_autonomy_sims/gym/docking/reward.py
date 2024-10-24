@@ -80,7 +80,7 @@ def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.
     float
         reward value
     """
-    r = -((delta_v(state, prev_state) / m) + b)
+    r = -((abs(delta_v(state, prev_state)) / m) + b)
     return r
 
 
