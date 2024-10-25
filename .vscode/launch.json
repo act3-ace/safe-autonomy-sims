@@ -25,7 +25,7 @@
             "type": "python",
             "request": "launch",
             "module": "corl.train_rl",
-            "args": ["--cfg", "${workspaceFolder}/configs/multiagent-six-dof-inspection/experiment.yml"],
+            "args": ["--cfg", "${workspaceFolder}/configs/multiagent-weighted-six-dof-inspection/experiment.yml"],
             "justMyCode": true
         },
         {
@@ -41,7 +41,7 @@
             "type": "python",
             "request": "launch",
             "module": "corl.train_rl",
-            "args": ["--cfg", "${workspaceFolder}/configs/six-dof-inspection/experiment.yml"],
+            "args": ["--cfg", "${workspaceFolder}/configs/weighted-six-dof-inspection/experiment.yml"],
             "justMyCode": true
         },
         {

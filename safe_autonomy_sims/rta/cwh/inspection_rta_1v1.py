@@ -20,8 +20,6 @@ from run_time_assurance.zoo.cwh.inspection_1v1 import (
     CHIEF_RADIUS_DEFAULT,
     DEPUTY_RADIUS_DEFAULT,
     FOV_DEFAULT,
-    M_DEFAULT,
-    N_DEFAULT,
     R_MAX_DEFAULT,
     SUN_VEL_DEFAULT,
     U_MAX_DEFAULT,
@@ -31,6 +29,7 @@ from run_time_assurance.zoo.cwh.inspection_1v1 import (
     VEL_LIMIT_DEFAULT,
     Inspection1v1RTA,
 )
+from safe_autonomy_simulation.sims.spacecraft.defaults import M_DEFAULT, N_DEFAULT
 
 from safe_autonomy_sims.glues.rta_glue import RTAGlue, RTAGlueValidator, RTASingleton
 
