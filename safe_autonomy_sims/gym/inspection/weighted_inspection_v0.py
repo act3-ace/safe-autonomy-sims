@@ -321,9 +321,9 @@ class WeightedInspectionEnv(gym.Env):
         # Get info from simulator
         observation = self._get_obs()
         reward = self._get_reward()
-        info = self._get_info()
         terminated = self._get_terminated()
-        truncated = self.simulator.sim_time > self.max_time
+        truncated = self._get_truncated()
+        info = self._get_info()
         return observation, reward, terminated, truncated, info
 
     def _get_obs(self):

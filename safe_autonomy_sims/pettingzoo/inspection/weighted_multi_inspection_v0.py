@@ -304,7 +304,6 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         # Get info from simulator
         observations = {a: self._get_obs(a) for a in self.agents}
         rewards = {a: self._get_reward(a) for a in self.agents}
-        infos = {a: self._get_info(a) for a in self.agents}
         terminations = {a: self._get_terminated(a) for a in self.agents}
         truncations = {a: False for a in self.agents}  # used to signal episode ended unexpectedly
 
@@ -312,7 +311,10 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         if any(terminations.values()) or any(truncations.values()):
             truncations = {a: True for a in self.agents}
             terminations = {a: True for a in self.agents}
+            infos = {a: self._get_info(a) for a in self.agents}
             self.agents = []
+        else:
+            infos = {a: self._get_info(a) for a in self.agents}
 
         return observations, rewards, terminations, truncations, infos
 
@@ -330,8 +332,8 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def _get_info(self, agent: typing.Any) -> dict:
         return {
-            "reward_components": self.reward_components,
-            "status": self.status
+            "reward_components": self.reward_components[agent],
+            "status": self.status[agent]
         }
 
     def _get_reward(self, agent: typing.Any) -> float:
@@ -378,12 +380,12 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         # Update Status
         if crash:
             self.status[agent] = "Crash"
-        elif all_inspected:
-            self.status[agent] = "Success"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
             self.status[agent] = "Timeout"
+        elif all_inspected:
+            self.status[agent] = "Success"
         
         return oob or crash or timeout or all_inspected
 

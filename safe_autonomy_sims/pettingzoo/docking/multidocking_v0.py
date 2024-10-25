@@ -210,17 +210,18 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         # Get info from simulator
         observations = {a: self._get_obs(agent=a) for a in self.agents}
         rewards = {a: self._get_reward(agent=a) for a in self.agents}
-        infos = {a: self._get_info(agent=a) for a in self.agents}
         terminations = {a: self._get_terminated(agent=a) for a in self.agents}
         truncations = {
             a: False for a in self.agents
         }  # used to signal episode ended unexpectedly
-
         # End episode if any agent is terminated or truncated
         if any(terminations.values() or any(truncations.values())):
             truncations = {a: True for a in self.agents}
             terminations = {a: True for a in self.agents}
+            infos = {a: self._get_info(agent=a) for a in self.agents}
             self.agents = []
+        else:
+            infos = {a: self._get_info(agent=a) for a in self.agents}
 
         return observations, rewards, terminations, truncations, infos
 
@@ -262,8 +263,8 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
     def _get_info(self, agent: str) -> dict[str, typing.Any]:
         return {
-            "reward_components": self.reward_components,
-            "status": self.status
+            "reward_components": self.reward_components[agent],
+            "status": self.status[agent]
         }
 
     def _get_reward(self, agent: str) -> float:
@@ -359,14 +360,14 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         # Update Status
         if crash:
             self.status[agent] = "Crash"
-        elif docked:
-            self.status[agent] = "Success"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
             self.status[agent] = "Timeout"
         elif max_v_violation:
             self.status[agent] = "Max Velocity Violation"
+        elif docked:
+            self.status[agent] = "Success"
 
         return oob or crash or max_v_violation or timeout or docked
 
