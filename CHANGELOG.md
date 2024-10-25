@@ -1,3 +1,10 @@
+## [4.1.5](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.4...v4.1.5) (2024-10-25)
+
+
+### Bug Fixes
+
+* update example experiments for new sim backend API ([221a5e2](https://github.com/act3-ace/safe-autonomy-sims/commit/221a5e2bb73980ab9d94cb0686ac4556ec7e8dcd)), closes [#16](https://github.com/act3-ace/safe-autonomy-sims/issues/16)
+
 ## [4.1.4](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.3...v4.1.4) (2024-10-24)
 
 
