@@ -392,10 +392,8 @@ class SafeRLSimulator(BaseSimulator):
         for entity_name, entity in self.sim_entities.items():
             action = entity_actions.get(entity_name, None)
 
-            if action is not None:
-                entity.add_control(action)
-
-            entity.step(step_size=step_size)
+            if entity_name in platforms_to_action or not entity_name in self.platforms:
+                entity.step(action=action, step_size=step_size)
 
     def _step_get_entity_actions(
         self,
