@@ -257,6 +257,9 @@ From `configs/multiagent-weighted-six-dof-inspection/environment.yml`:
     "additional_entities": {
       "chief": { 
         "platform": "cwh",
+        "initializer": {
+          "functor": "safe_autonomy_sims.simulators.initializers.cwh.PositionVelocityInitializer",
+        },
         "config":{
           "x": 0,
           "y": 0,
@@ -267,7 +270,7 @@ From `configs/multiagent-weighted-six-dof-inspection/environment.yml`:
         }
       },
       "sun": { 
-        "entity_class": "safe_autonomy_simulation.sims.inspection.sun_model.SunEntity",
+        "entity_class": "safe_autonomy_simulation.sims.inspection.sun.Sun",
         "config":{
           "theta": {
             "type": "corl.libraries.parameters.UniformParameter",

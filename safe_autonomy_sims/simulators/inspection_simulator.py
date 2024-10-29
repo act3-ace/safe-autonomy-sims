@@ -396,6 +396,7 @@ class InspectionPoints:
         # get parent entity info
         parent_position = self.parent_entity.position
         parent_orientation = self.parent_entity.orientation
+        parent_orientation = Rotation.from_quat(parent_orientation)
 
         self.priority_vector = parent_orientation.apply(self.init_priority_vector)
 
@@ -611,15 +612,6 @@ class InspectionSimulator(SafeRLSimulator):
             )
 
         return points_map
-
-    def _construct_sim_entities(self, reset_config: SafeRLSimulatorResetValidator,
-                                entity_init_map: typing.Dict[str, typing.Dict]) -> typing.Dict[str, Entity]:
-        sim_entities = super()._construct_sim_entities(reset_config, entity_init_map)
-
-        for _, entity in self.agent_sim_entities.items():
-            entity.set_sim(self)
-
-        return sim_entities
 
     def _construct_simulator_state(self) -> dict:
         return InspectionSimulatorState(

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-autonomy-sims"
-version = "4.1.4"
+version = "4.1.5"
 description = "The Safe-Autonomy-Sims library provides the components and tools to build modular, integration-focused Reinforcement Learning environments with Run Time Assurance (RTA)"
 authors = [
     "Charles Keating <Charles.Keating@udri.udayton.edu>",
@@ -30,11 +30,11 @@ torch = "1.13.0"
 imageio = "2.25.0"
 imageio-ffmpeg = "0.4.8"
 pettingzoo = "^1.24.3"
-safe-autonomy-simulation = "^2.0.12"
-run-time-assurance = "^1.16.2"
+safe-autonomy-simulation = "^2.1.2"
+run-time-assurance = "^1.18.5"
 corl = "^3.16.2"
 # setuptools cannot be upgraded to 71.x.x+ until dependencies (ray) are updated to handle the removal of pkg_resources._vendor
-setuptools = "^70.3.0"
+setuptools = "^69.5.1"
 
 [tool.poetry.group.lint.dependencies]
 ruff = "^0.5.2"

@@ -18,7 +18,7 @@ import numpy as np
 from corl.libraries.units import Quantity
 from scipy.spatial.transform import Rotation
 
-from safe_autonomy_sims.simulators.initializers.initializer import BaseInitializerWithPint, InitializerValidator, strip_units_from_dict
+from safe_autonomy_sims.simulators.initializers.initializer import BaseInitializer, BaseInitializerWithPint, InitializerValidator, strip_units_from_dict
 from safe_autonomy_sims.utils import velocity_limit
 
 
@@ -83,12 +83,8 @@ class CWH3DRadialInitializer(BaseInitializerWithPint):
         z_dot = vel_mag * np.sin(vel_elevation_angle)
 
         return {
-            'x': x,
-            'y': y,
-            'z': z,
-            'x_dot': x_dot,
-            'y_dot': y_dot,
-            'z_dot': z_dot,
+            'position': np.array([x, y, z]),
+            'velocity': np.array([x_dot, y_dot, z_dot])
         }
 
 
@@ -164,14 +160,55 @@ class CWH3DENMTInitializer(BaseInitializerWithPint):
         y_dot = -2 * self.config.mean_motion * x
 
         return {
-            'x': x,
-            'y': y,
-            'z': z,
-            'x_dot': x_dot,
-            'y_dot': y_dot,
-            'z_dot': z_dot,
+            'position': np.array([x, y, z]),
+            'velocity': np.array([x_dot, y_dot, z_dot])
         }
+    
+class PositionVelocityInitializer(BaseInitializer):
+    """
+    This class handles the initialization of agent reset parameters for the cwh 3D environment.
+    Both position and velocity are initialized by specifying the individual components of position
+    velocity..
+    """
 
+    def compute(self, **kwargs):
+        return self._compute(**kwargs)
+    
+    def _compute(self,
+                x: float,
+                y: float,
+                z: float,
+                x_dot: float,
+                y_dot: float,
+                z_dot: float
+    ):
+        """Computes initial conditions for cwh 3d
+
+        Parameters
+        ----------
+        x : float
+            The x component of the position, meters
+        y : float
+            The y component of the position, meters
+        z : float
+            The z component of the position, meters
+        x_dot : float
+            The reset value for the x velocity of the agent
+        y_dot : float
+            The reset value for the y velocity of the agent
+        z_dot : float
+            The reset value for the z velocity of the agent
+
+        Returns
+        -------
+        typing.Dict
+            initial conditions of platform
+        """
+
+        return {
+            "position": np.array([x, y, z]),
+            "velocity": np.array([x_dot, y_dot, z_dot])
+        }
 
 class Docking3DRadialInitializerValidator(InitializerValidator):
     """
@@ -283,12 +320,8 @@ class Docking3DRadialInitializer(BaseInitializerWithPint):
         z_dot = vel_mag * np.sin(vel_elevation_angle)
 
         return {
-            'x': x,
-            'y': y,
-            'z': z,
-            'x_dot': x_dot,
-            'y_dot': y_dot,
-            'z_dot': z_dot,
+            'position': np.array([x, y, z]),
+            'velocity': np.array([x_dot, y_dot, z_dot])
         }
 
 
@@ -360,19 +393,10 @@ class CWHSixDOFRadialInitializer(BaseInitializerWithPint):
         q = Rotation.random().as_quat()
 
         return {
-            'x': x,
-            'y': y,
-            'z': z,
-            'x_dot': x_dot,
-            'y_dot': y_dot,
-            'z_dot': z_dot,
-            'q1': q[0],
-            'q2': q[1],
-            'q3': q[2],
-            'q4': q[3],
-            'wx': wx,
-            'wy': wy,
-            'wz': wz,
+            'position': np.array([x, y, z]),
+            'velocity': np.array([x_dot, y_dot, z_dot]),
+            'orientation': np.array([q[0], q[1], q[2], q[3]]),
+            'angular_velocity': np.array([wx, wy, wz])
         }
 
 
@@ -441,11 +465,7 @@ class CWH3DRadialWithSunInitializer(BaseInitializerWithPint):
         z_dot = vel_mag * np.sin(vel_elevation_angle)
 
         return {
-            'x': x,
-            'y': y,
-            'z': z,
-            'x_dot': x_dot,
-            'y_dot': y_dot,
-            'z_dot': z_dot,
+            'position': np.array([x, y, z]),
+            'velocity': np.array([x_dot, y_dot, z_dot]),
             'sun_angle': sun_angle,
         }

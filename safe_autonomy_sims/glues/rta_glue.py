@@ -227,8 +227,8 @@ class RTAGlue(BaseMultiWrapperGlue):
 
     def get_info_dict(self):
         return {
-            "actual control": self.rta.control_actual,
-            "desired control": self.rta.control_desired,
+            "actual_control": self.rta.control_actual,
+            "desired_control": self.rta.control_desired,
             "intervening": self.rta.intervening,
         }
 
