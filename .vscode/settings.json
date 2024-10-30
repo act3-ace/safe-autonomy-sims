@@ -1,8 +1,7 @@
 {
     // Pytest
     "python.testing.pytestArgs": [
-        "test",
-        "-m unit_test"
+        "test/unit_tests",
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
