@@ -18,9 +18,9 @@ def test_weighted_6DOF_inspection_env_terminates_on_inspection_threshold_met(moc
 
     # First step, the environment should not be terminated so we can tell what's causing
     # the environment to terminate on the next step
-    _, _, terminated, _, _ = env.step(action=None)
+    _, _, terminated, _, _ = env.step(action=env.action_space.sample())
     assert not terminated, "environment should not be terminated"
 
-    _, _, terminated, _, _ = env.step(action=None)
+    _, _, terminated, _, _ = env.step(action=env.action_space.sample())
 
     assert terminated, "environment should be terminated after points inspected"

@@ -238,6 +238,13 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
     def step(
         self, actions: dict[str, np.ndarray]
     ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
+        for a in self.agents:
+            assert self.action_space(
+                a
+            ).contains(
+                actions[a]
+            ), f"given action {a}: {actions[a]} is not contained in action space {a}: {self.action_space(a)}"
+
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
         self.prev_num_inspected = (
@@ -314,7 +321,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
     def _get_info(self, agent):
         return {
             "reward_components": self.reward_components[agent],
-            "status": self.status[agent]
+            "status": self.status[agent],
         }
 
     def _get_reward(self, agent):

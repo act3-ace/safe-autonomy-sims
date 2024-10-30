@@ -208,6 +208,13 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
     def step(
         self, actions: dict[str, typing.Any]
     ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
+        for a in self.agents:
+            assert self.action_space(
+                a
+            ).contains(
+                actions[a]
+            ), f"given action {a}: {actions[a]} is not contained in action space {a}: {self.action_space(a)}"
+
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
 
@@ -273,7 +280,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
     def _get_info(self, agent: str) -> dict[str, typing.Any]:
         return {
             "reward_components": self.reward_components[agent],
-            "status": self.status[agent]
+            "status": self.status[agent],
         }
 
     def _get_reward(self, agent: str) -> float:
@@ -320,7 +327,9 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         self.reward_components[agent]["success"] = success_reward
         reward += success_reward
 
-        timeout_reward = r.timeout_reward(t=self.simulator.sim_time, max_time=self.max_time)
+        timeout_reward = r.timeout_reward(
+            t=self.simulator.sim_time, max_time=self.max_time
+        )
         self.reward_components[agent]["timeout"] = timeout_reward
         reward += timeout_reward
 

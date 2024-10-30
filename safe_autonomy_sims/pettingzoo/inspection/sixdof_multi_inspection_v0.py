@@ -1,4 +1,5 @@
 """Module for the V0 version of the Weighted 6DOF Multiagent Inspection environment"""
+
 import copy
 import functools
 import typing
@@ -10,7 +11,11 @@ import safe_autonomy_simulation.sims.inspection as sim
 from scipy.spatial.transform import Rotation
 
 import safe_autonomy_sims.pettingzoo.inspection.reward as r
-from safe_autonomy_sims.gym.inspection.utils import closest_fft_distance, polar_to_cartesian, rel_dist
+from safe_autonomy_sims.gym.inspection.utils import (
+    closest_fft_distance,
+    polar_to_cartesian,
+    rel_dist,
+)
 
 
 class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
@@ -327,7 +332,9 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.sun: sim.Sun
         self.simulator: sim.InspectionSimulator
 
-    def reset(self, seed: int | None = None, options: dict[str, typing.Any] | None = None) -> tuple[typing.Any, dict[str, typing.Any]]:
+    def reset(
+        self, seed: int | None = None, options: dict[str, typing.Any] | None = None
+    ) -> tuple[typing.Any, dict[str, typing.Any]]:
         self.agents = copy.copy(self.possible_agents)
         self.rng = np.random.default_rng(seed)
         self._init_sim()  # sim is light enough we just reconstruct it
@@ -341,11 +348,28 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def step(
         self, actions: dict[str, typing.Any]
-    ) -> tuple[dict[str, typing.Any], dict[str, float], dict[str, bool], dict[str, bool], dict[str, dict]]:
+    ) -> tuple[
+        dict[str, typing.Any],
+        dict[str, float],
+        dict[str, bool],
+        dict[str, bool],
+        dict[str, dict],
+    ]:
+        for a in self.agents:
+            assert self.action_space(
+                a
+            ).contains(
+                actions[a]
+            ), f"given action {a}: {actions[a]} is not contained in action space {a}: {self.action_space(a)}"
+
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
-        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
+        self.prev_num_inspected = (
+            self.chief.inspection_points.get_num_points_inspected()
+        )
+        self.prev_weight_inspected = (
+            self.chief.inspection_points.get_total_weight_inspected()
+        )
 
         # Update simulator state
         for agent, action in actions.items():
@@ -356,7 +380,9 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         observations = {a: self._get_obs(a) for a in self.agents}
         rewards = {a: self._get_reward(a) for a in self.agents}
         terminations = {a: self._get_terminated(a) for a in self.agents}
-        truncations = {a: False for a in self.agents}  # used to signal episode ended unexpectedly
+        truncations = {
+            a: False for a in self.agents
+        }  # used to signal episode ended unexpectedly
 
         # End episode if any agent is terminated or truncated
         if any(terminations.values()) or any(truncations.values()):
@@ -380,8 +406,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             priority_vector=priority_vector,
         )
         self.deputies = {
-            a:
-            sim.SixDOFInspector(
+            a: sim.SixDOFInspector(
                 name=a,
                 position=polar_to_cartesian(
                     r=self.rng.uniform(50, 100),
@@ -417,23 +442,28 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         obs[17:20] = Rotation.from_quat(deputy.orientation).as_euler("XYZ")
         obs[20] = np.dot(
             Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-            (self.chief.position - deputy.position) / np.linalg.norm(self.chief.position - deputy.position),
+            (self.chief.position - deputy.position)
+            / np.linalg.norm(self.chief.position - deputy.position),
         )
         obs[21] = self.sun.theta
         obs[22] = self.chief.inspection_points.get_num_points_inspected()
-        obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=deputy.camera, sun=self.sun)
+        obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(
+            camera=deputy.camera, sun=self.sun
+        )
         obs[26:29] = self.chief.inspection_points.priority_vector
         obs[29] = self.chief.inspection_points.get_total_weight_inspected()
         obs[30] = np.dot(
             Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-            self.chief.inspection_points.kmeans_find_nearest_cluster(camera=deputy.camera, sun=self.sun),
+            self.chief.inspection_points.kmeans_find_nearest_cluster(
+                camera=deputy.camera, sun=self.sun
+            ),
         )
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict[str, typing.Any]:
         return {
             "reward_components": self.reward_components[agent],
-            "status": self.status[agent]
+            "status": self.status[agent],
         }
 
     def _get_reward(self, agent: typing.Any) -> float:
@@ -441,30 +471,46 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         deputy = self.deputies[agent]
 
         # Dense rewards
-        points_reward = r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
+        points_reward = r.weighted_observed_points_reward(
+            chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
+        )
         self.reward_components[agent]["observed_points"] = points_reward
         reward += points_reward
 
-        delta_v_reward = r.delta_v_reward(v=deputy.velocity, prev_v=self.prev_state[agent][3:6])
+        delta_v_reward = r.delta_v_reward(
+            v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
+        )
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
-        live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
+        live_timestep_reward = r.live_timestep_reward(
+            t=self.simulator.sim_time, t_max=self.max_time
+        )
         self.reward_components[agent]["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
-        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=deputy, epsilon=0.01)
+        facing_chief_reward = r.facing_chief_reward(
+            chief=self.chief, deputy=deputy, epsilon=0.01
+        )
         self.reward_components[agent]["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
         # Sparse rewards
-        success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
-        if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=deputy) < self.crash_radius):
+        success_reward = r.weighted_inspection_success_reward(
+            chief=self.chief, total_weight=self.success_threshold
+        )
+        if (
+            success_reward > 0
+            and closest_fft_distance(chief=self.chief, deputy=deputy)
+            < self.crash_radius
+        ):
             success_reward = -1.0
         self.reward_components[agent]["success"] = success_reward
         reward += success_reward
 
-        crash_reward = r.crash_reward(chief=self.chief, deputy=deputy, crash_radius=self.crash_radius)
+        crash_reward = r.crash_reward(
+            chief=self.chief, deputy=deputy, crash_radius=self.crash_radius
+        )
         self.reward_components[agent]["crash"] = crash_reward
         reward += crash_reward
 
@@ -480,7 +526,10 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         oob = d > self.max_distance
         crash = d < self.crash_radius
         timeout = self.simulator.sim_time > self.max_time
-        all_inspected = self.chief.inspection_points.get_total_weight_inspected() >= self.success_threshold
+        all_inspected = (
+            self.chief.inspection_points.get_total_weight_inspected()
+            >= self.success_threshold
+        )
 
         # Update Status
         if crash:
@@ -533,7 +582,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
                     [1],  # facing cluster dot product
                 )
             ),
-            shape=(31, ),
+            shape=(31,),
             dtype=np.float64,
         )
 
@@ -544,7 +593,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         return gym.spaces.Box(
             np.array([-1, -1, -1, -0.001, -0.001, -0.001]),
             np.array([1, 1, 1, 0.001, 0.001, 0.001]),
-            shape=(6, ),
+            shape=(6,),
             dtype=np.float64,
         )
 

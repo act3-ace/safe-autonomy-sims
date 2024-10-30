@@ -261,6 +261,10 @@ class InspectionEnv(gym.Env):
     def step(
         self, action: typing.Any
     ) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
+        assert self.action_space.contains(
+            action
+        ), f"given action {action} is not contained in action space {self.action_space}"
+
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
         self.prev_num_inspected = (
@@ -321,10 +325,7 @@ class InspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {
-            "reward_components": self.reward_components,
-            "status": self.status
-        }
+        return {"reward_components": self.reward_components, "status": self.status}
 
     def _get_reward(self):
         reward = 0

@@ -18,7 +18,7 @@ def test_weighted_multi_inspection_env_terminates_on_inspection_threshold_met(mo
     env = WeightedMultiInspectionEnv()
     env.reset()
 
-    actions = {name: None for name, _ in env.deputies.items()}
+    actions = {name: env.action_space(name).sample() for name, _ in env.deputies.items()}
 
     # First step, the environment should not be terminated so we can tell what's causing
     # the environment to terminate on the next step
