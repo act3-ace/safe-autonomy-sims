@@ -172,6 +172,15 @@ class WeightedInspectionEnv(gym.Env):
 
     The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95.
 
+    ## Information
+
+    `step()` and `reset()` return a dict with the following keys:
+    * reward_components - a dict of reward component string names to their last computed float values.
+    * status - a string descirbing the status of the current episode.
+
+    Statuses for the episode are either "Running" or describe a unique terminal state. Terminal
+    states can be one of the following: "Success", "Crash", "Out of Bounds", "Timeout".
+
     ## References
 
     <a id="1">[1]</a>
@@ -256,6 +265,8 @@ class WeightedInspectionEnv(gym.Env):
         self.prev_state: dict[typing.Any, typing.Any] | None = None
         self.prev_num_inspected = 0
         self.prev_weight_inspected = 0.0
+        self.reward_components = {}
+        self.status = "Running"
 
         # Lazy initialized
         self.chief: sim.Target
@@ -319,9 +330,9 @@ class WeightedInspectionEnv(gym.Env):
         # Get info from simulator
         observation = self._get_obs()
         reward = self._get_reward()
-        info = self._get_info()
         terminated = self._get_terminated()
-        truncated = self.simulator.sim_time > self.max_time
+        truncated = self._get_truncated()
+        info = self._get_info()
         return observation, reward, terminated, truncated, info
 
     def _get_obs(self):
@@ -336,21 +347,33 @@ class WeightedInspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {}
+        return {
+            "reward_components": self.reward_components,
+            "status": self.status
+        }
 
     def _get_reward(self):
         reward = 0
 
         # Dense rewards
-        reward += r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
-        reward += r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        points_reward = r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
+        self.reward_components["observed_points"] = points_reward
+        reward += points_reward
+
+        delta_v_reward = r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        self.reward_components["delta_v"] = delta_v_reward
+        reward += delta_v_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
         if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=self.deputy) < self.crash_radius):
             success_reward = -1.0
+        self.reward_components["success"] = success_reward
         reward += success_reward
-        reward += r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
+
+        crash_reward = r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
+        self.reward_components["crash"] = crash_reward
+        reward += crash_reward
 
         return reward
 
@@ -362,12 +385,25 @@ class WeightedInspectionEnv(gym.Env):
         crash = d < self.crash_radius
         all_inspected = self.chief.inspection_points.get_total_weight_inspected() >= self.success_threshold
 
+        # Update Status
+        if crash:
+            self.status = "Crash"
+        elif all_inspected:
+            self.status = "Success"
+
         return crash or all_inspected
 
     def _get_truncated(self):
         d = rel_dist(pos1=self.chief.position, pos2=self.deputy.position)
         oob = d > self.max_distance
         timeout = self.simulator.sim_time > self.max_time
+
+        # Update Status
+        if oob:
+            self.status = "Out of Bounds"
+        elif timeout:
+            self.status = "Timeout"
+
         return oob or timeout
 
     @property

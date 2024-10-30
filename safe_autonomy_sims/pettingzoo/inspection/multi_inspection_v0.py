@@ -154,6 +154,15 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
     The episode is considered done and successful if and only if all 100 points have been inspected.
 
+    ## Information
+
+    `step()` and `reset()` return a dict with the following keys:
+    * reward_components - a dict of reward component string names to their last computed float values.
+    * status - a string descirbing the status of the current episode.
+
+    Statuses for the episode are either "Running" or describe a unique terminal state. Terminal
+    states can be one of the following: "Success", "Crash", "Out of Bounds", "Timeout".
+
     ## References
 
     <a id="1">[1]</a>
@@ -210,6 +219,8 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         # Episode level information
         self.prev_state = None
         self.prev_num_inspected = 0
+        self.reward_components = {a: {} for a in self.possible_agents}
+        self.status = {a: "Running" for a in self.possible_agents}
 
     def reset(
         self, seed: int | None = None, options: dict[str, typing.Any] | None = None
@@ -241,7 +252,6 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         # Get info from simulator
         observations = {a: self._get_obs(a) for a in self.agents}
         rewards = {a: self._get_reward(a) for a in self.agents}
-        infos = {a: self._get_info(a) for a in self.agents}
         terminations = {a: self._get_terminated(a) for a in self.agents}
         truncations = {
             a: False for a in self.agents
@@ -251,7 +261,10 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         if any(terminations.values() or any(truncations.values())):
             truncations = {a: True for a in self.agents}
             terminations = {a: True for a in self.agents}
+            infos = {a: self._get_info(a) for a in self.agents}
             self.agents = []
+        else:
+            infos = {a: self._get_info(a) for a in self.agents}
 
         return observations, rewards, terminations, truncations, infos
 
@@ -299,30 +312,44 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         return obs
 
     def _get_info(self, agent):
-        return {}
+        return {
+            "reward_components": self.reward_components[agent],
+            "status": self.status[agent]
+        }
 
     def _get_reward(self, agent):
         reward = 0
         deputy = self.deputies[agent]
 
         # Dense rewards
-        reward += r.observed_points_reward(
+        points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        reward += r.delta_v_reward(
+        self.reward_components[agent]["observed_points"] = points_reward
+        reward += points_reward
+
+        delta_v_reward = r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
+        self.reward_components[agent]["delta_v"] = delta_v_reward
+        reward += delta_v_reward
 
         # Sparse rewards
-        reward += r.inspection_success_reward(
+        success_reward = r.inspection_success_reward(
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        reward += r.crash_reward(
+        self.reward_components[agent]["success"] = success_reward
+        reward += success_reward
+
+        crash_reward = r.crash_reward(
             chief=self.chief,
             deputy=deputy,
             crash_radius=self.crash_radius,
         )
+        self.reward_components[agent]["crash"] = crash_reward
+        reward += crash_reward
+
         return reward
 
     def _get_terminated(self, agent):
@@ -339,6 +366,16 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             self.chief.inspection_points.get_num_points_inspected()
             == self.success_threshold
         )
+
+        # Update Status
+        if crash:
+            self.status[agent] = "Crash"
+        elif oob:
+            self.status[agent] = "Out of Bounds"
+        elif timeout:
+            self.status[agent] = "Timeout"
+        elif all_inspected:
+            self.status[agent] = "Success"
 
         return oob or crash or timeout or all_inspected
 

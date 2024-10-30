@@ -170,6 +170,15 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     The episode is considered done and successful if and only if the cumulative weight of inspected points exceeds 0.95.
 
+    ## Information
+
+    `step()` and `reset()` return a dict with the following keys:
+    * reward_components - a dict of reward component string names to their last computed float values.
+    * status - a string descirbing the status of the current episode.
+
+    Statuses for the episode are either "Running" or describe a unique terminal state. Terminal
+    states can be one of the following: "Success", "Crash", "Out of Bounds", "Timeout".
+
     ## References
 
     <a id="1">[1]</a>
@@ -231,6 +240,8 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.prev_state: dict[typing.Any, typing.Any] = {}
         self.prev_num_inspected = 0
         self.prev_weight_inspected = 0.0
+        self.reward_components = {a: {} for a in self.possible_agents}
+        self.status = {a: "Running" for a in self.possible_agents}
 
         # Lazy initialized items
         self.rng: np.random.Generator
@@ -302,7 +313,6 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         # Get info from simulator
         observations = {a: self._get_obs(a) for a in self.agents}
         rewards = {a: self._get_reward(a) for a in self.agents}
-        infos = {a: self._get_info(a) for a in self.agents}
         terminations = {a: self._get_terminated(a) for a in self.agents}
         truncations = {a: False for a in self.agents}  # used to signal episode ended unexpectedly
 
@@ -310,7 +320,10 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         if any(terminations.values()) or any(truncations.values()):
             truncations = {a: True for a in self.agents}
             terminations = {a: True for a in self.agents}
+            infos = {a: self._get_info(a) for a in self.agents}
             self.agents = []
+        else:
+            infos = {a: self._get_info(a) for a in self.agents}
 
         return observations, rewards, terminations, truncations, infos
 
@@ -327,25 +340,37 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict:
-        return {agent: None}
+        return {
+            "reward_components": self.reward_components[agent],
+            "status": self.status[agent]
+        }
 
     def _get_reward(self, agent: typing.Any) -> float:
         reward = 0.0
         deputy = self.deputies[agent]
 
         # Dense rewards
-        reward += r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
-        reward += r.delta_v_reward(
+        points_reward = r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
+        self.reward_components[agent]["observed_points"] = points_reward
+        reward += points_reward
+
+        delta_v_reward = r.delta_v_reward(
             v=deputy.velocity,
             prev_v=self.prev_state[agent][3:6],
         )
+        self.reward_components[agent]["delta_v"] = delta_v_reward
+        reward += delta_v_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
         if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=deputy) < self.crash_radius):
             success_reward = -1.0
+        self.reward_components[agent]["success"] = success_reward
         reward += success_reward
-        reward += r.crash_reward(chief=self.chief, deputy=deputy, crash_radius=self.crash_radius)
+
+        crash_reward = r.crash_reward(chief=self.chief, deputy=deputy, crash_radius=self.crash_radius)
+        self.reward_components[agent]["crash"] = crash_reward
+        reward += crash_reward
 
         return reward
 
@@ -360,7 +385,17 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         crash = d < self.crash_radius
         timeout = self.simulator.sim_time > self.max_time
         all_inspected = self.chief.inspection_points.get_total_weight_inspected() >= self.success_threshold
-
+        
+        # Update Status
+        if crash:
+            self.status[agent] = "Crash"
+        elif oob:
+            self.status[agent] = "Out of Bounds"
+        elif timeout:
+            self.status[agent] = "Timeout"
+        elif all_inspected:
+            self.status[agent] = "Success"
+        
         return oob or crash or timeout or all_inspected
 
     # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment

@@ -153,6 +153,15 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
     The episode is considered done and successful if and only if the agent maneuvers the deputy
     within the docking region while maintaining a safe velocity.
 
+    ## Information
+
+    `step()` and `reset()` return a dict with the following keys:
+    * reward_components - a dict of reward component string names to their last computed float values.
+    * status - a string descirbing the status of the current episode.
+
+    Statuses for the episode are either "Running" or describe a unique terminal state. Terminal
+    states can be one of the following: "Success", "Crash", "Out of Bounds", "Timeout", 
+    "Max Velocity Violation".
 
     ## References
 
@@ -180,6 +189,8 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         # Episode level information
         self.prev_state = None
         self.episode_v_violations = 0
+        self.reward_components = {a: {} for a in self.possible_agents}
+        self.status = {a: "Running" for a in self.possible_agents}
 
     def reset(
         self, seed: int | None = None, options: dict[str, typing.Any] | None = None
@@ -208,17 +219,18 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         # Get info from simulator
         observations = {a: self._get_obs(agent=a) for a in self.agents}
         rewards = {a: self._get_reward(agent=a) for a in self.agents}
-        infos = {a: self._get_info(agent=a) for a in self.agents}
         terminations = {a: self._get_terminated(agent=a) for a in self.agents}
         truncations = {
             a: False for a in self.agents
         }  # used to signal episode ended unexpectedly
-
         # End episode if any agent is terminated or truncated
         if any(terminations.values() or any(truncations.values())):
             truncations = {a: True for a in self.agents}
             terminations = {a: True for a in self.agents}
+            infos = {a: self._get_info(agent=a) for a in self.agents}
             self.agents = []
+        else:
+            infos = {a: self._get_info(agent=a) for a in self.agents}
 
         return observations, rewards, terminations, truncations, infos
 
@@ -259,32 +271,43 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         return obs
 
     def _get_info(self, agent: str) -> dict[str, typing.Any]:
-        return {}
+        return {
+            "reward_components": self.reward_components[agent],
+            "status": self.status[agent]
+        }
 
     def _get_reward(self, agent: str) -> float:
         reward = 0
         deputy = self.deputies[agent]
 
         # Dense rewards
-        reward += r.distance_pivot_reward(
+        dist_pivot_reward = r.distance_pivot_reward(
             rel_dist=utils.rel_dist(pos1=self.chief.position, pos2=deputy.position),
             rel_dist_prev=utils.rel_dist(
                 pos1=self.prev_state["chief"][0:3], pos2=self.prev_state[agent][0:3]
             ),
         )
-        reward += r.delta_v_reward(
+        self.reward_components[agent]["distance_pivot"] = dist_pivot_reward
+        reward += dist_pivot_reward
+
+        delta_v_reward = r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
-        reward += r.velocity_constraint_reward(
+        self.reward_components[agent]["delta_v"] = delta_v_reward
+        reward += delta_v_reward
+
+        vel_const_reward = r.velocity_constraint_reward(
             v1=deputy.velocity,
             v2=self.chief.velocity,
             v_limit=utils.v_limit(
                 chief_pos=self.chief.position, deputy_pos=deputy.position
             ),
         )
+        self.reward_components[agent]["velocity_constraint"] = vel_const_reward
+        reward += vel_const_reward
 
         # Sparse rewards
-        reward += r.docking_success_reward(
+        success_reward = r.docking_success_reward(
             chief=self.chief,
             deputy=deputy,
             t=self.simulator.sim_time,
@@ -294,8 +317,14 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
             docking_radius=self.docking_radius,
             max_time=self.max_time,
         )
-        reward += r.timeout_reward(t=self.simulator.sim_time, max_time=self.max_time)
-        reward += r.crash_reward(
+        self.reward_components[agent]["success"] = success_reward
+        reward += success_reward
+
+        timeout_reward = r.timeout_reward(t=self.simulator.sim_time, max_time=self.max_time)
+        self.reward_components[agent]["timeout"] = timeout_reward
+        reward += timeout_reward
+
+        crash_reward = r.crash_reward(
             chief=self.chief,
             deputy=deputy,
             vel_limit=utils.v_limit(
@@ -303,11 +332,17 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
             ),
             docking_radius=self.docking_radius,
         )
-        reward += r.out_of_bounds_reward(
+        self.reward_components[agent]["crash"] = crash_reward
+        reward += crash_reward
+
+        oob_reward = r.out_of_bounds_reward(
             chief_pos=self.chief.position,
             deputy_pos=deputy.position,
             max_distance=self.max_distance,
         )
+        self.reward_components[agent]["out_of_bounds"] = oob_reward
+        reward += oob_reward
+
         return reward
 
     def _get_terminated(self, agent: str) -> bool:
@@ -330,6 +365,18 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         max_v_violation = self.episode_v_violations > self.max_v_violation
         timeout = self.simulator.sim_time > self.max_time
         docked = in_docking and safe_v
+
+        # Update Status
+        if crash:
+            self.status[agent] = "Crash"
+        elif oob:
+            self.status[agent] = "Out of Bounds"
+        elif timeout:
+            self.status[agent] = "Timeout"
+        elif max_v_violation:
+            self.status[agent] = "Max Velocity Violation"
+        elif docked:
+            self.status[agent] = "Success"
 
         return oob or crash or max_v_violation or timeout or docked
 
