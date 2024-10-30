@@ -247,6 +247,15 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
     inspected points exceeds 0.95 while the deputy remains on a safe trajectory
     (not on a collision course with the chief).
 
+    ## Information
+
+    `step()` and `reset()` return a dict with the following keys:
+    * reward_components - a dict of reward component string names to their last computed float values.
+    * status - a string descirbing the status of the current episode.
+
+    Statuses for the episode are either "Running" or describe a unique terminal state. Terminal
+    states can be one of the following: "Success", "Crash", "Out of Bounds", "Timeout".
+
     ## References
 
     <a id="1">[1]</a>
