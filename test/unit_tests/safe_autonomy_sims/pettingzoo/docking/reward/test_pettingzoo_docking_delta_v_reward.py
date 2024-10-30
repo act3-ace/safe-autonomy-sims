@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import os
 from safe_autonomy_sims.pettingzoo.docking.reward import delta_v_reward
-from test.unit_tests.safe_autonomy_sims.conftest import delimiter, read_test_cases
+from test.conftest import delimiter, read_test_cases
 
 
 @pytest.fixture(name='prev_v')
