@@ -17,6 +17,7 @@ Author: John McCarroll
 
 import yaml
 import math
+from typing import Any
 import numpy as np
 from scipy.spatial.transform import Rotation
 from corl.dones.done_func_base import DoneStatusCodes
@@ -27,7 +28,7 @@ delimiter = ","
 
 
 # Define functions
-def wrap_angle(angle, max=np.pi):
+def wrap_angle(angle: float, max: float=np.pi):
     """
     Wraps angle between -pi and pi by default.
 
@@ -52,7 +53,7 @@ def wrap_angle(angle, max=np.pi):
     return angle
 
 
-def execute_strings(value):
+def execute_strings(value: str):
     """
     A recursive helper function to convert string expressions (read from a file) into numerical floats.
 
@@ -82,14 +83,18 @@ def execute_strings(value):
     return value
 
 
-def preprocess_values(value, keyword, functions):
+def preprocess_values(value: dict, keyword: Any, functions: dict):
     """
-    A recursive helper function to
+    A recursive helper function to process string values stored in dicts.
 
     Parameters
     ----------
-    value
-        A value to be converted or modified based on string format.
+    value: float or dict
+        A dict or numerical value
+    keyword: str
+        A keyword used to access a dict of functions
+    functions: dict
+        A dict of string function names
 
     Returns
     -------
@@ -114,7 +119,7 @@ def preprocess_values(value, keyword, functions):
     return value
 
 
-def read_test_cases(file_path, parameter_keywords):
+def read_test_cases(file_path: str, parameter_keywords: list):
     """
     A util function for parameterized tests which searches a YAML test case config file and constructs a list of
     positionally organized test cases.
