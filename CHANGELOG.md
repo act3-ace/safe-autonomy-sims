@@ -1,3 +1,10 @@
+## [4.2.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.2.0...v4.2.1) (2024-10-30)
+
+
+### Bug Fixes
+
+* **reward:** calculate d_v reward from absolute value ([cb26685](https://github.com/act3-ace/safe-autonomy-sims/commit/cb26685f620ac57d908868762e626e929813ab58)), closes [#28](https://github.com/act3-ace/safe-autonomy-sims/issues/28)
+
 # [4.2.0](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.1.5...v4.2.0) (2024-10-30)
 
 
