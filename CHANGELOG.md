@@ -1,3 +1,10 @@
+## [4.2.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.2.1...v4.2.2) (2024-10-31)
+
+
+### Bug Fixes
+
+* throw error on invalid actions passed to step  ([876b626](https://github.com/act3-ace/safe-autonomy-sims/commit/876b6260d8809155084fe0d6bf897b099b188305)), closes [#34](https://github.com/act3-ace/safe-autonomy-sims/issues/34)
+
 ## [4.2.1](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.2.0...v4.2.1) (2024-10-30)
 
 
