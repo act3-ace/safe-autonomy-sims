@@ -6,7 +6,12 @@ import gymnasium as gym
 import safe_autonomy_simulation
 from gymnasium import spaces
 import safe_autonomy_sims.gym.docking.reward as r
-from safe_autonomy_sims.gym.docking.utils import v_limit, rel_dist, rel_vel, polar_to_cartesian
+from safe_autonomy_sims.gym.docking.utils import (
+    v_limit,
+    rel_dist,
+    rel_vel,
+    polar_to_cartesian,
+)
 
 
 class DockingEnv(gym.Env):
@@ -213,6 +218,10 @@ class DockingEnv(gym.Env):
     def step(
         self, action: Any
     ) -> tuple[Any, SupportsFloat, bool, bool, dict[str, Any]]:
+        assert self.action_space.contains(
+            action
+        ), f"given action {action} is not contained in action space {self.action_space}"
+
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
 
@@ -244,7 +253,7 @@ class DockingEnv(gym.Env):
                 r=self.np_random.uniform(0, 0.8),
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
                 theta=self.np_random.uniform(0, 2 * np.pi),
-            )
+            ),
         )
         self.simulator = safe_autonomy_simulation.Simulator(
             frame_rate=1, entities=[self.chief, self.deputy]
@@ -261,10 +270,7 @@ class DockingEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {
-            "reward_components": self.reward_components,
-            "status": self.status
-        }
+        return {"reward_components": self.reward_components, "status": self.status}
 
     def _get_reward(self):
         reward = 0
@@ -276,7 +282,9 @@ class DockingEnv(gym.Env):
         self.reward_components["distance_pivot"] = dist_pivot_reward
         reward += dist_pivot_reward
 
-        delta_v_reward = r.delta_v_reward(state=self.sim_state, prev_state=self.prev_state)
+        delta_v_reward = r.delta_v_reward(
+            state=self.sim_state, prev_state=self.prev_state
+        )
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
@@ -297,7 +305,9 @@ class DockingEnv(gym.Env):
         self.reward_components["success"] = success_reward
         reward += success_reward
 
-        timeout_reward = r.timeout_reward(t=self.simulator.sim_time, max_time=self.max_time)
+        timeout_reward = r.timeout_reward(
+            t=self.simulator.sim_time, max_time=self.max_time
+        )
         self.reward_components["timeout"] = timeout_reward
         reward += timeout_reward
 

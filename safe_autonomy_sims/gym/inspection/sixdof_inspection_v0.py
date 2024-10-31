@@ -379,6 +379,10 @@ class WeightedSixDofInspectionEnv(gym.Env):
         return obs, info
 
     def step(self, action: typing.Any) -> tuple[typing.Any, typing.SupportsFloat, bool, bool, dict[str, typing.Any]]:
+        assert self.action_space.contains(
+            action
+        ), f"given action {action} is not contained in action space {self.action_space}"
+
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
         self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
