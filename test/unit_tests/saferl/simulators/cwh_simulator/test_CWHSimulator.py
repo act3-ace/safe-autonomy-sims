@@ -206,7 +206,6 @@ test_configs, IDs = read_test_cases(
 )
 def test_delete_platform(cut, name):
     """Tests the delete_platform method of the CWHSimulator"""
-
     cut.reset({})
     expected_sim_entity = cut.sim_platforms[name]._platform
     cut.delete_platform(name)
