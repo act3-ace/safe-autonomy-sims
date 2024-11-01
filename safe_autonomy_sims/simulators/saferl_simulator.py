@@ -421,3 +421,8 @@ class SafeRLSimulator(BaseSimulator):
 
     def _step_update_sim_statuses(self, step_size: float):
         """perform custom updates on derived simulation status properties"""
+
+    def delete_platform(self, name):
+        if name in self.sim_platforms:
+            del self.sim_platforms[name]
+            del self._state.sim_platforms[name]
