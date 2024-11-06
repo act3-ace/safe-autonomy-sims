@@ -4,7 +4,7 @@ import onnx # TODO: add onnx dependency
 import onnxruntime as ort # TODO: add dependency
 import numpy as np
 from safe_autonomy_sims.gym.docking.docking_v0 import DockingEnv
-from safe_autonomy_sims.gym.docking.utils import polar_to_cartesian
+from safe_autonomy_sims.simulators.initializers.cwh import Docking3DRadialInitializer
 import safe_autonomy_simulation
 import time
 import os
@@ -65,6 +65,23 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     vel_phi = initial_conditions['vel_phi']
     vel_theta = initial_conditions['vel_theta']
 
+    # Gym uses different initializer logic than default CoRL
+    config = {
+        "threshold_distance": 0.5,
+        "velocity_threshold": 0.2,
+        "mean_motion": 0.001027,
+        "slope": 2.0,
+    }
+    corl_initializer = Docking3DRadialInitializer(config)
+    initial_conditions_dict = corl_initializer.compute(
+        radius=pos_r,
+        azimuth_angle=pos_phi,
+        elevation_angle=pos_theta,
+        vel_max_ratio=vel_r,
+        vel_azimuth_angle=vel_phi,
+        vel_elevation_angle=vel_theta,
+    )
+
     class TestDockingEnv(DockingEnv):
         def _init_sim(self):
             # Initialize simulator with chief and deputy spacecraft
@@ -73,16 +90,8 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
             )
             self.deputy = safe_autonomy_simulation.sims.spacecraft.CWHSpacecraft(
                 name="deputy",
-                position=polar_to_cartesian(
-                    r=pos_r,
-                    phi=pos_phi,
-                    theta=pos_theta,
-                ),
-                velocity=polar_to_cartesian(
-                    r=vel_r,
-                    phi=vel_phi,
-                    theta=vel_theta,
-                )
+                position=initial_conditions_dict["position"],
+                velocity=initial_conditions_dict["velocity"]
             )
             self.simulator = safe_autonomy_simulation.Simulator(
                 frame_rate=1, entities=[self.chief, self.deputy]
@@ -118,7 +127,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
         agent = 'deputy'
         action = get_action(ort_sess_deputy, observations, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
-        print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
+        # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
         obs_array.append(observations)
         control_array.append(action)
         reward_components_array.append(infos['reward_components'])
