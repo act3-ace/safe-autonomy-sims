@@ -6,7 +6,7 @@ from pathlib import Path
 # set up
 task_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/translational-inspection/task.yml"
 checkpoint_path = "/tmp/safe-autonomy-sims/output/tune/TRANSLATIONAL-INSPECTION/TRANSLATIONAL-INSPECTION-test-PPO_CorlMultiAgentEnv_802f6_00000_0_2024-11-06_13-46-57/checkpoint_000000"
-output_path = "/tmp/safe-autonomy-sims/inspection_v0_validation_testing"
+output_path = "/tmp/safe-autonomy-sims/inspection_v0_validation_testing_r"
 # experiment_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/docking/experiment.yml"
 experiment_config_path = Path("/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/translational-inspection/experiment.yml")
 # experiment_config_path = "configs/docking/experiment.yml"
@@ -15,6 +15,7 @@ platform_serializer_class = SerializeCWH3D
 test_case_manager_config = None
 rl_algorithm_name = None
 num_workers= 1
+
 
 # execute eval episode
 evaluate(

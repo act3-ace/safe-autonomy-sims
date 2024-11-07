@@ -5,9 +5,6 @@ import onnxruntime as ort # TODO: add dependency
 import numpy as np
 from safe_autonomy_sims.gym.inspection.inspection_v0 import InspectionEnv
 import safe_autonomy_simulation.sims.inspection as sim
-import safe_autonomy_sims.gym.inspection.utils as utils
-
-from safe_autonomy_sims.rta.rta_rejection_sampler import RejectionSampler, RejectionSamplerInitializer
 from safe_autonomy_sims.simulators.initializers.cwh import CWH3DRadialWithSunInitializer
 import time
 import os
@@ -75,7 +72,6 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
         vel_elevation_angle=initial_conditions["vel_elevation_angle"],
         sun_angle=initial_conditions["sun_angle"],
     )
-    print(initial_conditions_dict)
 
     class TestInspectionEnv(InspectionEnv):
         def _init_sim(self):
@@ -103,8 +99,13 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Norms used with CoRL
     input_norms = {
-        'deputy': np.array([1.0000e+02, 1.0000e+02, 1.0000e+02, 0.5000e+00, 0.5000e+00,
-            0.5000e+00, 1.0000e+02, 1.0000e+00, 1.0e+0, 1.0e+0, 1.0e+0]),
+        'deputy': np.array([
+            1.0000e+02, 1.0000e+02, 1.0000e+02, # position
+            0.5000e+00, 0.5000e+00, 0.5000e+00, # velocity
+            1.0000e+02, # points
+            1.0000e+00, 1.0e+0, 1.0e+0, # uninspected points
+            1.0e+0 # sun angle
+            ]),
     }
     output_norms = {
         'deputy': np.array([1., 1., 1.], dtype=np.float32),
@@ -118,6 +119,8 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Reset env
     observations, infos = env.reset()
+    corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6]
+    reordered_obs = observations[corl_obs_order] # first obs not recording in CoRL's EpisodeArtifact
     termination = False
     truncation = False
     obs_array = []
@@ -128,10 +131,12 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     while not termination and not truncation:
         st = time.time()
         agent = 'deputy'
-        action = get_action(ort_sess_deputy, observations, input_norms[agent], output_norms[agent])
+        action = get_action(ort_sess_deputy, reordered_obs, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
+        # handle obs element order mismatch
+        reordered_obs = observations[corl_obs_order]
         # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
-        obs_array.append(observations)
+        obs_array.append(reordered_obs)
         control_array.append(action)
         reward_components_array.append(infos['reward_components'])
 
@@ -148,11 +153,11 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     # check values
     for i, corl_step_action in enumerate(corl_actions):
         print(i)
-        assert np.allclose(corl_step_action, control_array[i], rtol=1e-02, atol=1e-08)
+        assert np.allclose(corl_step_action, control_array[i], rtol=1e-04, atol=1e-08)
 
     for i, corl_step_obs in enumerate(corl_obs):
         print(i)
-        assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-04, atol=1e-08)
+        assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-05, atol=1e-08)
 
     # for i, corl_step_rewards in enumerate(corl_rewards):
     #     # reward components are different*
