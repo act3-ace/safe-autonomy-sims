@@ -4,7 +4,7 @@ import numpy as np
 
 # set up
 # episode_artifact_path = "/tmp/safe-autonomy-sims/docking_validation_testing/test_case_0/2024-11-05_20-42-31_episode_artifact.pkl"
-episode_artifact_path = "/tmp/safe-autonomy-sims/MULTIAGENT-DOCKING_validation_testing/test_case_0/2024-11-08_08-20-27_episode_artifact.pkl"
+episode_artifact_path = "/tmp/safe-autonomy-sims/MULTIAGENT-DOCKING_validation_testing/test_case_0/2024-11-12_14-22-03_episode_artifact.pkl"
 
 # open
 with open(episode_artifact_path, 'rb') as file:
