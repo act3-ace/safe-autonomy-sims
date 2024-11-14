@@ -78,9 +78,10 @@ def convert_policies_to_onnx(
 if __name__ == "__main__":
     # pylint:disable=line-too-long
     # chkpt_path = "/tmp/safe-autonomy-sims/output/tune/DOCKING/DOCKING-PPO_CorlMultiAgentEnv_3f697_00000_0_2024-10-30_16-33-40/checkpoint_000000"
-    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/WEIGHTED-TRANSLATIONAL-INSPECTION/WEIGHTED-TRANSLATIONAL-INSPECTION-test-PPO_CorlMultiAgentEnv_bea00_00000_0_2024-11-07_13-04-34/checkpoint_000000"
-
+    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/MULTIAGENT-TRANSLATIONAL-INSPECTION/MULTIAGENT-TRANSLATIONAL-INSPECTION-test-PPO_CorlMultiAgentEnv_2317b_00000_0_2024-11-14_13-56-20/checkpoint_000000"
+    # policies = "/tmp/safe-autonomy-sims/output/tune/MULTIAGENT-TRANSLATIONAL-INSPECTION/MULTIAGENT-TRANSLATIONAL-INSPECTION-test-PPO_CorlMultiAgentEnv_2317b_00000_0_2024-11-14_13-56-20/checkpoint_000000/policies/{}/policy_state.pkl"
     args = parse_corl_args()
     experiment_class, experiment_file_validated = build_experiment(args) # calls register envs
 
-    rllib_chkpt_to_onnx(chkpt_path)
+    rllib_chkpt_to_onnx(chkpt_path, output_folder= "./onnx_model_2", policy_id="blue2_ctrl")
+    # convert_policies_to_onnx(policy_dir=policies, dest_dir="./onnx_models")
