@@ -8,7 +8,8 @@ import numpy as np
 # episode_artifact_path = "/tmp/safe-autonomy-sims/inspection_v0_validation_testing_r/test_case_0/2024-11-06_18-33-44_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_inspection_v0_validation_testing/test_case_0/2024-11-07_16-56-51_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing/test_case_0/2024-11-13_17-15-42_episode_artifact.pkl"
-episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing_2/test_case_0/2024-11-14_14-22-00_episode_artifact.pkl"
+# episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing_2/test_case_0/2024-11-14_14-22-00_episode_artifact.pkl"
+episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_weighted_translational_inspection_v0_validation_testing/test_case_0/2024-11-15_14-58-58_episode_artifact.pkl"
 
 # open
 with open(episode_artifact_path, 'rb') as file:
@@ -55,6 +56,7 @@ corl_episode_info["IC"] = ea.initial_state
 #     rew_dict = step_info.agents['blue0_ctrl'].rewards
 #     corl_episode_info["rewards"].append(rew_dict)
 
+
 # # inspection_v0 env data collection
 # for step_info in ea.steps:
 #     # Collect obs
@@ -80,6 +82,7 @@ corl_episode_info["IC"] = ea.initial_state
 #     # Collect rewards
 #     rew_dict = step_info.agents['blue0_ctrl'].rewards
 #     corl_episode_info["rewards"].append(rew_dict)
+
 
 # # weighted inspection v0
 # for step_info in ea.steps:
@@ -109,6 +112,96 @@ corl_episode_info["IC"] = ea.initial_state
 #     rew_dict = step_info.agents['blue0_ctrl'].rewards
 #     corl_episode_info["rewards"].append(rew_dict)
 
+
+# # multiagent inspection v0
+# for step_info in ea.steps:
+#     # Collect obs
+#     obs0_dict = step_info.agents['blue0_ctrl'].observations
+#     if obs0_dict:
+#         position = obs0_dict["Obs_Sensor_Position"]["direct_observation"].value
+#         velocity = obs0_dict["Obs_Sensor_Velocity"]["direct_observation"].value
+#         points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+#         uninspected_points = obs0_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
+#         sun_angle = obs0_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
+
+#         obs0 = np.concatenate((position, velocity, points, uninspected_points, sun_angle))
+#     else:
+#         obs0 = None
+#     corl_episode_info["obs0"].append(obs0)
+
+#     obs1_dict = step_info.agents['blue1_ctrl'].observations
+#     if obs1_dict:
+#         position = obs1_dict["Obs_Sensor_Position"]["direct_observation"].value
+#         velocity = obs1_dict["Obs_Sensor_Velocity"]["direct_observation"].value
+#         points = obs1_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+#         uninspected_points = obs1_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
+#         sun_angle = obs1_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
+
+#         obs1 = np.concatenate((position, velocity, points, uninspected_points, sun_angle))
+#     else:
+#         obs1 = None
+#     corl_episode_info["obs1"].append(obs1)
+
+#     obs2_dict = step_info.agents['blue2_ctrl'].observations
+#     if obs2_dict:
+#         position = obs2_dict["Obs_Sensor_Position"]["direct_observation"].value
+#         velocity = obs2_dict["Obs_Sensor_Velocity"]["direct_observation"].value
+#         points = obs2_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+#         uninspected_points = obs2_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
+#         sun_angle = obs2_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
+
+#         obs2 = np.concatenate((position, velocity, points, uninspected_points, sun_angle))
+#     else:
+#         obs2 = None
+#     corl_episode_info["obs2"].append(obs2)
+
+#     # Collect actions
+#     actions0_dict = step_info.agents['blue0_ctrl'].actions
+#     if actions0_dict:
+#         x_thrust = actions0_dict["RTAModule.x_thrust"]
+#         y_thrust = actions0_dict["RTAModule.y_thrust"]
+#         z_thrust = actions0_dict["RTAModule.z_thrust"]
+
+#         actions0 = np.concatenate((x_thrust, y_thrust, z_thrust))
+#     else:
+#         actions0 = None
+#     corl_episode_info["actions0"].append(actions0)
+
+#     actions1_dict = step_info.agents['blue1_ctrl'].actions
+#     if actions1_dict:
+#         x_thrust = actions1_dict["RTAModule.x_thrust"]
+#         y_thrust = actions1_dict["RTAModule.y_thrust"]
+#         z_thrust = actions1_dict["RTAModule.z_thrust"]
+
+#         actions1 = np.concatenate((x_thrust, y_thrust, z_thrust))
+#     else:
+#         actions1 = None
+#     corl_episode_info["actions1"].append(actions1)
+
+#     actions2_dict = step_info.agents['blue2_ctrl'].actions
+#     if actions2_dict:
+#         x_thrust = actions2_dict["RTAModule.x_thrust"]
+#         y_thrust = actions2_dict["RTAModule.y_thrust"]
+#         z_thrust = actions2_dict["RTAModule.z_thrust"]
+
+#         actions2 = np.concatenate((x_thrust, y_thrust, z_thrust))
+#     else:
+#         actions2 = None
+#     corl_episode_info["actions2"].append(actions2)
+
+#     # Collect rewards
+#     rew0_dict = step_info.agents['blue0_ctrl'].rewards
+#     corl_episode_info["rewards0"].append(rew0_dict)
+
+#     # Collect rewards
+#     rew1_dict = step_info.agents['blue1_ctrl'].rewards
+#     corl_episode_info["rewards1"].append(rew1_dict)
+
+#     # Collect rewards
+#     rew2_dict = step_info.agents['blue2_ctrl'].rewards
+#     corl_episode_info["rewards2"].append(rew2_dict)
+
+
 # multiagent inspection v0
 for step_info in ea.steps:
     # Collect obs
@@ -119,8 +212,10 @@ for step_info in ea.steps:
         points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
         uninspected_points = obs0_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
         sun_angle = obs0_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
+        priority_vec = obs0_dict["Obs_Sensor_PriorityVector"]["direct_observation"].value
+        points_score = obs0_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
 
-        obs0 = np.concatenate((position, velocity, points, uninspected_points, sun_angle))
+        obs0 = np.concatenate((position, velocity, points, uninspected_points, sun_angle, priority_vec, points_score))
     else:
         obs0 = None
     corl_episode_info["obs0"].append(obs0)
@@ -132,8 +227,10 @@ for step_info in ea.steps:
         points = obs1_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
         uninspected_points = obs1_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
         sun_angle = obs1_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
+        priority_vec = obs1_dict["Obs_Sensor_PriorityVector"]["direct_observation"].value
+        points_score = obs1_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
 
-        obs1 = np.concatenate((position, velocity, points, uninspected_points, sun_angle))
+        obs1 = np.concatenate((position, velocity, points, uninspected_points, sun_angle, priority_vec, points_score))
     else:
         obs1 = None
     corl_episode_info["obs1"].append(obs1)
@@ -145,11 +242,14 @@ for step_info in ea.steps:
         points = obs2_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
         uninspected_points = obs2_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
         sun_angle = obs2_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
+        priority_vec = obs2_dict["Obs_Sensor_PriorityVector"]["direct_observation"].value
+        points_score = obs2_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
 
-        obs2 = np.concatenate((position, velocity, points, uninspected_points, sun_angle))
+        obs2 = np.concatenate((position, velocity, points, uninspected_points, sun_angle, priority_vec, points_score))
     else:
         obs2 = None
     corl_episode_info["obs2"].append(obs2)
+
 
     # Collect actions
     actions0_dict = step_info.agents['blue0_ctrl'].actions
@@ -185,6 +285,7 @@ for step_info in ea.steps:
         actions2 = None
     corl_episode_info["actions2"].append(actions2)
 
+
     # Collect rewards
     rew0_dict = step_info.agents['blue0_ctrl'].rewards
     corl_episode_info["rewards0"].append(rew0_dict)
@@ -198,8 +299,7 @@ for step_info in ea.steps:
     corl_episode_info["rewards2"].append(rew2_dict)
 
 
-
 # store dict in pickle for test for now
-with open('multiagent_inspection_v0_episode_data.pkl', 'wb') as file:
+with open('multiagent_weighted_inspection_v0_episode_data.pkl', 'wb') as file:
     pickle.dump(corl_episode_info, file)
 

@@ -134,8 +134,6 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     observations, infos = env.reset()
     corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6, 11, 12, 13, 14]
     reordered_obs = observations[corl_obs_order] # first obs not recording in CoRL's EpisodeArtifact
-    print("FIRST")
-    print(reordered_obs)
     termination = False
     truncation = False
     obs_array = []
