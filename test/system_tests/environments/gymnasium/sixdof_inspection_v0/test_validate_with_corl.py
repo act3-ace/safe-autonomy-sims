@@ -3,10 +3,9 @@ import pickle
 import onnx # TODO: add onnx dependency
 import onnxruntime as ort # TODO: add dependency
 import numpy as np
-from safe_autonomy_sims.gym.inspection.weighted_inspection_v0 import WeightedInspectionEnv
+from safe_autonomy_sims.gym.inspection.sixdof_inspection_v0 import WeightedSixDofInspectionEnv
 import safe_autonomy_simulation.sims.inspection as sim
 from safe_autonomy_sims.simulators.initializers.cwh import CWH3DRadialWithSunInitializer
-import time
 import os
 
 
@@ -81,7 +80,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     init_priority_vector[1] = np.sin(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
     init_priority_vector[2] = np.sin(initial_conditions["priority_vector_elevation_angle"])
 
-    class TestWeightedInspectionEnv(WeightedInspectionEnv):
+    class TestWeightedSixDofInspectionEnv(WeightedSixDofInspectionEnv):
         def _init_sim(self):
             # Initialize spacecraft, sun, and simulator
             priority_vector = init_priority_vector
@@ -106,7 +105,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
                 targets=[self.chief],
                 sun=self.sun,
             )
-    env = TestWeightedInspectionEnv()
+    env = TestWeightedSixDofInspectionEnv()
 
     # Norms used with CoRL
     input_norms = {
@@ -142,13 +141,11 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Continue until done
     while not termination and not truncation:
-        # st = time.time()
         agent = 'deputy'
         action = get_action(ort_sess_deputy, reordered_obs, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
         # handle obs element order mismatch
         reordered_obs = observations[corl_obs_order]
-        # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
         obs_array.append(reordered_obs)
         control_array.append(action)
         reward_components_array.append(infos['reward_components'])
