@@ -78,8 +78,8 @@ def convert_policies_to_onnx(
 if __name__ == "__main__":
     # pylint:disable=line-too-long
     # chkpt_path = "/tmp/safe-autonomy-sims/output/tune/DOCKING/DOCKING-PPO_CorlMultiAgentEnv_3f697_00000_0_2024-10-30_16-33-40/checkpoint_000000"
-    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/MULTIAGENT-WEIGHTED-TRANSLATIONAL-INSPECTION/MULTIAGENT-WEIGHTED-TRANSLATIONAL-INSPECTION-test-PPO_CorlMultiAgentEnv_8cd7b_00000_0_2024-11-14_17-34-03/checkpoint_000000"
-    
+    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/MULTIAGENT-SIX-DOF-INSPECTION/MULTIAGENT-SIX-DOF-INSPECTION-test-PPO_CorlMultiAgentEnv_7a358_00000_0_2024-11-15_16-27-55/checkpoint_000000"
+
     args = parse_corl_args()
     experiment_class, experiment_file_validated = build_experiment(args) # calls register envs
 
