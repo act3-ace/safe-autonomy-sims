@@ -4,11 +4,11 @@ from safe_autonomy_sims.evaluation.launch.serialize_cwh3d import SerializeCWH3D
 from pathlib import Path
 
 # set up
-task_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/multiagent-weighted-six-dof-inspection/task.yml"
-checkpoint_path = "/tmp/safe-autonomy-sims/output/tune/MULTIAGENT-SIX-DOF-INSPECTION/MULTIAGENT-SIX-DOF-INSPECTION-test-PPO_CorlMultiAgentEnv_7a358_00000_0_2024-11-15_16-27-55/checkpoint_000000"
-output_path = "/tmp/safe-autonomy-sims/multiagent_weighted_six_dof_inspection_v0_validation_testing"
+task_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/weighted-six-dof-inspection/task.yml"
+checkpoint_path = "/tmp/safe-autonomy-sims/output/tune/SIX-DOF-INSPECTION/SIX-DOF-INSPECTION-test-PPO_CorlMultiAgentEnv_7acd9_00000_0_2024-11-18_14-37-00/checkpoint_000000"
+output_path = "/tmp/safe-autonomy-sims/weighted_six_dof_inspection_v0_validation_testing"
 # experiment_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/docking/experiment.yml"
-experiment_config_path = Path("/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/multiagent-weighted-six-dof-inspection/experiment.yml")
+experiment_config_path = Path("/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/weighted-six-dof-inspection/experiment.yml")
 # experiment_config_path = "configs/docking/experiment.yml"
 launch_dir_of_experiment = "/home/john/AFRL/test_initiative/safe-autonomy-sims"
 platform_serializer_class = SerializeCWH3D
