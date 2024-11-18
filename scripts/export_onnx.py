@@ -83,5 +83,8 @@ if __name__ == "__main__":
     args = parse_corl_args()
     experiment_class, experiment_file_validated = build_experiment(args) # calls register envs
 
+    # for agent in ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]:
+    #     rllib_chkpt_to_onnx(chkpt_path, output_folder=f"test/system_tests/environments/pettingzoo/multidocking_v0/models/{agent}", policy_id=agent)
+    
     rllib_chkpt_to_onnx(chkpt_path, output_folder= "./onnx_model", policy_id="blue0_ctrl")
-    # convert_policies_to_onnx(policy_dir=policies, dest_dir="./onnx_models")
+    

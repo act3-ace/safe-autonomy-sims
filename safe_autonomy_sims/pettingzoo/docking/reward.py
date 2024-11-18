@@ -86,7 +86,7 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     return r
 
 
-def velocity_constraint_reward(v1: np.ndarray, v2: np.ndarray, v_limit: float):
+def velocity_constraint_reward(v1: np.ndarray, v2: np.ndarray, v_limit: float, scale=-0.01, bias=-0.01):
     """A dense reward that punishes the deputy
     for violating a distance-based velocity constraint.
 
@@ -111,7 +111,10 @@ def velocity_constraint_reward(v1: np.ndarray, v2: np.ndarray, v_limit: float):
     float
         reward value
     """
-    r = min(-(utils.rel_vel(vel1=v1, vel2=v2) - v_limit), 0)
+    if utils.rel_vel(vel1=v1, vel2=v2) > v_limit:
+        r = scale * (utils.rel_vel(vel1=v1, vel2=v2) - v_limit) + bias
+    else:
+        r = 0.
     return r
 
 
