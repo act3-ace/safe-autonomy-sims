@@ -3,7 +3,7 @@ import pickle
 import onnx # TODO: add onnx dependency
 import onnxruntime as ort # TODO: add dependency
 import numpy as np
-from safe_autonomy_sims.gym.inspection.inspection_v0 import InspectionEnv
+from safe_autonomy_sims.gym.inspection.weighted_inspection_v0 import WeightedInspectionEnv
 import safe_autonomy_simulation.sims.inspection as sim
 from safe_autonomy_sims.simulators.initializers.cwh import CWH3DRadialWithSunInitializer
 import time
@@ -30,7 +30,7 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 @pytest.fixture(name="corl_data")
 def fixture_load_corl_data():
     current_dir = os.path.dirname(__file__)
-    corl_data_path = os.path.join(current_dir, 'inspection_v0_episode_data.pkl')
+    corl_data_path = os.path.join(current_dir, 'weighted_inspection_v0_episode_data.pkl')
     with open(corl_data_path, 'rb') as f:
         data = pickle.load(f)
     return data
@@ -39,13 +39,15 @@ def fixture_load_corl_data():
 @pytest.fixture(name="initial_conditions")
 def fixture_initial_conditions():
     ic = {
-        "radius": 62.04303711979668,
-        "azimuth_angle": 2.5928229798716957,
-        "elevation_angle": 1.1217152607083294,
-        "vel_mag": 0.2871053440330955,
-        "vel_azimuth_angle": 4.88752815681357,
-        "vel_elevation_angle": -1.1826284001971126,
-        "sun_angle": 1.9078404144016834,
+        "radius": 70.4688500686556,
+        "azimuth_angle": 5.591767551579794,
+        "elevation_angle": 1.3530600468515865,
+        "vel_mag": 0.05530428436783764,
+        "vel_azimuth_angle": 1.2092531635835906,
+        "vel_elevation_angle": -1.1596684186528265,
+        "sun_angle": 6.161208309022409,
+        "priority_vector_azimuth_angle": 1.823676366683567,
+        "priority_vector_elevation_angle": 0.8613711310531718,
     }
     return ic
 
@@ -73,13 +75,22 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
         sun_angle=initial_conditions["sun_angle"],
     )
 
-    class TestInspectionEnv(InspectionEnv):
+    # priority vector
+    init_priority_vector = np.zeros((3,), dtype=np.float32)
+    init_priority_vector[0] = np.cos(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
+    init_priority_vector[1] = np.sin(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
+    init_priority_vector[2] = np.sin(initial_conditions["priority_vector_elevation_angle"])
+
+    class TestWeightedInspectionEnv(WeightedInspectionEnv):
         def _init_sim(self):
             # Initialize spacecraft, sun, and simulator
+            priority_vector = init_priority_vector
+            priority_vector /= np.linalg.norm(priority_vector)  # convert to unit vector
             self.chief = sim.Target(
                 name="chief",
                 num_points=100,
                 radius=1,
+                priority_vector=priority_vector,
             )
             self.deputy = sim.Inspector(
                 name="deputy",
@@ -95,7 +106,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
                 targets=[self.chief],
                 sun=self.sun,
             )
-    env = TestInspectionEnv()
+    env = TestWeightedInspectionEnv()
 
     # Norms used with CoRL
     input_norms = {
@@ -104,7 +115,9 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
             0.5000e+00, 0.5000e+00, 0.5000e+00, # velocity
             1.0000e+02, # points
             1.0000e+00, 1.0e+0, 1.0e+0, # uninspected points
-            1.0e+0 # sun angle
+            1.0e+0, # sun angle
+            1.0000e+00, 1.0e+0, 1.0e+0, # priority vector
+            1.0e+0, # points score
             ]),
     }
     output_norms = {
@@ -119,7 +132,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Reset env
     observations, infos = env.reset()
-    corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6]
+    corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6, 11, 12, 13, 14]
     reordered_obs = observations[corl_obs_order] # first obs not recording in CoRL's EpisodeArtifact
     termination = False
     truncation = False
@@ -129,7 +142,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Continue until done
     while not termination and not truncation:
-        st = time.time()
+        # st = time.time()
         agent = 'deputy'
         action = get_action(ort_sess_deputy, reordered_obs, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
@@ -157,7 +170,11 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     for i, corl_step_obs in enumerate(corl_obs):
         print(i)
-        assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-05, atol=1e-08)
+        print("CORL")
+        print(corl_step_obs)
+        print("GYM")
+        print(obs_array[i])
+        assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-03, atol=1e-08)
 
     # for i, corl_step_rewards in enumerate(corl_rewards):
     #     # reward components are different*

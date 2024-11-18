@@ -78,10 +78,13 @@ def convert_policies_to_onnx(
 if __name__ == "__main__":
     # pylint:disable=line-too-long
     # chkpt_path = "/tmp/safe-autonomy-sims/output/tune/DOCKING/DOCKING-PPO_CorlMultiAgentEnv_3f697_00000_0_2024-10-30_16-33-40/checkpoint_000000"
-    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/MULTIAGENT-DOCKING/MULTIAGENT-DOCKING-PPO_CorlMultiAgentEnv_30368_00000_0_2024-11-12_14-20-33/checkpoint_000000"
+    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/SIX-DOF-INSPECTION/SIX-DOF-INSPECTION-test-PPO_CorlMultiAgentEnv_7acd9_00000_0_2024-11-18_14-37-00/checkpoint_000000"
 
     args = parse_corl_args()
     experiment_class, experiment_file_validated = build_experiment(args) # calls register envs
 
-    for agent in ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]:
-        rllib_chkpt_to_onnx(chkpt_path, output_folder=f"test/system_tests/environments/pettingzoo/multidocking_v0/models/{agent}", policy_id=agent)
+    # for agent in ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]:
+    #     rllib_chkpt_to_onnx(chkpt_path, output_folder=f"test/system_tests/environments/pettingzoo/multidocking_v0/models/{agent}", policy_id=agent)
+    
+    rllib_chkpt_to_onnx(chkpt_path, output_folder= "./onnx_model", policy_id="blue0_ctrl")
+    

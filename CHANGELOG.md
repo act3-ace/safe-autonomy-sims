@@ -1,3 +1,10 @@
+## [4.2.3](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.2.2...v4.2.3) (2024-11-13)
+
+
+### Bug Fixes
+
+* **corl:** update torch version expected by corl package ([becef2f](https://github.com/act3-ace/safe-autonomy-sims/commit/becef2ffce92b13acf0a75dad90d4129446823a2))
+
 ## [4.2.2](https://github.com/act3-ace/safe-autonomy-sims/compare/v4.2.1...v4.2.2) (2024-10-31)
 
 
