@@ -41,7 +41,8 @@ def fixture_onnx_model_path():
     return path
 
 
-def test_validate_docking_gym_with_corl(corl_data, onnx_model_path):
+@pytest.mark.integration
+def test_validate_multiagent_docking_pettingzoo_with_corl(corl_data, onnx_model_path):
     # Dynamic env class definition to insert initial conditions
     deputies = [f"deputy_{i}" for i in range(3)]
     models = ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]

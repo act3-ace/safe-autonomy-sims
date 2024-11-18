@@ -56,7 +56,8 @@ def fixture_initial_conditions():
     return ic
 
 
-def test_validate_docking_gym_with_corl(corl_data, onnx_model_path, initial_conditions):
+@pytest.mark.integration
+def test_validate_multiagent_weighted_inspection_pettingzoo_with_corl(corl_data, onnx_model_path, initial_conditions):
     # Dynamic env class definition to insert initial conditions
     deputies = [f"deputy_{i}" for i in range(3)]
     models = ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]

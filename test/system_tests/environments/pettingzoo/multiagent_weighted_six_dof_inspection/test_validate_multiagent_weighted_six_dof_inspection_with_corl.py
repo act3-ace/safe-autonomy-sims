@@ -3,9 +3,10 @@ import pickle
 import onnx # TODO: add onnx dependency
 import onnxruntime as ort # TODO: add dependency
 import numpy as np
-from safe_autonomy_sims.pettingzoo.inspection.multi_inspection_v0 import MultiInspectionEnv
+from safe_autonomy_sims.pettingzoo.inspection.sixdof_multi_inspection_v0 import WeightedSixDofMultiInspectionEnv
 import os
 import safe_autonomy_simulation.sims.inspection as sim
+import typing
 
 
 # Get action from onnx trained with CoRL
@@ -27,7 +28,7 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 @pytest.fixture(name="corl_data")
 def fixture_load_corl_data():
     current_dir = os.path.dirname(__file__)
-    corl_data_path = os.path.join(current_dir, 'multiagent_inspection_v0_episode_data.pkl')
+    corl_data_path = os.path.join(current_dir, 'multiagent_weighted_six_dof_inspection_v0_episode_data.pkl')
     with open(corl_data_path, 'rb') as f:
         data = pickle.load(f)
     return data
@@ -43,56 +44,93 @@ def fixture_onnx_model_path():
 @pytest.fixture(name="initial_conditions")
 def fixture_initial_conditions():
     ic = {
-        'sun_angle': 1.424975716637098,
-        'blue0_position': np.array([-12.6520983,   1.842438, -32.60466323]),
-        'blue0_velocity': np.array([-0.05525816, -0.16368131, -0.07830456]),
-        'blue1_position': np.array([-15.54117335,   2.26315411,  35.33016436]),
-        'blue1_velocity': np.array([-0.07330804, -0.21714724,  0.06216107]),
-        'blue2_position': np.array([-29.18383274,   4.24984071, -24.75601503]),
-        'blue2_velocity': np.array([-0.03754564, -0.11121469, -0.12248139]),
+        'sun_angle': 4.638011137123597,
+        'priority_vector_azimuth_angle': 1.740797543236975,
+        'priority_vector_elevation_angle': -0.2916098416406021,
+
+        'blue0_position': np.array([11.430147336766295, 63.568910155357834, 11.31895934084295]),
+        'blue0_velocity': np.array([0.00230551198121581, -0.014048140092895723, 0.23191365557839458]),
+        "blue0_orientation": np.array([0.4233210003451737, -0.7388380026969613, -0.5009630219073203, -0.15477011054790946]),
+        "blue0_angular_velocity": np.array([-0.009014330025620028, -0.007101284824735656, 0.007311050038821246]),
+
+        'blue1_position': np.array([-29.31479904751045, 37.155355533746715, -47.12654798021313]),
+        'blue1_velocity': np.array([-0.0013852601336736417, -0.003318044554698742, 0.0031932885738289543]),
+        "blue1_orientation": np.array([-0.570304110280664, -0.2745528102660915, -0.3039263890786014, -0.7120412391102178]),
+        "blue1_angular_velocity": np.array([-0.0047554460525149975, -0.0033270346650434955, 0.007147049058518156]),
+
+        'blue2_position': np.array([-73.41978911241524, 18.715397760419425, 51.90245238760071]),
+        'blue2_velocity': np.array([-0.12398404379534131, -0.17514801489112783, -0.07716526666833894]),
+        "blue2_orientation": np.array([0.26399990092713393, 0.289352611427717, 0.9144111207026154, 0.10213432775424303]),
+        "blue2_angular_velocity": np.array([-0.005104106532254922, 0.0006993988875818591, -0.0012258391469860408]),
     }
     return ic
 
 
-def test_validate_docking_gym_with_corl(corl_data, onnx_model_path, initial_conditions):
+@pytest.mark.integration
+def test_validate_multiagent_six_dof_inspection_pettingzoo_with_corl(corl_data, onnx_model_path, initial_conditions):
     # Dynamic env class definition to insert initial conditions
     deputies = [f"deputy_{i}" for i in range(3)]
     models = ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]
 
-    class TestMultiInspectionEnv(MultiInspectionEnv):
+    # priority vector
+    init_priority_vector = np.zeros((3,), dtype=np.float32)
+    init_priority_vector[0] = np.cos(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
+    init_priority_vector[1] = np.sin(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
+    init_priority_vector[2] = np.sin(initial_conditions["priority_vector_elevation_angle"])
+
+    class TestWeightedSixDofMultiInspectionEnv(WeightedSixDofMultiInspectionEnv):
         def _init_sim(self):
             # Initialize spacecraft, sun, and simulator
-            self.chief = sim.Target(
+            priority_vector = init_priority_vector
+            priority_vector /= np.linalg.norm(priority_vector)  # convert to unit vector
+            self.chief = sim.SixDOFTarget(
                 name="chief",
                 num_points=100,
                 radius=1,
+                priority_vector=priority_vector,
             )
             self.deputies = {
-                deputies[0]: sim.Inspector(
+                deputies[0]: sim.SixDOFInspector(
                     name=deputies[0],
                     position=initial_conditions['blue0_position'],
-                    velocity=initial_conditions['blue0_velocity']
+                    velocity=initial_conditions['blue0_velocity'],
+                    orientation=initial_conditions["blue0_orientation"],
+                    angular_velocity=initial_conditions["blue0_angular_velocity"],
                 ),
-                deputies[1]: sim.Inspector(
+                deputies[1]: sim.SixDOFInspector(
                     name=deputies[1],
                     position=initial_conditions['blue1_position'],
-                    velocity=initial_conditions['blue1_velocity']
+                    velocity=initial_conditions['blue1_velocity'],
+                    orientation=initial_conditions["blue1_orientation"],
+                    angular_velocity=initial_conditions["blue1_angular_velocity"],
                 ),
-                deputies[2]: sim.Inspector(
+                deputies[2]: sim.SixDOFInspector(
                     name=deputies[2],
                     position=initial_conditions['blue2_position'],
-                    velocity=initial_conditions['blue2_velocity']
+                    velocity=initial_conditions['blue2_velocity'],
+                    orientation=initial_conditions["blue2_orientation"],
+                    angular_velocity=initial_conditions["blue2_angular_velocity"],
                 ),
             }
             self.sun = sim.Sun(theta=initial_conditions["sun_angle"])
             self.simulator = sim.InspectionSimulator(
-                # frame_rate=1,
+                # frame_rate=10,
                 frame_rate=0.1,
                 inspectors=list(self.deputies.values()),
                 targets=[self.chief],
                 sun=self.sun,
             )
-    env = TestMultiInspectionEnv(num_agents=3)
+
+        # override info to dump out deputy orientations
+        def _get_info(self, agent: typing.Any) -> dict[str, typing.Any]:
+            orientation = self.deputies[agent].orientation
+            return {
+                "reward_components": self.reward_components[agent],
+                "status": self.status[agent],
+                "orientation": orientation
+            }
+
+    env = TestWeightedSixDofMultiInspectionEnv(num_agents=3)
 
     # Norms used with CoRL
     input_norms = np.array([
@@ -100,9 +138,13 @@ def test_validate_docking_gym_with_corl(corl_data, onnx_model_path, initial_cond
         0.5000e+00, 0.5000e+00, 0.5000e+00, # velocity
         1.0000e+02, # points
         1.0000e+00, 1.0e+0, 1.0e+0, # uninspected points
-        1.0e+0 # sun angle
+        1.0e+0, # sun angle
+        1.0000e+00, 1.0e+0, 1.0e+0, # priority vector
+        1.0e+0, # points score
+        1.0e+0, 1.0e+0, 1.0e+0, 1.0e+0, # quaternion (4 dims)
+        0.0500e+00, 0.0500e+00, 0.0500e+00, # angular velocity
     ])
-    output_norms = np.array([1., 1., 1.], dtype=np.float32)
+    output_norms = np.array([1., 1., 1., 1., 1., 1.], dtype=np.float32)
 
     # Load deputy onnx models
     ort_sessions = {}
@@ -114,10 +156,16 @@ def test_validate_docking_gym_with_corl(corl_data, onnx_model_path, initial_cond
 
     # Reset env
     observations, infos = env.reset()
-    corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6]
+    # 31,32,33,34 -> dims for orientation added to each deputy's obs
+    corl_obs_order = [0,1,2,7,8,9,22,23,24,25,21,26,27,28,29,31,32,33,34,14,15,16]
+    env_actions_order = [1,3,5,0,2,4]
     # first obs not recorded in CoRL's EpisodeArtifact
     for deputy, obs in observations.items():
+        # get deputy's orientation
+        orientation = infos[deputy]["orientation"]
+        obs = np.concatenate((obs, orientation))
         observations[deputy] = obs[corl_obs_order]
+
     termination = dict.fromkeys(deputies, False)
     truncation = dict.fromkeys(deputies, False)
     obs_array = []
@@ -129,6 +177,8 @@ def test_validate_docking_gym_with_corl(corl_data, onnx_model_path, initial_cond
         action = {}
         for agent in deputies:
             action[agent] = get_action(ort_sessions[agent], observations[agent], input_norms, output_norms)
+            # reorder action space
+            action[agent] = action[agent][env_actions_order]
         observations, rewards, termination, truncation, infos = env.step(action)
         for deputy, obs in observations.items():
             observations[deputy] = obs[corl_obs_order]

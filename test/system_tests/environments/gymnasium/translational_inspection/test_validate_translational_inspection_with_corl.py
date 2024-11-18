@@ -3,8 +3,10 @@ import pickle
 import onnx # TODO: add onnx dependency
 import onnxruntime as ort # TODO: add dependency
 import numpy as np
-from safe_autonomy_sims.gym.inspection.sixdof_inspection_v0 import WeightedSixDofInspectionEnv
+from safe_autonomy_sims.gym.inspection.inspection_v0 import InspectionEnv
 import safe_autonomy_simulation.sims.inspection as sim
+from safe_autonomy_sims.simulators.initializers.cwh import CWH3DRadialWithSunInitializer
+import time
 import os
 
 
@@ -28,7 +30,7 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 @pytest.fixture(name="corl_data")
 def fixture_load_corl_data():
     current_dir = os.path.dirname(__file__)
-    corl_data_path = os.path.join(current_dir, 'weighted_six_dof_inspection_v0_episode_data.pkl')
+    corl_data_path = os.path.join(current_dir, 'inspection_v0_episode_data.pkl')
     with open(corl_data_path, 'rb') as f:
         data = pickle.load(f)
     return data
@@ -37,14 +39,13 @@ def fixture_load_corl_data():
 @pytest.fixture(name="initial_conditions")
 def fixture_initial_conditions():
     ic = {
-        "sun_angle": 4.894076056971742,
-        "priority_vector_azimuth_angle": 4.073586928538976,
-        "priority_vector_elevation_angle": -1.0966449747644242,
-
-        "angular_velocity": np.array([0.007485587676434926, -0.00784136861399348, 0.0011536854246057757]),
-        "orientation": np.array([0.14153391216566147, 0.5165677281234464, 0.774576236934284, -0.33638904135715836]),
-        "position": np.array([22.234393074496325, -48.08033288410433, 53.20879556201181]),
-        "velocity": np.array([0.1726241925062788, 0.10827729728538717, -0.15299274875095167]),
+        "radius": 62.04303711979668,
+        "azimuth_angle": 2.5928229798716957,
+        "elevation_angle": 1.1217152607083294,
+        "vel_mag": 0.2871053440330955,
+        "vel_azimuth_angle": 4.88752815681357,
+        "vel_elevation_angle": -1.1826284001971126,
+        "sun_angle": 1.9078404144016834,
     }
     return ic
 
@@ -56,54 +57,55 @@ def fixture_onxx_model_path():
     return path
 
 
-def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_model_path):
-    # priority vector
-    # pv = np.array([[-0.27223072, -0.36655014, -0.88968052]])
-    init_priority_vector = np.zeros((3,), dtype=np.float32)
-    init_priority_vector[0] = np.cos(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
-    init_priority_vector[1] = np.sin(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
-    init_priority_vector[2] = np.sin(initial_conditions["priority_vector_elevation_angle"])
+@pytest.mark.integration
+def test_validate_inspection_gym_with_corl(corl_data, initial_conditions, onxx_model_path):
+    # Dynamic env class definition to insert initial conditions
 
-    class TestWeightedSixDofInspectionEnv(WeightedSixDofInspectionEnv):
+    # Gym uses different initializer logic than default CoRL
+    config = {}
+    corl_initializer = CWH3DRadialWithSunInitializer(config=config)
+    initial_conditions_dict = corl_initializer.compute(
+        radius=initial_conditions["radius"],
+        azimuth_angle=initial_conditions["azimuth_angle"],
+        elevation_angle=initial_conditions["elevation_angle"],
+        vel_mag=initial_conditions["vel_mag"],
+        vel_azimuth_angle=initial_conditions["vel_azimuth_angle"],
+        vel_elevation_angle=initial_conditions["vel_elevation_angle"],
+        sun_angle=initial_conditions["sun_angle"],
+    )
+
+    class TestInspectionEnv(InspectionEnv):
         def _init_sim(self):
             # Initialize spacecraft, sun, and simulator
-            priority_vector = init_priority_vector
-            priority_vector /= np.linalg.norm(priority_vector)  # convert to unit vector
-            self.chief = sim.SixDOFTarget(
+            self.chief = sim.Target(
                 name="chief",
                 num_points=100,
                 radius=1,
-                priority_vector=priority_vector,
             )
-            self.deputy = sim.SixDOFInspector(
+            self.deputy = sim.Inspector(
                 name="deputy",
-                position=initial_conditions["position"],
-                velocity=initial_conditions["velocity"],
-                angular_velocity=initial_conditions["angular_velocity"],
-                orientation=initial_conditions["orientation"],
+                position=initial_conditions_dict["position"],
+                velocity=initial_conditions_dict["velocity"],
                 fov=np.pi,
                 focal_length=1,
             )
-            self.sun = sim.Sun(theta=initial_conditions["sun_angle"])
+            self.sun = sim.Sun(theta=initial_conditions_dict["sun_angle"])
             self.simulator = sim.InspectionSimulator(
                 frame_rate=0.1,
                 inspectors=[self.deputy],
                 targets=[self.chief],
                 sun=self.sun,
             )
-    env = TestWeightedSixDofInspectionEnv()
+    env = TestInspectionEnv()
 
     # Norms used with CoRL
     input_norms = {
         'deputy': np.array([
-            # 1.0000e+02, 1.0000e+02, 1.0000e+02, # position
-            # 0.5000e+00, 0.5000e+00, 0.5000e+00, # velocity
-            # 1.0000e+02, # points
-            # 1.0000e+00, 1.0e+0, 1.0e+0, # uninspected points
-            # 1.0e+0, # sun angle
-            # 1.0000e+00, 1.0e+0, 1.0e+0, # priority vector
-            # 1.0e+0, # points score
-            1.0
+            1.0000e+02, 1.0000e+02, 1.0000e+02, # position
+            0.5000e+00, 0.5000e+00, 0.5000e+00, # velocity
+            1.0000e+02, # points
+            1.0000e+00, 1.0e+0, 1.0e+0, # uninspected points
+            1.0e+0 # sun angle
             ]),
     }
     output_norms = {
@@ -118,11 +120,8 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Reset env
     observations, infos = env.reset()
-    # gym obs are too different from corl obs
-    # needs to be addressed before test can pass
-    # corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6, 11, 12, 13, 14]
-    # reordered_obs = observations[corl_obs_order] # first obs not recording in CoRL's EpisodeArtifact
-    reordered_obs = observations
+    corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6]
+    reordered_obs = observations[corl_obs_order] # first obs not recording in CoRL's EpisodeArtifact
     termination = False
     truncation = False
     obs_array = []
@@ -131,20 +130,21 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Continue until done
     while not termination and not truncation:
+        st = time.time()
         agent = 'deputy'
         action = get_action(ort_sess_deputy, reordered_obs, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
         # handle obs element order mismatch
-        # reordered_obs = observations[corl_obs_order]
-        reordered_obs = observations
+        reordered_obs = observations[corl_obs_order]
+        # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
         obs_array.append(reordered_obs)
         control_array.append(action)
         reward_components_array.append(infos['reward_components'])
 
     # assert that obs, actions, and rewards aligns with data from corl environment
-    corl_obs = corl_data["obs0"]
-    corl_actions = corl_data["actions0"]
-    corl_rewards = corl_data["rewards0"]
+    corl_obs = corl_data["obs"]
+    corl_actions = corl_data["actions"]
+    corl_rewards = corl_data["rewards"]
 
     # check episode lengths
     assert len(corl_obs) == len(obs_array)
@@ -153,10 +153,12 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # check values
     for i, corl_step_action in enumerate(corl_actions):
+        print(i)
         assert np.allclose(corl_step_action, control_array[i], rtol=1e-04, atol=1e-08)
 
     for i, corl_step_obs in enumerate(corl_obs):
-        assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-03, atol=1e-08)
+        print(i)
+        assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-05, atol=1e-08)
 
     # for i, corl_step_rewards in enumerate(corl_rewards):
     #     # reward components are different*
