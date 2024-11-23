@@ -174,6 +174,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         self,
         num_agents: int = 2,
         docking_radius: float = 0.2,
+        collision_radius: float = 10,
         max_time: int = 2000,
         max_distance: float = 10000,
         max_v_violation: int = 5,
@@ -182,6 +183,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
         # Environment parameters
         self.docking_radius = docking_radius
+        self.collision_radius = collision_radius
         self.max_time = max_time
         self.max_distance = max_distance
         self.max_v_violation = max_v_violation
@@ -374,10 +376,18 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         max_v_violation = self.episode_v_violations[agent] > self.max_v_violation
         timeout = self.simulator.sim_time >= self.max_time
         docked = in_docking and safe_v
+        collision = False
+        for name, other_deputy in self.deputies.items():
+            if name == agent:
+                continue
+            radial_distance = np.linalg.norm(deputy.position - other_deputy.position)
+            collision = collision or radial_distance < self.collision_radius
 
         # Update Status
         if crash:
             self.status[agent] = "Crash"
+        elif collision:
+            self.status[agent] = "Collision"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:

@@ -144,7 +144,7 @@ def test_validate_multiagent_six_dof_inspection_pettingzoo_with_corl(corl_data, 
         1.0e+0, 1.0e+0, 1.0e+0, 1.0e+0, # quaternion (4 dims)
         0.0500e+00, 0.0500e+00, 0.0500e+00, # angular velocity
     ])
-    output_norms = np.array([1., 1., 1., 1., 1., 1.], dtype=np.float32)
+    output_norms = np.array([1., 1., 1., .001, .001, .001], dtype=np.float32)
 
     # Load deputy onnx models
     ort_sessions = {}

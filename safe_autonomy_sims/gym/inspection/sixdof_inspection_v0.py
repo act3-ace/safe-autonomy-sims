@@ -407,7 +407,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.chief = sim.SixDOFTarget(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputy = sim.SixDOFInspector(

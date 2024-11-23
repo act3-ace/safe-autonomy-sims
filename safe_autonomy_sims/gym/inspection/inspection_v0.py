@@ -288,7 +288,7 @@ class InspectionEnv(gym.Env):
         self.chief = sim.Target(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
         )
         self.deputy = sim.Inspector(
             name="deputy",

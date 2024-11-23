@@ -305,6 +305,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         num_agents: int = 2,
         success_threshold: float = 0.95,
         crash_radius: float = 15,
+        collision_radius: float = 10,
         max_distance: float = 800,
         max_time: float = 1000,
     ) -> None:
@@ -312,6 +313,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Environment parameters
         self.crash_radius = crash_radius
+        self.collision_radius = collision_radius
         self.max_distance = max_distance
         self.max_time = max_time
         self.success_threshold = success_threshold
@@ -402,7 +404,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.chief = sim.SixDOFTarget(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputies = {
@@ -423,7 +425,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         }
         self.sun = sim.Sun(theta=self.rng.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
-            frame_rate=10,
+            frame_rate=0.1,
             inspectors=list(self.deputies.values()),
             targets=[self.chief],
             sun=self.sun,
@@ -446,12 +448,12 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             / np.linalg.norm(self.chief.position - deputy.position),
         )
         obs[21] = self.sun.theta
-        obs[22] = self.chief.inspection_points.get_num_points_inspected()
+        obs[22] = self.chief.inspection_points.get_num_points_inspected(inspector_entity=deputy)
         obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(
             camera=deputy.camera, sun=self.sun
         )
         obs[26:29] = self.chief.inspection_points.priority_vector
-        obs[29] = self.chief.inspection_points.get_total_weight_inspected()
+        obs[29] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=deputy)
         obs[30] = np.dot(
             Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
             self.chief.inspection_points.kmeans_find_nearest_cluster(
@@ -530,10 +532,18 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             self.chief.inspection_points.get_total_weight_inspected()
             >= self.success_threshold
         )
+        collision = False
+        for name, other_deputy in self.deputies.items():
+            if name == agent:
+                continue
+            radial_distance = np.linalg.norm(deputy.position - other_deputy.position)
+            collision = collision or radial_distance < self.collision_radius
 
         # Update Status
         if crash:
             self.status[agent] = "Crash"
+        elif collision:
+            self.status[agent] = "Collision"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
