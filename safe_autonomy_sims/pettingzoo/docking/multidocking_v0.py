@@ -188,7 +188,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
         # Episode level information
         self.prev_state = None
-        self.episode_v_violations = 0
+        self.episode_v_violations = {a: 0. for a in self.possible_agents}
         self.reward_components = {a: {} for a in self.possible_agents}
         self.status = {a: "Running" for a in self.possible_agents}
 
@@ -202,7 +202,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         observations = {a: self._get_obs(agent=a) for a in self.agents}
         infos = {a: self._get_info(agent=a) for a in self.agents}
         self.prev_state = None
-        self.episode_v_violations = 0
+        self.episode_v_violations = {a: 0. for a in self.agents}
         return observations, infos
 
     def step(
@@ -364,15 +364,15 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         )
         in_docking = d < self.docking_radius
         safe_v = v < vel_limit
-        self.episode_v_violations += -r.velocity_constraint_reward(
+        self.episode_v_violations[agent] += -r.velocity_constraint_reward(
             v1=deputy.velocity, v2=self.chief.velocity, v_limit=vel_limit
         )
 
         # Determine if in terminal state
         oob = d > self.max_distance
         crash = in_docking and not safe_v
-        max_v_violation = self.episode_v_violations > self.max_v_violation
-        timeout = self.simulator.sim_time > self.max_time
+        max_v_violation = self.episode_v_violations[agent] > self.max_v_violation
+        timeout = self.simulator.sim_time >= self.max_time
         docked = in_docking and safe_v
 
         # Update Status
