@@ -174,7 +174,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         self,
         num_agents: int = 2,
         docking_radius: float = 0.2,
-        collision_radius: float = 10,
+        collision_radius: float = 0.5,
         max_time: int = 2000,
         max_distance: float = 10000,
         max_v_violation: int = 5,
