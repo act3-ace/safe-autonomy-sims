@@ -10,9 +10,10 @@ import numpy as np
 # episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_inspection_v0_validation_testing/test_case_0/2024-11-07_16-56-51_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing/test_case_0/2024-11-13_17-15-42_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing_2/test_case_0/2024-11-14_14-22-00_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_weighted_translational_inspection_v0_validation_testing/test_case_0/2024-11-15_14-58-58_episode_artifact.pkl"
+episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_multi_inspection_validation_testing/test_case_0/2024-11-26_17-06-42_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_weighted_six_dof_inspection_v0_validation_testing/test_case_0/2024-11-15_16-51-51_episode_artifact.pkl"
-episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_six_dof_inspection_v0_validation_testing/test_case_0/2024-11-18_15-10-49_episode_artifact.pkl"
+# episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_six_dof_inspection_v0_validation_testing/test_case_0/2024-11-18_15-10-49_episode_artifact.pkl"
+
 
 # open
 with open(episode_artifact_path, 'rb') as file:
@@ -572,9 +573,10 @@ def parse_weighted_multiagent_sixdof_inspection(episode_artifact):
         corl_episode_info["rewards2"].append(rew2_dict)
 
 
-corl_episode_info = parse_weighted_multiagent_sixdof_inspection(ea)
+# corl_episode_info = parse_weighted_multiagent_sixdof_inspection(ea)
+corl_episode_info = parse_weighted_multiagent_inspection(ea)
 
 # store dict in pickle for test for now
-with open('weighted_six_dof_inspection_v0_episode_data.pkl', 'wb') as file:
+with open('weighted_multiagent_translational_inspection_episode_data.pkl', 'wb') as file:
     pickle.dump(corl_episode_info, file)
 

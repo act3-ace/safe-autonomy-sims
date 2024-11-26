@@ -397,7 +397,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         elif docked:
             self.status[agent] = "Success"
 
-        return oob or crash or max_v_violation or timeout or docked
+        return oob or crash or collision or max_v_violation or timeout or docked
 
     @functools.lru_cache(maxsize=None)
     def observation_space(self, agent) -> gym.Space:

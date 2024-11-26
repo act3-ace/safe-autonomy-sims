@@ -27,7 +27,7 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 @pytest.fixture(name="corl_data")
 def fixture_load_corl_data():
     current_dir = os.path.dirname(__file__)
-    corl_data_path = os.path.join(current_dir, 'multiagent_weighted_inspection_v0_episode_data.pkl')
+    corl_data_path = os.path.join(current_dir, 'weighted_multiagent_translational_inspection_episode_data.pkl')
     with open(corl_data_path, 'rb') as f:
         data = pickle.load(f)
     return data
@@ -76,7 +76,7 @@ def test_validate_multiagent_weighted_inspection_pettingzoo_with_corl(corl_data,
             self.chief = sim.Target(
                 name="chief",
                 num_points=100,
-                radius=1,
+                radius=10,
                 priority_vector=priority_vector,
             )
             self.deputies = {
@@ -109,13 +109,13 @@ def test_validate_multiagent_weighted_inspection_pettingzoo_with_corl(corl_data,
 
     # Norms used with CoRL
     input_norms = np.array([
-        1.0000e+02, 1.0000e+02, 1.0000e+02, # position
-        0.5000e+00, 0.5000e+00, 0.5000e+00, # velocity
-        1.0000e+02, # points
-        1.0000e+00, 1.0e+0, 1.0e+0, # uninspected points
-        1.0e+0, # sun angle
-        1.0000e+00, 1.0e+0, 1.0e+0, # priority vector
-        1.0e+0, # points score
+        100.0, 100.0, 100.0, # position
+        0.5, 0.5, 0.5, # velocity
+        100.0, # points
+        1.0, 1.0, 1.0, # uninspected points
+        1.0, # sun angle
+        1.0, 1.0, 1.0, # priority vector
+        1.0, # points score
     ])
     output_norms = np.array([1., 1., 1.], dtype=np.float32)
 
@@ -164,9 +164,11 @@ def test_validate_multiagent_weighted_inspection_pettingzoo_with_corl(corl_data,
     corl_rewards2 = corl_data["rewards2"]
 
     # check episode lengths
-    assert len(corl_obs0) == len(obs_array)
-    assert len(corl_actions0) == len(control_array)
-    assert len(corl_rewards0) == len(reward_components_array)
+    # TODO: CoRL envs wait until ALL agents have hit a done condition, while pettinzoo envs end at the first done.
+    #       Therefore, episode lengths do not align.
+    # assert len(corl_obs0) == len(obs_array)
+    # assert len(corl_actions0) == len(control_array)
+    # assert len(corl_rewards0) == len(reward_components_array)
 
     # check values
     for i, gym_step_action_dict in enumerate(control_array):

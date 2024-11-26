@@ -446,7 +446,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         elif all_inspected:
             self.status[agent] = "Success"
 
-        return oob or crash or timeout or all_inspected
+        return oob or crash or collision or timeout or all_inspected
 
     # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment
     # should never be garabage collected when used
