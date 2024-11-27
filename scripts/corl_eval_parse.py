@@ -9,10 +9,10 @@ import numpy as np
 # episode_artifact_path = "/tmp/safe-autonomy-sims/inspection_v0_validation_testing_r/test_case_0/2024-11-06_18-33-44_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_inspection_v0_validation_testing/test_case_0/2024-11-07_16-56-51_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing/test_case_0/2024-11-13_17-15-42_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing_2/test_case_0/2024-11-14_14-22-00_episode_artifact.pkl"
-episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_multi_inspection_validation_testing/test_case_0/2024-11-26_17-06-42_episode_artifact.pkl"
+# episode_artifact_path = "/tmp/safe-autonomy-sims/multi_inspection_validation_testing/test_case_0/2024-11-26_18-33-33_episode_artifact.pkl"
+# episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_multi_inspection_validation_testing/test_case_0/2024-11-26_17-06-42_episode_artifact.pkl"
 # episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_weighted_six_dof_inspection_v0_validation_testing/test_case_0/2024-11-15_16-51-51_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_six_dof_inspection_v0_validation_testing/test_case_0/2024-11-18_15-10-49_episode_artifact.pkl"
+episode_artifact_path = "/tmp/safe-autonomy-sims/6dof_inspection_validation_testing/test_case_0/2024-11-27_11-42-57_episode_artifact.pkl"
 
 
 # open
@@ -163,14 +163,14 @@ def parse_weighted_sixdof_inspection(episode_artifact):
             relative_chief_pos_local_ref_mag = obs0_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref_MagNorm3D"]["direct_observation"].value
             relative_chief_vel_local_ref = obs0_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref"]["direct_observation"].value
             relative_chief_vel_local_ref_mag = obs0_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref_MagNorm3D"]["direct_observation"].value
-            quaternion = obs0_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
+            # quaternion = obs0_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
             angular_vel = obs0_dict["Obs_Sensor_AngularVelocity"]["direct_observation"].value
             orientation_unit_vector_local_ref = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref"]["direct_observation"].value
-            x_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_X-Axis_Local_Ref"]["direct_observation"].value
+            # x_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_X-Axis_Local_Ref"]["direct_observation"].value
             y_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_Y-Axis_Local_Ref"]["direct_observation"].value
             z_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_Z-Axis_Local_Ref"]["direct_observation"].value
-            orientation_unit_vector_local_ref_dotproduct_relative_chief_pos = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition"]["direct_observation"].value
-            inspected_points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+            # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition"]["direct_observation"].value
+            # inspected_points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
             uninspected_points_local_ref = obs0_dict["Obs_Sensor_UninspectedPoints_Local_Ref"]["direct_observation"].value
             sun_angle_unit_vector_local_ref = obs0_dict["Obs_Sensor_SunAngle_AngleToUnitVector_Local_Ref"]["direct_observation"].value
             priority_vec_local_ref = obs0_dict["Obs_Sensor_PriorityVector_Local_Ref"]["direct_observation"].value
@@ -182,14 +182,14 @@ def parse_weighted_sixdof_inspection(episode_artifact):
                 relative_chief_pos_local_ref_mag, 
                 relative_chief_vel_local_ref, 
                 relative_chief_vel_local_ref_mag, 
-                quaternion, 
+                # quaternion, 
                 angular_vel, 
                 orientation_unit_vector_local_ref, 
-                x_axis_local_ref, 
+                # x_axis_local_ref, 
                 y_axis_local_ref,
                 z_axis_local_ref,
-                orientation_unit_vector_local_ref_dotproduct_relative_chief_pos,
-                inspected_points,
+                # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos,
+                # inspected_points,
                 uninspected_points_local_ref,
                 sun_angle_unit_vector_local_ref,
                 priority_vec_local_ref,
@@ -198,7 +198,7 @@ def parse_weighted_sixdof_inspection(episode_artifact):
                 ))
         else:
             obs0 = None
-        corl_episode_info["obs0"].append(obs0)
+        corl_episode_info["obs"].append(obs0)
 
         # Collect actions
         actions0_dict = step_info.agents['blue0_ctrl'].actions
@@ -213,11 +213,11 @@ def parse_weighted_sixdof_inspection(episode_artifact):
             actions0 = np.concatenate((x_moment, x_thrust,Y_moment, Y_thrust, Z_moment, Z_thrust))
         else:
             actions0 = None
-        corl_episode_info["actions0"].append(actions0)
+        corl_episode_info["actions"].append(actions0)
 
         # Collect rewards
         rew0_dict = step_info.agents['blue0_ctrl'].rewards
-        corl_episode_info["rewards0"].append(rew0_dict)
+        corl_episode_info["rewards"].append(rew0_dict)
 
     return corl_episode_info
 
@@ -574,9 +574,9 @@ def parse_weighted_multiagent_sixdof_inspection(episode_artifact):
 
 
 # corl_episode_info = parse_weighted_multiagent_sixdof_inspection(ea)
-corl_episode_info = parse_weighted_multiagent_inspection(ea)
+corl_episode_info = parse_weighted_sixdof_inspection(ea)
 
 # store dict in pickle for test for now
-with open('weighted_multiagent_translational_inspection_episode_data.pkl', 'wb') as file:
+with open('weighted_sixdof_inspection_episode_data.pkl', 'wb') as file:
     pickle.dump(corl_episode_info, file)
 
