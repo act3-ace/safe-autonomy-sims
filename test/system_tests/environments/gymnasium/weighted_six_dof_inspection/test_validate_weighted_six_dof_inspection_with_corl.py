@@ -123,6 +123,7 @@ def test_validate_sixdof_inspection_gym_with_corl(corl_data, initial_conditions,
     ort_sess_deputy = ort.InferenceSession(onnx_location_dep)
 
     # Reset env
+    np.random.seed(3)
     observations, infos = env.reset()
     corl_actions_order = [1, 3, 5, 0, 2, 4]
     termination = False

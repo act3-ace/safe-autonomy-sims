@@ -155,6 +155,7 @@ def test_validate_multiagent_six_dof_inspection_pettingzoo_with_corl(corl_data, 
         ort_sessions[deputy] = ort.InferenceSession(onnx_location_dep)
 
     # Reset env
+    np.random.seed(3)
     observations, infos = env.reset()
     # 31,32,33,34 -> dims for orientation added to each deputy's obs
     corl_obs_order = [0,1,2,7,8,9,22,23,24,25,21,26,27,28,29,31,32,33,34,14,15,16]

@@ -132,6 +132,7 @@ def test_validate_weighted_inspection_gym_with_corl(corl_data, initial_condition
     ort_sess_deputy = ort.InferenceSession(onnx_location_dep)
 
     # Reset env
+    np.random.seed(3)
     observations, infos = env.reset()
     corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6, 11, 12, 13, 14]
     reordered_obs = observations[corl_obs_order] # first obs not recording in CoRL's EpisodeArtifact

@@ -80,6 +80,7 @@ def test_validate_multiagent_docking_pettingzoo_with_corl(corl_data, onnx_model_
         ort_sessions[deputy] = ort.InferenceSession(onnx_location_dep)
 
     # Reset env
+    np.random.seed(3)
     observations, infos = env.reset()
     termination = dict.fromkeys(deputies, False)
     truncation = dict.fromkeys(deputies, False)

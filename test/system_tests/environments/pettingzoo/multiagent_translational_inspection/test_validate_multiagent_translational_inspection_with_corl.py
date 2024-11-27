@@ -114,6 +114,7 @@ def test_validate_multiagent_inspection_pettingzoo_with_corl(corl_data, onnx_mod
         ort_sessions[deputy] = ort.InferenceSession(onnx_location_dep)
 
     # Reset env
+    np.random.seed(3)
     observations, infos = env.reset()
     corl_obs_order = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 6]
     # first obs not recorded in CoRL's EpisodeArtifact

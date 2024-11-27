@@ -115,6 +115,7 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     ort_sess_deputy = ort.InferenceSession(onnx_location_dep)
 
     # Reset env
+    np.random.seed(3)
     observations, infos = env.reset()
     termination = False
     truncation = False
