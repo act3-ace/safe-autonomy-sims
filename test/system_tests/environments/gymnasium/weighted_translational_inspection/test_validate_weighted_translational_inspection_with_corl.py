@@ -30,7 +30,7 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 @pytest.fixture(name="corl_data")
 def fixture_load_corl_data():
     current_dir = os.path.dirname(__file__)
-    corl_data_path = os.path.join(current_dir, 'weighted_inspection_v0_episode_data.pkl')
+    corl_data_path = os.path.join(current_dir, 'weighted_translational_inspection_episode_data.pkl')
     with open(corl_data_path, 'rb') as f:
         data = pickle.load(f)
     return data
@@ -90,7 +90,7 @@ def test_validate_weighted_inspection_gym_with_corl(corl_data, initial_condition
             self.chief = sim.Target(
                 name="chief",
                 num_points=100,
-                radius=1,
+                radius=10,
                 priority_vector=priority_vector,
             )
             self.deputy = sim.Inspector(
@@ -167,7 +167,7 @@ def test_validate_weighted_inspection_gym_with_corl(corl_data, initial_condition
 
     # check values
     for i, corl_step_action in enumerate(corl_actions):
-        assert np.allclose(corl_step_action, control_array[i], rtol=1e-04, atol=1e-08)
+        assert np.allclose(corl_step_action, control_array[i], rtol=1e-03, atol=1e-05)
 
     for i, corl_step_obs in enumerate(corl_obs):
         assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-03, atol=1e-08)

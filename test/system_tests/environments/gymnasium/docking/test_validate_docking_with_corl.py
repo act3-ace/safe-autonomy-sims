@@ -146,11 +146,9 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # check values
     for i, corl_step_action in enumerate(corl_actions):
-        print(i)
         assert np.allclose(corl_step_action, control_array[i], rtol=1e-02, atol=1e-08)
 
     for i, corl_step_obs in enumerate(corl_obs):
-        print(i)
         assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-04, atol=1e-08)
 
     # for i, corl_step_rewards in enumerate(corl_rewards):
