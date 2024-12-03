@@ -41,7 +41,6 @@ def fixture_initial_conditions():
         "priority_vector_elevation_angle": -1.0966449747644242,
 
         "angular_velocity": np.array([0.007485587676434926, -0.00784136861399348, 0.0011536854246057757]),
-        # "orientation": np.array([-0.5274357504740171, 0.5949370301254361, -0.018593715962941133, -0.6062307588980667]),
         "position": np.array([22.234393074496325, -48.08033288410433, 53.20879556201181]),
         "velocity": np.array([0.1726241925062788, 0.10827729728538717, -0.15299274875095167]),
     }
@@ -58,7 +57,6 @@ def fixture_onxx_model_path():
 @pytest.mark.integration
 def test_validate_sixdof_inspection_gym_with_corl(corl_data, initial_conditions, onxx_model_path):
     # priority vector
-    # pv = np.array([[-0.27223072, -0.36655014, -0.88968052]])
     init_priority_vector = np.zeros((3,), dtype=np.float32)
     init_priority_vector[0] = np.cos(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])
     init_priority_vector[1] = np.sin(initial_conditions["priority_vector_azimuth_angle"]) * np.cos(initial_conditions["priority_vector_elevation_angle"])

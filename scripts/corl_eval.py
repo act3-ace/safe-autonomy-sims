@@ -1,23 +1,29 @@
+"""
+This module quickly sets up and runs CoRL evaluation. This module is used to generate
+policies used for gymnasium and pettingzoo environment validation tests.
+
+Author: John McCarroll
+"""
+
 # use corl eval framework api to collect data for env validation tests
 from corl.evaluation.api import evaluate
 from safe_autonomy_sims.evaluation.launch.serialize_cwh3d import SerializeCWH3D
-from pathlib import Path
+import numpy as np
 
 
-# set up
-task_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/weighted-six-dof-inspection/task.yml"
-checkpoint_path = "/tmp/safe-autonomy-sims/output/tune/SIX-DOF-INSPECTION/SIX-DOF-INSPECTION-test-PPO_CorlMultiAgentEnv_a814a_00000_0_2024-11-27_11-28-38/checkpoint_000000"
-output_path = "/tmp/safe-autonomy-sims/6dof_inspection_validation_testing2"
-# experiment_config_path = "/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/docking/experiment.yml"
-experiment_config_path = Path("/home/john/AFRL/test_initiative/safe-autonomy-sims/configs/weighted-six-dof-inspection/experiment.yml")
-launch_dir_of_experiment = "/home/john/AFRL/test_initiative/safe-autonomy-sims/"
+# Set up
+task_config_path = "/absolute/path/to/task.yml"
+checkpoint_path = "/absolute/path/to/experiment_output_dir/checkpoint_000000"
+output_path = "/absolute/path/to/desired_output_dir"
+experiment_config_path = "/absolute/path/to/experiment.yml"
+launch_dir_of_experiment = "/absolute/path/to/safe-autonomy-sims/"
 platform_serializer_class = SerializeCWH3D
 test_case_manager_config = None
 rl_algorithm_name = None
 num_workers= 1
+np.random.seed(3)
 
-
-# execute eval episode
+# Execute eval episode
 evaluate(
     task_config_path,
     checkpoint_path,

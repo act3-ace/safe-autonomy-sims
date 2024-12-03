@@ -6,7 +6,6 @@ import numpy as np
 from safe_autonomy_sims.gym.docking.docking_v0 import DockingEnv
 from safe_autonomy_sims.simulators.initializers.cwh import Docking3DRadialInitializer
 import safe_autonomy_simulation
-import time
 import os
 
 
@@ -19,7 +18,6 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 
     # Run the session
     outputs = ort_sess.run(None, {'obs': obs_vec, 'state_ins': CONST_INPUT})
-    # print(outputs)
     onnx_act = np.array(outputs[0][0][::2], dtype=np.float32)
 
     # Check action
@@ -125,11 +123,9 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
 
     # Continue until done
     while not termination and not truncation:
-        st = time.time()
         agent = 'deputy'
         action = get_action(ort_sess_deputy, observations, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
-        # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
         obs_array.append(observations)
         control_array.append(action)
         reward_components_array.append(infos['reward_components'])

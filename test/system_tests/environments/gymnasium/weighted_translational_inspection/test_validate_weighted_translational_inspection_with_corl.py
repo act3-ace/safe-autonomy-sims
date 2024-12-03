@@ -6,7 +6,6 @@ import numpy as np
 from safe_autonomy_sims.gym.inspection.weighted_inspection_v0 import WeightedInspectionEnv
 import safe_autonomy_simulation.sims.inspection as sim
 from safe_autonomy_sims.simulators.initializers.cwh import CWH3DRadialWithSunInitializer
-import time
 import os
 
 
@@ -19,7 +18,6 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 
     # Run the session
     outputs = ort_sess.run(None, {'obs': obs_vec, 'state_ins': CONST_INPUT})
-    # print(outputs)
     onnx_act = np.array(outputs[0][0][::2], dtype=np.float32)
 
     # Check action
@@ -144,13 +142,11 @@ def test_validate_weighted_inspection_gym_with_corl(corl_data, initial_condition
 
     # Continue until done
     while not termination and not truncation:
-        # st = time.time()
         agent = 'deputy'
         action = get_action(ort_sess_deputy, reordered_obs, input_norms[agent], output_norms[agent])
         observations, rewards, termination, truncation, infos = env.step(action)
         # handle obs element order mismatch
         reordered_obs = observations[corl_obs_order]
-        # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
         obs_array.append(reordered_obs)
         control_array.append(action)
         reward_components_array.append(infos['reward_components'])

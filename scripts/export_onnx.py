@@ -13,7 +13,6 @@ Description: This module has the function necessary for converting rllib checkpo
 import os
 
 from ray.rllib.algorithms.algorithm import Algorithm
-
 from corl.experiments.rllib_experiment import RllibExperiment
 from corl.train_rl import parse_corl_args, build_experiment
 
@@ -76,15 +75,20 @@ def convert_policies_to_onnx(
 
 
 if __name__ == "__main__":
+    # NOTE:
+    # This module must be ran with the following command line arguments:
+    # `~/safe-autonomy-sims$ python safe_autonomy_sims/scripts/export_onnx.py --cfg relative/path/to/experiment.yml`
+    # This is required to registered the CoRL env in order for onnx model to be extracted from saved policy checkpoint
+
     # pylint:disable=line-too-long
-    # chkpt_path = "/tmp/safe-autonomy-sims/output/tune/DOCKING/DOCKING-PPO_CorlMultiAgentEnv_3f697_00000_0_2024-10-30_16-33-40/checkpoint_000000"
-    chkpt_path = "/tmp/safe-autonomy-sims/output/tune/SIX-DOF-INSPECTION/SIX-DOF-INSPECTION-test-PPO_CorlMultiAgentEnv_a814a_00000_0_2024-11-27_11-28-38/checkpoint_000000"
+    checkpoint_path = "/absolute/path/to/experiment_output_dir/checkpoint_000000"
 
     args = parse_corl_args()
     experiment_class, experiment_file_validated = build_experiment(args) # calls register envs
 
-    # for agent in ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]:
-    #     rllib_chkpt_to_onnx(chkpt_path, output_folder=f"test/system_tests/environments/pettingzoo/multidocking_v0/models/{agent}", policy_id=agent)
+    # multiagent tasks
+    for agent in ["blue0_ctrl", "blue1_ctrl", "blue2_ctrl"]:
+        rllib_chkpt_to_onnx(checkpoint_path, output_folder=f"test/system_tests/environments/pettingzoo/multiagent_weighted_six_dof_inspection/models/{agent}", policy_id=agent)
     
-    rllib_chkpt_to_onnx(chkpt_path, output_folder= "./onnx_model0", policy_id="blue0_ctrl")
-    
+    # single agent tasks
+    # rllib_chkpt_to_onnx(checkpoint_path, output_folder= "./onnx_model0", policy_id="blue0_ctrl")

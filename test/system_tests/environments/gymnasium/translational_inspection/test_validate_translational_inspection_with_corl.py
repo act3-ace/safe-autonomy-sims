@@ -6,7 +6,6 @@ import numpy as np
 from safe_autonomy_sims.gym.inspection.inspection_v0 import InspectionEnv
 import safe_autonomy_simulation.sims.inspection as sim
 from safe_autonomy_sims.simulators.initializers.cwh import CWH3DRadialWithSunInitializer
-import time
 import os
 
 
@@ -19,7 +18,6 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 
     # Run the session
     outputs = ort_sess.run(None, {'obs': obs_vec, 'state_ins': CONST_INPUT})
-    # print(outputs)
     onnx_act = np.array(outputs[0][0][::2], dtype=np.float32)
 
     # Check action
@@ -86,7 +84,6 @@ def test_validate_inspection_gym_with_corl(corl_data, initial_conditions, onxx_m
                 name="deputy",
                 position=initial_conditions_dict["position"],
                 velocity=initial_conditions_dict["velocity"],
-                #### DO THESE MATTER?
                 fov=np.pi,
                 focal_length=1,
             )

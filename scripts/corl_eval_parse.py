@@ -1,21 +1,19 @@
+"""
+This module parses evaluation data (EpisodeArtifacts) from safe-autonomy-sims CoRL tasks and saves
+observations, actions, rewards, and initial conditions to disk. This module is used to generate
+data used in gymnasium and pettingzoo environment validation tests.
+
+Author: John McCarroll
+"""
+
 import pickle
 import numpy as np
 
 
-# set up
-# episode_artifact_path = "/tmp/safe-autonomy-sims/docking_validation_testing/test_case_0/2024-11-05_20-42-31_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/MULTIAGENT-DOCKING_validation_testing/test_case_0/2024-11-12_14-22-03_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/inspection_v0_validation_testing/test_case_0/2024-11-06_13-57-00_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/inspection_v0_validation_testing_r/test_case_0/2024-11-06_18-33-44_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_inspection_v0_validation_testing/test_case_0/2024-11-07_16-56-51_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_translational_inspection_v0_validation_testing/test_case_0/2024-11-13_17-15-42_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/multi_inspection_validation_testing/test_case_0/2024-11-26_18-33-33_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/weighted_multi_inspection_validation_testing/test_case_0/2024-11-26_17-06-42_episode_artifact.pkl"
-# episode_artifact_path = "/tmp/safe-autonomy-sims/multiagent_weighted_six_dof_inspection_v0_validation_testing/test_case_0/2024-11-15_16-51-51_episode_artifact.pkl"
-episode_artifact_path = "/tmp/safe-autonomy-sims/6dof_inspection_validation_testing/test_case_0/2024-11-27_11-42-57_episode_artifact.pkl"
+# Define episode artifact path
+episode_artifact_path = "/absolute/path/to/test_case_0/<date-time>_episode_artifact.pkl"
 
-
-# open
+# Load object
 with open(episode_artifact_path, 'rb') as file:
     ea = pickle.load(file)
 
@@ -466,51 +464,131 @@ def parse_weighted_multiagent_sixdof_inspection(episode_artifact):
         # Collect obs
         obs0_dict = step_info.agents['blue0_ctrl'].observations
         if obs0_dict:
-            position = obs0_dict["Obs_Sensor_Position"]["direct_observation"].value
-            velocity = obs0_dict["Obs_Sensor_Velocity"]["direct_observation"].value
-            points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
-            uninspected_points = obs0_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
-            sun_angle = obs0_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
-            priority_vec = obs0_dict["Obs_Sensor_PriorityVector"]["direct_observation"].value
-            points_score = obs0_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
-            quat = obs0_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
+            relative_chief_pos_local_ref = obs0_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref"]["direct_observation"].value
+            relative_chief_pos_local_ref_mag = obs0_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref_MagNorm3D"]["direct_observation"].value
+            relative_chief_vel_local_ref = obs0_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref"]["direct_observation"].value
+            relative_chief_vel_local_ref_mag = obs0_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref_MagNorm3D"]["direct_observation"].value
+            # quaternion = obs0_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
             angular_vel = obs0_dict["Obs_Sensor_AngularVelocity"]["direct_observation"].value
+            orientation_unit_vector_local_ref = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref"]["direct_observation"].value
+            # x_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_X-Axis_Local_Ref"]["direct_observation"].value
+            y_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_Y-Axis_Local_Ref"]["direct_observation"].value
+            z_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_Z-Axis_Local_Ref"]["direct_observation"].value
+            # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition"]["direct_observation"].value
+            # inspected_points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+            uninspected_points_local_ref = obs0_dict["Obs_Sensor_UninspectedPoints_Local_Ref"]["direct_observation"].value
+            sun_angle_unit_vector_local_ref = obs0_dict["Obs_Sensor_SunAngle_AngleToUnitVector_Local_Ref"]["direct_observation"].value
+            priority_vec_local_ref = obs0_dict["Obs_Sensor_PriorityVector_Local_Ref"]["direct_observation"].value
+            inspected_points_score = obs0_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
+            uninspected_points_dotproduct_position = obs0_dict["Obs_Sensor_UninspectedPoints_DotProduct_Obs_Sensor_Position"]["direct_observation"].value
 
-            obs0 = np.concatenate((position, velocity, points, uninspected_points, sun_angle, priority_vec, points_score, quat, angular_vel))
+            obs0 = np.concatenate((
+                relative_chief_pos_local_ref, 
+                relative_chief_pos_local_ref_mag, 
+                relative_chief_vel_local_ref, 
+                relative_chief_vel_local_ref_mag, 
+                # quaternion, 
+                angular_vel, 
+                orientation_unit_vector_local_ref, 
+                # x_axis_local_ref, 
+                y_axis_local_ref,
+                z_axis_local_ref,
+                # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos,
+                # inspected_points,
+                uninspected_points_local_ref,
+                sun_angle_unit_vector_local_ref,
+                priority_vec_local_ref,
+                inspected_points_score,
+                uninspected_points_dotproduct_position,
+                ))
         else:
             obs0 = None
         corl_episode_info["obs0"].append(obs0)
 
+        # Collect obs
         obs1_dict = step_info.agents['blue1_ctrl'].observations
         if obs1_dict:
-            position = obs1_dict["Obs_Sensor_Position"]["direct_observation"].value
-            velocity = obs1_dict["Obs_Sensor_Velocity"]["direct_observation"].value
-            points = obs1_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
-            uninspected_points = obs1_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
-            sun_angle = obs1_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
-            priority_vec = obs1_dict["Obs_Sensor_PriorityVector"]["direct_observation"].value
-            points_score = obs1_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
-            quat = obs1_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
+            relative_chief_pos_local_ref = obs1_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref"]["direct_observation"].value
+            relative_chief_pos_local_ref_mag = obs1_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref_MagNorm3D"]["direct_observation"].value
+            relative_chief_vel_local_ref = obs1_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref"]["direct_observation"].value
+            relative_chief_vel_local_ref_mag = obs1_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref_MagNorm3D"]["direct_observation"].value
+            # quaternion = obs1_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
             angular_vel = obs1_dict["Obs_Sensor_AngularVelocity"]["direct_observation"].value
+            orientation_unit_vector_local_ref = obs1_dict["Obs_Sensor_OrientationUnitVector_Local_Ref"]["direct_observation"].value
+            # x_axis_local_ref = obs1_dict["Coordinate_Axis_Glue_X-Axis_Local_Ref"]["direct_observation"].value
+            y_axis_local_ref = obs1_dict["Coordinate_Axis_Glue_Y-Axis_Local_Ref"]["direct_observation"].value
+            z_axis_local_ref = obs1_dict["Coordinate_Axis_Glue_Z-Axis_Local_Ref"]["direct_observation"].value
+            # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos = obs1_dict["Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition"]["direct_observation"].value
+            # inspected_points = obs1_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+            uninspected_points_local_ref = obs1_dict["Obs_Sensor_UninspectedPoints_Local_Ref"]["direct_observation"].value
+            sun_angle_unit_vector_local_ref = obs1_dict["Obs_Sensor_SunAngle_AngleToUnitVector_Local_Ref"]["direct_observation"].value
+            priority_vec_local_ref = obs1_dict["Obs_Sensor_PriorityVector_Local_Ref"]["direct_observation"].value
+            inspected_points_score = obs1_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
+            uninspected_points_dotproduct_position = obs1_dict["Obs_Sensor_UninspectedPoints_DotProduct_Obs_Sensor_Position"]["direct_observation"].value
 
-            obs1 = np.concatenate((position, velocity, points, uninspected_points, sun_angle, priority_vec, points_score, quat, angular_vel))
+            obs1 = np.concatenate((
+                relative_chief_pos_local_ref, 
+                relative_chief_pos_local_ref_mag, 
+                relative_chief_vel_local_ref, 
+                relative_chief_vel_local_ref_mag, 
+                # quaternion, 
+                angular_vel, 
+                orientation_unit_vector_local_ref, 
+                # x_axis_local_ref, 
+                y_axis_local_ref,
+                z_axis_local_ref,
+                # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos,
+                # inspected_points,
+                uninspected_points_local_ref,
+                sun_angle_unit_vector_local_ref,
+                priority_vec_local_ref,
+                inspected_points_score,
+                uninspected_points_dotproduct_position,
+                ))
         else:
             obs1 = None
         corl_episode_info["obs1"].append(obs1)
 
+        # Collect obs
         obs2_dict = step_info.agents['blue2_ctrl'].observations
         if obs2_dict:
-            position = obs2_dict["Obs_Sensor_Position"]["direct_observation"].value
-            velocity = obs2_dict["Obs_Sensor_Velocity"]["direct_observation"].value
-            points = obs2_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
-            uninspected_points = obs2_dict["Obs_Sensor_UninspectedPoints"]["direct_observation"].value
-            sun_angle = obs2_dict["Obs_Sensor_SunAngle"]["direct_observation"].value
-            priority_vec = obs2_dict["Obs_Sensor_PriorityVector"]["direct_observation"].value
-            points_score = obs2_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
-            quat = obs2_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
+            relative_chief_pos_local_ref = obs2_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref"]["direct_observation"].value
+            relative_chief_pos_local_ref_mag = obs2_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref_MagNorm3D"]["direct_observation"].value
+            relative_chief_vel_local_ref = obs2_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref"]["direct_observation"].value
+            relative_chief_vel_local_ref_mag = obs2_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref_MagNorm3D"]["direct_observation"].value
+            # quaternion = obs2_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
             angular_vel = obs2_dict["Obs_Sensor_AngularVelocity"]["direct_observation"].value
+            orientation_unit_vector_local_ref = obs2_dict["Obs_Sensor_OrientationUnitVector_Local_Ref"]["direct_observation"].value
+            # x_axis_local_ref = obs2_dict["Coordinate_Axis_Glue_X-Axis_Local_Ref"]["direct_observation"].value
+            y_axis_local_ref = obs2_dict["Coordinate_Axis_Glue_Y-Axis_Local_Ref"]["direct_observation"].value
+            z_axis_local_ref = obs2_dict["Coordinate_Axis_Glue_Z-Axis_Local_Ref"]["direct_observation"].value
+            # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos = obs2_dict["Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition"]["direct_observation"].value
+            # inspected_points = obs2_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
+            uninspected_points_local_ref = obs2_dict["Obs_Sensor_UninspectedPoints_Local_Ref"]["direct_observation"].value
+            sun_angle_unit_vector_local_ref = obs2_dict["Obs_Sensor_SunAngle_AngleToUnitVector_Local_Ref"]["direct_observation"].value
+            priority_vec_local_ref = obs2_dict["Obs_Sensor_PriorityVector_Local_Ref"]["direct_observation"].value
+            inspected_points_score = obs2_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
+            uninspected_points_dotproduct_position = obs2_dict["Obs_Sensor_UninspectedPoints_DotProduct_Obs_Sensor_Position"]["direct_observation"].value
 
-            obs2 = np.concatenate((position, velocity, points, uninspected_points, sun_angle, priority_vec, points_score, quat, angular_vel))
+            obs2 = np.concatenate((
+                relative_chief_pos_local_ref, 
+                relative_chief_pos_local_ref_mag, 
+                relative_chief_vel_local_ref, 
+                relative_chief_vel_local_ref_mag, 
+                # quaternion, 
+                angular_vel, 
+                orientation_unit_vector_local_ref, 
+                # x_axis_local_ref, 
+                y_axis_local_ref,
+                z_axis_local_ref,
+                # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos,
+                # inspected_points,
+                uninspected_points_local_ref,
+                sun_angle_unit_vector_local_ref,
+                priority_vec_local_ref,
+                inspected_points_score,
+                uninspected_points_dotproduct_position,
+                ))
         else:
             obs2 = None
         corl_episode_info["obs2"].append(obs2)
@@ -572,11 +650,12 @@ def parse_weighted_multiagent_sixdof_inspection(episode_artifact):
         rew2_dict = step_info.agents['blue2_ctrl'].rewards
         corl_episode_info["rewards2"].append(rew2_dict)
 
+    return corl_episode_info
 
-# corl_episode_info = parse_weighted_multiagent_sixdof_inspection(ea)
-corl_episode_info = parse_weighted_sixdof_inspection(ea)
 
-# store dict in pickle for test for now
-with open('weighted_sixdof_inspection_episode_data.pkl', 'wb') as file:
+# Use parsing function appropriate to given task
+corl_episode_info = parse_weighted_multiagent_sixdof_inspection(ea)
+
+# Store data to disk
+with open('corl_evaluation_episode_data.pkl', 'wb') as file:
     pickle.dump(corl_episode_info, file)
-

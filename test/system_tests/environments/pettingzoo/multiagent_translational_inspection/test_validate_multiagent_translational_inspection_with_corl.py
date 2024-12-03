@@ -87,7 +87,6 @@ def test_validate_multiagent_inspection_pettingzoo_with_corl(corl_data, onnx_mod
             }
             self.sun = sim.Sun(theta=initial_conditions["sun_angle"])
             self.simulator = sim.InspectionSimulator(
-                # frame_rate=1,
                 frame_rate=0.1,
                 inspectors=list(self.deputies.values()),
                 targets=[self.chief],

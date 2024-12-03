@@ -17,7 +17,6 @@ def get_action(ort_sess, obs, input_norms, output_norms):
 
     # Run the session
     outputs = ort_sess.run(None, {'obs': obs_vec, 'state_ins': CONST_INPUT})
-    # print(outputs)
     onnx_act = np.array(outputs[0][0][::2], dtype=np.float32)
 
     # Check action
@@ -94,7 +93,6 @@ def test_validate_multiagent_docking_pettingzoo_with_corl(corl_data, onnx_model_
         for agent in deputies:
             action[agent] = get_action(ort_sessions[agent], observations[agent], input_norms, output_norms)
         observations, rewards, termination, truncation, infos = env.step(action)
-        # print(f"Sim time: {env.simulator.sim_time}, step computation time: {time.time()-st}")
         obs_array.append(observations)
         control_array.append(action)
         reward_components_array.append(infos)
