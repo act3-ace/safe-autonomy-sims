@@ -168,19 +168,16 @@ def test_validate_weighted_inspection_gym_with_corl(corl_data, initial_condition
     for i, corl_step_obs in enumerate(corl_obs):
         assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-03, atol=1e-08)
 
-    # for i, corl_step_rewards in enumerate(corl_rewards):
-    #     # reward components are different*
-    #     # cherry pick for now, lowest priority
-    #     print(i)
-    #     corl_delta_v = corl_step_rewards["DockingDeltaVReward"]
-    #     delta_v = reward_components_array[i]['delta_v']
-    #     assert corl_delta_v == delta_v
-    #     corl_vel_const = corl_step_rewards["DockingVelocityConstraintReward"]
-    #     vel_const = reward_components_array[i]['velocity_constraint']
-    #     assert corl_vel_const == vel_const
-    #     corl_success = corl_step_rewards["DockingSuccessReward"]
-    #     success = reward_components_array[i]["success"]
-    #     assert corl_success == success
-    #     # corl_failure = corl_step_rewards["DockingFailureReward"]
-    #     # failure = reward_components_array[i]['timeout'] + reward_components_array[i]['crash'] + reward_components_array[i]['out_of_bounds']
-    #     # assert corl_failure == failure
+    for i, corl_step_rewards in enumerate(corl_rewards):
+        corl_delta_v = corl_step_rewards["InspectionDeltaVReward"]
+        delta_v = reward_components_array[i]['delta_v']
+        assert corl_delta_v == pytest.approx(delta_v, rel=1e-04, abs=1e-10)
+        corl_inspected_points = corl_step_rewards["ObservedPointsReward"]
+        inspected_points = reward_components_array[i]['observed_points']
+        assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)
+        corl_success = corl_step_rewards["SafeInspectionSuccessReward"]
+        success = reward_components_array[i]["success"]
+        assert corl_success == pytest.approx(success, rel=1e-04, abs=1e-10)
+        corl_crash = corl_step_rewards["InspectionCrashReward"]
+        crash = reward_components_array[i]['crash']
+        assert corl_crash == pytest.approx(crash, rel=1e-04, abs=1e-10)

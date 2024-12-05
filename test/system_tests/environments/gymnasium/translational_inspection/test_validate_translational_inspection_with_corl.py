@@ -156,7 +156,6 @@ def test_validate_inspection_gym_with_corl(corl_data, initial_conditions, onxx_m
         assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-03, atol=1e-05)
 
     for i, corl_step_rewards in enumerate(corl_rewards):
-        print(i)
         corl_delta_v = corl_step_rewards["InspectionDeltaVReward"]
         delta_v = reward_components_array[i]['delta_v']
         assert corl_delta_v == pytest.approx(delta_v, rel=1e-04, abs=1e-10)
