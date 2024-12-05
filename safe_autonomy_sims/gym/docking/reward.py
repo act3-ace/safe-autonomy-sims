@@ -85,6 +85,7 @@ def distance_pivot_reward(
 #     return r
 
 def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01):
+    # TODO: update docstring
     """A dense reward based on the deputy's fuel
     use (change in velocity).
 

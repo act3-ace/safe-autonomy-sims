@@ -284,7 +284,6 @@ class DockingEnv(gym.Env):
         reward += dist_pivot_reward
 
         delta_v_reward = r.delta_v_reward(
-            # state=self.sim_state, prev_state=self.prev_state
             control=self.deputy.last_control
         )
         components["delta_v"] = delta_v_reward
