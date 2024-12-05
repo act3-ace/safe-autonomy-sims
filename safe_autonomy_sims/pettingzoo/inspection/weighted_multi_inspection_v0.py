@@ -376,20 +376,21 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def _get_reward(self, agent: typing.Any) -> float:
         reward = 0.0
+        components = {a: {} for a in self.possible_agents}
         deputy = self.deputies[agent]
 
         # Dense rewards
         points_reward = r.weighted_observed_points_reward(
             chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
         )
-        self.reward_components[agent]["observed_points"] = points_reward
+        components[agent]["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
             v=deputy.velocity,
             prev_v=self.prev_state[agent][3:6],
         )
-        self.reward_components[agent]["delta_v"] = delta_v_reward
+        components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         # Sparse rewards
@@ -402,15 +403,16 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
             < self.crash_radius
         ):
             success_reward = -1.0
-        self.reward_components[agent]["success"] = success_reward
+        components[agent]["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(
             chief=self.chief, deputy=deputy, crash_radius=self.crash_radius
         )
-        self.reward_components[agent]["crash"] = crash_reward
+        components[agent]["crash"] = crash_reward
         reward += crash_reward
 
+        self.reward_components = components
         return reward
 
     def _get_terminated(self, agent: typing.Any) -> bool:

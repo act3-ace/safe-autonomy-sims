@@ -329,18 +329,19 @@ class InspectionEnv(gym.Env):
 
     def _get_reward(self):
         reward = 0
+        components = {}
 
         # Dense rewards
         points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        self.reward_components["observed_points"] = points_reward
+        components["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
             v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
         )
-        self.reward_components["delta_v"] = delta_v_reward
+        components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         # Sparse rewards
@@ -348,7 +349,7 @@ class InspectionEnv(gym.Env):
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        self.reward_components["success"] = success_reward
+        components["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(
@@ -356,9 +357,10 @@ class InspectionEnv(gym.Env):
             deputy=self.deputy,
             crash_radius=self.crash_radius,
         )
-        self.reward_components["crash"] = crash_reward
+        components["crash"] = crash_reward
         reward += crash_reward
 
+        self.reward_components = components
         return reward
 
     def _get_terminated(self):

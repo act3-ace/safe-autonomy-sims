@@ -571,35 +571,37 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
     def _get_reward(self):
         reward = 0
+        components = {}
 
         # Dense rewards
         points_reward = r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
-        self.reward_components["observed_points"] = points_reward
+        components["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
-        self.reward_components["delta_v"] = delta_v_reward
+        components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
-        self.reward_components["live_timestep"] = live_timestep_reward
+        components["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
         facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.01)
-        self.reward_components["facing_chief"] = facing_chief_reward
+        components["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
         if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=self.deputy) < self.crash_radius):
             success_reward = -1.0
-        self.reward_components["success"] = success_reward
+        components["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
-        self.reward_components["crash"] = crash_reward
+        components["crash"] = crash_reward
         reward += crash_reward
 
+        self.reward_components = components
         return reward
 
     def _get_terminated(self):
