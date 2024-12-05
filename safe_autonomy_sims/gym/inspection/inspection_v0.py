@@ -267,9 +267,10 @@ class InspectionEnv(gym.Env):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -339,7 +340,7 @@ class InspectionEnv(gym.Env):
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
+            control=self.deputy.last_control
         )
         components["delta_v"] = delta_v_reward
         reward += delta_v_reward

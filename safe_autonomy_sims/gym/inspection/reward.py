@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation
 from safe_autonomy_sims.pettingzoo.inspection.utils import delta_v, rel_dist
 
 
-def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
+def observed_points_reward(chief: sim.Target, prev_num_inspected: int, scale: float = 0.01) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode.
 
@@ -33,7 +33,7 @@ def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
     assert current_num_inspected >= prev_num_inspected, "previously inspected points cannot be uninspected"
 
     step_inspected = current_num_inspected - prev_num_inspected
-    r = 0.1 * step_inspected
+    r = scale * step_inspected
     return r
 
 
@@ -130,9 +130,40 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
     return r
 
 
-# pylint:disable=W1401
-def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
-    r"""A dense reward based on the deputy's fuel
+# # pylint:disable=W1401
+# def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
+#     r"""A dense reward based on the deputy's fuel
+#     use (change in velocity).
+
+#     $r_t = -((\deltav / m) + b)$
+
+#     where
+#     * $\deltav$ is the change in velocity
+#     * $m$ is the mass of the deputy
+#     * $b$ is a tunable bias term
+
+#     Parameters
+#     ----------
+#     v : np.ndarray
+#         current velocity
+#     prev_v : np.ndarray
+#         previous velocity
+#     m : float, optional
+#         deputy mass, by default 12.0
+#     b : float, optional
+#         bias term, by default 0.0
+
+#     Returns
+#     -------
+#     float
+#         reward value
+#     """
+#     r = -((abs(delta_v(v=v, prev_v=prev_v)) / m) + b)
+#     return r
+
+def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01):
+    # TODO: update docstring
+    """A dense reward based on the deputy's fuel
     use (change in velocity).
 
     $r_t = -((\deltav / m) + b)$
@@ -144,10 +175,10 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
 
     Parameters
     ----------
-    v : np.ndarray
-        current velocity
-    prev_v : np.ndarray
-        previous velocity
+    state : dict
+        current simulation state
+    prev_state : dict
+        previous simulation state
     m : float, optional
         deputy mass, by default 12.0
     b : float, optional
@@ -158,7 +189,8 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     float
         reward value
     """
-    r = -((abs(delta_v(v=v, prev_v=prev_v)) / m) + b)
+    dv = delta_v(control=control, m=m)
+    r = scale * dv + b
     return r
 
 
