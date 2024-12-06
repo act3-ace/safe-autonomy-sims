@@ -424,8 +424,9 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
-        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
+            self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -578,7 +579,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         components["observed_points"] = points_reward
         reward += points_reward
 
-        delta_v_reward = r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        step_size = 1 / self.simulator.frame_rate
+        delta_v_reward = r.delta_v_reward(control=self.deputy.orientation, scale=-0.005, step_size=step_size)
         components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
@@ -586,7 +588,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         components["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
-        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.01)
+        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.15)
         components["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
@@ -600,6 +602,10 @@ class WeightedSixDofInspectionEnv(gym.Env):
         crash_reward = r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
         components["crash"] = crash_reward
         reward += crash_reward
+
+        max_distance_reward = r.max_distance_reward(chief=self.chief, deputy=self.deputy, max_distance=self.max_distance)
+        components["max_distance"] = max_distance_reward
+        reward += max_distance_reward
 
         self.reward_components = components
         return reward

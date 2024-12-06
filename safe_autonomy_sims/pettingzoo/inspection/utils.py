@@ -85,7 +85,7 @@ def rel_vel(vel1: np.ndarray, vel2: np.ndarray) -> float:
 #     prev_v_norm = np.linalg.norm(prev_v)
 #     return v_norm - prev_v_norm
 
-def delta_v(control: np.ndarray, m: float = 12.0):
+def delta_v(control: np.ndarray, m: float = 12.0, step_size: float = 1.0):
     """The change in velocity of the deputy.
 
     Parameters
@@ -100,7 +100,7 @@ def delta_v(control: np.ndarray, m: float = 12.0):
     float
         the deputy's change in velocity
     """
-    dv = np.sum(np.abs(control)) / m
+    dv = np.sum(np.abs(control)) / m * step_size
     return dv
 
 

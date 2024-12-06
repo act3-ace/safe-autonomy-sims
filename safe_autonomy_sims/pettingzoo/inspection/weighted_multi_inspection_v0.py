@@ -323,12 +323,13 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
-        self.prev_weight_inspected = (
-            self.chief.inspection_points.get_total_weight_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
+            self.prev_weight_inspected = (
+                self.chief.inspection_points.get_total_weight_inspected()
+            )
 
         # Update simulator state
         for agent, action in actions.items():

@@ -161,7 +161,7 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
 #     r = -((abs(delta_v(v=v, prev_v=prev_v)) / m) + b)
 #     return r
 
-def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01):
+def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01, step_size: float = 1.0):
     # TODO: update docstring
     """A dense reward based on the deputy's fuel
     use (change in velocity).
@@ -189,7 +189,7 @@ def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: 
     float
         reward value
     """
-    dv = delta_v(control=control, m=m)
+    dv = delta_v(control=control, m=m, step_size=step_size)
     r = scale * dv + b
     return r
 
@@ -225,7 +225,7 @@ def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
 
 
 # pylint:disable=W1401
-def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float):
+def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float, scale: float = 0.0005, max_diff: float = 1.0):
     r"""A dense gaussian decaying reward which reward the agent
     for facing the chief.
 
@@ -251,13 +251,18 @@ def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float
     float
         reward value
     """
+    reward = 0.0
     rel_pos = chief.position - deputy.position
     rel_pos = rel_pos / np.linalg.norm(rel_pos)
-    gaussian_decay = np.exp(-np.abs(((np.dot(
+
+    diff = (np.dot(
         Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
         rel_pos,
-    ) - 1)**2) / epsilon))
-    reward = 0.0005 * gaussian_decay
+    ))**2
+    abs_diff = abs(diff)
+    if not abs_diff > max_diff:
+        gaussian_decay = np.exp(-np.abs(diff / epsilon))
+        reward = scale * gaussian_decay
     return reward
 
 
@@ -285,4 +290,11 @@ def live_timestep_reward(t: int, t_max: int):
     reward = 0.0
     if t < t_max:
         reward = 0.001
+    return reward
+
+
+def max_distance_reward(chief: sim.Target, deputy: sim.Inspector, max_distance: float, scale: float = -1.0):
+    # TODO: docstring
+    d = rel_dist(pos1=deputy.position, pos2=chief.position)
+    reward = scale if d > max_distance else 0.0
     return reward

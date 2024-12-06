@@ -249,9 +249,10 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
 
         # Update simulator state
         for a, action in actions.items():
