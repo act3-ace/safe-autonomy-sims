@@ -205,6 +205,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         num_agents: int = 2,
         success_threshold: float = 100,
         crash_radius: float = 15,
+        collision_radius: float = 10,
         max_distance: float = 800,
         max_time: float = 1000,
     ) -> None:
@@ -212,6 +213,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Environment parameters
         self.crash_radius = crash_radius
+        self.collision_radius = collision_radius
         self.max_distance = max_distance
         self.max_time = max_time
         self.success_threshold = success_threshold
@@ -247,9 +249,10 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
 
         # Update simulator state
         for a, action in actions.items():
@@ -280,7 +283,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         self.chief = sim.Target(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
         )
         self.deputies = {
             a: sim.Inspector(
@@ -300,7 +303,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         }
         self.sun = sim.Sun(theta=self.rng.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
-            frame_rate=1,
+            frame_rate=0.1,
             inspectors=list(self.deputies.values()),
             targets=[self.chief],
             sun=self.sun,
@@ -312,7 +315,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         obs[:3] = deputy.position
         obs[3:6] = deputy.velocity
         obs[6] = self.sun.theta
-        obs[7] = self.chief.inspection_points.get_num_points_inspected()
+        obs[7] = self.chief.inspection_points.get_num_points_inspected(inspector_entity=deputy)
         obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(
             camera=deputy.camera, sun=self.sun
         )
@@ -326,19 +329,20 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def _get_reward(self, agent):
         reward = 0
+        components = {a: {} for a in self.possible_agents}
         deputy = self.deputies[agent]
 
         # Dense rewards
         points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        self.reward_components[agent]["observed_points"] = points_reward
+        components[agent]["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
-        self.reward_components[agent]["delta_v"] = delta_v_reward
+        components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         # Sparse rewards
@@ -346,7 +350,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        self.reward_components[agent]["success"] = success_reward
+        components[agent]["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(
@@ -354,9 +358,10 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             deputy=deputy,
             crash_radius=self.crash_radius,
         )
-        self.reward_components[agent]["crash"] = crash_reward
+        components[agent]["crash"] = crash_reward
         reward += crash_reward
 
+        self.reward_components = components
         return reward
 
     def _get_terminated(self, agent):
@@ -373,10 +378,18 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             self.chief.inspection_points.get_num_points_inspected()
             == self.success_threshold
         )
+        collision = False
+        for name, other_deputy in self.deputies.items():
+            if name == agent:
+                continue
+            radial_distance = np.linalg.norm(deputy.position - other_deputy.position)
+            collision = collision or radial_distance < self.collision_radius
 
         # Update Status
         if crash:
             self.status[agent] = "Crash"
+        elif collision:
+            self.status[agent] = "Collision"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
@@ -384,7 +397,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         elif all_inspected:
             self.status[agent] = "Success"
 
-        return oob or crash or timeout or all_inspected
+        return oob or crash or collision or timeout or all_inspected
 
     @functools.lru_cache(maxsize=None)
     def observation_space(self, agent: typing.Any) -> gym.Space:
