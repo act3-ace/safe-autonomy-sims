@@ -55,7 +55,38 @@ def distance_pivot_reward(
     return r
 
 
-def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
+# def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
+#     """A dense reward based on the deputy's fuel
+#     use (change in velocity).
+
+#     $r_t = -((\deltav / m) + b)$
+
+#     where
+#     * $\deltav$ is the change in velocity
+#     * $m$ is the mass of the deputy
+#     * $b$ is a tunable bias term
+
+#     Parameters
+#     ----------
+#     v : np.ndarray
+#         current velocity
+#     prev_v : np.ndarray
+#         previous velocity
+#     m : float, optional
+#         deputy mass, by default 12.0
+#     b : float, optional
+#         bias term, by default 0.0
+
+#     Returns
+#     -------
+#     float
+#         reward value
+#     """
+#     r = -((abs(utils.delta_v(v=v, prev_v=prev_v)) / m) + b)
+#     return r
+
+def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01):
+    # TODO: update docstring
     """A dense reward based on the deputy's fuel
     use (change in velocity).
 
@@ -68,10 +99,10 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
 
     Parameters
     ----------
-    v : np.ndarray
-        current velocity
-    prev_v : np.ndarray
-        previous velocity
+    state : dict
+        current simulation state
+    prev_state : dict
+        previous simulation state
     m : float, optional
         deputy mass, by default 12.0
     b : float, optional
@@ -82,7 +113,8 @@ def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float 
     float
         reward value
     """
-    r = -((abs(utils.delta_v(v=v, prev_v=prev_v)) / m) + b)
+    dv = utils.delta_v(control=control, m=m)
+    r = scale * dv + b
     return r
 
 
@@ -184,7 +216,7 @@ def timeout_reward(t: float, max_time: float = 2000):
         reward value
     """
     r = 0
-    if t > max_time:
+    if t >= max_time:
         r = -1.0
     return r
 

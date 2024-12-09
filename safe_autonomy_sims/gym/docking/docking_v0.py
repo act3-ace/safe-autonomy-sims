@@ -3,6 +3,7 @@
 from typing import Any, SupportsFloat
 import numpy as np
 import gymnasium as gym
+import copy
 import safe_autonomy_simulation
 from gymnasium import spaces
 import safe_autonomy_sims.gym.docking.reward as r
@@ -210,6 +211,8 @@ class DockingEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.episode_v_violations = 0
@@ -270,29 +273,28 @@ class DockingEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {"reward_components": self.reward_components, "status": self.status}
+        return {"reward_components": copy.copy(self.reward_components), "status": copy.copy(self.status)}
 
     def _get_reward(self):
         reward = 0.0
-        components = {}
 
         # Dense rewards
         dist_pivot_reward = r.distance_pivot_reward(
             state=self.sim_state, prev_state=self.prev_state
         )
-        components["distance_pivot"] = dist_pivot_reward
+        self.reward_components["distance_pivot"] = dist_pivot_reward
         reward += dist_pivot_reward
 
         delta_v_reward = r.delta_v_reward(
             control=self.deputy.last_control
         )
-        components["delta_v"] = delta_v_reward
+        self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         vel_constraint_reward = r.velocity_constraint_reward(
             state=self.sim_state, v_limit=v_limit(self.sim_state)
         )
-        components["velocity_constraint"] = vel_constraint_reward
+        self.reward_components["velocity_constraint"] = vel_constraint_reward
         reward += vel_constraint_reward
 
         # Sparse rewards
@@ -303,13 +305,13 @@ class DockingEnv(gym.Env):
             docking_radius=self.docking_radius,
             max_time=self.max_time,
         )
-        components["success"] = success_reward
+        self.reward_components["success"] = success_reward
         reward += success_reward
 
         timeout_reward = r.timeout_reward(
             t=self.simulator.sim_time, max_time=self.max_time
         )
-        components["timeout"] = timeout_reward
+        self.reward_components["timeout"] = timeout_reward
         reward += timeout_reward
 
         crash_reward = r.crash_reward(
@@ -317,16 +319,15 @@ class DockingEnv(gym.Env):
             vel_limit=v_limit(state=self.sim_state),
             docking_radius=self.docking_radius,
         )
-        components["crash"] = crash_reward
+        self.reward_components["crash"] = crash_reward
         reward += crash_reward
 
         oob_reward = r.out_of_bounds_reward(
             state=self.sim_state, max_distance=self.max_distance
         )
-        components["out_of_bounds"] = oob_reward
+        self.reward_components["out_of_bounds"] = oob_reward
         reward += oob_reward
 
-        self.reward_components = components
         return reward
 
     def _get_terminated(self):

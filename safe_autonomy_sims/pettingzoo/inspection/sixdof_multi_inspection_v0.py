@@ -342,6 +342,8 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(a) for a in self.agents}
+        self.reward_components = {a: {} for a in self.agents}
+        self.status = {a: "Running" for a in self.agents}
         infos = {a: self._get_info(a) for a in self.agents}
         self.prev_state = {}
         self.prev_num_inspected = 0
@@ -535,38 +537,37 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def _get_info(self, agent: typing.Any) -> dict[str, typing.Any]:
         return {
-            "reward_components": self.reward_components[agent],
-            "status": self.status[agent],
+            "reward_components": copy.copy(self.reward_components[agent]),
+            "status": copy.copy(self.status[agent]),
         }
 
     def _get_reward(self, agent: typing.Any) -> float:
         reward = 0.0
-        components = {a: {} for a in self.possible_agents}
         deputy = self.deputies[agent]
 
         # Dense rewards
         points_reward = r.weighted_observed_points_reward(
             chief=self.chief, prev_weight_inspected=self.prev_weight_inspected
         )
-        components[agent]["observed_points"] = points_reward
+        self.reward_components[agent]["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
-        components[agent]["delta_v"] = delta_v_reward
+        self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         live_timestep_reward = r.live_timestep_reward(
             t=self.simulator.sim_time, t_max=self.max_time
         )
-        components[agent]["live_timestep"] = live_timestep_reward
+        self.reward_components[agent]["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
         facing_chief_reward = r.facing_chief_reward(
             chief=self.chief, deputy=deputy, epsilon=0.01
         )
-        components[agent]["facing_chief"] = facing_chief_reward
+        self.reward_components[agent]["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
         # Sparse rewards
@@ -579,16 +580,15 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             < self.crash_radius
         ):
             success_reward = -1.0
-        components[agent]["success"] = success_reward
+        self.reward_components[agent]["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(
             chief=self.chief, deputy=deputy, crash_radius=self.crash_radius
         )
-        components[agent]["crash"] = crash_reward
+        self.reward_components[agent]["crash"] = crash_reward
         reward += crash_reward
 
-        self.reward_components = components
         return reward
 
     def _get_terminated(self, agent: typing.Any) -> bool:

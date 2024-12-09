@@ -3,6 +3,7 @@
 import typing
 import numpy as np
 import gymnasium as gym
+import copy
 import safe_autonomy_simulation.sims.inspection as sim
 import safe_autonomy_sims.gym.inspection.reward as r
 import safe_autonomy_sims.gym.inspection.utils as utils
@@ -253,6 +254,8 @@ class InspectionEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -326,23 +329,22 @@ class InspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {"reward_components": self.reward_components, "status": self.status}
+        return {"reward_components": copy.copy(self.reward_components), "status": copy.copy(self.status)}
 
     def _get_reward(self):
         reward = 0
-        components = {}
 
         # Dense rewards
         points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        components["observed_points"] = points_reward
+        self.reward_components["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
             control=self.deputy.last_control
         )
-        components["delta_v"] = delta_v_reward
+        self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         # Sparse rewards
@@ -350,7 +352,7 @@ class InspectionEnv(gym.Env):
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        components["success"] = success_reward
+        self.reward_components["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(
@@ -358,10 +360,9 @@ class InspectionEnv(gym.Env):
             deputy=self.deputy,
             crash_radius=self.crash_radius,
         )
-        components["crash"] = crash_reward
+        self.reward_components["crash"] = crash_reward
         reward += crash_reward
 
-        self.reward_components = components
         return reward
 
     def _get_terminated(self):

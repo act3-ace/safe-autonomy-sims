@@ -3,6 +3,7 @@ import typing
 
 import gymnasium as gym
 import numpy as np
+import copy
 import safe_autonomy_simulation.sims.inspection as sim
 from gymnasium.core import RenderFrame
 from scipy.spatial.transform import Rotation
@@ -411,6 +412,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -566,48 +569,46 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
     def _get_info(self):
         return {
-            "reward_components": self.reward_components,
-            "status": self.status
+            "reward_components": copy.copy(self.reward_components),
+            "status": copy.copy(self.status)
         }
 
     def _get_reward(self):
         reward = 0
-        components = {}
 
         # Dense rewards
         points_reward = r.weighted_observed_points_reward(chief=self.chief, prev_weight_inspected=self.prev_weight_inspected)
-        components["observed_points"] = points_reward
+        self.reward_components["observed_points"] = points_reward
         reward += points_reward
 
         step_size = 1 / self.simulator.frame_rate
         delta_v_reward = r.delta_v_reward(control=self.deputy.orientation, scale=-0.005, step_size=step_size)
-        components["delta_v"] = delta_v_reward
+        self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
-        components["live_timestep"] = live_timestep_reward
+        self.reward_components["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
         facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.15)
-        components["facing_chief"] = facing_chief_reward
+        self.reward_components["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(chief=self.chief, total_weight=self.success_threshold)
         if (success_reward > 0 and closest_fft_distance(chief=self.chief, deputy=self.deputy) < self.crash_radius):
             success_reward = -1.0
-        components["success"] = success_reward
+        self.reward_components["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
-        components["crash"] = crash_reward
+        self.reward_components["crash"] = crash_reward
         reward += crash_reward
 
         max_distance_reward = r.max_distance_reward(chief=self.chief, deputy=self.deputy, max_distance=self.max_distance)
-        components["max_distance"] = max_distance_reward
+        self.reward_components["max_distance"] = max_distance_reward
         reward += max_distance_reward
 
-        self.reward_components = components
         return reward
 
     def _get_terminated(self):

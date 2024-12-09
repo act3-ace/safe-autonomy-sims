@@ -85,7 +85,7 @@ def test_validate_multiagent_docking_pettingzoo_with_corl(corl_data, onnx_model_
     truncation = dict.fromkeys(deputies, False)
     obs_array = []
     control_array = []
-    reward_components_array = []
+    info_array = []
 
     # Continue until done
     while not any(termination.values()) and not any(truncation.values()):
@@ -95,7 +95,7 @@ def test_validate_multiagent_docking_pettingzoo_with_corl(corl_data, onnx_model_
         observations, rewards, termination, truncation, infos = env.step(action)
         obs_array.append(observations)
         control_array.append(action)
-        reward_components_array.append(infos)
+        info_array.append(infos)
 
     # assert that obs, actions, and rewards aligns with data from corl environment
     corl_obs = corl_data["obs"]
@@ -105,15 +105,34 @@ def test_validate_multiagent_docking_pettingzoo_with_corl(corl_data, onnx_model_
     # check episode lengths
     assert len(corl_obs) == len(obs_array)
     assert len(corl_actions) == len(control_array)
-    assert len(corl_rewards) == len(reward_components_array)
+    assert len(corl_rewards) == len(info_array)
 
     # check values
     for i, corl_step_action in enumerate(corl_actions):
-        print(i)
         for deputy, model in zip(deputies, models):
+            # TODO: grade tolerance such that it increases with episode length
             assert np.allclose(corl_step_action[model], control_array[i][deputy], rtol=8e-01, atol=1e-08)
 
     for i, corl_step_obs in enumerate(corl_obs):
-        print(i)
         for deputy, model in zip(deputies, models):
             assert np.allclose(corl_step_obs[model], obs_array[i][deputy], rtol=1e-02, atol=1e-08)
+
+    for i, corl_step_rewards in enumerate(corl_rewards):
+        for deputy, model in zip(deputies, models):
+            if i > 0:
+                # CoRL distance reward is always 0 on the first step
+                corl_distance = corl_step_rewards[model]["DockingDistanceExponentialChangeReward"]
+                distance = info_array[i][deputy]["reward_components"]['distance_pivot']
+                assert corl_distance == pytest.approx(distance, rel=1e-03, abs=1e-10)
+            corl_delta_v = corl_step_rewards[model]["DockingDeltaVReward"]
+            delta_v = info_array[i][deputy]["reward_components"]['delta_v']
+            assert corl_delta_v == pytest.approx(delta_v, rel=1e-04, abs=1e-08)
+            corl_vel_const = corl_step_rewards[model]["DockingVelocityConstraintReward"]
+            vel_const = info_array[i][deputy]["reward_components"]['velocity_constraint']
+            assert corl_vel_const == pytest.approx(vel_const, rel=1e-04)
+            corl_success = corl_step_rewards[model]["DockingSuccessReward"]
+            success = info_array[i][deputy]["reward_components"]["success"]
+            assert corl_success == pytest.approx(success, rel=1e-04)
+            corl_failure = corl_step_rewards[model]["DockingFailureReward"]
+            failure = info_array[i][deputy]["reward_components"]['timeout'] + info_array[i][deputy]["reward_components"]['crash'] + info_array[i][deputy]["reward_components"]['out_of_bounds']
+            assert corl_failure == pytest.approx(failure, rel=1e-04)

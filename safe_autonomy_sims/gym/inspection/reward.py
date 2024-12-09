@@ -288,7 +288,7 @@ def live_timestep_reward(t: int, t_max: int):
         reward value
     """
     reward = 0.0
-    if t < t_max:
+    if t <= t_max:
         reward = 0.001
     return reward
 

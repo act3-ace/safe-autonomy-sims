@@ -223,7 +223,7 @@ def live_timestep_reward(t: float, t_max: float):
     """A dense reward which rewards the agent for
     each timestep it remains active in the simulation.
 
-    $r_t = 0.001 if t < t_{max}$
+    $r_t = 0.001 if t <= t_{max}$
 
     where $t$ is the current time step and $t_{max}$
     is the maximum allowable time for the episode.
@@ -241,6 +241,6 @@ def live_timestep_reward(t: float, t_max: float):
         reward value
     """
     reward = 0.0
-    if t < t_max:
+    if t <= t_max:
         reward = 0.001
     return reward

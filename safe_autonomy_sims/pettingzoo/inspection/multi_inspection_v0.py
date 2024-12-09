@@ -232,6 +232,8 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(a) for a in self.agents}
+        self.reward_components = {a: {} for a in self.agents}
+        self.status = {a: "Running" for a in self.agents}
         infos = {a: self._get_info(a) for a in self.agents}
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -323,26 +325,25 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
 
     def _get_info(self, agent):
         return {
-            "reward_components": self.reward_components[agent],
-            "status": self.status[agent],
+            "reward_components": copy.copy(self.reward_components[agent]),
+            "status": copy.copy(self.status[agent]),
         }
 
     def _get_reward(self, agent):
         reward = 0
-        components = {a: {} for a in self.possible_agents}
         deputy = self.deputies[agent]
 
         # Dense rewards
         points_reward = r.observed_points_reward(
             chief=self.chief, prev_num_inspected=self.prev_num_inspected
         )
-        components[agent]["observed_points"] = points_reward
+        self.reward_components[agent]["observed_points"] = points_reward
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
             v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
         )
-        components[agent]["delta_v"] = delta_v_reward
+        self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         # Sparse rewards
@@ -350,7 +351,7 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             chief=self.chief,
             total_points=self.success_threshold,
         )
-        components[agent]["success"] = success_reward
+        self.reward_components[agent]["success"] = success_reward
         reward += success_reward
 
         crash_reward = r.crash_reward(
@@ -358,10 +359,9 @@ class MultiInspectionEnv(pettingzoo.ParallelEnv):
             deputy=deputy,
             crash_radius=self.crash_radius,
         )
-        components[agent]["crash"] = crash_reward
+        self.reward_components[agent]["crash"] = crash_reward
         reward += crash_reward
 
-        self.reward_components = components
         return reward
 
     def _get_terminated(self, agent):

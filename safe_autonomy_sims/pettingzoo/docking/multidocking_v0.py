@@ -202,6 +202,8 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(agent=a) for a in self.agents}
+        self.reward_components = {a: {} for a in self.agents}
+        self.status = {a: "Running" for a in self.agents}
         infos = {a: self._get_info(agent=a) for a in self.agents}
         self.prev_state = None
         self.episode_v_violations = {a: 0. for a in self.agents}
@@ -281,13 +283,12 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
     def _get_info(self, agent: str) -> dict[str, typing.Any]:
         return {
-            "reward_components": self.reward_components[agent],
-            "status": self.status[agent],
+            "reward_components": copy.copy(self.reward_components[agent]),
+            "status": copy.copy(self.status[agent]),
         }
 
     def _get_reward(self, agent: str) -> float:
         reward = 0
-        components = {a: {} for a in self.possible_agents}
         deputy = self.deputies[agent]
 
         # Dense rewards
@@ -297,13 +298,13 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
                 pos1=self.prev_state["chief"][0:3], pos2=self.prev_state[agent][0:3]
             ),
         )
-        components[agent]["distance_pivot"] = dist_pivot_reward
+        self.reward_components[agent]["distance_pivot"] = dist_pivot_reward
         reward += dist_pivot_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
+            control=deputy.last_control
         )
-        components[agent]["delta_v"] = delta_v_reward
+        self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         vel_const_reward = r.velocity_constraint_reward(
@@ -313,7 +314,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
                 chief_pos=self.chief.position, deputy_pos=deputy.position
             ),
         )
-        components[agent]["velocity_constraint"] = vel_const_reward
+        self.reward_components[agent]["velocity_constraint"] = vel_const_reward
         reward += vel_const_reward
 
         # Sparse rewards
@@ -327,13 +328,13 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
             docking_radius=self.docking_radius,
             max_time=self.max_time,
         )
-        components[agent]["success"] = success_reward
+        self.reward_components[agent]["success"] = success_reward
         reward += success_reward
 
         timeout_reward = r.timeout_reward(
             t=self.simulator.sim_time, max_time=self.max_time
         )
-        components[agent]["timeout"] = timeout_reward
+        self.reward_components[agent]["timeout"] = timeout_reward
         reward += timeout_reward
 
         crash_reward = r.crash_reward(
@@ -344,7 +345,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
             ),
             docking_radius=self.docking_radius,
         )
-        components[agent]["crash"] = crash_reward
+        self.reward_components[agent]["crash"] = crash_reward
         reward += crash_reward
 
         oob_reward = r.out_of_bounds_reward(
@@ -352,10 +353,9 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
             deputy_pos=deputy.position,
             max_distance=self.max_distance,
         )
-        components[agent]["out_of_bounds"] = oob_reward
+        self.reward_components[agent]["out_of_bounds"] = oob_reward
         reward += oob_reward
 
-        self.reward_components = components
         return reward
 
     def _get_terminated(self, agent: str) -> bool:

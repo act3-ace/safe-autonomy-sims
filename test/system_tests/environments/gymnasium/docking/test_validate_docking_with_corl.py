@@ -150,9 +150,9 @@ def test_validate_docking_gym_with_corl(corl_data, initial_conditions, onxx_mode
     for i, corl_step_rewards in enumerate(corl_rewards):
         if i > 0:
             # CoRL distance reward is always 0 on the first step
-            corl_delta_v = corl_step_rewards["DockingDistanceExponentialChangeReward"]
-            delta_v = reward_components_array[i]['distance_pivot']
-            assert corl_delta_v == pytest.approx(delta_v, rel=1e-04, abs=1e-10)
+            corl_distance = corl_step_rewards["DockingDistanceExponentialChangeReward"]
+            distance = reward_components_array[i]['distance_pivot']
+            assert corl_distance == pytest.approx(distance, rel=1e-04, abs=1e-10)
         corl_delta_v = corl_step_rewards["DockingDeltaVReward"]
         delta_v = reward_components_array[i]['delta_v']
         assert corl_delta_v == pytest.approx(delta_v, rel=1e-04)
