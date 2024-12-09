@@ -166,7 +166,6 @@ def test_validate_sixdof_inspection_gym_with_corl(corl_data, initial_conditions,
 
     for i, corl_step_rewards in enumerate(corl_rewards):
         print(i)
-
         corl_inspected_points = corl_step_rewards["ObservedPointsReward"]
         inspected_points = reward_components_array[i]['observed_points']
         assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)

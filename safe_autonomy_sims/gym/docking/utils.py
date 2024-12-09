@@ -64,25 +64,6 @@ def rel_vel(state: dict):
     return rel_v
 
 
-# def delta_v(state: dict, prev_state: dict):
-#     """The change in velocity of the deputy.
-
-#     Parameters
-#     ----------
-#     state : dict
-#         the current simulation state
-#     prev_state : dict
-#         the previous simulation state
-
-#     Returns
-#     -------
-#     float
-#         the deputy's change in velocity
-#     """
-#     v = np.linalg.norm(state["deputy"][3:6])
-#     prev_v = np.linalg.norm(prev_state["deputy"][3:6])
-#     return v - prev_v
-
 def delta_v(control: np.ndarray, m: float = 12.0):
     """The change in velocity of the deputy.
 

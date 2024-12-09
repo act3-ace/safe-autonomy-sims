@@ -389,8 +389,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=deputy.velocity,
-            prev_v=self.prev_state[agent][3:6],
+            control=deputy.last_control
         )
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward

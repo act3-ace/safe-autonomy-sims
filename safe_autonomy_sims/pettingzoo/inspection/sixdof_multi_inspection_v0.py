@@ -553,7 +553,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
+            control=deputy.last_control
         )
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
@@ -588,6 +588,10 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         )
         self.reward_components[agent]["crash"] = crash_reward
         reward += crash_reward
+
+        max_distance_reward = r.max_distance_reward(chief=self.chief, deputy=deputy, max_distance=self.max_distance)
+        self.reward_components["max_distance"] = max_distance_reward
+        reward += max_distance_reward
 
         return reward
 

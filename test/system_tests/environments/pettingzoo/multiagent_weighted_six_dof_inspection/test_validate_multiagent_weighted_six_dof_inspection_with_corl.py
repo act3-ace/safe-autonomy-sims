@@ -162,7 +162,7 @@ def test_validate_multiagent_six_dof_inspection_pettingzoo_with_corl(corl_data, 
     truncation = dict.fromkeys(deputies, False)
     obs_array = []
     control_array = []
-    reward_components_array = []
+    info_array = []
 
     # Continue until done
     while not any(termination.values()) and not any(truncation.values()):
@@ -177,7 +177,7 @@ def test_validate_multiagent_six_dof_inspection_pettingzoo_with_corl(corl_data, 
         observations, rewards, termination, truncation, infos = env.step(reordered_actions)
         obs_array.append(observations)
         control_array.append(corl_actions)
-        reward_components_array.append(infos)
+        info_array.append(infos)
 
     # assert that obs, actions, and rewards aligns with data from corl environment
     corl_obs0 = corl_data["obs0"]
@@ -212,19 +212,75 @@ def test_validate_multiagent_six_dof_inspection_pettingzoo_with_corl(corl_data, 
         if gym_step_obs_dict['deputy_2'] is not None:
             assert np.allclose(corl_obs2[i], gym_step_obs_dict['deputy_2'], rtol=1e-02, atol=1e-03)
 
-    # for i, corl_step_rewards in enumerate(corl_rewards):
-    #     # reward components are different*
-    #     # cherry pick for now, lowest priority
-    #     print(i)
-    #     corl_delta_v = corl_step_rewards["DockingDeltaVReward"]
-    #     delta_v = reward_components_array[i]['delta_v']
-    #     assert corl_delta_v == delta_v
-    #     corl_vel_const = corl_step_rewards["DockingVelocityConstraintReward"]
-    #     vel_const = reward_components_array[i]['velocity_constraint']
-    #     assert corl_vel_const == vel_const
-    #     corl_success = corl_step_rewards["DockingSuccessReward"]
-    #     success = reward_components_array[i]["success"]
-    #     assert corl_success == success
-    #     # corl_failure = corl_step_rewards["DockingFailureReward"]
-    #     # failure = reward_components_array[i]['timeout'] + reward_components_array[i]['crash'] + reward_components_array[i]['out_of_bounds']
-    #     # assert corl_failure == failure
+    for i, gym_step_rewards in enumerate(info_array):
+        if gym_step_obs_dict['deputy_0'] is not None:
+            corl_inspected_points = corl_rewards0[i]["ObservedPointsReward"]
+            inspected_points = gym_step_rewards['deputy_0']['reward_components']['observed_points']
+            assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)
+            corl_success = corl_rewards0[i]["SafeInspectionSuccessReward"]
+            success = gym_step_rewards['deputy_0']['reward_components']["success"]
+            assert corl_success == pytest.approx(success, rel=1e-04, abs=1e-10)
+            corl_crash = corl_rewards0[i]["InspectionCrashReward"]
+            crash = gym_step_rewards['deputy_0']['reward_components']['crash']
+            assert corl_crash == pytest.approx(crash, rel=1e-04, abs=1e-10)
+            # corl_max_dist = corl_rewards0[i]["MaxDistanceDoneReward"]
+            # max_dist = gym_step_rewards['deputy_0']['reward_components']['max_distance']
+            # assert corl_max_dist == pytest.approx(max_dist, rel=1e-04, abs=1e-10)
+            # corl_live_timestep = corl_rewards0[i]["LiveTimestepReward"]
+            # live_timestep = gym_step_rewards['deputy_0']['reward_components']['live_timestep']
+            # assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            # corl_facing_chief = corl_rewards0[i]["FacingChiefReward"]
+            # facing_chief = gym_step_rewards['deputy_0']['reward_components']['facing_chief']
+            # if corl_facing_chief != 0.0:
+            #     assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-04, abs=1e-10)
+            corl_delta_v = corl_rewards0[i]["InspectionDeltaVReward"]
+            delta_v = gym_step_rewards['deputy_0']['reward_components']['delta_v']
+            assert corl_delta_v == pytest.approx(delta_v, rel=1e-03, abs=1e-10)
+        
+        if gym_step_obs_dict['deputy_1'] is not None:
+            corl_inspected_points = corl_rewards1[i]["ObservedPointsReward"]
+            inspected_points = gym_step_rewards['deputy_1']['reward_components']['observed_points']
+            assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)
+            corl_success = corl_rewards1[i]["SafeInspectionSuccessReward"]
+            success = gym_step_rewards['deputy_1']['reward_components']["success"]
+            assert corl_success == pytest.approx(success, rel=1e-04, abs=1e-10)
+            corl_crash = corl_rewards1[i]["InspectionCrashReward"]
+            crash = gym_step_rewards['deputy_1']['reward_components']['crash']
+            assert corl_crash == pytest.approx(crash, rel=1e-04, abs=1e-10)
+            # corl_live_timestep = corl_rewards1[i]["MaxDistanceDoneReward"]
+            # live_timestep = gym_step_rewards['deputy_1']['reward_components']['max_distance']
+            # assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            # corl_live_timestep = corl_rewards1[i]["LiveTimestepReward"]
+            # live_timestep = gym_step_rewards['deputy_1']['reward_components']['live_timestep']
+            # assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            # corl_facing_chief = corl_rewards1[i]["FacingChiefReward"]
+            # facing_chief = gym_step_rewards['deputy_1']['reward_components']['facing_chief']
+            # if corl_facing_chief != 0.0:
+            #     assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-04, abs=1e-10)
+            corl_delta_v = corl_rewards1[i]["InspectionDeltaVReward"]
+            delta_v = gym_step_rewards['deputy_1']['reward_components']['delta_v']
+            assert corl_delta_v == pytest.approx(delta_v, rel=1e-03, abs=1e-10)
+        
+        if gym_step_obs_dict['deputy_2'] is not None:
+            corl_inspected_points = corl_rewards2[i]["ObservedPointsReward"]
+            inspected_points = gym_step_rewards['deputy_2']['reward_components']['observed_points']
+            assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)
+            corl_success = corl_rewards2[i]["SafeInspectionSuccessReward"]
+            success = gym_step_rewards['deputy_2']['reward_components']["success"]
+            assert corl_success == pytest.approx(success, rel=1e-04, abs=1e-10)
+            corl_crash = corl_rewards2[i]["InspectionCrashReward"]
+            crash = gym_step_rewards['deputy_2']['reward_components']['crash']
+            assert corl_crash == pytest.approx(crash, rel=1e-04, abs=1e-10)
+            # corl_live_timestep = corl_rewards2[i]["MaxDistanceDoneReward"]
+            # live_timestep = gym_step_rewards['deputy_2']['reward_components']['max_distance']
+            # assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            # corl_live_timestep = corl_rewards2[i]["LiveTimestepReward"]
+            # live_timestep = gym_step_rewards['deputy_2']['reward_components']['live_timestep']
+            # assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            # corl_facing_chief = corl_rewards2[i]["FacingChiefReward"]
+            # facing_chief = gym_step_rewards['deputy_2']['reward_components']['facing_chief']
+            # if corl_facing_chief != 0.0:
+            #     assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-04, abs=1e-10)
+            corl_delta_v = corl_rewards2[i]["InspectionDeltaVReward"]
+            delta_v = gym_step_rewards['deputy_2']['reward_components']['delta_v']
+            assert corl_delta_v == pytest.approx(delta_v, rel=1e-03, abs=1e-10)
