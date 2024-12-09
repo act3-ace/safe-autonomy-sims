@@ -3,6 +3,7 @@ import typing
 
 import gymnasium as gym
 import numpy as np
+import copy
 import safe_autonomy_simulation.sims.inspection as sim
 from gymnasium.core import RenderFrame
 from scipy.spatial.transform import Rotation
@@ -312,14 +313,14 @@ class WeightedSixDofInspectionEnv(gym.Env):
                     [-np.inf] * 3,  # deputy velocity
                     [-np.inf] * 4,  # deputy velocity magnorm
                     [-np.inf] * 3,  # deputy angular velocity
-                    [-2 * np.pi] * 3,  # deputy orientation (euler)
-                    [-1],  # facing chief dot product
-                    [0],  # sun angle
-                    [0],  # number of inspected points
-                    [-1] * 3,  # nearest cluster unit vector
-                    [-1] * 3,  # priority vector unit vector
-                    [0],  # cumulative weight of inspected points
-                    [-1],  # facing cluster dot product
+                    [-1] * 3,   # camera orientation
+                    [-1] * 3,   # x axis
+                    [-1] * 3,   # z axis
+                    [-1] * 3,   # uninspected points
+                    [-1] * 3,   # sun angle vector
+                    [-1] * 3,   # priority vector
+                    [0],  # inspected points score
+                    [-1],   # dot product of uninspected points and deputy position
                 )
             ),
             np.concatenate(
@@ -329,19 +330,58 @@ class WeightedSixDofInspectionEnv(gym.Env):
                     [np.inf] * 3,  # deputy velocity
                     [np.inf] * 4,  # deputy velocity magnorm
                     [np.inf] * 3,  # deputy angular velocity
-                    [2 * np.pi] * 3,  # deputy orientation
-                    [1],  # facing chief dot product
-                    [2 * np.pi],  # sun angle
-                    [100],  # number of inspected points
-                    [1] * 3,  # nearest cluster unit vector
-                    [1] * 3,  # priority vector unit vector
-                    [1],  # cumulative weight of inspected points
-                    [1],  # facing cluster dot product
+                    [1] * 3,   # camera orientation
+                    [1] * 3,   # x axis
+                    [1] * 3,   # z axis
+                    [1] * 3,   # uninspected points
+                    [1] * 3,   # sun angle vector
+                    [1] * 3,   # priority vector
+                    [np.inf],  # inspected points score
+                    [1],   # dot product of uninspected points and deputy position
                 )
             ),
-            shape=(31, ),
+            shape=(37, ),
             dtype=np.float64,
         )
+        # original obs space
+        # self.observation_space = gym.spaces.Box(
+        #     np.concatenate(
+        #         (
+        #             [-np.inf] * 3,  # deputy position
+        #             [-np.inf] * 4,  # deputy position magnorm
+        #             [-np.inf] * 3,  # deputy velocity
+        #             [-np.inf] * 4,  # deputy velocity magnorm
+        #             [-np.inf] * 3,  # deputy angular velocity
+        #             [-2 * np.pi] * 3,  # deputy orientation (euler)
+        #             [-1],  # facing chief dot product
+        #             [0],  # sun angle
+        #             [0],  # number of inspected points
+        #             [-1] * 3,  # nearest cluster unit vector
+        #             [-1] * 3,  # priority vector unit vector
+        #             [0],  # cumulative weight of inspected points
+        #             [-1],  # facing cluster dot product
+        #         )
+        #     ),
+        #     np.concatenate(
+        #         (
+        #             [np.inf] * 3,  # deputy position
+        #             [np.inf] * 4,  # deputy position magnorm
+        #             [np.inf] * 3,  # deputy velocity
+        #             [np.inf] * 4,  # deputy velocity magnorm
+        #             [np.inf] * 3,  # deputy angular velocity
+        #             [2 * np.pi] * 3,  # deputy orientation
+        #             [1],  # facing chief dot product
+        #             [2 * np.pi],  # sun angle
+        #             [100],  # number of inspected points
+        #             [1] * 3,  # nearest cluster unit vector
+        #             [1] * 3,  # priority vector unit vector
+        #             [1],  # cumulative weight of inspected points
+        #             [1],  # facing cluster dot product
+        #         )
+        #     ),
+        #     shape=(31, ),
+        #     dtype=np.float64,
+        # )
         self.action_space = gym.spaces.Box(
             np.array([-1, -1, -1, -0.001, -0.001, -0.001]),
             np.array([1, 1, 1, 0.001, 0.001, 0.001]),
@@ -372,6 +412,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -385,8 +427,9 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
-        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
+            self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -407,7 +450,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.chief = sim.SixDOFTarget(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputy = sim.SixDOFInspector(
@@ -422,8 +465,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
                 theta=self.np_random.uniform(0, 2 * np.pi),
             ),
-            fov=np.pi,
-            focal_length=1,
+            fov=1.0471975511965976,  # 60 degrees
+            focal_length=9.6e-3,
         )
         self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
@@ -435,33 +478,99 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
     def _get_obs(self):
         obs = self.observation_space.sample()
-        obs[:3] = self.deputy.position
-        obs[3] = np.linalg.norm(self.deputy.position)
-        obs[4:7] = np.abs(self.deputy.position)
-        obs[7:10] = self.deputy.velocity
-        obs[10] = np.linalg.norm(self.deputy.velocity)
-        obs[11:14] = np.abs(self.deputy.velocity)
-        obs[14:17] = self.deputy.angular_velocity
-        obs[17:20] = Rotation.from_quat(self.deputy.orientation).as_euler("XYZ")
-        obs[20] = np.dot(
-            Rotation.from_quat(self.deputy.camera.orientation).as_euler("XYZ"),
-            (self.chief.position - self.deputy.position) / np.linalg.norm(self.chief.position - self.deputy.position),
-        )
-        obs[21] = self.sun.theta
-        obs[22] = self.chief.inspection_points.get_num_points_inspected()
-        obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun)
-        obs[26:29] = self.chief.inspection_points.priority_vector
-        obs[29] = self.chief.inspection_points.get_total_weight_inspected()
-        obs[30] = np.dot(
-            Rotation.from_quat(self.deputy.camera.orientation).as_euler("XYZ"),
-            self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun),
-        )
+        # Relative distance to chief rotated to deputy body-frame
+        orientation = Rotation.from_quat(self.deputy.orientation)
+        deputy_position = self.deputy.position
+        chief_position = self.chief.position
+        rotated_relative_dist = orientation.inv().apply(chief_position - deputy_position).astype(np.float64)
+        obs[:3] = rotated_relative_dist
+        # Relative distance magnorm representation
+        rotated_relative_dist_magnitude = np.linalg.norm(rotated_relative_dist)
+        rotated_relative_dist_unit_vector = rotated_relative_dist / rotated_relative_dist_magnitude
+        if rotated_relative_dist_magnitude < 1e-5:
+            rotated_relative_dist_magnitude = np.array([0.0], dtype=np.float64)
+            rotated_relative_dist_unit_vector = np.zeros_like(rotated_relative_dist_unit_vector, dtype=np.float64)
+        obs[3] = rotated_relative_dist_magnitude
+        obs[4:7] = rotated_relative_dist_unit_vector
+        # Relative velocity to chief rotated to deputy body-frame
+        orientation = Rotation.from_quat(self.deputy.orientation)
+        deputy_velocity = self.deputy.velocity
+        chief_velocity = self.chief.velocity
+        rotated_relative_vel = orientation.inv().apply(chief_velocity - deputy_velocity).astype(np.float64)
+        obs[7:10] = rotated_relative_vel
+        # Relative velocity magnorm representation
+        rotated_relative_vel_magnitude = np.linalg.norm(rotated_relative_vel)
+        rotated_relative_vel_unit_vector = rotated_relative_vel / rotated_relative_vel_magnitude
+        if rotated_relative_vel_magnitude < 1e-5:
+            rotated_relative_vel_magnitude = np.array([0.0], dtype=np.float64)
+            rotated_relative_vel_unit_vector = np.zeros_like(rotated_relative_vel_unit_vector, dtype=np.float64)
+        obs[10] = rotated_relative_vel_magnitude
+        obs[11:14] = rotated_relative_vel_unit_vector
+        # Angular Velocity
+        angular_velocity = self.deputy.angular_velocity
+        obs[14:17] = angular_velocity
+        # Hill's frame deputy camera orientation
+        # TODO: does camera orientation update? or is it relative to deputy like in corl?
+        # TODO: is there a better place to get initial camera direction? hardcoding x axis assumption
+        initial_camera_orientation = np.array([1.0, 0.0, 0.0], dtype=np.float64)
+        # initial_camera_orientation = Rotation.from_quat(self.deputy.camera._initial_orientation). # this return identity quaternion
+        rotated_camera_orientation = orientation.apply(initial_camera_orientation).astype(np.float64)
+        obs[17:20] = rotated_camera_orientation
+        # Deputy body-frame Y axis rotated to Hill's frame
+        # TODO: CoRL config comments don't seem to align w code
+        y_axis = np.array([0.0, 1.0, 0.0], dtype=np.float64)
+        rotated_y_axis = orientation.apply(y_axis).astype(np.float64)
+        obs[20:23] = rotated_y_axis # TODO: 3 dims still?
+        # Deputy body-frame Z axis rotated to Hill's frame
+        # TODO: CoRL config comments don't seem to align w code
+        z_axis = np.array([0.0, 0.0, 1.0], dtype=np.float64)
+        rotated_z_axis = orientation.apply(z_axis).astype(np.float64)
+        obs[23:26] = rotated_z_axis # TODO: 3 dims still?
+        # Uninspected points vector rotated to deputy body-frame
+        uninspected_points_vector = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun)
+        rotated_uninspected_points_vector = orientation.inv().apply(uninspected_points_vector).astype(np.float64)
+        obs[26:29] = rotated_uninspected_points_vector
+        # Sun angle unit vector rotated to deputy body-frame
+        sun_vector = np.array([np.cos(self.sun.theta), -np.sin(self.sun.theta), 0.0], dtype=np.float64)
+        rotated_sun_vector = orientation.inv().apply(sun_vector).astype(np.float64)
+        obs[29:32] = rotated_sun_vector
+        # Priority vector rotated to deputy body-frame
+        rotated_priority_vector = orientation.inv().apply(self.chief.inspection_points.priority_vector).astype(np.float32)
+        obs[32:35] = rotated_priority_vector
+        # Inspected points score
+        obs[35] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=self.deputy)
+        # Dot product of uninspected points vectors and deputy position
+        normalized_dot_product = np.dot(uninspected_points_vector, deputy_position) / (np.linalg.norm(uninspected_points_vector) * np.linalg.norm(deputy_position) + 1e-5)
+        normalized_dot_product = np.clip(normalized_dot_product, -1.0, 1.0)
+        obs[36] = normalized_dot_product
+
+        # original obs
+        # obs[4:7] = np.abs(self.deputy.position)
+        # obs[7:10] = self.deputy.velocity
+        # obs[10] = np.linalg.norm(self.deputy.velocity)
+        # obs[11:14] = np.abs(self.deputy.velocity)
+        # obs[14:17] = self.deputy.angular_velocity
+        # obs[17:20] = Rotation.from_quat(self.deputy.orientation).as_euler("XYZ")
+        # obs[20] = np.dot(
+        #     Rotation.from_quat(self.deputy.camera.orientation).as_euler("XYZ"),
+        #     (self.chief.position - self.deputy.position) / np.linalg.norm(self.chief.position - self.deputy.position),
+        # )
+        # obs[21] = self.sun.theta
+        # obs[22] = self.chief.inspection_points.get_num_points_inspected()
+        # obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun)
+        # obs[26:29] = self.chief.inspection_points.priority_vector
+        # obs[29] = self.chief.inspection_points.get_total_weight_inspected()
+        # obs[30] = np.dot(
+        #     Rotation.from_quat(self.deputy.camera.orientation).as_euler("XYZ"),
+        #     self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun),
+        # )
+
         return obs
 
     def _get_info(self):
         return {
-            "reward_components": self.reward_components,
-            "status": self.status
+            "reward_components": copy.copy(self.reward_components),
+            "status": copy.copy(self.status)
         }
 
     def _get_reward(self):
@@ -472,7 +581,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.reward_components["observed_points"] = points_reward
         reward += points_reward
 
-        delta_v_reward = r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        step_size = 1 / self.simulator.frame_rate
+        delta_v_reward = r.delta_v_reward(control=self.deputy.last_control, scale=-0.005, step_size=step_size)
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
@@ -480,7 +590,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.reward_components["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
-        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.01)
+        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.15)
         self.reward_components["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
@@ -494,6 +604,10 @@ class WeightedSixDofInspectionEnv(gym.Env):
         crash_reward = r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
         self.reward_components["crash"] = crash_reward
         reward += crash_reward
+
+        max_distance_reward = r.max_distance_reward(chief=self.chief, deputy=self.deputy, max_distance=self.max_distance)
+        self.reward_components["max_distance"] = max_distance_reward
+        reward += max_distance_reward
 
         return reward
 

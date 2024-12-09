@@ -1,6 +1,7 @@
 """Reward functions for the docking environment"""
 
 import math
+import numpy as np
 from safe_autonomy_sims.gym.docking.utils import rel_dist, rel_vel, delta_v
 
 
@@ -53,7 +54,8 @@ def distance_pivot_reward(
     return r
 
 
-def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.0):
+def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01):
+    # TODO: update docstring
     """A dense reward based on the deputy's fuel
     use (change in velocity).
 
@@ -80,7 +82,8 @@ def delta_v_reward(state: dict, prev_state: dict, m: float = 12.0, b: float = 0.
     float
         reward value
     """
-    r = -((abs(delta_v(state, prev_state)) / m) + b)
+    dv = delta_v(control=control, m=m)
+    r = scale * dv + b
     return r
 
 
