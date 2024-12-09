@@ -582,7 +582,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         reward += points_reward
 
         step_size = 1 / self.simulator.frame_rate
-        delta_v_reward = r.delta_v_reward(control=self.deputy.orientation, scale=-0.005, step_size=step_size)
+        delta_v_reward = r.delta_v_reward(control=self.deputy.last_control, scale=-0.005, step_size=step_size)
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 

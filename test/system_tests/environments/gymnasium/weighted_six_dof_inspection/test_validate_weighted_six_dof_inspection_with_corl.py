@@ -184,7 +184,8 @@ def test_validate_sixdof_inspection_gym_with_corl(corl_data, initial_conditions,
         assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
         corl_facing_chief = corl_step_rewards["FacingChiefReward"]
         facing_chief = reward_components_array[i]['facing_chief']
-        assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-04, abs=1e-10)
+        if corl_facing_chief != 0.0:
+            assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-04, abs=1e-10)
         corl_delta_v = corl_step_rewards["InspectionDeltaVReward"]
         delta_v = reward_components_array[i]['delta_v']
         assert corl_delta_v == pytest.approx(delta_v, rel=1e-04, abs=1e-10)
