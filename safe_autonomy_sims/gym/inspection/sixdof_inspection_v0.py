@@ -465,7 +465,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
                 theta=self.np_random.uniform(0, 2 * np.pi),
             ),
-            fov=1.0471975511965976,  # 60 degrees
+            fov=np.pi/3,
             focal_length=9.6e-3,
         )
         self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))

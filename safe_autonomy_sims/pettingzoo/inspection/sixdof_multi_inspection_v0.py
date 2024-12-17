@@ -423,7 +423,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
                     phi=self.rng.uniform(-np.pi / 2, np.pi / 2),
                     theta=self.rng.uniform(0, 2 * np.pi),
                 ),
-                fov=1.0471975511965976,  # 60 degrees
+                fov=np.pi/3,  # 60 degrees
                 focal_length=9.6e-3,
             )
             for a in self.agents
