@@ -22,6 +22,8 @@ def observed_points_reward(chief: sim.Target, prev_num_inspected: int, scale: fl
         chief spacecraft under inspection
     prev_num_inspected : int
         number of previously inspected points
+    scale : float, optional
+        scalar to modify the magnitude and sign of the reward
 
     Returns
     -------
@@ -131,27 +133,28 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
 
 
 def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01, step_size: float = 1.0):
-    # TODO: update docstring
     """A dense reward based on the deputy's fuel
     use (change in velocity).
 
-    $r_t = -((\deltav / m) + b)$
+    $r_t = \scale * ((\deltav + b)$
 
     where
-    * $\deltav$ is the change in velocity
-    * $m$ is the mass of the deputy
+    # $\scale$ is the scalar of the reward
+    * $\deltav$ is the total thrust divided by deputy's mass
     * $b$ is a tunable bias term
 
     Parameters
     ----------
-    state : dict
-        current simulation state
-    prev_state : dict
-        previous simulation state
+    control : np.ndarray
+        the control vector of the deputy's thrust outputs
     m : float, optional
         deputy mass, by default 12.0
     b : float, optional
         bias term, by default 0.0
+    scale : float, optional
+        scalar to modify the magnitude and sign of the reward
+    step_size : float, optional
+        the amount of time between simulation steps
 
     Returns
     -------

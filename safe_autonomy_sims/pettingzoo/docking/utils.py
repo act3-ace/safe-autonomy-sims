@@ -65,19 +65,21 @@ def rel_vel(vel1: np.ndarray, vel2: np.ndarray) -> float:
 
 
 def delta_v(control: np.ndarray, m: float = 12.0):
-    """The change in velocity of the deputy.
+    """The sum of thrust used divided by the deputy's mass during a step in the simulation
 
     Parameters
     ----------
-    state : dict
-        the current simulation state
-    prev_state : dict
-        the previous simulation state
+    control : np.ndarray
+        the control vector of the deputy's thrust outputs
+    m : float, optional
+        deputy mass, by default 12.0
+    step_size : float, optional
+        the amount of time between simulation steps
 
     Returns
     -------
     float
-        the deputy's change in velocity
+        the deputy's delta_v
     """
     dv = np.sum(np.abs(control)) / m
     return dv
