@@ -224,16 +224,21 @@ def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float
         reward value
     """
     reward = 0.0
+    # compute facing chief dot product
+    initial_orientation_unit_vector = np.array([1, 0, 0])
+    orientation = Rotation.from_quat(deputy.camera.orientation)
+    rotated_vector = orientation.apply(initial_orientation_unit_vector).astype(np.float32) # 64?
     rel_pos = chief.position - deputy.position
-    rel_pos = rel_pos / np.linalg.norm(rel_pos)
-
-    diff = (np.dot(
-        Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-        rel_pos,
-    ))**2
+    dot_product = np.dot(rotated_vector, rel_pos)
+    # normalization
+    normalized_dot_product = dot_product / (np.linalg.norm(rotated_vector) * np.linalg.norm(rel_pos) + 1e-5)
+    normalized_dot_product = np.clip(normalized_dot_product, -1.0, 1.0)
+    # Gaussian decay from target value reward
+    target_value = 1.0
+    diff = normalized_dot_product - target_value
     abs_diff = abs(diff)
     if not abs_diff > max_diff:
-        gaussian_decay = np.exp(-np.abs(diff / epsilon))
+        gaussian_decay = np.exp(-np.abs(diff**2 / epsilon))
         reward = scale * gaussian_decay
     return reward
 

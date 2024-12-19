@@ -586,7 +586,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
-        live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
+        live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=3000.0)
         self.reward_components["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
