@@ -153,39 +153,44 @@ def test_validate_sixdof_inspection_gym_with_corl(corl_data, initial_conditions,
 
     # check values
     for i, corl_step_action in enumerate(corl_actions):
-        if i > 350:
+        if i <= 350:
+            assert np.allclose(corl_step_action, control_array[i], rtol=1e-03, atol=1e-06)
+        else:
             # rounding error accumulation becomes too much
             break
-        assert np.allclose(corl_step_action, control_array[i], rtol=1e-03, atol=1e-04)
 
     for i, corl_step_obs in enumerate(corl_obs):
-        if i > 350:
+        if i <= 100:
+            assert np.allclose(corl_step_obs, obs_array[i], rtol=1e-02, atol=1e-5)
+        elif i < 350:
+            assert np.allclose(corl_step_obs, obs_array[i], rtol=5e-02, atol=1e-03)    
+        else:
             # rounding error accumulation becomes too much
             break
-        assert np.allclose(corl_step_obs, obs_array[i], rtol=5e-02, atol=1e-03)
 
     for i, corl_step_rewards in enumerate(corl_rewards):
-        if i > 350:
+        if i < 350:
+            corl_inspected_points = corl_step_rewards["ObservedPointsReward"]
+            inspected_points = reward_components_array[i]['observed_points']
+            assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)
+            corl_success = corl_step_rewards["SafeInspectionSuccessReward"]
+            success = reward_components_array[i]["success"]
+            assert corl_success == pytest.approx(success, rel=1e-04, abs=1e-10)
+            corl_crash = corl_step_rewards["InspectionCrashReward"]
+            crash = reward_components_array[i]['crash']
+            assert corl_crash == pytest.approx(crash, rel=1e-04, abs=1e-10)
+            corl_live_timestep = corl_step_rewards["MaxDistanceDoneReward"]
+            live_timestep = reward_components_array[i]['max_distance']
+            assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            corl_live_timestep = corl_step_rewards["LiveTimestepReward"]
+            live_timestep = reward_components_array[i]['live_timestep']
+            assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
+            corl_facing_chief = corl_step_rewards["FacingChiefReward"]
+            facing_chief = reward_components_array[i]['facing_chief']
+            assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-03, abs=1e-10)
+            corl_delta_v = corl_step_rewards["InspectionDeltaVReward"]
+            delta_v = reward_components_array[i]['delta_v']
+            assert corl_delta_v == pytest.approx(delta_v, rel=1e-03, abs=1e-10)
+        else:
             # rounding error accumulation becomes too much
             break
-        corl_inspected_points = corl_step_rewards["ObservedPointsReward"]
-        inspected_points = reward_components_array[i]['observed_points']
-        assert corl_inspected_points == pytest.approx(inspected_points, rel=1e-04, abs=1e-10)
-        corl_success = corl_step_rewards["SafeInspectionSuccessReward"]
-        success = reward_components_array[i]["success"]
-        assert corl_success == pytest.approx(success, rel=1e-04, abs=1e-10)
-        corl_crash = corl_step_rewards["InspectionCrashReward"]
-        crash = reward_components_array[i]['crash']
-        assert corl_crash == pytest.approx(crash, rel=1e-04, abs=1e-10)
-        corl_live_timestep = corl_step_rewards["MaxDistanceDoneReward"]
-        live_timestep = reward_components_array[i]['max_distance']
-        assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
-        corl_live_timestep = corl_step_rewards["LiveTimestepReward"]
-        live_timestep = reward_components_array[i]['live_timestep']
-        assert corl_live_timestep == pytest.approx(live_timestep, rel=1e-04, abs=1e-10)
-        corl_facing_chief = corl_step_rewards["FacingChiefReward"]
-        facing_chief = reward_components_array[i]['facing_chief']
-        assert corl_facing_chief == pytest.approx(facing_chief, rel=1e-03, abs=1e-10)
-        corl_delta_v = corl_step_rewards["InspectionDeltaVReward"]
-        delta_v = reward_components_array[i]['delta_v']
-        assert corl_delta_v == pytest.approx(delta_v, rel=1e-03, abs=1e-10)

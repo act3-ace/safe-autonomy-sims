@@ -558,17 +558,17 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
-        live_timestep_reward = r.live_timestep_reward(
-            t=self.simulator.sim_time, t_max=self.max_time
-        )
-        self.reward_components[agent]["live_timestep"] = live_timestep_reward
-        reward += live_timestep_reward
+        # live_timestep_reward = r.live_timestep_reward(
+        #     t=self.simulator.sim_time, t_max=self.max_time
+        # )
+        # self.reward_components[agent]["live_timestep"] = live_timestep_reward
+        # reward += live_timestep_reward
 
-        facing_chief_reward = r.facing_chief_reward(
-            chief=self.chief, deputy=deputy, epsilon=0.01
-        )
-        self.reward_components[agent]["facing_chief"] = facing_chief_reward
-        reward += facing_chief_reward
+        # facing_chief_reward = r.facing_chief_reward(
+        #     chief=self.chief, deputy=deputy, epsilon=0.01
+        # )
+        # self.reward_components[agent]["facing_chief"] = facing_chief_reward
+        # reward += facing_chief_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(
