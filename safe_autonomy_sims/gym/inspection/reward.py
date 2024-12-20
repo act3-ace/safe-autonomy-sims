@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation
 from safe_autonomy_sims.pettingzoo.inspection.utils import delta_v, rel_dist
 
 
-def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
+def observed_points_reward(chief: sim.Target, prev_num_inspected: int, scale: float = 0.01) -> float:
     """A dense reward which rewards the agent for inspecting
     new points during each step of the episode.
 
@@ -22,6 +22,8 @@ def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
         chief spacecraft under inspection
     prev_num_inspected : int
         number of previously inspected points
+    scale : float, optional
+        scalar to modify the magnitude and sign of the reward
 
     Returns
     -------
@@ -33,7 +35,7 @@ def observed_points_reward(chief: sim.Target, prev_num_inspected: int) -> float:
     assert current_num_inspected >= prev_num_inspected, "previously inspected points cannot be uninspected"
 
     step_inspected = current_num_inspected - prev_num_inspected
-    r = 0.1 * step_inspected
+    r = scale * step_inspected
     return r
 
 
@@ -130,35 +132,37 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
     return r
 
 
-# pylint:disable=W1401
-def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
-    r"""A dense reward based on the deputy's fuel
+def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01, step_size: float = 1.0):
+    """A dense reward based on the deputy's fuel
     use (change in velocity).
 
-    $r_t = -((\deltav / m) + b)$
+    $r_t = \scale * ((\deltav + b)$
 
     where
-    * $\deltav$ is the change in velocity
-    * $m$ is the mass of the deputy
+    # $\scale$ is the scalar of the reward
+    * $\deltav$ is the total thrust divided by deputy's mass
     * $b$ is a tunable bias term
 
     Parameters
     ----------
-    v : np.ndarray
-        current velocity
-    prev_v : np.ndarray
-        previous velocity
+    control : np.ndarray
+        the control vector of the deputy's thrust outputs
     m : float, optional
         deputy mass, by default 12.0
     b : float, optional
         bias term, by default 0.0
+    scale : float, optional
+        scalar to modify the magnitude and sign of the reward
+    step_size : float, optional
+        the amount of time between simulation steps
 
     Returns
     -------
     float
         reward value
     """
-    r = -((abs(delta_v(v=v, prev_v=prev_v)) / m) + b)
+    dv = delta_v(control=control, m=m, step_size=step_size)
+    r = scale * dv + b
     return r
 
 
@@ -193,7 +197,7 @@ def crash_reward(chief: sim.Target, deputy: sim.Inspector, crash_radius: float):
 
 
 # pylint:disable=W1401
-def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float):
+def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float, scale: float = 0.0005, max_diff: float = 1.0):
     r"""A dense gaussian decaying reward which reward the agent
     for facing the chief.
 
@@ -219,13 +223,23 @@ def facing_chief_reward(chief: sim.Target, deputy: sim.Inspector, epsilon: float
     float
         reward value
     """
+    reward = 0.0
+    # compute facing chief dot product
+    initial_orientation_unit_vector = np.array([1, 0, 0])
+    orientation = Rotation.from_quat(deputy.camera.orientation)
+    rotated_vector = orientation.apply(initial_orientation_unit_vector).astype(np.float32) # 64?
     rel_pos = chief.position - deputy.position
-    rel_pos = rel_pos / np.linalg.norm(rel_pos)
-    gaussian_decay = np.exp(-np.abs(((np.dot(
-        Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-        rel_pos,
-    ) - 1)**2) / epsilon))
-    reward = 0.0005 * gaussian_decay
+    dot_product = np.dot(rotated_vector, rel_pos)
+    # normalization
+    normalized_dot_product = dot_product / (np.linalg.norm(rotated_vector) * np.linalg.norm(rel_pos) + 1e-5)
+    normalized_dot_product = np.clip(normalized_dot_product, -1.0, 1.0)
+    # Gaussian decay from target value reward
+    target_value = 1.0
+    diff = normalized_dot_product - target_value
+    abs_diff = abs(diff)
+    if not abs_diff > max_diff:
+        gaussian_decay = np.exp(-np.abs(diff**2 / epsilon))
+        reward = scale * gaussian_decay
     return reward
 
 
@@ -251,6 +265,13 @@ def live_timestep_reward(t: int, t_max: int):
         reward value
     """
     reward = 0.0
-    if t < t_max:
+    if t <= t_max:
         reward = 0.001
+    return reward
+
+
+def max_distance_reward(chief: sim.Target, deputy: sim.Inspector, max_distance: float, scale: float = -1.0):
+    # TODO: docstring
+    d = rel_dist(pos1=deputy.position, pos2=chief.position)
+    reward = scale if d > max_distance else 0.0
     return reward
