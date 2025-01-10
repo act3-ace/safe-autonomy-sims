@@ -174,6 +174,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         self,
         num_agents: int = 2,
         docking_radius: float = 0.2,
+        collision_radius: float = 0.5,
         max_time: int = 2000,
         max_distance: float = 10000,
         max_v_violation: int = 5,
@@ -182,13 +183,14 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
         # Environment parameters
         self.docking_radius = docking_radius
+        self.collision_radius = collision_radius
         self.max_time = max_time
         self.max_distance = max_distance
         self.max_v_violation = max_v_violation
 
         # Episode level information
         self.prev_state = None
-        self.episode_v_violations = 0
+        self.episode_v_violations = {a: 0. for a in self.possible_agents}
         self.reward_components = {a: {} for a in self.possible_agents}
         self.status = {a: "Running" for a in self.possible_agents}
 
@@ -200,9 +202,11 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(agent=a) for a in self.agents}
+        self.reward_components = {a: {} for a in self.agents}
+        self.status = {a: "Running" for a in self.agents}
         infos = {a: self._get_info(agent=a) for a in self.agents}
         self.prev_state = None
-        self.episode_v_violations = 0
+        self.episode_v_violations = {a: 0. for a in self.agents}
         return observations, infos
 
     def step(
@@ -279,8 +283,8 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
 
     def _get_info(self, agent: str) -> dict[str, typing.Any]:
         return {
-            "reward_components": self.reward_components[agent],
-            "status": self.status[agent],
+            "reward_components": copy.copy(self.reward_components[agent]),
+            "status": copy.copy(self.status[agent]),
         }
 
     def _get_reward(self, agent: str) -> float:
@@ -298,7 +302,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         reward += dist_pivot_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
+            control=deputy.last_control
         )
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
@@ -364,20 +368,28 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         )
         in_docking = d < self.docking_radius
         safe_v = v < vel_limit
-        self.episode_v_violations += -r.velocity_constraint_reward(
+        self.episode_v_violations[agent] += -r.velocity_constraint_reward(
             v1=deputy.velocity, v2=self.chief.velocity, v_limit=vel_limit
         )
 
         # Determine if in terminal state
         oob = d > self.max_distance
         crash = in_docking and not safe_v
-        max_v_violation = self.episode_v_violations > self.max_v_violation
-        timeout = self.simulator.sim_time > self.max_time
+        max_v_violation = self.episode_v_violations[agent] > self.max_v_violation
+        timeout = self.simulator.sim_time >= self.max_time
         docked = in_docking and safe_v
+        collision = False
+        for name, other_deputy in self.deputies.items():
+            if name == agent:
+                continue
+            radial_distance = np.linalg.norm(deputy.position - other_deputy.position)
+            collision = collision or radial_distance < self.collision_radius
 
         # Update Status
         if crash:
             self.status[agent] = "Crash"
+        elif collision:
+            self.status[agent] = "Collision"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
@@ -387,7 +399,7 @@ class MultiDockingEnv(pettingzoo.ParallelEnv):
         elif docked:
             self.status[agent] = "Success"
 
-        return oob or crash or max_v_violation or timeout or docked
+        return oob or crash or collision or max_v_violation or timeout or docked
 
     @functools.lru_cache(maxsize=None)
     def observation_space(self, agent) -> gym.Space:

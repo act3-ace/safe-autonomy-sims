@@ -3,6 +3,7 @@
 from typing import Any, SupportsFloat
 import numpy as np
 import gymnasium as gym
+import copy
 import safe_autonomy_simulation
 from gymnasium import spaces
 import safe_autonomy_sims.gym.docking.reward as r
@@ -210,6 +211,8 @@ class DockingEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.episode_v_violations = 0
@@ -270,10 +273,10 @@ class DockingEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {"reward_components": self.reward_components, "status": self.status}
+        return {"reward_components": copy.copy(self.reward_components), "status": copy.copy(self.status)}
 
     def _get_reward(self):
-        reward = 0
+        reward = 0.0
 
         # Dense rewards
         dist_pivot_reward = r.distance_pivot_reward(
@@ -283,7 +286,7 @@ class DockingEnv(gym.Env):
         reward += dist_pivot_reward
 
         delta_v_reward = r.delta_v_reward(
-            state=self.sim_state, prev_state=self.prev_state
+            control=self.deputy.last_control
         )
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward

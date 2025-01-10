@@ -122,34 +122,35 @@ def weighted_inspection_success_reward(chief: sim.Target, total_weight: float):
     return r
 
 
-def delta_v_reward(v: np.ndarray, prev_v: np.ndarray, m: float = 12.0, b: float = 0.0):
-    r"""A dense reward based on the deputy's fuel
+def delta_v_reward(control: np.ndarray, m: float = 12.0, b: float = 0.0, scale: float = -0.01):
+    """A dense reward based on the deputy's fuel
     use (change in velocity).
 
-    $r_t = -((\deltav / m) + b)$
+    $r_t = \scale * ((\deltav + b)$
 
     where
-    * $\deltav$ is the change in velocity
-    * $m$ is the mass of the deputy
+    # $\scale$ is the scalar of the reward
+    * $\deltav$ is the total thrust divided by deputy's mass
     * $b$ is a tunable bias term
 
     Parameters
     ----------
-    v : np.ndarray
-        current velocity
-    prev_v : np.ndarray
-        previous velocity
+    control : np.ndarray
+        the control vector of the deputy's thrust outputs
     m : float, optional
         deputy mass, by default 12.0
     b : float, optional
         bias term, by default 0.0
+    scale : float, optional
+        scalar to modify the magnitude and sign of the reward
 
     Returns
     -------
     float
         reward value
     """
-    r = -((abs(delta_v(v=v, prev_v=prev_v)) / m) + b)
+    dv = delta_v(control=control, m=m)
+    r = scale * dv + b
     return r
 
 
@@ -223,7 +224,7 @@ def live_timestep_reward(t: float, t_max: float):
     """A dense reward which rewards the agent for
     each timestep it remains active in the simulation.
 
-    $r_t = 0.001 if t < t_{max}$
+    $r_t = 0.001 if t <= t_{max}$
 
     where $t$ is the current time step and $t_{max}$
     is the maximum allowable time for the episode.
@@ -241,6 +242,13 @@ def live_timestep_reward(t: float, t_max: float):
         reward value
     """
     reward = 0.0
-    if t < t_max:
+    if t <= t_max:
         reward = 0.001
+    return reward
+
+
+def max_distance_reward(chief: sim.Target, deputy: sim.Inspector, max_distance: float, scale: float = -1.0):
+    # TODO: docstring
+    d = rel_dist(pos1=deputy.position, pos2=chief.position)
+    reward = scale if d > max_distance else 0.0
     return reward

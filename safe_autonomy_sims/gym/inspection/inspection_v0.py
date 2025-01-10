@@ -3,6 +3,7 @@
 import typing
 import numpy as np
 import gymnasium as gym
+import copy
 import safe_autonomy_simulation.sims.inspection as sim
 import safe_autonomy_sims.gym.inspection.reward as r
 import safe_autonomy_sims.gym.inspection.utils as utils
@@ -253,6 +254,8 @@ class InspectionEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -267,9 +270,10 @@ class InspectionEnv(gym.Env):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -288,7 +292,7 @@ class InspectionEnv(gym.Env):
         self.chief = sim.Target(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
         )
         self.deputy = sim.Inspector(
             name="deputy",
@@ -325,7 +329,7 @@ class InspectionEnv(gym.Env):
         return obs
 
     def _get_info(self):
-        return {"reward_components": self.reward_components, "status": self.status}
+        return {"reward_components": copy.copy(self.reward_components), "status": copy.copy(self.status)}
 
     def _get_reward(self):
         reward = 0
@@ -338,7 +342,7 @@ class InspectionEnv(gym.Env):
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6]
+            control=self.deputy.last_control
         )
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward

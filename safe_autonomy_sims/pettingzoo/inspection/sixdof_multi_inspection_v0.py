@@ -87,34 +87,25 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
     | 0     | x position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
     | 1     | y position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
     | 2     | z position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
-    | 3     | |pos| magnitude of the deputy's position                    | -inf| inf | Position (m) |
-    | 4     | |x| magnitude of the deputy's x position                    | -inf| inf | Position (m) |
-    | 5     | |y| magnitude of the deputy's y position                    | -inf| inf | Position (m) |
-    | 6     | |z| magnitude of the deputy's z position                    | -inf| inf | Position (m) |
-    | 7     | x component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 8     | y component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 9     | z component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 10    | |v| magnitude of the deputy's velocity                      | -inf| inf | Velocity (m/s) |
-    | 11    | |v_x| magnitude of the x component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 12    | |v_y| magnitude of the y component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 13    | |v_z| magnitude of the z component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 14    | x component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 15    | y component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 16    | z component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 17    | x component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 18    | y component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 19    | z component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 20    | facing chief dot product                                    | -1  | 1   | Scalar |
-    | 21    | sun angle                                                   | 0   | 2pi | Angle (rad) |
-    | 22    | number of inspected points                                  | 0   | 100 | Scalar |
-    | 23    | x component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 24    | y component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 25    | z component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 26    | x component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 27    | y component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 28    | z component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 29    | cumulative weight of inspected points                       | 0   | 1   | Scalar |
-    | 30    | dot product between nearest cluster and deputy's position   | -1  | 1   | Scalar |
+    | 3     | x component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 4     | y component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 5     | z component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 6     | x component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 7     | y component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 8     | z component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 9     | x component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 10    | y component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 11    | z component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 12    | w component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 13    | sun angle                                                   | 0   | 2pi | Angle (rad) |
+    | 14    | number of inspected points                                  | 0   | 100 | Scalar |
+    | 15    | x component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 16    | y component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 17    | z component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 18    | x component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 19    | y component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 20    | z component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 21    | cumulative weight of inspected points                       | 0   | 1   | Scalar |
 
     ## State Transition Dynamics
 
@@ -305,6 +296,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         num_agents: int = 2,
         success_threshold: float = 0.95,
         crash_radius: float = 15,
+        collision_radius: float = 10,
         max_distance: float = 800,
         max_time: float = 1000,
     ) -> None:
@@ -312,6 +304,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Environment parameters
         self.crash_radius = crash_radius
+        self.collision_radius = collision_radius
         self.max_distance = max_distance
         self.max_time = max_time
         self.success_threshold = success_threshold
@@ -340,6 +333,8 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(a) for a in self.agents}
+        self.reward_components = {a: {} for a in self.agents}
+        self.status = {a: "Running" for a in self.agents}
         infos = {a: self._get_info(a) for a in self.agents}
         self.prev_state = {}
         self.prev_num_inspected = 0
@@ -364,12 +359,13 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
-        self.prev_weight_inspected = (
-            self.chief.inspection_points.get_total_weight_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
+            self.prev_weight_inspected = (
+                self.chief.inspection_points.get_total_weight_inspected()
+            )
 
         # Update simulator state
         for agent, action in actions.items():
@@ -402,7 +398,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.chief = sim.SixDOFTarget(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputies = {
@@ -418,12 +414,14 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
                     phi=self.rng.uniform(-np.pi / 2, np.pi / 2),
                     theta=self.rng.uniform(0, 2 * np.pi),
                 ),
+                fov=np.pi/3,  # 60 degrees
+                focal_length=9.6e-3,
             )
             for a in self.agents
         }
         self.sun = sim.Sun(theta=self.rng.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
-            frame_rate=10,
+            frame_rate=0.1,
             inspectors=list(self.deputies.values()),
             targets=[self.chief],
             sun=self.sun,
@@ -433,37 +431,23 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         deputy = self.deputies[agent]
         obs = self.observation_space(agent).sample()
         obs[:3] = deputy.position
-        obs[3] = np.linalg.norm(deputy.position)
-        obs[4:7] = np.abs(deputy.position)
-        obs[7:10] = deputy.velocity
-        obs[10] = np.linalg.norm(deputy.velocity)
-        obs[11:14] = np.abs(deputy.velocity)
-        obs[14:17] = deputy.angular_velocity
-        obs[17:20] = Rotation.from_quat(deputy.orientation).as_euler("XYZ")
-        obs[20] = np.dot(
-            Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-            (self.chief.position - deputy.position)
-            / np.linalg.norm(self.chief.position - deputy.position),
-        )
-        obs[21] = self.sun.theta
-        obs[22] = self.chief.inspection_points.get_num_points_inspected()
-        obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(
+        obs[3:6] = deputy.velocity
+        obs[6:9] = deputy.angular_velocity
+        obs[9:13] = deputy.orientation
+        obs[13] = self.sun.theta
+        obs[14] = self.chief.inspection_points.get_num_points_inspected(inspector_entity=deputy)
+        obs[15:18] = self.chief.inspection_points.kmeans_find_nearest_cluster(
             camera=deputy.camera, sun=self.sun
         )
-        obs[26:29] = self.chief.inspection_points.priority_vector
-        obs[29] = self.chief.inspection_points.get_total_weight_inspected()
-        obs[30] = np.dot(
-            Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-            self.chief.inspection_points.kmeans_find_nearest_cluster(
-                camera=deputy.camera, sun=self.sun
-            ),
-        )
+        obs[18:21] = self.chief.inspection_points.priority_vector
+        obs[21] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=deputy)
+        
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict[str, typing.Any]:
         return {
-            "reward_components": self.reward_components[agent],
-            "status": self.status[agent],
+            "reward_components": copy.copy(self.reward_components[agent]),
+            "status": copy.copy(self.status[agent]),
         }
 
     def _get_reward(self, agent: typing.Any) -> float:
@@ -478,19 +462,19 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=deputy.velocity, prev_v=self.prev_state[agent][3:6]
+            control=deputy.last_control
         )
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
         live_timestep_reward = r.live_timestep_reward(
-            t=self.simulator.sim_time, t_max=self.max_time
+            t=self.simulator.sim_time, t_max=3000.0
         )
         self.reward_components[agent]["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
         facing_chief_reward = r.facing_chief_reward(
-            chief=self.chief, deputy=deputy, epsilon=0.01
+            chief=self.chief, deputy=deputy, epsilon=0.15
         )
         self.reward_components[agent]["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
@@ -514,6 +498,10 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.reward_components[agent]["crash"] = crash_reward
         reward += crash_reward
 
+        max_distance_reward = r.max_distance_reward(chief=self.chief, deputy=deputy, max_distance=self.max_distance)
+        self.reward_components["max_distance"] = max_distance_reward
+        reward += max_distance_reward
+
         return reward
 
     def _get_terminated(self, agent: typing.Any) -> bool:
@@ -530,10 +518,18 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             self.chief.inspection_points.get_total_weight_inspected()
             >= self.success_threshold
         )
+        collision = False
+        for name, other_deputy in self.deputies.items():
+            if name == agent:
+                continue
+            radial_distance = np.linalg.norm(deputy.position - other_deputy.position)
+            collision = collision or radial_distance < self.collision_radius
 
         # Update Status
         if crash:
             self.status[agent] = "Crash"
+        elif collision:
+            self.status[agent] = "Collision"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
@@ -541,7 +537,7 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         elif all_inspected:
             self.status[agent] = "Success"
 
-        return oob or crash or timeout or all_inspected
+        return oob or crash or collision or timeout or all_inspected
 
     # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment
     # should never be garabage collected when used
@@ -551,38 +547,30 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             np.concatenate(
                 (
                     [-np.inf] * 3,  # deputy position
-                    [-np.inf] * 4,  # deputy position magnorm
                     [-np.inf] * 3,  # deputy velocity
-                    [-np.inf] * 4,  # deputy velocity magnorm
                     [-np.inf] * 3,  # deputy angular velocity
-                    [-2 * np.pi] * 3,  # deputy orientation (euler)
-                    [-1],  # facing chief dot product
+                    [-2 * np.pi] * 4,  # deputy orientation (quaternion)
                     [0],  # sun angle
                     [0],  # number of inspected points
                     [-1] * 3,  # nearest cluster unit vector
                     [-1] * 3,  # priority vector unit vector
                     [0],  # cumulative weight of inspected points
-                    [-1],  # facing cluster dot product
                 )
             ),
             np.concatenate(
                 (
                     [np.inf] * 3,  # deputy position
-                    [np.inf] * 4,  # deputy position magnorm
                     [np.inf] * 3,  # deputy velocity
-                    [np.inf] * 4,  # deputy velocity magnorm
                     [np.inf] * 3,  # deputy angular velocity
-                    [2 * np.pi] * 3,  # deputy orientation
-                    [1],  # facing chief dot product
+                    [2 * np.pi] * 4,  # deputy orientation
                     [2 * np.pi],  # sun angle
                     [100],  # number of inspected points
                     [1] * 3,  # nearest cluster unit vector
                     [1] * 3,  # priority vector unit vector
                     [1],  # cumulative weight of inspected points
-                    [1],  # facing cluster dot product
                 )
             ),
-            shape=(31,),
+            shape=(22,),
             dtype=np.float64,
         )
 

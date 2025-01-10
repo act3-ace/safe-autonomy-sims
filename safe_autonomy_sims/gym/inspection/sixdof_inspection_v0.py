@@ -3,6 +3,7 @@ import typing
 
 import gymnasium as gym
 import numpy as np
+import copy
 import safe_autonomy_simulation.sims.inspection as sim
 from gymnasium.core import RenderFrame
 from scipy.spatial.transform import Rotation
@@ -80,34 +81,25 @@ class WeightedSixDofInspectionEnv(gym.Env):
     | 0     | x position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
     | 1     | y position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
     | 2     | z position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
-    | 3     | |pos| magnitude of the deputy's position                    | -inf| inf | Position (m) |
-    | 4     | |x| magnitude of the deputy's x position                    | -inf| inf | Position (m) |
-    | 5     | |y| magnitude of the deputy's y position                    | -inf| inf | Position (m) |
-    | 6     | |z| magnitude of the deputy's z position                    | -inf| inf | Position (m) |
-    | 7     | x component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 8     | y component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 9     | z component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 10    | |v| magnitude of the deputy's velocity                      | -inf| inf | Velocity (m/s) |
-    | 11    | |v_x| magnitude of the x component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 12    | |v_y| magnitude of the y component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 13    | |v_z| magnitude of the z component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 14    | x component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 15    | y component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 16    | z component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 17    | x component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 18    | y component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 19    | z component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 20    | facing chief dot product                                    | -1  | 1   | Scalar |
-    | 21    | sun angle                                                   | 0   | 2pi | Angle (rad) |
-    | 22    | number of inspected points                                  | 0   | 100 | Scalar |
-    | 23    | x component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 24    | y component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 25    | z component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 26    | x component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 27    | y component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 28    | z component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 29    | cumulative weight of inspected points                       | 0   | 1   | Scalar |
-    | 30    | dot product between nearest cluster and deputy's position   | -1  | 1   | Scalar |
+    | 3     | x component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 4     | y component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 5     | z component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 6     | x component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 7     | y component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 8     | z component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 9     | x component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 10    | y component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 11    | z component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 12    | w component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 13    | sun angle                                                   | 0   | 2pi | Angle (rad) |
+    | 14    | number of inspected points                                  | 0   | 100 | Scalar |
+    | 15    | x component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 16    | y component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 17    | z component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 18    | x component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 19    | y component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 20    | z component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 21    | cumulative weight of inspected points                       | 0   | 1   | Scalar |
 
     ## State Transition Dynamics
 
@@ -308,40 +300,33 @@ class WeightedSixDofInspectionEnv(gym.Env):
             np.concatenate(
                 (
                     [-np.inf] * 3,  # deputy position
-                    [-np.inf] * 4,  # deputy position magnorm
                     [-np.inf] * 3,  # deputy velocity
-                    [-np.inf] * 4,  # deputy velocity magnorm
                     [-np.inf] * 3,  # deputy angular velocity
-                    [-2 * np.pi] * 3,  # deputy orientation (euler)
-                    [-1],  # facing chief dot product
+                    [-2 * np.pi] * 4,  # deputy orientation (quaternion)
                     [0],  # sun angle
                     [0],  # number of inspected points
                     [-1] * 3,  # nearest cluster unit vector
                     [-1] * 3,  # priority vector unit vector
                     [0],  # cumulative weight of inspected points
-                    [-1],  # facing cluster dot product
                 )
             ),
             np.concatenate(
                 (
                     [np.inf] * 3,  # deputy position
-                    [np.inf] * 4,  # deputy position magnorm
                     [np.inf] * 3,  # deputy velocity
-                    [np.inf] * 4,  # deputy velocity magnorm
                     [np.inf] * 3,  # deputy angular velocity
-                    [2 * np.pi] * 3,  # deputy orientation
-                    [1],  # facing chief dot product
+                    [2 * np.pi] * 4,  # deputy orientation
                     [2 * np.pi],  # sun angle
                     [100],  # number of inspected points
                     [1] * 3,  # nearest cluster unit vector
                     [1] * 3,  # priority vector unit vector
                     [1],  # cumulative weight of inspected points
-                    [1],  # facing cluster dot product
                 )
             ),
-            shape=(31, ),
+            shape=(22, ),
             dtype=np.float64,
         )
+
         self.action_space = gym.spaces.Box(
             np.array([-1, -1, -1, -0.001, -0.001, -0.001]),
             np.array([1, 1, 1, 0.001, 0.001, 0.001]),
@@ -372,6 +357,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -385,8 +372,9 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
-        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
+            self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -407,7 +395,7 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.chief = sim.SixDOFTarget(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputy = sim.SixDOFInspector(
@@ -422,8 +410,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
                 phi=self.np_random.uniform(-np.pi / 2, np.pi / 2),
                 theta=self.np_random.uniform(0, 2 * np.pi),
             ),
-            fov=np.pi,
-            focal_length=1,
+            fov=np.pi/3,
+            focal_length=9.6e-3,
         )
         self.sun = sim.Sun(theta=self.np_random.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
@@ -435,33 +423,22 @@ class WeightedSixDofInspectionEnv(gym.Env):
 
     def _get_obs(self):
         obs = self.observation_space.sample()
-        obs[:3] = self.deputy.position
-        obs[3] = np.linalg.norm(self.deputy.position)
-        obs[4:7] = np.abs(self.deputy.position)
-        obs[7:10] = self.deputy.velocity
-        obs[10] = np.linalg.norm(self.deputy.velocity)
-        obs[11:14] = np.abs(self.deputy.velocity)
-        obs[14:17] = self.deputy.angular_velocity
-        obs[17:20] = Rotation.from_quat(self.deputy.orientation).as_euler("XYZ")
-        obs[20] = np.dot(
-            Rotation.from_quat(self.deputy.camera.orientation).as_euler("XYZ"),
-            (self.chief.position - self.deputy.position) / np.linalg.norm(self.chief.position - self.deputy.position),
-        )
-        obs[21] = self.sun.theta
-        obs[22] = self.chief.inspection_points.get_num_points_inspected()
-        obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun)
-        obs[26:29] = self.chief.inspection_points.priority_vector
-        obs[29] = self.chief.inspection_points.get_total_weight_inspected()
-        obs[30] = np.dot(
-            Rotation.from_quat(self.deputy.camera.orientation).as_euler("XYZ"),
-            self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun),
-        )
+        obs[0:3] = self.deputy.position
+        obs[3:6] = self.deputy.velocity
+        obs[6:9] = self.deputy.angular_velocity
+        obs[9:13] = self.deputy.orientation
+        obs[13] = self.sun.theta
+        obs[14] = self.chief.inspection_points.get_num_points_inspected()
+        obs[15:18] = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=self.deputy.camera, sun=self.sun)
+        obs[18:21] = self.chief.inspection_points.priority_vector
+        obs[21] = self.chief.inspection_points.get_total_weight_inspected()
+
         return obs
 
     def _get_info(self):
         return {
-            "reward_components": self.reward_components,
-            "status": self.status
+            "reward_components": copy.copy(self.reward_components),
+            "status": copy.copy(self.status)
         }
 
     def _get_reward(self):
@@ -472,15 +449,16 @@ class WeightedSixDofInspectionEnv(gym.Env):
         self.reward_components["observed_points"] = points_reward
         reward += points_reward
 
-        delta_v_reward = r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        step_size = 1 / self.simulator.frame_rate
+        delta_v_reward = r.delta_v_reward(control=self.deputy.last_control, scale=-0.005, step_size=step_size)
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
-        live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=self.max_time)
+        live_timestep_reward = r.live_timestep_reward(t=self.simulator.sim_time, t_max=3000.0)
         self.reward_components["live_timestep"] = live_timestep_reward
         reward += live_timestep_reward
 
-        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.01)
+        facing_chief_reward = r.facing_chief_reward(chief=self.chief, deputy=self.deputy, epsilon=0.15)
         self.reward_components["facing_chief"] = facing_chief_reward
         reward += facing_chief_reward
 
@@ -494,6 +472,10 @@ class WeightedSixDofInspectionEnv(gym.Env):
         crash_reward = r.crash_reward(chief=self.chief, deputy=self.deputy, crash_radius=self.crash_radius)
         self.reward_components["crash"] = crash_reward
         reward += crash_reward
+
+        max_distance_reward = r.max_distance_reward(chief=self.chief, deputy=self.deputy, max_distance=self.max_distance)
+        self.reward_components["max_distance"] = max_distance_reward
+        reward += max_distance_reward
 
         return reward
 

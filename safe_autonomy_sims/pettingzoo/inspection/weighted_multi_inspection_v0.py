@@ -228,6 +228,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         num_agents: int = 2,
         success_threshold: float = 0.95,
         crash_radius: float = 15,
+        collision_radius: float = 10,
         max_distance: float = 800,
         max_time: float = 1000,
     ) -> None:
@@ -235,6 +236,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Environment parameters
         self.crash_radius = crash_radius
+        self.collision_radius = collision_radius
         self.max_distance = max_distance
         self.max_time = max_time
         self.success_threshold = success_threshold
@@ -263,6 +265,8 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
         observations = {a: self._get_obs(a) for a in self.agents}
+        self.reward_components = {a: {} for a in self.agents}
+        self.status = {a: "Running" for a in self.agents}
         infos = {a: self._get_info(a) for a in self.agents}
         self.prev_state = {}
         self.prev_num_inspected = 0
@@ -276,7 +280,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.chief = sim.Target(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputies = {
@@ -297,7 +301,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         }
         self.sun = sim.Sun(theta=self.rng.uniform(0, 2 * np.pi))
         self.simulator = sim.InspectionSimulator(
-            frame_rate=10,
+            frame_rate=0.1,
             inspectors=list(self.deputies.values()),
             targets=[self.chief],
             sun=self.sun,
@@ -321,12 +325,13 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
 
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (
-            self.chief.inspection_points.get_num_points_inspected()
-        )
-        self.prev_weight_inspected = (
-            self.chief.inspection_points.get_total_weight_inspected()
-        )
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (
+                self.chief.inspection_points.get_num_points_inspected()
+            )
+            self.prev_weight_inspected = (
+                self.chief.inspection_points.get_total_weight_inspected()
+            )
 
         # Update simulator state
         for agent, action in actions.items():
@@ -358,18 +363,18 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         obs[:3] = deputy.position
         obs[3:6] = deputy.velocity
         obs[6] = self.sun.theta
-        obs[7] = self.chief.inspection_points.get_num_points_inspected()
+        obs[7] = self.chief.inspection_points.get_num_points_inspected(inspector_entity=deputy)
         obs[8:11] = self.chief.inspection_points.kmeans_find_nearest_cluster(
             camera=deputy.camera, sun=self.sun
         )
         obs[11:14] = self.chief.inspection_points.priority_vector
-        obs[14] = self.chief.inspection_points.get_total_weight_inspected()
+        obs[14] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=deputy)
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict:
         return {
-            "reward_components": self.reward_components[agent],
-            "status": self.status[agent],
+            "reward_components": copy.copy(self.reward_components[agent]),
+            "status": copy.copy(self.status[agent]),
         }
 
     def _get_reward(self, agent: typing.Any) -> float:
@@ -384,8 +389,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         reward += points_reward
 
         delta_v_reward = r.delta_v_reward(
-            v=deputy.velocity,
-            prev_v=self.prev_state[agent][3:6],
+            control=deputy.last_control
         )
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
@@ -425,10 +429,18 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
             self.chief.inspection_points.get_total_weight_inspected()
             >= self.success_threshold
         )
+        collision = False
+        for name, other_deputy in self.deputies.items():
+            if name == agent:
+                continue
+            radial_distance = np.linalg.norm(deputy.position - other_deputy.position)
+            collision = collision or radial_distance < self.collision_radius
 
         # Update Status
         if crash:
             self.status[agent] = "Crash"
+        elif collision:
+            self.status[agent] = "Collision"
         elif oob:
             self.status[agent] = "Out of Bounds"
         elif timeout:
@@ -436,7 +448,7 @@ class WeightedMultiInspectionEnv(pettingzoo.ParallelEnv):
         elif all_inspected:
             self.status[agent] = "Success"
 
-        return oob or crash or timeout or all_inspected
+        return oob or crash or collision or timeout or all_inspected
 
     # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment
     # should never be garabage collected when used

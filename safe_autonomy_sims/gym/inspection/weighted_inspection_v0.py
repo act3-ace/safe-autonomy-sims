@@ -3,6 +3,7 @@ import typing
 
 import gymnasium as gym
 import numpy as np
+import copy
 import safe_autonomy_simulation.sims.inspection as sim
 from gymnasium.core import RenderFrame
 
@@ -278,6 +279,8 @@ class WeightedInspectionEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self._init_sim()  # sim is light enough we just reconstruct it
         self.simulator.reset()
+        self.reward_components = {}
+        self.status = "Running"
         obs, info = self._get_obs(), self._get_info()
         self.prev_state = None
         self.prev_num_inspected = 0
@@ -291,7 +294,7 @@ class WeightedInspectionEnv(gym.Env):
         self.chief = sim.Target(
             name="chief",
             num_points=100,
-            radius=1,
+            radius=10,
             priority_vector=priority_vector,
         )
         self.deputy = sim.Inspector(
@@ -324,8 +327,9 @@ class WeightedInspectionEnv(gym.Env):
         
         # Store previous simulator state
         self.prev_state = self.sim_state.copy()
-        self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
-        self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
+        if self.simulator.sim_time > 0:
+            self.prev_num_inspected = (self.chief.inspection_points.get_num_points_inspected())
+            self.prev_weight_inspected = (self.chief.inspection_points.get_total_weight_inspected())
 
         # Update simulator state
         self.deputy.add_control(action)
@@ -352,8 +356,8 @@ class WeightedInspectionEnv(gym.Env):
 
     def _get_info(self):
         return {
-            "reward_components": self.reward_components,
-            "status": self.status
+            "reward_components": copy.copy(self.reward_components),
+            "status": copy.copy(self.status)
         }
 
     def _get_reward(self):
@@ -364,7 +368,7 @@ class WeightedInspectionEnv(gym.Env):
         self.reward_components["observed_points"] = points_reward
         reward += points_reward
 
-        delta_v_reward = r.delta_v_reward(v=self.deputy.velocity, prev_v=self.prev_state["deputy"][3:6])
+        delta_v_reward = r.delta_v_reward(control=self.deputy.last_control)
         self.reward_components["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
