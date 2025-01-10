@@ -56,7 +56,7 @@ def fixture_initial_conditions():
     return ic
 
 
-@pytest.mark.integration
+@pytest.mark.system_test
 def test_validate_multiagent_weighted_inspection_pettingzoo_with_corl(corl_data, onnx_model_path, initial_conditions):
     # Dynamic env class definition to insert initial conditions
     deputies = [f"deputy_{i}" for i in range(3)]

@@ -87,34 +87,25 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
     | 0     | x position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
     | 1     | y position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
     | 2     | z position of the deputy in Hill's frame                    | -inf| inf | Position (m) |
-    | 3     | |pos| magnitude of the deputy's position                    | -inf| inf | Position (m) |
-    | 4     | |x| magnitude of the deputy's x position                    | -inf| inf | Position (m) |
-    | 5     | |y| magnitude of the deputy's y position                    | -inf| inf | Position (m) |
-    | 6     | |z| magnitude of the deputy's z position                    | -inf| inf | Position (m) |
-    | 7     | x component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 8     | y component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 9     | z component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
-    | 10    | |v| magnitude of the deputy's velocity                      | -inf| inf | Velocity (m/s) |
-    | 11    | |v_x| magnitude of the x component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 12    | |v_y| magnitude of the y component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 13    | |v_z| magnitude of the z component of the deputy's velocity | -inf| inf | Velocity (m/s) |
-    | 14    | x component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 15    | y component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 16    | z component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
-    | 17    | x component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 18    | y component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 19    | z component of the deputy's orientation                     | 0   | 2pi | Orientation (rad) |
-    | 20    | facing chief dot product                                    | -1  | 1   | Scalar |
-    | 21    | sun angle                                                   | 0   | 2pi | Angle (rad) |
-    | 22    | number of inspected points                                  | 0   | 100 | Scalar |
-    | 23    | x component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 24    | y component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 25    | z component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
-    | 26    | x component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 27    | y component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 28    | z component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
-    | 29    | cumulative weight of inspected points                       | 0   | 1   | Scalar |
-    | 30    | dot product between nearest cluster and deputy's position   | -1  | 1   | Scalar |
+    | 3     | x component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 4     | y component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 5     | z component of the deputy's velocity                        | -inf| inf | Velocity (m/s) |
+    | 6     | x component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 7     | y component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 8     | z component of the deputy's angular velocity                | -inf| inf | Angular Velocity (rad/s) |
+    | 9     | x component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 10    | y component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 11    | z component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 12    | w component of the deputy's quaternion orientation          | -inf| inf | Orientation |
+    | 13    | sun angle                                                   | 0   | 2pi | Angle (rad) |
+    | 14    | number of inspected points                                  | 0   | 100 | Scalar |
+    | 15    | x component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 16    | y component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 17    | z component of unit vector pointing to the nearest cluster  | -1  | 1   | Scalar |
+    | 18    | x component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 19    | y component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 20    | z component of unit vector pointing to the priority vector  | -1  | 1   | Scalar |
+    | 21    | cumulative weight of inspected points                       | 0   | 1   | Scalar |
 
     ## State Transition Dynamics
 
@@ -439,100 +430,18 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
     def _get_obs(self, agent: typing.Any) -> np.ndarray:
         deputy = self.deputies[agent]
         obs = self.observation_space(agent).sample()
-
-        # Relative distance to chief rotated to deputy body-frame
-        orientation = Rotation.from_quat(deputy.orientation)
-        deputy_position = deputy.position
-        chief_position = self.chief.position
-        rotated_relative_dist = orientation.inv().apply(chief_position - deputy_position).astype(np.float64)
-        obs[:3] = rotated_relative_dist
-        # Relative distance magnorm representation
-        rotated_relative_dist_magnitude = np.linalg.norm(rotated_relative_dist)
-        rotated_relative_dist_unit_vector = rotated_relative_dist / rotated_relative_dist_magnitude
-        if rotated_relative_dist_magnitude < 1e-5:
-            rotated_relative_dist_magnitude = np.array([0.0], dtype=np.float64)
-            rotated_relative_dist_unit_vector = np.zeros_like(rotated_relative_dist_unit_vector, dtype=np.float64)
-        obs[3] = rotated_relative_dist_magnitude
-        obs[4:7] = rotated_relative_dist_unit_vector
-        # Relative velocity to chief rotated to deputy body-frame
-        orientation = Rotation.from_quat(deputy.orientation)
-        deputy_velocity = deputy.velocity
-        chief_velocity = self.chief.velocity
-        rotated_relative_vel = orientation.inv().apply(chief_velocity - deputy_velocity).astype(np.float64)
-        obs[7:10] = rotated_relative_vel
-        # Relative velocity magnorm representation
-        rotated_relative_vel_magnitude = np.linalg.norm(rotated_relative_vel)
-        rotated_relative_vel_unit_vector = rotated_relative_vel / rotated_relative_vel_magnitude
-        if rotated_relative_vel_magnitude < 1e-5:
-            rotated_relative_vel_magnitude = np.array([0.0], dtype=np.float64)
-            rotated_relative_vel_unit_vector = np.zeros_like(rotated_relative_vel_unit_vector, dtype=np.float64)
-        obs[10] = rotated_relative_vel_magnitude
-        obs[11:14] = rotated_relative_vel_unit_vector
-        # Angular Velocity
-        angular_velocity = deputy.angular_velocity
-        obs[14:17] = angular_velocity
-        # Hill's frame deputy camera orientation
-        # TODO: does camera orientation update? or is it relative to deputy like in corl?
-        # TODO: is there a better place to get initial camera direction? hardcoding x axis assumption
-        initial_camera_orientation = np.array([1.0, 0.0, 0.0], dtype=np.float64)
-        # initial_camera_orientation = Rotation.from_quat(deputy.camera._initial_orientation). # this return identity quaternion
-        rotated_camera_orientation = orientation.apply(initial_camera_orientation).astype(np.float64)
-        obs[17:20] = rotated_camera_orientation
-        # Deputy body-frame Y axis rotated to Hill's frame
-        # TODO: CoRL config comments don't seem to align w code
-        y_axis = np.array([0.0, 1.0, 0.0], dtype=np.float64)
-        rotated_y_axis = orientation.apply(y_axis).astype(np.float64)
-        obs[20:23] = rotated_y_axis # TODO: 3 dims still?
-        # Deputy body-frame Z axis rotated to Hill's frame
-        # TODO: CoRL config comments don't seem to align w code
-        z_axis = np.array([0.0, 0.0, 1.0], dtype=np.float64)
-        rotated_z_axis = orientation.apply(z_axis).astype(np.float64)
-        obs[23:26] = rotated_z_axis # TODO: 3 dims still?
-        # Uninspected points vector rotated to deputy body-frame
-        uninspected_points_vector = self.chief.inspection_points.kmeans_find_nearest_cluster(camera=deputy.camera, sun=self.sun)
-        rotated_uninspected_points_vector = orientation.inv().apply(uninspected_points_vector).astype(np.float64)
-        obs[26:29] = rotated_uninspected_points_vector
-        # Sun angle unit vector rotated to deputy body-frame
-        sun_vector = np.array([np.cos(self.sun.theta), -np.sin(self.sun.theta), 0.0], dtype=np.float64)
-        rotated_sun_vector = orientation.inv().apply(sun_vector).astype(np.float64)
-        obs[29:32] = rotated_sun_vector
-        # Priority vector rotated to deputy body-frame
-        rotated_priority_vector = orientation.inv().apply(self.chief.inspection_points.priority_vector).astype(np.float32)
-        obs[32:35] = rotated_priority_vector
-        # Inspected points score
-        obs[35] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=deputy)
-        # Dot product of uninspected points vectors and deputy position
-        normalized_dot_product = np.dot(uninspected_points_vector, deputy_position) / (np.linalg.norm(uninspected_points_vector) * np.linalg.norm(deputy_position) + 1e-5)
-        normalized_dot_product = np.clip(normalized_dot_product, -1.0, 1.0)
-        obs[36] = normalized_dot_product
-
-        # obs = self.observation_space(agent).sample()
-        # obs[:3] = deputy.position
-        # obs[3] = np.linalg.norm(deputy.position)
-        # obs[4:7] = np.abs(deputy.position)
-        # obs[7:10] = deputy.velocity
-        # obs[10] = np.linalg.norm(deputy.velocity)
-        # obs[11:14] = np.abs(deputy.velocity)
-        # obs[14:17] = deputy.angular_velocity
-        # obs[17:20] = Rotation.from_quat(deputy.orientation).as_euler("XYZ")
-        # obs[20] = np.dot(
-        #     Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-        #     (self.chief.position - deputy.position)
-        #     / np.linalg.norm(self.chief.position - deputy.position),
-        # )
-        # obs[21] = self.sun.theta
-        # obs[22] = self.chief.inspection_points.get_num_points_inspected(inspector_entity=deputy)
-        # obs[23:26] = self.chief.inspection_points.kmeans_find_nearest_cluster(
-        #     camera=deputy.camera, sun=self.sun
-        # )
-        # obs[26:29] = self.chief.inspection_points.priority_vector
-        # obs[29] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=deputy)
-        # obs[30] = np.dot(
-        #     Rotation.from_quat(deputy.camera.orientation).as_euler("XYZ"),
-        #     self.chief.inspection_points.kmeans_find_nearest_cluster(
-        #         camera=deputy.camera, sun=self.sun
-        #     ),
-        # )
+        obs[:3] = deputy.position
+        obs[3:6] = deputy.velocity
+        obs[6:9] = deputy.angular_velocity
+        obs[9:13] = deputy.orientation
+        obs[13] = self.sun.theta
+        obs[14] = self.chief.inspection_points.get_num_points_inspected(inspector_entity=deputy)
+        obs[15:18] = self.chief.inspection_points.kmeans_find_nearest_cluster(
+            camera=deputy.camera, sun=self.sun
+        )
+        obs[18:21] = self.chief.inspection_points.priority_vector
+        obs[21] = self.chief.inspection_points.get_total_weight_inspected(inspector_entity=deputy)
+        
         return obs
 
     def _get_info(self, agent: typing.Any) -> dict[str, typing.Any]:
@@ -558,17 +467,17 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
         self.reward_components[agent]["delta_v"] = delta_v_reward
         reward += delta_v_reward
 
-        # live_timestep_reward = r.live_timestep_reward(
-        #     t=self.simulator.sim_time, t_max=self.max_time
-        # )
-        # self.reward_components[agent]["live_timestep"] = live_timestep_reward
-        # reward += live_timestep_reward
+        live_timestep_reward = r.live_timestep_reward(
+            t=self.simulator.sim_time, t_max=3000.0
+        )
+        self.reward_components[agent]["live_timestep"] = live_timestep_reward
+        reward += live_timestep_reward
 
-        # facing_chief_reward = r.facing_chief_reward(
-        #     chief=self.chief, deputy=deputy, epsilon=0.01
-        # )
-        # self.reward_components[agent]["facing_chief"] = facing_chief_reward
-        # reward += facing_chief_reward
+        facing_chief_reward = r.facing_chief_reward(
+            chief=self.chief, deputy=deputy, epsilon=0.15
+        )
+        self.reward_components[agent]["facing_chief"] = facing_chief_reward
+        reward += facing_chief_reward
 
         # Sparse rewards
         success_reward = r.weighted_inspection_success_reward(
@@ -638,78 +547,32 @@ class WeightedSixDofMultiInspectionEnv(pettingzoo.ParallelEnv):
             np.concatenate(
                 (
                     [-np.inf] * 3,  # deputy position
-                    [-np.inf] * 4,  # deputy position magnorm
                     [-np.inf] * 3,  # deputy velocity
-                    [-np.inf] * 4,  # deputy velocity magnorm
                     [-np.inf] * 3,  # deputy angular velocity
-                    [-1] * 3,   # camera orientation
-                    [-1] * 3,   # x axis
-                    [-1] * 3,   # z axis
-                    [-1] * 3,   # uninspected points
-                    [-1] * 3,   # sun angle vector
-                    [-1] * 3,   # priority vector
-                    [0],  # inspected points score
-                    [-1],   # dot product of uninspected points and deputy position
+                    [-2 * np.pi] * 4,  # deputy orientation (quaternion)
+                    [0],  # sun angle
+                    [0],  # number of inspected points
+                    [-1] * 3,  # nearest cluster unit vector
+                    [-1] * 3,  # priority vector unit vector
+                    [0],  # cumulative weight of inspected points
                 )
             ),
             np.concatenate(
                 (
                     [np.inf] * 3,  # deputy position
-                    [np.inf] * 4,  # deputy position magnorm
                     [np.inf] * 3,  # deputy velocity
-                    [np.inf] * 4,  # deputy velocity magnorm
                     [np.inf] * 3,  # deputy angular velocity
-                    [1] * 3,   # camera orientation
-                    [1] * 3,   # x axis
-                    [1] * 3,   # z axis
-                    [1] * 3,   # uninspected points
-                    [1] * 3,   # sun angle vector
-                    [1] * 3,   # priority vector
-                    [np.inf],  # inspected points score
-                    [1],   # dot product of uninspected points and deputy position
+                    [2 * np.pi] * 4,  # deputy orientation
+                    [2 * np.pi],  # sun angle
+                    [100],  # number of inspected points
+                    [1] * 3,  # nearest cluster unit vector
+                    [1] * 3,  # priority vector unit vector
+                    [1],  # cumulative weight of inspected points
                 )
             ),
-            shape=(37, ),
+            shape=(22,),
             dtype=np.float64,
         )
-        # return gym.spaces.Box(
-        #     np.concatenate(
-        #         (
-        #             [-np.inf] * 3,  # deputy position
-        #             [-np.inf] * 4,  # deputy position magnorm
-        #             [-np.inf] * 3,  # deputy velocity
-        #             [-np.inf] * 4,  # deputy velocity magnorm
-        #             [-np.inf] * 3,  # deputy angular velocity
-        #             [-2 * np.pi] * 3,  # deputy orientation (euler)
-        #             [-1],  # facing chief dot product
-        #             [0],  # sun angle
-        #             [0],  # number of inspected points
-        #             [-1] * 3,  # nearest cluster unit vector
-        #             [-1] * 3,  # priority vector unit vector
-        #             [0],  # cumulative weight of inspected points
-        #             [-1],  # facing cluster dot product
-        #         )
-        #     ),
-        #     np.concatenate(
-        #         (
-        #             [np.inf] * 3,  # deputy position
-        #             [np.inf] * 4,  # deputy position magnorm
-        #             [np.inf] * 3,  # deputy velocity
-        #             [np.inf] * 4,  # deputy velocity magnorm
-        #             [np.inf] * 3,  # deputy angular velocity
-        #             [2 * np.pi] * 3,  # deputy orientation
-        #             [1],  # facing chief dot product
-        #             [2 * np.pi],  # sun angle
-        #             [100],  # number of inspected points
-        #             [1] * 3,  # nearest cluster unit vector
-        #             [1] * 3,  # priority vector unit vector
-        #             [1],  # cumulative weight of inspected points
-        #             [1],  # facing cluster dot product
-        #         )
-        #     ),
-        #     shape=(31,),
-        #     dtype=np.float64,
-        # )
 
     # Pylint warns that self will never be garbage collected due to the use of the lru_cache, but the environment
     # should never be garabage collected when used

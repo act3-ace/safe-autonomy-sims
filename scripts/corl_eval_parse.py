@@ -155,44 +155,28 @@ def parse_weighted_sixdof_inspection(episode_artifact):
     # weighted six dof inspection v0
     for step_info in ea.steps:
         # Collect obs
-        obs0_dict = step_info.agents['blue0_ctrl'].observations
-        if obs0_dict:
-            relative_chief_pos_local_ref = obs0_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref"]["direct_observation"].value
-            relative_chief_pos_local_ref_mag = obs0_dict["Obs_Sensor_RelativeChiefPosition_Local_Ref_MagNorm3D"]["direct_observation"].value
-            relative_chief_vel_local_ref = obs0_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref"]["direct_observation"].value
-            relative_chief_vel_local_ref_mag = obs0_dict["Obs_Sensor_RelativeChiefVelocity_Local_Ref_MagNorm3D"]["direct_observation"].value
-            # quaternion = obs0_dict["Obs_Sensor_Quaternion"]["direct_observation"].value
-            angular_vel = obs0_dict["Obs_Sensor_AngularVelocity"]["direct_observation"].value
-            orientation_unit_vector_local_ref = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref"]["direct_observation"].value
-            # x_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_X-Axis_Local_Ref"]["direct_observation"].value
-            y_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_Y-Axis_Local_Ref"]["direct_observation"].value
-            z_axis_local_ref = obs0_dict["Coordinate_Axis_Glue_Z-Axis_Local_Ref"]["direct_observation"].value
-            # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos = obs0_dict["Obs_Sensor_OrientationUnitVector_Local_Ref_DotProduct_Obs_Sensor_RelativeChiefPosition"]["direct_observation"].value
-            # inspected_points = obs0_dict["Obs_Sensor_InspectedPoints"]["direct_observation"].value
-            uninspected_points_local_ref = obs0_dict["Obs_Sensor_UninspectedPoints_Local_Ref"]["direct_observation"].value
-            sun_angle_unit_vector_local_ref = obs0_dict["Obs_Sensor_SunAngle_AngleToUnitVector_Local_Ref"]["direct_observation"].value
-            priority_vec_local_ref = obs0_dict["Obs_Sensor_PriorityVector_Local_Ref"]["direct_observation"].value
-            inspected_points_score = obs0_dict["Obs_Sensor_InspectedPointsScore"]["direct_observation"].value
-            uninspected_points_dotproduct_position = obs0_dict["Obs_Sensor_UninspectedPoints_DotProduct_Obs_Sensor_Position"]["direct_observation"].value
+        sensors = step_info.platforms[0]['sensors']
+        if sensors:
+            position = sensors['Sensor_Position']['measurement'].value
+            velocity = sensors['Sensor_Velocity']['measurement'].value
+            angular_velocity = sensors['Sensor_AngularVelocity']['measurement'].value
+            orientation = sensors['Sensor_Quaternion']['measurement'].value
+            sun_angle = sensors['Sensor_SunAngle']['measurement'].value
+            points = sensors['Sensor_InspectedPoints']['measurement'].value
+            cluster = sensors['Sensor_UninspectedPoints']['measurement'].value
+            priority_vector = sensors['Sensor_PriorityVector']['measurement'].value
+            inspection_weight = sensors['Sensor_InspectedPointsScore']['measurement'].value
 
             obs0 = np.concatenate((
-                relative_chief_pos_local_ref, 
-                relative_chief_pos_local_ref_mag, 
-                relative_chief_vel_local_ref, 
-                relative_chief_vel_local_ref_mag, 
-                # quaternion, 
-                angular_vel, 
-                orientation_unit_vector_local_ref, 
-                # x_axis_local_ref, 
-                y_axis_local_ref,
-                z_axis_local_ref,
-                # orientation_unit_vector_local_ref_dotproduct_relative_chief_pos,
-                # inspected_points,
-                uninspected_points_local_ref,
-                sun_angle_unit_vector_local_ref,
-                priority_vec_local_ref,
-                inspected_points_score,
-                uninspected_points_dotproduct_position,
+                position, 
+                velocity, 
+                angular_velocity, 
+                orientation, 
+                sun_angle, 
+                points, 
+                cluster,
+                priority_vector,
+                inspection_weight,
                 ))
         else:
             obs0 = None
@@ -459,7 +443,7 @@ def parse_weighted_multiagent_sixdof_inspection(episode_artifact):
 
     corl_episode_info["IC"] = episode_artifact.initial_state
 
-    # multiagent six dof inspection v0
+    # six dof inspection v0
     for step_info in ea.steps:
         # Collect obs
         obs0_dict = step_info.agents['blue0_ctrl'].observations
@@ -654,7 +638,7 @@ def parse_weighted_multiagent_sixdof_inspection(episode_artifact):
 
 
 # Use parsing function appropriate to given task
-corl_episode_info = parse_weighted_multiagent_sixdof_inspection(ea)
+corl_episode_info = parse_weighted_sixdof_inspection(ea)
 
 # Store data to disk
 with open('corl_evaluation_episode_data.pkl', 'wb') as file:

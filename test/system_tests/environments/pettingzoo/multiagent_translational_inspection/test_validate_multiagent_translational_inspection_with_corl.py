@@ -54,7 +54,7 @@ def fixture_initial_conditions():
     return ic
 
 
-@pytest.mark.integration
+@pytest.mark.system_test
 def test_validate_multiagent_inspection_pettingzoo_with_corl(corl_data, onnx_model_path, initial_conditions):
     # Dynamic env class definition to insert initial conditions
     deputies = [f"deputy_{i}" for i in range(3)]
@@ -155,7 +155,6 @@ def test_validate_multiagent_inspection_pettingzoo_with_corl(corl_data, onnx_mod
 
     # check values
     for i, gym_step_action_dict in enumerate(control_array):
-        print(i)
         if gym_step_action_dict['deputy_0'] is not None:
             assert np.allclose(corl_actions0[i], gym_step_action_dict['deputy_0'], rtol=1e-03, atol=1e-08)
         if gym_step_action_dict['deputy_1'] is not None:

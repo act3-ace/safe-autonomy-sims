@@ -57,7 +57,7 @@ def fixture_onxx_model_path():
     return path
 
 
-@pytest.mark.integration
+@pytest.mark.system_test
 def test_validate_weighted_inspection_gym_with_corl(corl_data, initial_conditions, onxx_model_path):
     # Dynamic env class definition to insert initial conditions
 
