@@ -477,6 +477,8 @@ class WeightedSixDofInspectionEnv(gym.Env):
             frame_rate=0.1,
             inspectors=[self.deputy],
             targets=[self.chief],
+            # Toggle for illumination
+            # sun=None,
             sun=self.sun,
         )
 
